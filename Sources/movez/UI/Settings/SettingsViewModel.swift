@@ -1,4 +1,5 @@
 import AppKit
+import Combine
 import SwiftUI
 
 /// Everything the settings window can do, in one place.
@@ -20,6 +21,7 @@ final class SettingsViewModel: ObservableObject {
     let library: MovementLibrary
     let launchAtLogin: LaunchAtLoginService
     private let onChange: () -> Void
+    private var debugCancellables: Set<AnyCancellable> = []
 
     @Published var openSheet: Sheet?
     /// The working hours being edited. Nothing is written until Apply passes validation.
@@ -28,6 +30,9 @@ final class SettingsViewModel: ObservableObject {
     @Published var librarySearch = ""
     @Published var libraryBucket: Bucket?
     @Published var launchAtLoginError: String?
+    /// The debug tools, once they are attached. Absent in contexts with no coordinator.
+    @Published var debug: DebugState?
+    var debugActions = DebugActions()
 
     init(
         settings: SettingsStore,
@@ -273,6 +278,18 @@ final class SettingsViewModel: ObservableObject {
 
     func setDebugExpanded(_ expanded: Bool) {
         settings.debugExpanded = expanded
+        objectWillChange.send()
+    }
+
+    /// Connects the debug tools to the window. Everything the section draws flows through
+    /// `debug`, so the section itself never reaches for a coordinator.
+    func attach(debug viewModel: DebugViewModel) {
+        debugActions = viewModel.actions
+        debug = viewModel.state
+        viewModel.$state
+            .receive(on: RunLoop.main)
+            .sink { [weak self] state in self?.debug = state }
+            .store(in: &debugCancellables)
     }
 
     // MARK: - Bindings

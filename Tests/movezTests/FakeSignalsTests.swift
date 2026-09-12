@@ -5,9 +5,11 @@ import XCTest
 final class FakeSignalsTests: XCTestCase {
     func testEveryInjectorProducesItsEvent() {
         let now = SchedulerHarness.mondayMorning
-        XCTAssertEqual(SignalInjector.idle.event(now: now), .idle(seconds: 200))
+        XCTAssertEqual(SignalInjector.idleFour.event(now: now), .idle(seconds: 240))
+        XCTAssertEqual(SignalInjector.idleSeven.event(now: now), .idle(seconds: 420))
         XCTAssertEqual(SignalInjector.sleep.event(now: now), .sleep)
         XCTAssertEqual(SignalInjector.wake.event(now: now), .wake(gapSeconds: 120))
+        XCTAssertEqual(SignalInjector.wakeFiveHours.event(now: now), .wake(gapSeconds: 5 * 3600))
         XCTAssertEqual(SignalInjector.lock.event(now: now), .lock)
         XCTAssertEqual(SignalInjector.unlock.event(now: now), .unlock(gapSeconds: 15))
         XCTAssertEqual(SignalInjector.micOn.event(now: now), .signals(SignalSnapshot(microphoneActive: true)))
@@ -16,7 +18,7 @@ final class FakeSignalsTests: XCTestCase {
         XCTAssertEqual(SignalInjector.fullscreenOn.event(now: now), .signals(SignalSnapshot(fullscreenActive: true)))
         XCTAssertEqual(SignalInjector.simulateFourHourGap.event(now: now), .wake(gapSeconds: 4 * 3600))
         XCTAssertNil(SignalInjector.fireMicro.event(now: now))
-        XCTAssertEqual(SignalInjector.allCases.count, 14)
+        XCTAssertEqual(SignalInjector.allCases.count, 16)
         XCTAssertFalse(SignalInjector.allCases.contains { $0.label.isEmpty })
     }
 

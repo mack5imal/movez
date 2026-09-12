@@ -325,3 +325,70 @@ extension SnapshotFixtures {
         return viewModel
     }
 }
+
+/// The debug tools with something in them: a morning's worth of transitions, a held microphone,
+/// and the clock running at sixty times.
+@MainActor
+extension SnapshotFixtures {
+    /// 09:00 on the fixture's Friday, which every transition below hangs off.
+    static let debugMorning = menuDate(month: 9, day: 11, hour: 9)
+
+    static func debugState() -> DebugState {
+        var snapshot = SchedulerSnapshot(now: debugMorning, dayKey: "2026-09-11")
+        snapshot.state = .sitting
+        snapshot.nextFullDueAt = debugMorning.addingTimeInterval(55 * 60)
+        snapshot.nextMicroDueAt = debugMorning.addingTimeInterval(30 * 60)
+        snapshot.lastCompletedBreakAt = debugMorning.addingTimeInterval(-5 * 60)
+        snapshot.doneToday = 3
+        snapshot.snoozedToday = 1
+        snapshot.skipsToday = 1
+        for transition in debugTransitions { snapshot.transitions.append(transition) }
+
+        var state = DebugState()
+        state.timeScale = 60
+        state.rows = DebugViewModel.rows(DebugViewModel.InspectorInput(
+            snapshot: snapshot,
+            now: debugMorning.addingTimeInterval(23 * 60),
+            snoozesLeft: 2,
+            polling: true,
+            pollCount: 412,
+            overrides: "mic=on"
+        ))
+        state.transitions = snapshot.transitions.newestFirst
+            .map { $0.line(formatter: TransitionLog.timeFormatter) }
+        return state
+    }
+
+    /// Nine transitions: a morning that ran, was interrupted by a call, and recovered.
+    static var debugTransitions: [Transition] {
+        func step(_ minutes: Double, _ from: SchedulerState, _ to: SchedulerState, _ reason: String) -> Transition {
+            Transition(at: debugMorning.addingTimeInterval(minutes * 60), from: from, to: to, reason: reason)
+        }
+        let anchor = debugMorning
+        let pending = SchedulerState.pendingFull(since: anchor)
+        let headsUp = SchedulerState.headsUp(startedAt: anchor, deferredSince: nil)
+        let breaking = SchedulerState.fullBreak(startedAt: anchor)
+        let countIn = SchedulerState.microCountIn(startedAt: anchor)
+        let running = SchedulerState.microRunning(startedAt: anchor)
+        let call = SchedulerState.suppressed(since: anchor, deferredFullDue: nil)
+
+        return [
+            step(0, .offHours, .sitting, "working hours started"),
+            step(55, .sitting, pending, "full break due"),
+            step(55.2, pending, headsUp, "input paused for 12 s"),
+            step(56.2, headsUp, breaking, "heads-up elapsed"),
+            step(61, breaking, .sitting, "break completed"),
+            step(91, .sitting, countIn, "micro-break due"),
+            step(91.5, countIn, running, "micro-break started"),
+            step(92.5, running, .sitting, "micro-break finished"),
+            step(104, .sitting, call, "call or screen share")
+        ]
+    }
+
+    static func debugSettingsViewModel() -> SettingsViewModel? {
+        guard let viewModel = settingsViewModel() else { return nil }
+        viewModel.settings.debugExpanded = true
+        viewModel.debug = debugState()
+        return viewModel
+    }
+}

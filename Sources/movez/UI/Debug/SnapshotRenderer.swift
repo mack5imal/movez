@@ -26,6 +26,7 @@ enum SnapshotSurface: String, CaseIterable {
     case settingsLibrary = "settings-library"
     case settingsExceptions = "settings-exceptions"
     case settingsCustom = "settings-custom"
+    case debug
 
     /// A 1440×900 display, which is what the handoff's overlay screenshots are drawn on.
     static let screen = CGSize(width: 1440, height: 900)
@@ -45,6 +46,8 @@ enum SnapshotSurface: String, CaseIterable {
         case .menuIcon: return CGSize(width: 880, height: 260)
         case .settings, .settingsHours, .settingsLibrary, .settingsExceptions, .settingsCustom:
             return SettingsScreen.size
+        case .debug:
+            return CGSize(width: SettingsScreen.size.width, height: 1_500)
         case .overlayFull, .overlayCollapsed, .overlaySide, .overlayEnd, .overlayOtherDisplay:
             return Self.screen
         }
@@ -93,13 +96,15 @@ enum SnapshotRenderer {
             viewModel = SnapshotFixtures.settingsViewModel(sheet: .exceptions)
         case .settingsCustom:
             viewModel = SnapshotFixtures.settingsViewModel(preset: .custom)
+        case .debug:
+            viewModel = SnapshotFixtures.debugSettingsViewModel()
         default:
             return nil
         }
         guard let viewModel else {
             return AnyView(MovezText("The bundled movement library did not load.", MovezType.panelTitle))
         }
-        return AnyView(SettingsScreen(viewModel: viewModel))
+        return AnyView(SettingsScreen(viewModel: viewModel, height: surface.size.height))
     }
 
     /// The gallery and the floating panels.

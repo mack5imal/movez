@@ -69,6 +69,8 @@ final class AppCoordinator: ObservableObject {
     private var sink: EffectSink
     /// The real system monitors, attached at launch and absent in tests.
     var aggregator: SignalAggregator?
+    /// Debug values held in front of the real sources. Empty unless an injector is pressed.
+    let signalOverrides = SignalOverrides()
     var powerMonitor: PowerMonitor?
     private var tickTimer: DispatchSourceTimer?
     private var wakeCheckTimer: DispatchSourceTimer?
@@ -136,10 +138,10 @@ final class AppCoordinator: ObservableObject {
     /// Wires the real macOS monitors in. Tests drive the scheduler directly and never call this.
     func attachSystemSignals() {
         let aggregator = SignalAggregator(
-            idle: IdleMonitor(),
-            mic: MicrophoneMonitor(),
-            capture: ScreenCaptureMonitor(),
-            fullscreen: FullscreenMonitor(),
+            idle: OverridingIdleSource(IdleMonitor(), overrides: signalOverrides),
+            mic: OverridingMicSource(MicrophoneMonitor(), overrides: signalOverrides),
+            capture: OverridingCaptureSource(ScreenCaptureMonitor(), overrides: signalOverrides),
+            fullscreen: OverridingFullscreenSource(FullscreenMonitor(), overrides: signalOverrides),
             clock: clock,
             settings: settings,
             dispatch: { [weak self] event in self?.inject(event) }
@@ -203,6 +205,7 @@ final class AppCoordinator: ObservableObject {
 
     private func applyTimeScale() {
         (clock as? SystemClock)?.timeScale = max(1, settings.debugTimeScale)
+        aggregator?.restartIfRunning()
     }
 
     // MARK: - Timers

@@ -75,11 +75,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
             coordinator.start()
             self.coordinator = coordinator
             menuBar = MenuBarViewModel(coordinator: coordinator)
-            settingsWindow = SettingsWindowController(viewModel: SettingsViewModel(
+            let settingsViewModel = SettingsViewModel(
                 settings: settings,
                 library: library,
                 onChange: { [weak coordinator] in coordinator?.settingsChanged() }
-            ))
+            )
+            settingsViewModel.attach(debug: DebugViewModel(coordinator: coordinator))
+            settingsWindow = SettingsWindowController(viewModel: settingsViewModel)
         } catch {
             presentFatal(error)
         }

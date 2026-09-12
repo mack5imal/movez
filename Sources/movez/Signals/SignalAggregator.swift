@@ -49,10 +49,15 @@ final class SignalAggregator {
 
     // MARK: - Lifecycle
 
+    /// How often the sources are sampled, which the debug time scale speeds up.
+    var pollInterval: TimeInterval {
+        max(Self.minimumPollSeconds, Self.pollSeconds / max(1, settings.debugTimeScale))
+    }
+
     func start() {
         guard timer == nil else { return }
         lastPollAt = clock.now
-        let interval = max(Self.minimumPollSeconds, Self.pollSeconds / max(1, settings.debugTimeScale))
+        let interval = pollInterval
         let timer = DispatchSource.makeTimerSource(queue: .main)
         timer.schedule(deadline: .now() + interval, repeating: interval)
         timer.setEventHandler { [weak self] in self?.poll() }
@@ -71,6 +76,14 @@ final class SignalAggregator {
     /// Called by the coordinator when the scheduler's polling requirement changes.
     func setPolling(_ enabled: Bool) {
         if enabled { start() } else { stop() }
+    }
+
+    /// Picks up a new `pollInterval` — the debug time scale changing is the only thing that moves
+    /// it, and a 60x session polled every two seconds would miss most of what it is meant to see.
+    func restartIfRunning() {
+        guard isRunning else { return }
+        stop()
+        start()
     }
 
     // MARK: - Polling

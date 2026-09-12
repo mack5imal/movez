@@ -12,6 +12,10 @@ struct SettingsScreen: View {
     static let size = CGSize(width: 760, height: 700)
     static let titleBarHeight: CGFloat = 52
 
+    /// The window is a fixed 700 tall; only the debug snapshot renders it longer, so the whole
+    /// expanded section can be seen at once instead of scrolled.
+    var height: CGFloat = SettingsScreen.size.height
+
     var body: some View {
         ZStack {
             Tokens.panelSolid.color
@@ -25,7 +29,7 @@ struct SettingsScreen: View {
                 sheetContent(sheet)
             }
         }
-        .frame(width: Self.size.width, height: Self.size.height)
+        .frame(width: Self.size.width, height: height)
     }
 
     private var titleBar: some View {
@@ -65,7 +69,13 @@ struct SettingsView: View {
                 general
                 if settings.debugExpanded {
                     sectionRule
-                    SettingsSection(label: "Debug") { DebugContainer() }
+                    SettingsSection(label: "Debug") {
+                        if let debug = viewModel.debug {
+                            DebugSection(state: debug, actions: viewModel.debugActions)
+                        } else {
+                            DebugContainer()
+                        }
+                    }
                 }
             }
             .padding(EdgeInsets(top: 24, leading: 32, bottom: 24, trailing: 32))
@@ -195,7 +205,8 @@ struct SettingsView: View {
     }
 }
 
-/// The box the debug tools are built into. Empty until they exist.
+/// What the disclosure shows when there are no debug tools to show — a snapshot render, or the
+/// window before the coordinator exists.
 struct DebugContainer: View {
     var body: some View {
         RoundedRectangle(cornerRadius: Tokens.Radius.settings, style: .continuous)
