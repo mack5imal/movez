@@ -34,6 +34,13 @@ struct BreakRecord: Codable, Equatable, Identifiable {
     var id: String { "\(at.timeIntervalSince1970)-\(routineName)" }
 }
 
+/// A day the user actually used movez on, and what it came to.
+struct RecordedDay: Equatable {
+    var key: String
+    var date: Date
+    var stats: DailyStats
+}
+
 /// The counters the menu bar shows for a day.
 struct DailyStats: Codable, Equatable {
     var done = 0
@@ -177,10 +184,10 @@ final class HistoryStore {
     }
 
     /// The most recent day with any break recorded — what the off-hours menu shows.
-    func lastRecordedDay() -> (key: String, stats: DailyStats)? {
+    func lastRecordedDay() -> RecordedDay? {
         guard let record = data.breakRecords.last else { return nil }
         let key = DayKey.key(for: record.at, calendar: calendar)
-        return (key, data.days[key] ?? .empty)
+        return RecordedDay(key: key, date: record.at, stats: data.days[key] ?? .empty)
     }
 
     /// Which Diff-3 movements the user has earned.

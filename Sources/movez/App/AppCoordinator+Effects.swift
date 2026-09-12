@@ -262,15 +262,12 @@ extension AppCoordinator {
         state.secondsUntilBreak = scheduler.snapshot.secondsUntilFullBreak(at: now)
         state.nextBreakAt = scheduler.snapshot.nextFullDueAt
         state.nextRoutineSubtitle = nextRoutinePreview?.subtitle ?? ""
-        let stats = history.stats(on: now)
-        state.statsLine = "Today · \(stats.summary)"
-        state.longestBoutLine = "Longest sitting bout \(AppCoordinator.duration(stats.longestBoutSeconds))"
         state.streak = history.streak(on: now)
         return state
     }
 
     /// "1 h 12 m" / "32 m" — the phrasing the menu uses.
-    static func duration(_ seconds: Int) -> String {
+    nonisolated static func duration(_ seconds: Int) -> String {
         let minutes = max(0, seconds) / 60
         guard minutes >= 60 else { return "\(minutes) m" }
         return "\(minutes / 60) h \(minutes % 60) m"

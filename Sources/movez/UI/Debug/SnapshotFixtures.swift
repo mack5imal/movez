@@ -227,3 +227,60 @@ extension SnapshotFixtures {
         )
     }()
 }
+
+/// The menu-bar states the snapshots render, frozen at the moments the handoff draws:
+/// 32 minutes to a Hip reset, a 42-minute pause, and a Saturday.
+extension SnapshotFixtures {
+    static let menuStats = DailyStats(done: 3, snoozed: 1, skipped: 1, longestBoutSeconds: 72 * 60)
+    static let menuOffHoursStats = DailyStats(done: 6, snoozed: 2, skipped: 1, longestBoutSeconds: 95 * 60)
+
+    static func menuSitting() -> MenuBarState {
+        var state = MenuBarState()
+        state.mode = .sitting
+        state.minutesRemaining = 32
+        // 32 of a 55-minute bout left.
+        state.elapsedFraction = 1 - 32.0 / 55
+        state.title = MenuBarState.title(mode: .sitting, minutesRemaining: 32)
+        state.subtitle = "\(routineName) · \(routineFocus)"
+        state.stats = MenuBarState.statsLine(day: "Today", stats: menuStats)
+        state.longestBout = MenuBarState.longestBoutLine(seconds: menuStats.longestBoutSeconds)
+        return state
+    }
+
+    static func menuPaused() -> MenuBarState {
+        var state = MenuBarState()
+        state.mode = .paused
+        state.minutesRemaining = 42
+        state.title = MenuBarState.title(mode: .paused, minutesRemaining: 42)
+        state.subtitle = MenuBarState.pausedSubtitle(resumesAt: menuResumeAt, remainingMinutes: 23)
+        state.stats = MenuBarState.statsLine(day: "Today", stats: menuStats)
+        state.longestBout = MenuBarState.longestBoutLine(seconds: menuStats.longestBoutSeconds)
+        return state
+    }
+
+    static func menuOffHours() -> MenuBarState {
+        var state = MenuBarState()
+        state.mode = .offHours
+        state.title = MenuBarState.title(mode: .offHours, minutesRemaining: 0)
+        state.subtitle = MenuBarState.offHoursSubtitle(nextStart: menuMondayNine, now: menuSaturday)
+        state.stats = MenuBarState.statsLine(day: "Friday", stats: menuOffHoursStats)
+        state.longestBout = MenuBarState.longestBoutLine(seconds: menuOffHoursStats.longestBoutSeconds)
+        return state
+    }
+
+    /// 15:00, when the paused countdown picks up again.
+    static let menuResumeAt = menuDate(month: 9, day: 11, hour: 15)
+    /// Saturday 12 September 2026, and the Monday morning that follows it.
+    static let menuSaturday = menuDate(month: 9, day: 12, hour: 10, minute: 41)
+    static let menuMondayNine = menuDate(month: 9, day: 14, hour: 9)
+
+    static func menuDate(month: Int, day: Int, hour: Int, minute: Int = 0) -> Date {
+        var components = DateComponents()
+        components.year = 2026
+        components.month = month
+        components.day = day
+        components.hour = hour
+        components.minute = minute
+        return Calendar.current.date(from: components) ?? panelInstant
+    }
+}

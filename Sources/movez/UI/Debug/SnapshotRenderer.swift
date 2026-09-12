@@ -17,12 +17,18 @@ enum SnapshotSurface: String, CaseIterable {
     case microCountIn = "micro-countin"
     case microRunning = "micro-running"
     case toast
+    case menuSitting = "menu-sitting"
+    case menuPaused = "menu-paused"
+    case menuOffHours = "menu-offhours"
+    case menuIcon = "menu-icon"
 
     /// A 1440×900 display, which is what the handoff's overlay screenshots are drawn on.
     static let screen = CGSize(width: 1440, height: 900)
     /// Enough of a desktop around a floating panel to show where on it the panel sits.
     static let panelCanvas = CGSize(width: 680, height: 420)
     static let toastCanvas = CGSize(width: 680, height: 320)
+    /// Enough desktop to show the menu hanging from its bar.
+    static let menuCanvas = CGSize(width: 560, height: 460)
 
     /// The point size the surface is rendered at.
     var size: CGSize {
@@ -30,6 +36,8 @@ enum SnapshotSurface: String, CaseIterable {
         case .gallery: return CGSize(width: 1400, height: 2900)
         case .headsUp, .headsUpDeferred, .microCountIn, .microRunning: return Self.panelCanvas
         case .toast: return Self.toastCanvas
+        case .menuSitting, .menuPaused, .menuOffHours: return Self.menuCanvas
+        case .menuIcon: return CGSize(width: 880, height: 260)
         case .overlayFull, .overlayCollapsed, .overlaySide, .overlayEnd, .overlayOtherDisplay:
             return Self.screen
         }
@@ -61,7 +69,7 @@ enum SnapshotRenderer {
     static let scale: CGFloat = 2
 
     static func view(for surface: SnapshotSurface) -> AnyView {
-        panelView(for: surface) ?? overlayView(for: surface)
+        panelView(for: surface) ?? menuView(for: surface) ?? overlayView(for: surface)
     }
 
     /// The gallery and the floating panels.
@@ -79,6 +87,22 @@ enum SnapshotRenderer {
             return AnyView(PanelSnapshot(viewModel: SnapshotFixtures.microRunning()))
         case .toast:
             return AnyView(PanelSnapshot(viewModel: SnapshotFixtures.awayToast(), placement: .bottomRight))
+        default:
+            return nil
+        }
+    }
+
+    /// The menu-bar dropdown in each of its three moods, and the glyph itself.
+    private static func menuView(for surface: SnapshotSurface) -> AnyView? {
+        switch surface {
+        case .menuSitting:
+            return AnyView(MenuSnapshot(state: SnapshotFixtures.menuSitting()))
+        case .menuPaused:
+            return AnyView(MenuSnapshot(state: SnapshotFixtures.menuPaused()))
+        case .menuOffHours:
+            return AnyView(MenuSnapshot(state: SnapshotFixtures.menuOffHours()))
+        case .menuIcon:
+            return AnyView(MenuIconStrip())
         default:
             return nil
         }

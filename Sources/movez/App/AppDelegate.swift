@@ -5,9 +5,11 @@ import SwiftUI
 /// lifetime, and the head-less command-line entry points used by the build and verification
 /// harnesses.
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     private let arguments = LaunchArguments.current
     private(set) var coordinator: AppCoordinator?
+    /// Published so the menu-bar scene picks the view model up the moment the coordinator exists.
+    @Published private(set) var menuBar: MenuBarViewModel?
 
     func applicationWillFinishLaunching(_ notification: Notification) {
         MovezFont.register()
@@ -71,6 +73,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             attachUI(to: coordinator, settings: settings)
             coordinator.start()
             self.coordinator = coordinator
+            menuBar = MenuBarViewModel(coordinator: coordinator)
         } catch {
             presentFatal(error)
         }

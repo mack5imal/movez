@@ -29,8 +29,6 @@ struct MenuState: Equatable {
     var nextBreakAt: Date?
     var pausedUntil: Date?
     var nextRoutineSubtitle: String = ""
-    var statsLine: String = "Today · 0 done · 0 snoozed · 0 skipped"
-    var longestBoutLine: String = "Longest sitting bout 0 m"
     var streak: Int = 0
 }
 
