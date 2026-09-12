@@ -1,10 +1,13 @@
 import AppKit
 import SwiftUI
 
-/// Owns process-level concerns: font registration, accessory activation policy, and the
-/// head-less command-line entry points used by the build and verification harnesses.
+/// Owns process-level concerns: font registration, accessory activation policy, the coordinator's
+/// lifetime, and the head-less command-line entry points used by the build and verification
+/// harnesses.
+@MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let arguments = LaunchArguments.current
+    private(set) var coordinator: AppCoordinator?
 
     func applicationWillFinishLaunching(_ notification: Notification) {
         MovezFont.register()
@@ -12,7 +15,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        guard arguments.isHeadless else { return }
+        guard arguments.isHeadless else {
+            startCoordinator()
+            return
+        }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [arguments] in
             if arguments.smoke {
                 // Intentional stdout line: the build harness asserts on it.
@@ -23,5 +29,44 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    func applicationWillTerminate(_ notification: Notification) {
+        coordinator?.stop()
+    }
+
     func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool { true }
+
+    /// Builds the coordinator from the bundled library and the user's saved state. A library that
+    /// will not load is fatal and loud: an app that quietly serves no movements is worse than one
+    /// that says why it cannot.
+    private func startCoordinator() {
+        do {
+            let library = try LibraryLoader.loadBundled()
+            let settings = SettingsStore()
+            let historyStore = try? FileHistoryStore.historyFile()
+            let snapshotStore = try? FileSnapshotStore.stateFile()
+            let coordinator = AppCoordinator(
+                library: library,
+                settings: settings,
+                history: historyStore.map { HistoryStore(store: $0) } ?? HistoryStore(),
+                clock: SystemClock(),
+                snapshotStore: snapshotStore
+            )
+            coordinator.start()
+            self.coordinator = coordinator
+        } catch {
+            presentFatal(error)
+        }
+    }
+
+    private func presentFatal(_ error: Error) {
+        let alert = NSAlert()
+        alert.messageText = "movez could not start"
+        alert.informativeText = error.localizedDescription
+        alert.alertStyle = .critical
+        alert.addButton(withTitle: "Quit")
+        NSApp.setActivationPolicy(.regular)
+        NSApp.activate(ignoringOtherApps: true)
+        alert.runModal()
+        NSApp.terminate(nil)
+    }
 }
