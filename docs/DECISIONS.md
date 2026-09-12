@@ -81,6 +81,14 @@ Sources of truth, in order: `product-brief-v1.md`, `scheduler-research-v1.md`,
     hours shifts the whole bout forward by its length; four hours or more starts the day over. It
     is never credited as a break: a running app can tell from the idle clock whether the user was
     at the keyboard, and an app that was not running cannot.
+20c. **The streak and "Today" stay on the calendar day, and reset at midnight mid-session.**
+    `HistoryStore` buckets every break by its own calendar day and the streak counts consecutive
+    completed breaks within one of them, so someone working 22:00–04:00 sees `Today: 0 · streak 0`
+    at 00:01 having just done three breaks. Considered and declined, not deferred: the scheduling
+    underneath is correct — 20a keeps the countdown intact across the boundary — and this is the
+    display disagreeing with it, not the app misbehaving. Aligning it would mean changing the
+    on-disk history format, the streak calculation and every surface that reads them, which is a
+    great deal of machinery for a number that is only ever glanced at.
 21. **Nothing is polled while paused or off hours.** The signal monitors stop outright rather than
     sampling into a void; a thirty-second wake-check notices when the pause runs out.
 22. **A break counts as done at half the movements or half the time** (research §4.11).
