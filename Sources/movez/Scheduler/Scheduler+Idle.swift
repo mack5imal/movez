@@ -7,16 +7,12 @@ import Foundation
 /// full break. Both credits are reversible for six seconds, because the app cannot tell a walk to
 /// the kitchen from a long read on paper.
 extension Scheduler {
-    /// The states an idle stretch can interrupt. A running full break is not one of them: the
-    /// user standing still during a stretch is the point.
-    static let idleInterruptible: [String] = ["sitting", "pending_full", "heads_up", "micro_count_in", "micro_running"]
-
     mutating func handleIdle(seconds: Int, now: Date) -> [SchedulerEffect] {
         guard seconds >= config.awayThresholdSeconds else { return [] }
-        guard Self.idleInterruptible.contains(snapshot.state.name) else { return [] }
+        guard snapshot.state.interruptibleByIdle else { return [] }
 
         let since = now.addingTimeInterval(-Double(seconds))
-        var effects = dismissSurfaces()
+        var effects = dismissSurfaces(now: now)
         snapshot.dueAtAway = snapshot.nextFullDueAt
         snapshot.remainingAtAwaySeconds = snapshot.nextFullDueAt.map { max(0, Int($0.timeIntervalSince(since))) }
         transition(to: .away(since: since), reason: "idle for \(seconds / 60) min", at: now)
@@ -101,12 +97,7 @@ extension Scheduler {
             lastCompletedBreakAt: snapshot.lastCompletedBreakAt,
             doneToday: snapshot.doneToday,
             longestBoutSeconds: snapshot.longestBoutSeconds,
-            expiresAt: now.addingTimeInterval(TimeInterval(ToastInfo(
-                kind: .creditedFullBreak,
-                awaySeconds: 0,
-                nextBreakAt: nil,
-                reversal: .wasSittingAfterFullCredit
-            ).secondsOnScreen))
+            expiresAt: now.addingTimeInterval(TimeInterval(ToastInfo.defaultSecondsOnScreen))
         )
     }
 
@@ -125,14 +116,17 @@ extension Scheduler {
     }
 
     /// Takes every break surface off screen. Used by sleep, lock, pause and idle alike.
-    mutating func dismissSurfaces() -> [SchedulerEffect] {
+    ///
+    /// It takes `now` rather than reaching for `Date()`: the scheduler is a pure function of the
+    /// clock it is handed, and a single wall-clock read in here would break replay at 60×.
+    mutating func dismissSurfaces(now: Date) -> [SchedulerEffect] {
         switch snapshot.state {
         case .headsUp, .pendingFull:
             return [.hideHeadsUp]
         case .fullBreak:
             return [.endFullBreak(.interrupted)]
         case .microCountIn, .microRunning:
-            snapshot.nextMicroDueAt = microDue(anchoredAt: snapshot.microAnchorAt ?? Date())
+            snapshot.nextMicroDueAt = microDue(anchoredAt: snapshot.microAnchorAt ?? now)
             snapshot.microAnchorAt = nil
             snapshot.microSnoozeUsed = false
             return [.hideMicro]

@@ -123,6 +123,9 @@ final class MenuBarViewModel: ObservableObject {
         case .paused: applyPaused(to: &next, now: now)
         case .offHours: applyOffHours(to: &next, now: now)
         }
+        // The coordinator publishes every two seconds; the menu bar only changes once a minute.
+        // Assigning an identical state would redraw the menu-bar item for nothing.
+        guard next != state else { return }
         state = next
     }
 

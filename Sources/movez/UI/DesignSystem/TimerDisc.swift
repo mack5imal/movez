@@ -24,6 +24,12 @@ struct TimerDisc: View {
     var numeralStyle: MovezTextStyle?
     var action: (() -> Void)?
 
+    /// "0:42, NEXT →" — what VoiceOver reads when the disc is the button that advances.
+    static func announcement(numerals: String, label: String?) -> String {
+        guard let label, !label.isEmpty else { return numerals }
+        return "\(numerals), \(label)"
+    }
+
     /// The handoff specifies the 300 pt overlay disc: a 6 pt ring, 84 pt numerals and a 16 pt
     /// label. Every other size is that same disc scaled, which is how the 64 pt panel disc lands
     /// on its specified 17 pt numerals without a second table.
@@ -61,7 +67,7 @@ struct TimerDisc: View {
         if let action {
             Button(action: action) { disc }
                 .buttonStyle(.plain)
-                .accessibilityLabel(label.map { "\(numerals), \($0)" } ?? numerals)
+                .accessibilityLabel(TimerDisc.announcement(numerals: numerals, label: label))
         } else {
             disc.accessibilityElement(children: .combine)
         }

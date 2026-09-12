@@ -62,11 +62,14 @@ struct ToastInfo: Equatable {
         case creditedMicroBreak
     }
 
+    /// How long the credit stays reversible, which is how long the toast stays on screen.
+    static let defaultSecondsOnScreen = 6
+
     var kind: Kind
     var awaySeconds: Int
     var nextBreakAt: Date?
     var reversal: ToastReversal
-    var secondsOnScreen: Int = 6
+    var secondsOnScreen: Int = ToastInfo.defaultSecondsOnScreen
 }
 
 /// Everything the scheduler asks the world to do. The scheduler itself touches nothing.
@@ -88,10 +91,10 @@ enum SchedulerEffect: Equatable {
 
 extension SchedulerEffect {
     /// A short, stable label for logs, tests and the debug inspector.
-    var name: String { surfaceName ?? sideEffectName }
-
-    /// The effects that put something on screen or take it away.
-    private var surfaceName: String? {
+    ///
+    /// One exhaustive switch, so adding an effect fails to build rather than quietly reporting
+    /// itself as "unknown" in every test that reads this.
+    var name: String {
         switch self {
         case .showHeadsUp: return "showHeadsUp"
         case .hideHeadsUp: return "hideHeadsUp"
@@ -100,20 +103,13 @@ extension SchedulerEffect {
         case .showMicroCountIn: return "showMicroCountIn"
         case .showMicroRunning: return "showMicroRunning"
         case .hideMicro: return "hideMicro"
-        default: return nil
-        }
-    }
-
-    /// Everything else: sound, toasts and bookkeeping.
-    private var sideEffectName: String {
-        switch self {
         case .chime(let chime): return "chime(\(chime.rawValue))"
         case .showToast: return "showToast"
         case .hideToast: return "hideToast"
         case .persist: return "persist"
         case .pollingChanged(let enabled): return "pollingChanged(\(enabled))"
         case .menuRefresh: return "menuRefresh"
-        default: return "unknown"
         }
     }
+
 }

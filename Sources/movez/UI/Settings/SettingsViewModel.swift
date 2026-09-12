@@ -1,6 +1,5 @@
 import AppKit
 import Combine
-import SwiftUI
 
 /// Everything the settings window can do, in one place.
 ///
@@ -290,12 +289,6 @@ final class SettingsViewModel: ObservableObject {
             .receive(on: RunLoop.main)
             .sink { [weak self] state in self?.debug = state }
             .store(in: &debugCancellables)
-    }
-
-    // MARK: - Bindings
-
-    func toggle(_ keyPath: ReferenceWritableKeyPath<SettingsStore, Bool>, _ write: @escaping (Bool) -> Void) -> Binding<Bool> {
-        Binding(get: { [settings] in settings[keyPath: keyPath] }, set: write)
     }
 
     private func changed() {

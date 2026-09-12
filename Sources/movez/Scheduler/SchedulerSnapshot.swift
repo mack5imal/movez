@@ -44,11 +44,6 @@ struct SchedulerSnapshot: Codable, Equatable {
         self.dayKey = dayKey
     }
 
-    /// Seconds the user has been sitting in the current bout.
-    func sittingSeconds(at now: Date) -> Int {
-        max(0, Int(now.timeIntervalSince(boutStartedAt)))
-    }
-
     /// Seconds until the next full break, or nil when nothing is scheduled.
     func secondsUntilFullBreak(at now: Date) -> Int? {
         nextFullDueAt.map { max(0, Int($0.timeIntervalSince(now))) }

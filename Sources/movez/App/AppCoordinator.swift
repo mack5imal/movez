@@ -29,7 +29,6 @@ struct MenuState: Equatable {
     var nextBreakAt: Date?
     var pausedUntil: Date?
     var nextRoutineSubtitle: String = ""
-    var streak: Int = 0
 }
 
 /// The one object that ties the pure scheduler to the world: it owns the clock, drives ticks,
@@ -46,6 +45,9 @@ final class AppCoordinator: ObservableObject {
     // Published view state. Written only by the coordinator's own extensions; the UI reads it.
     @Published var menuState = MenuState()
     @Published var currentBreak: BreakSession?
+    /// A break that sleep or a locked screen cut short, kept so the one that resumes is the same
+    /// break rather than a fresh routine at block zero.
+    var interruptedSession: BreakSession?
     @Published var currentMicro: MicroBreak?
     @Published var headsUpInfo: HeadsUpInfo?
     @Published var toastInfo: ToastInfo?
@@ -111,13 +113,25 @@ final class AppCoordinator: ObservableObject {
         microBuilder = MicroBreakBuilder(library: library)
 
         let config = settings.schedulerConfig
-        if let restored = try? snapshotStore?.load() ?? nil {
+        if let restored = AppCoordinator.restore(from: snapshotStore) {
             scheduler = Scheduler(snapshot: restored, config: config)
         } else {
             scheduler = Scheduler(config: config, now: clock.now)
         }
         routinesDayKey = DayKey.key(for: clock.now, calendar: config.calendar)
         refreshPublished()
+    }
+
+    /// A state file that will not parse is not worth crashing over — the day simply starts fresh
+    /// — but it is worth saying so somewhere a developer can find it.
+    static func restore(from store: SnapshotStore?) -> SchedulerSnapshot? {
+        guard let store else { return nil }
+        do {
+            return try store.load()
+        } catch {
+            MovezLog.store.error("state could not be read, starting fresh: \(error.localizedDescription, privacy: .public)")
+            return nil
+        }
     }
 
     // MARK: - Lifecycle
@@ -247,12 +261,21 @@ final class AppCoordinator: ObservableObject {
         refreshPublished()
     }
 
+    /// Republishes what an effect may have changed.
+    ///
+    /// Each assignment is guarded: `@Published` fires on every write, equal or not, and four
+    /// unconditional writes here wake every view model four times for one event.
     func refreshPublished() {
         let now = clock.now
-        todayStats = history.stats(on: now)
-        streak = history.streak(on: now)
-        nextRoutinePreview = previewNextRoutine(now: now)
+        assign(history.stats(on: now), to: \.todayStats)
+        assign(history.streak(on: now), to: \.streak)
+        assign(previewNextRoutine(now: now), to: \.nextRoutinePreview)
         menuState = makeMenuState(now: now)
+    }
+
+    private func assign<Value: Equatable>(_ value: Value, to keyPath: ReferenceWritableKeyPath<AppCoordinator, Value>) {
+        guard self[keyPath: keyPath] != value else { return }
+        self[keyPath: keyPath] = value
     }
 
     /// Throws the cached preview away, so the next read rebuilds it against current settings.

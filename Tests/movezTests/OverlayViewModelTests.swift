@@ -260,9 +260,30 @@ final class OverlayViewModelTests: XCTestCase {
         let clock = ManualClock(now: SchedulerHarness.mondayMorning)
         let viewModel = makeViewModel(clock: clock)
         XCTAssertFalse(viewModel.doneAvailable)
-        clock.advance(TimeInterval(fixtureRoutine().totalSeconds / 2))
+        clock.advance(TimeInterval(SchedulerConfig().completionSeconds))
         viewModel.refresh()
         XCTAssertTrue(viewModel.doneAvailable, "half the planned time counts even with no blocks done")
+    }
+
+    /// The overlay's Done gate and the scheduler's completion rule have to be the same rule. When
+    /// they were not, a routine shorter than the configured break let the user press Done and be
+    /// recorded as having skipped.
+    func testDoneIsNeverOfferedBeforeTheSchedulerWouldAcceptIt() {
+        let clock = ManualClock(now: SchedulerHarness.mondayMorning)
+        let viewModel = makeViewModel(clock: clock)
+        let config = SchedulerConfig()
+
+        for elapsed in stride(from: 0, through: config.breakSeconds, by: 10) {
+            clock.set(SchedulerHarness.mondayMorning.addingTimeInterval(TimeInterval(elapsed)))
+            viewModel.refresh()
+            let schedulerWouldAccept = Scheduler.meetsCompletionRule(
+                completed: viewModel.completedBlocks,
+                total: viewModel.totalBlocks,
+                elapsed: elapsed,
+                config: config
+            )
+            XCTAssertEqual(viewModel.doneAvailable, schedulerWouldAccept, "at \(elapsed) s")
+        }
     }
 
     // MARK: - End state

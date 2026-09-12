@@ -14,6 +14,10 @@ final class OverlayWindowController {
     private var previousApp: NSRunningApplication?
     private var screenObserver: NSObjectProtocol?
     private var tickTimer: DispatchSourceTimer?
+    /// Bumped on every presentation. A fade-out that completes after the next break has already
+    /// opened would otherwise hand focus back to the app underneath — the exact keystroke leak
+    /// this class exists to prevent.
+    private var presentation = 0
 
     /// How long the dim takes to fade when a break ends well.
     static let dismissFade: TimeInterval = 0.3
@@ -26,6 +30,7 @@ final class OverlayWindowController {
 
     func present(_ viewModel: OverlayViewModel) {
         dismiss(animated: false)
+        presentation += 1
         self.viewModel = viewModel
         previousApp = NSWorkspace.shared.frontmostApplication
 
@@ -41,7 +46,7 @@ final class OverlayWindowController {
         // be key — which is what lets keystrokes fall through to whatever is underneath.
         activateApp()
 
-        let cursorScreen = screenUnderCursor()
+        let cursorScreen = PanelWindowController.activeScreen()
         var activeWindow: NSWindow?
         for screen in NSScreen.screens {
             let isActive = screen == cursorScreen
@@ -110,11 +115,6 @@ final class OverlayWindowController {
         return NSRect(x: frame.minX, y: frame.minY, width: frame.width, height: frame.height - menuBarHeight)
     }
 
-    private func screenUnderCursor() -> NSScreen? {
-        let location = NSEvent.mouseLocation
-        return NSScreen.screens.first { $0.frame.contains(location) } ?? NSScreen.main
-    }
-
     // MARK: - Keyboard
 
     /// → and Return advance. Everything else is swallowed, so a break never types into whatever
@@ -147,10 +147,9 @@ final class OverlayWindowController {
 
     /// A display plugged in or unplugged mid-break gets its own dim rather than a gap.
     private func rebuildForScreenChange() {
-        guard isPresenting, let viewModel else { return }
+        guard isPresenting, viewModel != nil else { return }
         closeWindows()
         build()
-        _ = viewModel
     }
 
     // MARK: - Ticking
@@ -184,19 +183,22 @@ final class OverlayWindowController {
             return
         }
 
+        let generation = presentation
         if animated {
             NSAnimationContext.runAnimationGroup { context in
                 context.duration = Self.dismissFade
                 for window in windows { window.animator().alphaValue = 0 }
             } completionHandler: { [weak self] in
-                MainActor.assumeIsolated { self?.finishDismiss() }
+                MainActor.assumeIsolated { self?.finishDismiss(generation: generation) }
             }
         } else {
-            finishDismiss()
+            finishDismiss(generation: generation)
         }
     }
 
-    private func finishDismiss() {
+    private func finishDismiss(generation: Int) {
+        // A newer break took over while this one was fading; it owns the windows and the focus.
+        guard generation == presentation else { return }
         closeWindows()
         viewModel = nil
         // Give focus back to whatever the user was in.
@@ -244,7 +246,6 @@ struct OverlayScreen: View {
 
             if showsCard {
                 OverlayView(state: viewModel.state, actions: actions, animated: viewModel.animationsEnabled)
-                    .scaleEffect(viewModel.animationsEnabled ? 1 : 1)
                     .transition(.opacity)
             } else {
                 OtherDisplayLabel(timeLeft: "\(OverlayState.clock(viewModel.breakRemaining)) left")

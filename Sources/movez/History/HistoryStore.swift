@@ -77,6 +77,17 @@ final class HistoryStore {
     /// How many times a Diff-2 movement must be completed before its Diff-3 counterpart unlocks.
     static let difficultyUnlockThreshold = 5
 
+    /// A history file that will not parse costs the user their record, which is bad — but losing
+    /// the app to a crash on every launch afterwards would be worse.
+    static func restore(from store: HistoryPersisting) -> HistoryData {
+        do {
+            return try store.load() ?? HistoryData()
+        } catch {
+            MovezLog.store.error("history could not be read, starting fresh: \(error.localizedDescription, privacy: .public)")
+            return HistoryData()
+        }
+    }
+
     init(data: HistoryData = HistoryData(), store: HistoryPersisting? = nil, calendar: Calendar = .current) {
         self.data = data
         self.store = store
@@ -84,7 +95,7 @@ final class HistoryStore {
     }
 
     convenience init(store: HistoryPersisting, calendar: Calendar = .current) {
-        self.init(data: (try? store.load()) ?? HistoryData(), store: store, calendar: calendar)
+        self.init(data: HistoryStore.restore(from: store), store: store, calendar: calendar)
     }
 
     // MARK: - Recording
@@ -167,9 +178,17 @@ final class HistoryStore {
         data.days[DayKey.key(for: date, calendar: calendar)] ?? .empty
     }
 
+    /// Today's breaks, read backwards from the newest and stopped at the first record from
+    /// another day. The record grows for as long as the app is used; the answer never depends on
+    /// anything before this morning.
     func breaks(on date: Date) -> [BreakRecord] {
         let key = DayKey.key(for: date, calendar: calendar)
-        return data.breakRecords.filter { DayKey.key(for: $0.at, calendar: calendar) == key }
+        var today: [BreakRecord] = []
+        for record in data.breakRecords.reversed() {
+            guard DayKey.key(for: record.at, calendar: calendar) == key else { break }
+            today.append(record)
+        }
+        return today.reversed()
     }
 
     /// Consecutive completed breaks, counting back from the most recent one. A skip resets it; a

@@ -39,6 +39,20 @@ struct SequenceStrip: View {
             MovezText("\(item.number)", MovezType.stripNumber, color: numberColor(item))
             name(item)
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(announcement(for: item))
+    }
+
+    /// "March in place, block 1 of 4, current" — read from standing distance, or not at all.
+    func announcement(for item: StripItem) -> String {
+        var parts = ["\(item.name), block \(item.number) of \(items.count)"]
+        switch item.state {
+        case .current: parts.append("current")
+        case .done: parts.append("done")
+        case .upcoming: parts.append("upcoming")
+        }
+        if let side = item.sideIndex { parts.append(side == 0 ? "left side" : "right side") }
+        return parts.joined(separator: ", ")
     }
 
     /// The 3 pt rule above each column. A per-side block in progress fills only its half.

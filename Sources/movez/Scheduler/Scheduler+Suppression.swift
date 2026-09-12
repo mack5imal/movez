@@ -15,13 +15,15 @@ extension Scheduler {
         switch snapshot.state {
         case .sitting:
             break
-        case .pendingFull:
+        case .pendingFull, .snoozed:
+            // A snooze that runs out during a call must not put the heads-up on screen for the
+            // two seconds it takes the next poll to notice.
             deferred = snapshot.nextFullDueAt
         case .headsUp(_, let deferredSince):
             deferred = deferredSince ?? snapshot.nextFullDueAt
             effects.append(.hideHeadsUp)
         case .microCountIn, .microRunning:
-            effects += dismissSurfaces()
+            effects += dismissSurfaces(now: now)
         default:
             // A break already on screen is left alone, and paused or off-hours outrank a call.
             return []

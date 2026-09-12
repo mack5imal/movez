@@ -86,6 +86,9 @@ struct SelectField<Value: Hashable>: View {
     var options: [(value: Value, label: String)]
     @Binding var selection: Value
     var minWidth: CGFloat = 160
+    /// What the field is for. The visible name sits in the row beside it, so VoiceOver needs to
+    /// be told separately or it announces only the current value.
+    var accessibilityName: String = ""
 
     var body: some View {
         Menu {
@@ -115,6 +118,8 @@ struct SelectField<Value: Hashable>: View {
             RoundedRectangle(cornerRadius: Tokens.Radius.select, style: .continuous)
                 .strokeBorder(Tokens.panelBorder.color, lineWidth: 1)
         )
+        .accessibilityLabel(accessibilityName.isEmpty ? label(for: selection) : accessibilityName)
+        .accessibilityValue(label(for: selection))
     }
 
     private func label(for value: Value) -> String {
@@ -196,6 +201,9 @@ struct MenuRow<Trailing: View>: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        // The trailing shortcut or chevron is decoration; the row is its title.
+        .accessibilityLabel(title)
+        .accessibilityAddTraits(.isButton)
     }
 }
 

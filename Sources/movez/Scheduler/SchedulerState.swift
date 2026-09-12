@@ -55,6 +55,15 @@ enum SchedulerState: Codable, Equatable {
         }
     }
 
+    /// The states an idle stretch may interrupt. A running full break is not one of them: the
+    /// user standing still during a stretch is the point.
+    var interruptibleByIdle: Bool {
+        switch self {
+        case .sitting, .pendingFull, .headsUp, .microCountIn, .microRunning: return true
+        default: return false
+        }
+    }
+
     /// The sitting countdown only runs in these states.
     var countdownRuns: Bool {
         switch self {

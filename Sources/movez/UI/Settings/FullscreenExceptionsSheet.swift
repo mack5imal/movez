@@ -58,7 +58,8 @@ struct FullscreenExceptionsSheet: View {
                         viewModel.addException(bundleId)
                     }
                 ),
-                minWidth: 200
+                minWidth: 200,
+                accessibilityName: "Add running app"
             )
         }
     }

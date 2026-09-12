@@ -74,6 +74,7 @@ final class DebugViewModel: ObservableObject {
         ))
         next.transitions = coordinator.scheduler.snapshot.transitions.newestFirst
             .map { $0.line(formatter: TransitionLog.timeFormatter) }
+        guard next != state else { return }
         state = next
     }
 

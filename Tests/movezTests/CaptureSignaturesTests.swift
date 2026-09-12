@@ -51,11 +51,26 @@ final class CaptureSignaturesTests: XCTestCase {
         XCTAssertNil(signatures.firstMatch(bundleIds: ["com.apple.Safari"], processNames: ["Safari"]))
     }
 
-    func testTruncatedProcessNamesStillMatch() {
-        // proc_name clips at sixteen characters, so Teams' helper arrives shortened.
-        XCTAssertTrue(CaptureSignature.namesMatch("Microsoft Teams ", "Microsoft Teams (Screen Share)"))
+    func testOnlyATruncatedNameIsAllowedToMatchOnAPrefix() {
         XCTAssertTrue(CaptureSignature.namesMatch("CptHost", "CptHost"))
         XCTAssertFalse(CaptureSignature.namesMatch("Finder", "CptHost"))
+
+        // A name that filled proc_name's buffer is clipped, and matches what it is a prefix of.
+        let clipped = String(repeating: "a", count: CaptureSignature.nameLimit)
+        XCTAssertTrue(CaptureSignature.namesMatch(clipped, clipped + " (Screen Share)"))
+        XCTAssertFalse(CaptureSignature.namesMatch(String(clipped.dropLast()), clipped + " (Screen Share)"))
+    }
+
+    /// The overlay ⌘⇧5 leaves running is called `screencaptureui`. Matching it against the
+    /// `screencapture` signature suppressed every break for as long as it lingered.
+    func testTheScreenshotOverlayDoesNotCountAsARecording() {
+        XCTAssertFalse(CaptureSignature.namesMatch("screencaptureui", "screencapture"))
+        XCTAssertNil(signatures.firstMatch(bundleIds: [], processNames: ["screencaptureui"]))
+        XCTAssertEqual(
+            signatures.firstMatch(bundleIds: [], processNames: ["screencapture"])?.name,
+            "macOS screen recording",
+            "the real recorder still matches"
+        )
     }
 
     func testTheRealMonitorReadsTheBundledFile() {

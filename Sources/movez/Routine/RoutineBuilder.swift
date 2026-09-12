@@ -26,7 +26,8 @@ struct RoutineBuilder {
 
     func build(context: RoutineContext) -> Routine {
         let shape = RoutineShape.shape(for: context.timeOfDay)
-        let pool = candidates(for: context)
+        var pool = candidates(for: context)
+        if pool.isEmpty { pool = relaxedCandidates(for: context) }
 
         let selection = Selection(shape: shape, pool: pool, context: context)
         var blocks = assemble(count: 4, in: selection)
@@ -64,6 +65,27 @@ struct RoutineBuilder {
             result.append(resolved)
         }
         return result
+    }
+
+    /// The last resort, when the filters between them leave nothing at all: a day that has
+    /// already served every movement, or a user who has excluded the entire library. A repeat is
+    /// always better than a break with nothing in it.
+    func relaxedCandidates(for context: RoutineContext) -> [Movement] {
+        var relaxed = context
+        relaxed.usedMovementIdsToday = []
+        var pool = candidates(for: relaxed)
+        if !pool.isEmpty { return pool }
+
+        relaxed.excluded = []
+        pool = candidates(for: relaxed)
+        if !pool.isEmpty { return pool }
+
+        // Everything off: the cap raised *and* the difficulty-3 gate opened with it, or the last
+        // rung would filter out exactly what it was reaching for.
+        relaxed.difficultyCap = 3
+        relaxed.unlockedDiff3 = Set(library.movements.map(\.id))
+        relaxed.equipment = []
+        return candidates(for: relaxed)
     }
 
     private func usable(_ movement: Movement, context: RoutineContext) -> Bool {

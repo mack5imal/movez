@@ -9,10 +9,12 @@ extension Scheduler {
     /// Pass nil seconds for "the rest of the day".
     mutating func pause(seconds: Int?, focusInitiated: Bool, now: Date) -> [SchedulerEffect] {
         if case .fullBreak = snapshot.state { return [] }
-        if case .paused = snapshot.state { return extendOrSwitchPause(seconds: seconds, now: now) }
+        if case .paused = snapshot.state {
+            return extendOrSwitchPause(seconds: seconds, focusInitiated: focusInitiated, now: now)
+        }
 
         let wasPolling = pollingRequired
-        var effects = dismissSurfaces()
+        var effects = dismissSurfaces(now: now)
 
         snapshot.remainingAtPauseSeconds = snapshot.nextFullDueAt.map { max(0, Int($0.timeIntervalSince(now))) }
         snapshot.pauseIsFocusInitiated = focusInitiated
@@ -32,9 +34,19 @@ extension Scheduler {
             ?? config.calendar.startOfDay(for: now).addingTimeInterval(24 * 3600 - 60)
     }
 
-    private mutating func extendOrSwitchPause(seconds: Int?, now: Date) -> [SchedulerEffect] {
+    private mutating func extendOrSwitchPause(
+        seconds: Int?,
+        focusInitiated: Bool,
+        now: Date
+    ) -> [SchedulerEffect] {
         guard case .paused = snapshot.state else { return [] }
-        let until = pauseEnd(seconds: seconds, focusInitiated: false, now: now)
+        // A Focus turning on over a pause the user set by hand changes nothing. The deliberate
+        // choice outranks the automatic one — and rewriting it would both lengthen the pause to
+        // the end of the day and leave the Focus unable to lift what it did not set.
+        if focusInitiated, !snapshot.pauseIsFocusInitiated { return [] }
+
+        snapshot.pauseIsFocusInitiated = focusInitiated
+        let until = pauseEnd(seconds: seconds, focusInitiated: focusInitiated, now: now)
         transition(to: .paused(until: until), reason: "pause changed", at: now)
         return [.persist, .menuRefresh]
     }

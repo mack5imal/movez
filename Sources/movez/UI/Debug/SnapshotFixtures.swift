@@ -180,15 +180,7 @@ extension SnapshotFixtures {
     }
 
     /// 14:02 on the fixture's day — the time the handoff's toast shows.
-    static let toastNextBreak: Date = {
-        var components = DateComponents()
-        components.year = 2026
-        components.month = 1
-        components.day = 1
-        components.hour = 14
-        components.minute = 2
-        return Calendar.current.date(from: components) ?? panelInstant
-    }()
+    static let toastNextBreak = menuDate(month: 1, day: 1, hour: 14, minute: 2)
 
     static func microBreak() -> MicroBreak {
         MicroBreak(

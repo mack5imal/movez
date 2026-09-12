@@ -27,6 +27,9 @@ enum MovezFont {
             }
         }
         didRegister = isAvailable
+        // A missing font is not fatal — `nsFont` falls back to the system face and movez still
+        // runs — but it is loud in a Debug build, because every screen would be off-design.
+        assert(didRegister, "Manrope did not register; movez is drawing in the system face")
         return didRegister
     }
 
@@ -55,14 +58,30 @@ enum MovezFont {
         return (contents ?? []).filter { $0.pathExtension.lowercased() == "ttf" }
     }
 
+    /// Resolved faces, keyed by size and weight.
+    ///
+    /// There are thirty-odd styles in the app and the overlay redraws every second, so resolving
+    /// a descriptor — under the registration lock — for each of fifteen text views per frame is
+    /// most of what drawing a break costs.
+    private static let faceLock = NSLock()
+    nonisolated(unsafe) private static var faces: [String: NSFont] = [:]
+
     /// An `NSFont` on the Manrope weight axis, falling back to the system face if registration failed.
     static func nsFont(_ size: CGFloat, weight: NSFont.Weight = .regular) -> NSFont {
         register()
+        let key = "\(size)-\(weight.rawValue)"
+
+        faceLock.lock()
+        defer { faceLock.unlock() }
+        if let cached = faces[key] { return cached }
+
         let descriptor = NSFontDescriptor(fontAttributes: [
             .family: familyName,
             .traits: [NSFontDescriptor.TraitKey.weight: weight.rawValue]
         ])
-        return NSFont(descriptor: descriptor, size: size) ?? .systemFont(ofSize: size, weight: weight)
+        let face = NSFont(descriptor: descriptor, size: size) ?? .systemFont(ofSize: size, weight: weight)
+        faces[key] = face
+        return face
     }
 
     /// A SwiftUI `Font` on the Manrope weight axis.

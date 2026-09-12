@@ -18,6 +18,7 @@ make snapshots  # render every UI surface to PNG
 make run        # launch the built app
 make app        # print the path of the built .app
 make hygiene    # open the break overlay on every display and check its window hygiene
+make panel-hygiene  # show each floating panel and check it never takes focus
 make assets     # re-fetch Manrope and regenerate the chimes
 ```
 
@@ -29,8 +30,12 @@ committed so the repo opens in Xcode without XcodeGen, but `project.yml` is the 
 ```
 project.yml                 XcodeGen spec (source of truth for the Xcode project)
 Makefile                    build / test / lint / snapshot entry points
-Sources/movez/App           app entry point, delegate, launch arguments
-Sources/movez/UI            design system and the four UI surfaces
+Sources/movez/App           app entry point, delegate, coordinator, launch arguments
+Sources/movez/Library       the movement library, decoded and validated
+Sources/movez/Routine       routine and micro-break generation
+Sources/movez/Scheduler     the sitting-to-break state machine (pure, clock-injected)
+Sources/movez/Signals       idle, microphone, screen capture, fullscreen, power
+Sources/movez/UI            design system and the five UI surfaces
 Sources/movez/Resources     Info.plist, Manrope, chimes
 Tests/movezTests            XCTest suite
 scripts/                    font fetch and chime synthesis
@@ -41,6 +46,36 @@ The Markdown and JSON documents at the repository root — `product-brief-v1.md`
 `design_handoff_movez_ui/` folder — are the source of truth for behaviour and visual design.
 `movement-library-v4.json` is bundled into the app directly from the repository root; there is
 no second copy to keep in sync.
+
+## The surfaces
+
+`make snapshots` renders every one of them offscreen, at 2×, from frozen fixtures. That is how a
+screen is reviewed without waiting an hour for a break to come round.
+
+| Surface | What it is |
+|---|---|
+| `gallery` | Every colour, type style and control in the design system on one sheet |
+| `overlay-full`, `overlay-collapsed`, `overlay-side`, `overlay-end`, `overlay-other-display` | The full break: a movement running, an instruction the user has collapsed, a per-side movement, the end card, and what the other displays show |
+| `headsup`, `headsup-deferred` | The minute before a break, and the variant for a break that waited for a call |
+| `micro-countin`, `micro-running` | The micro-break's thirty-second count-in and its minute |
+| `toast` | "Away 7 min · counted as your break", with the reversal |
+| `menu-sitting`, `menu-paused`, `menu-offhours`, `menu-icon` | The dropdown in each mode, and the menu-bar glyph at five moments |
+| `settings`, `settings-hours`, `settings-library`, `settings-exceptions`, `settings-custom` | The settings window and its three sheets, plus the custom preset |
+| `debug` | The settings window with the debug disclosure open |
+
+## Known limitations
+
+- **Screen-capture detection is a heuristic** — see the note below. It will miss a tool that is
+  not in `capture-signatures.json`.
+- **Fullscreen detection is a guess about intent.** A maximised editor looks exactly like a
+  presentation, which is what the per-app exceptions list in Settings is for.
+- **Launch at login needs a signed build.** `SMAppService.mainApp.register()` refuses on an
+  ad-hoc-signed Debug build on some systems; movez shows the refusal under the toggle rather than
+  letting it silently spring back.
+- **Working hours are one window a day.** A split shift has to be handled by pausing.
+- **The break overlay covers every display but the menu bar.** That is deliberate: a break must
+  never trap the user.
+- **The app is unsandboxed**, for the reasons in the notes below.
 
 ## Notes
 
@@ -66,5 +101,10 @@ no second copy to keep in sync.
   grants activation rights through Launch Services; a binary exec'd from a shell never becomes the
   active app, so its overlay can never take keyboard focus and the check reports `key=false` even
   though the shipped app is fine.
+- `movez --panel-hygiene` shows each floating panel for a second and fails if any of them moves
+  the frontmost app, activates movez, or lands off its specified inset. Unlike the overlay check
+  it is run straight from the binary, because not activating is the whole point.
+- Idle CPU sits at roughly 0.5% while movez is counting down, and at nothing at all while it is
+  paused or off hours: the signal monitors stop entirely rather than polling into a void.
 - Manrope is bundled under the SIL Open Font License 1.1 (`Sources/movez/Resources/Fonts/OFL.txt`).
 - The chimes are synthesised locally by `scripts/gen_chimes.py`; no audio is downloaded.

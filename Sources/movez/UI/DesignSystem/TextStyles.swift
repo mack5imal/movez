@@ -92,6 +92,21 @@ extension View {
     }
 }
 
+/// The app's clock, in one place.
+///
+/// "9:00", "14:02" — the overlay, the menu bar and the toast all show the same 24-hour time, and
+/// the formatter is cached because building one is among the most expensive things Foundation
+/// does and these are read on a per-second redraw path.
+enum MovezClock {
+    nonisolated(unsafe) private static let formatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "H:mm"
+        return formatter
+    }()
+
+    static func label(_ date: Date) -> String { formatter.string(from: date) }
+}
+
 /// Text in one of the house styles, in one of the house colours.
 struct MovezText: View {
     let content: String

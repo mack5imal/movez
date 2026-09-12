@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 
 /// Polls the system signals and hands them to the coordinator.
@@ -104,15 +105,26 @@ final class SignalAggregator {
     }
 
     /// Reads every source, then lets the settings veto each signal.
+    ///
+    /// Each source is asked only when the setting that would act on it is on. The fullscreen one
+    /// matters most: its reading is a window-server round trip that bridges every on-screen
+    /// window on the machine, and it used to happen twice a second whether the toggle was on or
+    /// not — the frontmost app's own bundle id is all the snapshot needs otherwise.
     func read(now: Date) -> SignalSnapshot {
-        let reading = fullscreen.reading(exceptions: Set(settings.fullscreenExceptions))
+        let reading = settings.suppressFullscreen
+            ? fullscreen.reading(exceptions: Set(settings.fullscreenExceptions))
+            : FullscreenReading(isFullscreen: false, bundleId: frontmostBundleId())
         return SignalSnapshot(
             idleSeconds: max(0, Int(idle.idleSeconds())),
             microphoneActive: settings.suppressMic && mic.isInUse(),
             screenCaptureActive: settings.suppressCapture && capture.isCaptured(),
-            fullscreenActive: settings.suppressFullscreen && reading.isFullscreen,
+            fullscreenActive: reading.isFullscreen,
             frontmostBundleId: reading.bundleId
         )
+    }
+
+    private func frontmostBundleId() -> String? {
+        NSWorkspace.shared.frontmostApplication?.bundleIdentifier
     }
 
     /// A long gap between polls means the process was suspended — the machine slept without the

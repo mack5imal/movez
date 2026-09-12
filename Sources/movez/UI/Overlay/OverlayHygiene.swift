@@ -67,7 +67,14 @@ enum OverlayHygiene {
             streak: 2,
             nextBreakAt: clock.now.addingTimeInterval(3300)
         )
+        // How long the break takes to actually appear. A break that arrives a second late has
+        // already interrupted whatever the user was doing, twice.
+        let presentStart = Date()
         controller.present(viewModel)
+        while controller.visibleWindowCount == 0, Date().timeIntervalSince(presentStart) < 2 {
+            RunLoop.current.run(mode: .default, before: Date().addingTimeInterval(0.005))
+        }
+        let presentMs = Date().timeIntervalSince(presentStart) * 1000
 
         SnapshotRenderer.pumpRunLoop(seconds: presentSeconds)
 
@@ -83,6 +90,7 @@ enum OverlayHygiene {
             "canBecomeKey=\(controller.windowsCanBecomeKey)",
             "keyWindowOwner=\(NSApp.keyWindow.map { String(describing: type(of: $0)) } ?? "none")",
             "visible=\(controller.visibleWindowCount)",
+            "presentMs=\(String(format: "%.0f", presentMs))",
             "policy=\(NSApp.activationPolicy().rawValue)"
         ].joined(separator: " "))
 

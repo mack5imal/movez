@@ -7,6 +7,19 @@ import Foundation
 /// gap is treated exactly like an idle stretch of the same length.
 extension Scheduler {
     mutating func handleSleepOrLock(now: Date, reason: String) -> [SchedulerEffect] {
+        switch snapshot.state {
+        case .away:
+            // Already away. A lock on top of an idle stretch must not restart the clock on it,
+            // or a six-minute absence is measured as the four minutes since the screen locked.
+            return []
+        case .paused, .offHours:
+            // A pause outlasts a closed lid, and off hours there is nothing to interrupt. Going
+            // away here would cancel the pause and credit a break the user never took.
+            return []
+        default:
+            break
+        }
+
         if case .fullBreak(let startedAt) = snapshot.state {
             snapshot.interruptedBreak = InterruptedBreak(
                 startedAt: startedAt,
@@ -16,11 +29,10 @@ extension Scheduler {
                 totalBlocks: 0
             )
         }
-        guard snapshot.state != .away(since: now) else { return [] }
 
         // Sleep takes every surface down, not just the one that happened to be showing: waking
         // to a stale overlay is the loudest failure this whole category of app has.
-        var effects = dismissSurfaces()
+        var effects = dismissSurfaces(now: now)
         for dismissal in [SchedulerEffect.hideHeadsUp, .hideMicro] where !effects.contains(dismissal) {
             effects.append(dismissal)
         }
@@ -99,6 +111,15 @@ extension Scheduler {
         transition(to: .fullBreak(startedAt: resumedStart), reason: "break resumed after wake", at: now)
         let plan = BreakPlan(startedAt: resumedStart, seconds: config.breakSeconds)
         return [.startFullBreak(plan), .persist, .menuRefresh]
+    }
+
+    /// A snapshot restored from a previous launch may be from another day. The counters, the
+    /// routine seed and the streak all key off `dayKey`, so a stale one is rolled forward before
+    /// anything reads it — otherwise Monday opens with Friday's numbers and Friday's routines.
+    mutating func rollDayIfStale(now: Date) -> [SchedulerEffect] {
+        guard !snapshot.dayKey.isEmpty else { return [] }
+        guard DayKey.key(for: now, calendar: config.calendar) != snapshot.dayKey else { return [] }
+        return resetDay(now: now, reason: "restored on a later day")
     }
 
     func shouldResetDay(gapSeconds: Int, now: Date) -> Bool {

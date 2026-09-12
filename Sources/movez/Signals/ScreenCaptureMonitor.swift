@@ -14,31 +14,59 @@ struct CaptureSignature: Codable, Equatable {
     var enabled: Bool = true
     var disabledReason: String?
 
+    /// `running` and `processes` arrive already lowercased; this is on the two-second poll path
+    /// and lowercasing a thousand process names per comparison is most of what the app would do.
+    ///
+    /// The bundle check comes first because it is a hash lookup and the process check is a scan:
+    /// Zoom and Teams are only worth looking for a helper of when they are running at all.
     func matches(bundleIds running: Set<String>, processNames processes: Set<String>) -> Bool {
         guard enabled else { return false }
 
-        let processHit = processNames.contains { candidate in
-            processes.contains { CaptureSignature.namesMatch($0, candidate) }
+        if !bundleIds.isEmpty {
+            guard bundleIds.contains(where: running.contains) else { return false }
+            guard requireProcessName else { return true }
         }
-        guard !bundleIds.isEmpty else { return processHit }
-
-        let bundleHit = bundleIds.contains { running.contains($0.lowercased()) }
-        guard bundleHit else { return false }
-        return requireProcessName ? processHit : true
+        return processNames.contains { processes.contains($0) || matchesTruncated($0, in: processes) }
     }
 
-    /// `proc_name` truncates to sixteen characters, so "Microsoft Teams (Screen Share)" arrives
-    /// clipped. Treat a prefix match in either direction as a hit.
+    /// The slow half, reached only for a candidate that no running name matches outright.
+    private func matchesTruncated(_ candidate: String, in processes: Set<String>) -> Bool {
+        guard candidate.count > CaptureSignature.nameLimit else { return false }
+        return processes.contains { CaptureSignature.namesMatch($0, candidate) }
+    }
+
+    /// `proc_name` fills a fixed buffer, so an unusually long executable name arrives clipped.
+    /// A clipped name is one that filled the buffer, and it matches a candidate it is a prefix of.
+    /// Anything shorter has to match exactly.
+    ///
+    /// Matching a *longer* running name against a shorter candidate is what this deliberately
+    /// does not do: `screencaptureui` — the overlay ⌘⇧5 leaves running — would otherwise satisfy
+    /// the `screencapture` signature and suppress every break for as long as it lingered.
+    static let nameLimit = 31
+
     static func namesMatch(_ running: String, _ candidate: String) -> Bool {
         let running = running.lowercased()
         let candidate = candidate.lowercased()
-        return running == candidate || candidate.hasPrefix(running) || running.hasPrefix(candidate)
+        if running == candidate { return true }
+        guard running.count >= nameLimit else { return false }
+        return candidate.hasPrefix(running)
     }
 }
 
 struct CaptureSignatures: Codable, Equatable {
     var note: String
     var signatures: [CaptureSignature]
+
+    /// The signatures with every id and name already lowercased, computed once rather than on
+    /// every poll.
+    private var lowercased: [CaptureSignature] {
+        signatures.map { signature in
+            var lowered = signature
+            lowered.bundleIds = signature.bundleIds.map { $0.lowercased() }
+            lowered.processNames = signature.processNames.map { $0.lowercased() }
+            return lowered
+        }
+    }
 
     static func bundled() -> CaptureSignatures? {
         guard let url = MovezBundle.resources.url(forResource: "capture-signatures", withExtension: "json"),
@@ -48,8 +76,12 @@ struct CaptureSignatures: Codable, Equatable {
 
     /// Which signature, if any, is currently satisfied.
     func firstMatch(bundleIds: Set<String>, processNames: Set<String>) -> CaptureSignature? {
-        let lowered = Set(bundleIds.map { $0.lowercased() })
-        return signatures.first { $0.matches(bundleIds: lowered, processNames: processNames) }
+        let loweredBundles = Set(bundleIds.map { $0.lowercased() })
+        let loweredProcesses = Set(processNames.map { $0.lowercased() })
+        guard let index = lowercased.firstIndex(where: {
+            $0.matches(bundleIds: loweredBundles, processNames: loweredProcesses)
+        }) else { return nil }
+        return signatures[index]
     }
 }
 
@@ -85,18 +117,22 @@ final class ScreenCaptureMonitor: CaptureSource {
 
     /// Every running process name, from libproc. Helper processes such as Zoom's `CptHost` never
     /// appear in `NSWorkspace.runningApplications`, which is exactly why this is needed.
+    ///
+    /// `proc_name` rather than `proc_pidpath`: this runs on every poll across ~1,200 processes,
+    /// and asking each one for its full executable path costs five times as much as asking for
+    /// its name. The name arrives truncated to sixteen characters, which is precisely what
+    /// `CaptureSignature.namesMatch` was written to tolerate.
     static func runningProcessNames() -> Set<String> {
         var pids = [pid_t](repeating: 0, count: 8192)
         let byteCount = proc_listpids(UInt32(PROC_ALL_PIDS), 0, &pids, Int32(pids.count * MemoryLayout<pid_t>.size))
         guard byteCount > 0 else { return [] }
 
         var names: Set<String> = []
-        // PROC_PIDPATHINFO_MAXSIZE (4 * MAXPATHLEN) is not imported into Swift.
-        var pathBuffer = [CChar](repeating: 0, count: 4 * Int(MAXPATHLEN))
+        var nameBuffer = [CChar](repeating: 0, count: 256)
         for pid in pids.prefix(Int(byteCount) / MemoryLayout<pid_t>.size) where pid > 0 {
-            if proc_pidpath(pid, &pathBuffer, UInt32(pathBuffer.count)) > 0 {
-                let path = String(cString: pathBuffer)
-                if !path.isEmpty { names.insert((path as NSString).lastPathComponent) }
+            if proc_name(pid, &nameBuffer, UInt32(nameBuffer.count)) > 0 {
+                let name = String(cString: nameBuffer)
+                if !name.isEmpty { names.insert(name) }
             }
         }
         return names

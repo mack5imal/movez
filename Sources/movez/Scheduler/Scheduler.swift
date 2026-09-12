@@ -115,8 +115,15 @@ struct Scheduler {
     // MARK: - Tick
 
     private mutating func tick(now: Date) -> [SchedulerEffect] {
+        // Working hours first: opening a new working day already rolls the counters, and an
+        // ad-hoc session that ran past midnight has to end before anything else is decided.
         let hours = applyWorkingHours(now: now)
         if !hours.isEmpty { return hours }
+
+        // Then the day itself, for the session that simply ran through midnight — or was
+        // restored from a launch on an earlier day — without either boundary firing.
+        let rolled = rollDayIfStale(now: now)
+        if !rolled.isEmpty { return rolled }
         if let effects = tickBreakStates(now: now) { return effects }
         if let effects = tickMicroStates(now: now) { return effects }
         if let effects = tickInterruptedStates(now: now) { return effects }
@@ -235,7 +242,7 @@ struct Scheduler {
         config = updated
         snapshot.configHash = updated.stableHash
 
-        if snapshot.state.countdownRuns || snapshot.state == .sitting {
+        if snapshot.state.countdownRuns {
             snapshot.nextFullDueAt = snapshot.boutStartedAt.addingTimeInterval(TimeInterval(updated.sitSeconds))
             snapshot.nextMicroDueAt = microDue(anchoredAt: snapshot.microAnchorAt ?? snapshot.boutStartedAt)
         }

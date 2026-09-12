@@ -207,7 +207,7 @@ final class PanelViewModel: ObservableObject {
 
     var toastSubtitle: String {
         guard let next = toast?.nextBreakAt else { return "" }
-        return "Next break at \(OverlayViewModel.timeLabel(next))"
+        return "Next break at \(MovezClock.label(next))"
     }
 
     // MARK: - Actions

@@ -11,9 +11,14 @@ final class SettingsWindowController {
     let viewModel: SettingsViewModel
     private(set) var window: NSWindow?
     private var observer: NSObjectProtocol?
+    /// Built on the first open. The inspector rebuilds itself on every coordinator publish, and
+    /// a window nobody has opened has no business doing that from launch until quit.
+    private let makeDebug: (() -> DebugViewModel)?
+    private var debug: DebugViewModel?
 
-    init(viewModel: SettingsViewModel) {
+    init(viewModel: SettingsViewModel, debug: (() -> DebugViewModel)? = nil) {
         self.viewModel = viewModel
+        makeDebug = debug
         observer = NotificationCenter.default.addObserver(
             forName: .movezOpenSettings,
             object: nil,
@@ -30,6 +35,11 @@ final class SettingsWindowController {
     var isOpen: Bool { window?.isVisible ?? false }
 
     func show() {
+        if debug == nil, let makeDebug {
+            let viewModel = makeDebug()
+            debug = viewModel
+            self.viewModel.attach(debug: viewModel)
+        }
         viewModel.syncLaunchAtLogin()
         let window = self.window ?? makeWindow()
         self.window = window

@@ -111,13 +111,13 @@ struct MenuBarState: Equatable {
     /// end — a Focus filter decides when that one lifts, not the clock.
     static func pausedSubtitle(resumesAt: Date?, remainingMinutes: Int) -> String {
         guard let resumesAt else { return "Countdown resumes with \(remainingMinutes) min left" }
-        return "Countdown resumes at \(clockLabel(resumesAt)) with \(remainingMinutes) min left"
+        return "Countdown resumes at \(MovezClock.label(resumesAt)) with \(remainingMinutes) min left"
     }
 
     /// "Breaks resume Monday at 9:00" — or today, or tomorrow, which read better than the day name.
     static func offHoursSubtitle(nextStart: Date?, now: Date, calendar: Calendar = .current) -> String {
         guard let nextStart else { return "No working days are switched on" }
-        return "Breaks resume \(dayPhrase(nextStart, now: now, calendar: calendar)) at \(clockLabel(nextStart))"
+        return "Breaks resume \(dayPhrase(nextStart, now: now, calendar: calendar)) at \(MovezClock.label(nextStart))"
     }
 
     static func dayPhrase(_ date: Date, now: Date, calendar: Calendar = .current) -> String {
@@ -141,12 +141,6 @@ struct MenuBarState: Equatable {
         "Longest sitting bout \(AppCoordinator.duration(seconds))"
     }
 
-    /// "9:00" / "15:00" — the same 24-hour clock the rest of the app uses.
-    static func clockLabel(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "H:mm"
-        return formatter.string(from: date)
-    }
 }
 
 /// What the menu bar can ask the app to do. Defaults do nothing, which is what snapshots want.

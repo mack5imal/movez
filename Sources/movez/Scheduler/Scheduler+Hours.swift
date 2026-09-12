@@ -25,7 +25,7 @@ extension Scheduler {
 
     mutating func enterOffHours(now: Date, reason: String) -> [SchedulerEffect] {
         let wasPolling = pollingRequired
-        var effects = dismissSurfaces()
+        var effects = dismissSurfaces(now: now)
         snapshot.adHocSession = false
         snapshot.adHocSessionStartedAt = nil
         transition(to: .offHours, reason: reason, at: now)

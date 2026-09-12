@@ -92,13 +92,15 @@ struct WorkingHoursPopover: View {
             SelectField(
                 options: Self.startOptions,
                 selection: $viewModel.hoursDraft.days[index].startMinutes,
-                minWidth: 96
+                minWidth: 96,
+                accessibilityName: "\(WorkingHours.shortNames[index]) start"
             )
             MovezText("–", MovezType.settingsRow, color: Tokens.text3)
             SelectField(
                 options: Self.endOptions,
                 selection: $viewModel.hoursDraft.days[index].endMinutes,
-                minWidth: 96
+                minWidth: 96,
+                accessibilityName: "\(WorkingHours.shortNames[index]) end"
             )
         }
         .opacity(day.enabled ? 1 : 0.55)

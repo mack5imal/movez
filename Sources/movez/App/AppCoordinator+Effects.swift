@@ -50,6 +50,20 @@ extension AppCoordinator {
     // MARK: - Breaks
 
     private func beginBreak(_ plan: BreakPlan) {
+        // A break the lid closed on picks up where it left off, with the movements it had, and
+        // without counting twice against the day's rotation.
+        if let resumed = interruptedSession {
+            interruptedSession = nil
+            currentBreak = BreakSession(
+                routine: resumed.routine,
+                startedAt: plan.startedAt,
+                blockIndex: resumed.blockIndex,
+                completedBlocks: resumed.completedBlocks,
+                deferred: plan.deferred
+            )
+            return
+        }
+
         let routine = nextRoutine(at: plan.startedAt)
         rememberRoutine(routine, at: plan.startedAt)
         cachedPreview = nil
@@ -92,8 +106,9 @@ extension AppCoordinator {
             ))
         case .interrupted:
             // Sleep or a locked screen: nothing is recorded until the machine comes back and the
-            // scheduler decides what the interruption meant.
-            break
+            // scheduler decides what the interruption meant. The session is kept so the break
+            // that resumes is this one.
+            interruptedSession = current
         }
     }
 
@@ -261,8 +276,9 @@ extension AppCoordinator {
 
         state.secondsUntilBreak = scheduler.snapshot.secondsUntilFullBreak(at: now)
         state.nextBreakAt = scheduler.snapshot.nextFullDueAt
+        // The subtitle is read off the published preview rather than rebuilt: this runs on every
+        // tick, and the menu is the only thing that wants it.
         state.nextRoutineSubtitle = nextRoutinePreview?.subtitle ?? ""
-        state.streak = history.streak(on: now)
         return state
     }
 

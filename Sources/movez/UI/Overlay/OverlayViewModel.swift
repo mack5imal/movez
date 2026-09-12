@@ -16,6 +16,8 @@ final class OverlayViewModel: ObservableObject {
     let startedAt: Date
     private let clock: Clock
     private let chimes: ChimePlayer?
+    /// The scheduler's own rules, so the overlay and the state machine agree about what counts.
+    private let config: SchedulerConfig
     private var collapsed: Set<String>
     private let persistCollapsed: (String, Bool) -> Void
     private let reduceMotion: Bool
@@ -26,6 +28,8 @@ final class OverlayViewModel: ObservableObject {
     private(set) var phase: OverlayState.Phase = .running
     private var blockStartedAt: Date
     private var halfwayChimed = false
+    /// The strip only changes when the block or the side does, not on every tick.
+    private var cachedStrip: [StripItem] = []
 
     var snoozesLeft: Int
     var skipsToday: Int
@@ -43,6 +47,7 @@ final class OverlayViewModel: ObservableObject {
         routine: Routine,
         startedAt: Date,
         clock: Clock,
+        config: SchedulerConfig = SchedulerConfig(),
         chimes: ChimePlayer? = nil,
         collapsed: Set<String> = [],
         snoozesLeft: Int = 2,
@@ -55,6 +60,7 @@ final class OverlayViewModel: ObservableObject {
         self.routine = routine
         self.startedAt = startedAt
         self.clock = clock
+        self.config = config
         self.chimes = chimes
         self.collapsed = collapsed
         self.snoozesLeft = snoozesLeft
@@ -65,6 +71,7 @@ final class OverlayViewModel: ObservableObject {
         self.persistCollapsed = persistCollapsed
         blockStartedAt = startedAt
         side = routine.blocks.first?.perSide == true ? .left : .none
+        rebuildStrip()
         refresh()
     }
 
@@ -86,9 +93,17 @@ final class OverlayViewModel: ObservableObject {
 
     /// Done replaces Snooze once the break has actually been done: half the blocks, or half the
     /// planned time.
+    ///
+    /// It asks the scheduler's own rule rather than restating it. The two used to disagree —
+    /// the overlay offered Done at half the *routine*, the scheduler counted half the configured
+    /// break — so on a short routine the user could press Done and be recorded as having skipped.
     var doneAvailable: Bool {
-        completedBlocks >= Int((Double(totalBlocks) * 0.5).rounded(.up))
-            || Int(clock.now.timeIntervalSince(startedAt)) >= routine.totalSeconds / 2
+        Scheduler.meetsCompletionRule(
+            completed: completedBlocks,
+            total: totalBlocks,
+            elapsed: Int(clock.now.timeIntervalSince(startedAt)),
+            config: config
+        )
     }
 
     var skipEnabled: Bool {
@@ -108,6 +123,7 @@ final class OverlayViewModel: ObservableObject {
         if block.perSide, !halfwayChimed, blockElapsed >= block.seconds / 2 {
             halfwayChimed = true
             side = .right
+            rebuildStrip()
             chimes?.play(.transition)
         }
 
@@ -153,6 +169,7 @@ final class OverlayViewModel: ObservableObject {
     func choose(side newSide: BreakSide) {
         guard block?.perSide == true else { return }
         side = newSide
+        rebuildStrip()
         refresh()
     }
 
@@ -173,12 +190,14 @@ final class OverlayViewModel: ObservableObject {
         blockStartedAt = clock.now
         halfwayChimed = false
         side = block?.perSide == true ? .left : .none
+        rebuildStrip()
         chimes?.play(.transition)
         refresh()
     }
 
     private func finish() {
         phase = .complete
+        rebuildStrip()
         chimes?.play(.completion)
         onFinished?(completedBlocks, totalBlocks)
         refresh()
@@ -190,17 +209,17 @@ final class OverlayViewModel: ObservableObject {
     func refresh() {
         var state = OverlayState()
         state.phase = phase
-        state.strip = stripItems()
+        state.strip = cachedStrip
         state.streak = streak
         state.skipsToday = skipsToday
 
         guard phase == .running else {
             state.eyebrow = "\(routine.name) · complete".uppercased()
-            state.headerTrailing = nextBreakAt.map { "NEXT BREAK \(Self.timeLabel($0))" } ?? ""
+            state.headerTrailing = nextBreakAt.map { "NEXT BREAK \(MovezClock.label($0))" } ?? ""
             state.completionTitle = routine.completionTitle
             state.endSummary = OverlayState.summary(
                 movements: completedBlocks,
-                nextBreakAt: nextBreakAt.map(Self.timeLabel) ?? "the usual time"
+                nextBreakAt: nextBreakAt.map(MovezClock.label) ?? "the usual time"
             )
             self.state = state
             return
@@ -233,8 +252,8 @@ final class OverlayViewModel: ObservableObject {
         return max(0, min(1, halfElapsed))
     }
 
-    private func stripItems() -> [StripItem] {
-        routine.blocks.enumerated().map { index, block in
+    private func rebuildStrip() {
+        cachedStrip = routine.blocks.enumerated().map { index, block in
             let itemState: StripItem.State = phase == .complete
                 ? .done
                 : (index < blockIndex ? .done : (index == blockIndex ? .current : .upcoming))
@@ -255,9 +274,4 @@ final class OverlayViewModel: ObservableObject {
         return "\(short.prefix(1).uppercased())\(short.dropFirst()) /side"
     }
 
-    static func timeLabel(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "H:mm"
-        return formatter.string(from: date)
-    }
 }

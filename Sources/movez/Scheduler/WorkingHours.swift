@@ -58,6 +58,18 @@ struct WorkingHours: Codable, Equatable, Hashable {
         self.days = days.count == 7 ? days : Array(repeating: .nineToSix, count: 7)
     }
 
+    private enum CodingKeys: String, CodingKey {
+        case days
+    }
+
+    /// Decoding goes through the validating initialiser. The days array is indexed by weekday
+    /// everywhere, so a saved blob with the wrong number of entries would be a crash rather than
+    /// a wrong answer.
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(days: try container.decode([DayHours].self, forKey: .days))
+    }
+
     func hours(on date: Date, calendar: Calendar) -> DayHours {
         days[(calendar.component(.weekday, from: date) - 1) % 7]
     }
@@ -83,7 +95,7 @@ struct WorkingHours: Codable, Equatable, Hashable {
     func endOfToday(_ date: Date, calendar: Calendar) -> Date? {
         let day = hours(on: date, calendar: calendar)
         guard day.enabled else { return nil }
-        return Self.date(startOfDay: calendar.startOfDay(for: date), minutes: day.endMinutes)
+        return Self.moment(onDayOf: date, minutes: day.endMinutes, calendar: calendar)
     }
 
     private func boundary(
@@ -95,8 +107,7 @@ struct WorkingHours: Codable, Equatable, Hashable {
             guard let candidateDay = calendar.date(byAdding: .day, value: offset, to: date) else { continue }
             let day = hours(on: candidateDay, calendar: calendar)
             guard day.enabled else { continue }
-            let midnight = calendar.startOfDay(for: candidateDay)
-            let moment = Self.date(startOfDay: midnight, minutes: selector(day))
+            let moment = Self.moment(onDayOf: candidateDay, minutes: selector(day), calendar: calendar)
             if moment > date { return moment }
         }
         return nil
@@ -146,7 +157,19 @@ struct WorkingHours: Codable, Equatable, Hashable {
         return (components.hour ?? 0) * 60 + (components.minute ?? 0)
     }
 
-    static func date(startOfDay: Date, minutes: Int) -> Date {
-        startOfDay.addingTimeInterval(TimeInterval(minutes * 60))
+    /// A wall-clock time on the day a date falls on.
+    ///
+    /// Built with the calendar rather than by adding seconds to midnight: on the two days a year
+    /// the clocks change, midnight plus nine hours is not nine o'clock, and every working-hours
+    /// boundary — the off-hours menu, "rest of the day", the day-reset check — would be an hour
+    /// out.
+    static func moment(onDayOf date: Date, minutes: Int, calendar: Calendar) -> Date {
+        let midnight = calendar.startOfDay(for: date)
+        guard minutes < 24 * 60 else {
+            return calendar.date(byAdding: .day, value: 1, to: midnight)
+                ?? midnight.addingTimeInterval(24 * 3_600)
+        }
+        return calendar.date(bySettingHour: minutes / 60, minute: minutes % 60, second: 0, of: midnight)
+            ?? midnight.addingTimeInterval(TimeInterval(minutes * 60))
     }
 }

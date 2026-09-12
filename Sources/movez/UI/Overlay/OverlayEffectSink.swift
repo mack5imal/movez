@@ -43,6 +43,7 @@ final class OverlayEffectSink: EffectSink {
             routine: session.routine,
             startedAt: session.startedAt,
             clock: coordinator.clock,
+            config: coordinator.settings.schedulerConfig,
             chimes: chimes,
             collapsed: coordinator.history.data.collapsedInstructions,
             snoozesLeft: coordinator.scheduler.snoozesLeft,

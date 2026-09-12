@@ -156,7 +156,8 @@ struct SettingsView: View {
             SettingsRow(label: "Focus") {
                 SelectField(
                     options: SettingsViewModel.focusOptions,
-                    selection: Binding(get: { settings.focus }, set: viewModel.setFocus)
+                    selection: Binding(get: { settings.focus }, set: viewModel.setFocus),
+                    accessibilityName: "Focus"
                 )
             }
         }
@@ -182,7 +183,8 @@ struct SettingsView: View {
                 SelectField(
                     options: SettingsViewModel.awayOptions,
                     selection: Binding(get: { settings.awayThresholdMinutes }, set: viewModel.setAwayMinutes),
-                    minWidth: 92
+                    minWidth: 92,
+                    accessibilityName: "Count me away after"
                 )
             }
         }

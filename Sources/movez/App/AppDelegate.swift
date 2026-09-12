@@ -8,6 +8,8 @@ import SwiftUI
 final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     private let arguments = LaunchArguments.current
     private(set) var coordinator: AppCoordinator?
+    /// Replaced in tests; the real one shows an alert and quits.
+    var fatalPresenter: FatalPresenter = AlertFatalPresenter()
     /// Published so the menu-bar scene picks the view model up the moment the coordinator exists.
     @Published private(set) var menuBar: MenuBarViewModel?
     private var settingsWindow: SettingsWindowController?
@@ -58,32 +60,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     /// will not load is fatal and loud: an app that quietly serves no movements is worse than one
     /// that says why it cannot.
     private func startCoordinator() {
-        do {
-            let library = try LibraryLoader.loadBundled()
-            let settings = SettingsStore()
-            let historyStore = try? FileHistoryStore.historyFile()
-            let snapshotStore = try? FileSnapshotStore.stateFile()
-            let coordinator = AppCoordinator(
-                library: library,
-                settings: settings,
-                history: historyStore.map { HistoryStore(store: $0) } ?? HistoryStore(),
-                clock: SystemClock(),
-                snapshotStore: snapshotStore
-            )
-            coordinator.attachSystemSignals()
-            attachUI(to: coordinator, settings: settings)
-            coordinator.start()
-            self.coordinator = coordinator
-            menuBar = MenuBarViewModel(coordinator: coordinator)
-            let settingsViewModel = SettingsViewModel(
-                settings: settings,
-                library: library,
-                onChange: { [weak coordinator] in coordinator?.settingsChanged() }
-            )
-            settingsViewModel.attach(debug: DebugViewModel(coordinator: coordinator))
-            settingsWindow = SettingsWindowController(viewModel: settingsViewModel)
-        } catch {
-            presentFatal(error)
+        guard let library = Launch.loadLibrary(presenter: fatalPresenter) else { return }
+        let settings = SettingsStore()
+        let historyStore = try? FileHistoryStore.historyFile()
+        let snapshotStore = try? FileSnapshotStore.stateFile()
+        let coordinator = AppCoordinator(
+            library: library,
+            settings: settings,
+            history: historyStore.map { HistoryStore(store: $0) } ?? HistoryStore(),
+            clock: SystemClock(),
+            snapshotStore: snapshotStore
+        )
+        coordinator.attachSystemSignals()
+        attachUI(to: coordinator, settings: settings)
+        coordinator.start()
+        self.coordinator = coordinator
+        menuBar = MenuBarViewModel(coordinator: coordinator)
+
+        let settingsViewModel = SettingsViewModel(
+            settings: settings,
+            library: library,
+            onChange: { [weak coordinator] in coordinator?.settingsChanged() }
+        )
+        settingsWindow = SettingsWindowController(viewModel: settingsViewModel) {
+            DebugViewModel(coordinator: coordinator)
         }
     }
 
@@ -95,17 +95,5 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
             PanelEffectSink(controller: PanelWindowController())
         ])
         coordinator.register(sink: sink)
-    }
-
-    private func presentFatal(_ error: Error) {
-        let alert = NSAlert()
-        alert.messageText = "movez could not start"
-        alert.informativeText = error.localizedDescription
-        alert.alertStyle = .critical
-        alert.addButton(withTitle: "Quit")
-        NSApp.setActivationPolicy(.regular)
-        NSApp.activate(ignoringOtherApps: true)
-        alert.runModal()
-        NSApp.terminate(nil)
     }
 }
