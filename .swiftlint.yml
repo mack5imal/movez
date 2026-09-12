@@ -1,0 +1,31 @@
+opt_in_rules:
+  - empty_count
+  - closure_spacing
+
+excluded:
+  - build
+  - movez.xcodeproj
+  - DerivedData
+  - .supergoal
+  - design_handoff_movez_ui
+
+line_length:
+  warning: 140
+  error: 200
+
+function_body_length:
+  warning: 60
+  error: 160
+
+type_body_length:
+  warning: 400
+  error: 600
+
+file_length:
+  warning: 600
+  error: 1200
+
+identifier_name:
+  min_length: 2
+
+reporter: "xcode"

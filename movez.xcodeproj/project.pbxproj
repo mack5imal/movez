@@ -1,0 +1,491 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0A594F456CB2C473CB12952C /* LaunchArguments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5829A9C4500C849FB13FEFAD /* LaunchArguments.swift */; };
+		17BBAC1362BB4FB7E6E5F809 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD9EEE57E8EDF899EE10357B /* AppDelegate.swift */; };
+		1F539EFD5D18C4F5ABE07347 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DDDDC773AAE7422F7A1D24 /* SmokeTests.swift */; };
+		3A1BB6EDE397350F51E3479E /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = E34A24AFC078FC0BFEFF7291 /* Fonts */; };
+		55074040540FC506FB3D1593 /* movezApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E025EF728AA5019AE530696 /* movezApp.swift */; };
+		7E4EE203AAA5BFB4E8F1C3CE /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0540DC096C801998998E1E5 /* Fonts.swift */; };
+		930E072744DEE5F4050F35E3 /* MovezBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EE54B4CE88693D730866958 /* MovezBundle.swift */; };
+		AED7B97C500E48E342DFCE4F /* Chimes in Resources */ = {isa = PBXBuildFile; fileRef = A053CED1DBBFDC22F031D6FB /* Chimes */; };
+		B026DE4B18272944666811A4 /* movement-library-v4.json in Resources */ = {isa = PBXBuildFile; fileRef = F14A2D2340D0DA758E7380B8 /* movement-library-v4.json */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		04736B29C9F3BD87CECA0B8A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F5E0D58E994FA64CA3A98CB3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 219ED0BAD40FC725CC802D46;
+			remoteInfo = movez;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		4EE54B4CE88693D730866958 /* MovezBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovezBundle.swift; sourceTree = "<group>"; };
+		5829A9C4500C849FB13FEFAD /* LaunchArguments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchArguments.swift; sourceTree = "<group>"; };
+		5E025EF728AA5019AE530696 /* movezApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = movezApp.swift; sourceTree = "<group>"; };
+		A053CED1DBBFDC22F031D6FB /* Chimes */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Chimes; path = Sources/movez/Resources/Chimes; sourceTree = SOURCE_ROOT; };
+		AD9EEE57E8EDF899EE10357B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		C8C62D9F791457B612525A3B /* movez.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = movez.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E34A24AFC078FC0BFEFF7291 /* Fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Fonts; path = Sources/movez/Resources/Fonts; sourceTree = SOURCE_ROOT; };
+		E5218DC9337ADC8083520BD0 /* movezTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = movezTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F0540DC096C801998998E1E5 /* Fonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fonts.swift; sourceTree = "<group>"; };
+		F14A2D2340D0DA758E7380B8 /* movement-library-v4.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "movement-library-v4.json"; sourceTree = "<group>"; };
+		F1DDDDC773AAE7422F7A1D24 /* SmokeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmokeTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		01A0344647A980D4D06E0808 /* movez */ = {
+			isa = PBXGroup;
+			children = (
+				39574247522A2FF00EDAAEC6 /* App */,
+				C3925A8B36DE132C0847976A /* Resources */,
+				80BC2BFC9DD9C48F42BC087A /* UI */,
+			);
+			path = movez;
+			sourceTree = "<group>";
+		};
+		1C9532C0576C5A15AB57A8D0 /* movezTests */ = {
+			isa = PBXGroup;
+			children = (
+				F1DDDDC773AAE7422F7A1D24 /* SmokeTests.swift */,
+			);
+			path = movezTests;
+			sourceTree = "<group>";
+		};
+		3402559F7C15AFF135757FE0 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				01A0344647A980D4D06E0808 /* movez */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		3512B72421A20C85DB297871 = {
+			isa = PBXGroup;
+			children = (
+				3402559F7C15AFF135757FE0 /* Sources */,
+				C1F3A2880F9EE65E5404C18A /* Tests */,
+				F14A2D2340D0DA758E7380B8 /* movement-library-v4.json */,
+				F002C31118AF5C2DC8A62C54 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		39574247522A2FF00EDAAEC6 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				AD9EEE57E8EDF899EE10357B /* AppDelegate.swift */,
+				5829A9C4500C849FB13FEFAD /* LaunchArguments.swift */,
+				5E025EF728AA5019AE530696 /* movezApp.swift */,
+				4EE54B4CE88693D730866958 /* MovezBundle.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		80BC2BFC9DD9C48F42BC087A /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				EFF9C23AE5620C29C9B23D42 /* DesignSystem */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		C1F3A2880F9EE65E5404C18A /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				1C9532C0576C5A15AB57A8D0 /* movezTests */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		C3925A8B36DE132C0847976A /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A053CED1DBBFDC22F031D6FB /* Chimes */,
+				E34A24AFC078FC0BFEFF7291 /* Fonts */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		EFF9C23AE5620C29C9B23D42 /* DesignSystem */ = {
+			isa = PBXGroup;
+			children = (
+				F0540DC096C801998998E1E5 /* Fonts.swift */,
+			);
+			path = DesignSystem;
+			sourceTree = "<group>";
+		};
+		F002C31118AF5C2DC8A62C54 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C8C62D9F791457B612525A3B /* movez.app */,
+				E5218DC9337ADC8083520BD0 /* movezTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		219ED0BAD40FC725CC802D46 /* movez */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 327550F3CA1978949E93BA10 /* Build configuration list for PBXNativeTarget "movez" */;
+			buildPhases = (
+				988FEDBE2840C3B89ABE8526 /* Sources */,
+				630C5D32E4418DA0B6141BC3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = movez;
+			packageProductDependencies = (
+			);
+			productName = movez;
+			productReference = C8C62D9F791457B612525A3B /* movez.app */;
+			productType = "com.apple.product-type.application";
+		};
+		DDB15632DC92785C0809CF54 /* movezTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 22C38E498791DA51F261B555 /* Build configuration list for PBXNativeTarget "movezTests" */;
+			buildPhases = (
+				9E615F5D521217733DCAAC09 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				25D08198AAC0248F8A9E630A /* PBXTargetDependency */,
+			);
+			name = movezTests;
+			packageProductDependencies = (
+			);
+			productName = movezTests;
+			productReference = E5218DC9337ADC8083520BD0 /* movezTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F5E0D58E994FA64CA3A98CB3 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					219ED0BAD40FC725CC802D46 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Manual;
+					};
+					DDB15632DC92785C0809CF54 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Manual;
+					};
+				};
+			};
+			buildConfigurationList = B148E78305BF15A73F66F198 /* Build configuration list for PBXProject "movez" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 3512B72421A20C85DB297871;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = F002C31118AF5C2DC8A62C54 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				219ED0BAD40FC725CC802D46 /* movez */,
+				DDB15632DC92785C0809CF54 /* movezTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		630C5D32E4418DA0B6141BC3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AED7B97C500E48E342DFCE4F /* Chimes in Resources */,
+				3A1BB6EDE397350F51E3479E /* Fonts in Resources */,
+				B026DE4B18272944666811A4 /* movement-library-v4.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		988FEDBE2840C3B89ABE8526 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				17BBAC1362BB4FB7E6E5F809 /* AppDelegate.swift in Sources */,
+				7E4EE203AAA5BFB4E8F1C3CE /* Fonts.swift in Sources */,
+				0A594F456CB2C473CB12952C /* LaunchArguments.swift in Sources */,
+				930E072744DEE5F4050F35E3 /* MovezBundle.swift in Sources */,
+				55074040540FC506FB3D1593 /* movezApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9E615F5D521217733DCAAC09 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1F539EFD5D18C4F5ABE07347 /* SmokeTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		25D08198AAC0248F8A9E630A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 219ED0BAD40FC725CC802D46 /* movez */;
+			targetProxy = 04736B29C9F3BD87CECA0B8A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		2997C24E6C12A268D4A0E913 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = targeted;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = NO;
+				SWIFT_VERSION = 5;
+			};
+			name = Debug;
+		};
+		3718C54794A5D112CAEA2B69 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_STRICT_CONCURRENCY = targeted;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = NO;
+				SWIFT_VERSION = 5;
+			};
+			name = Release;
+		};
+		6E1B8BC7AB1F2F828EA2C992 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kylemack.movezTests;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/movez.app/Contents/MacOS/movez";
+			};
+			name = Release;
+		};
+		87AF56CF321E2F590C065CC9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Sources/movez/movez.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_TESTABILITY = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Sources/movez/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.kylemack.movez;
+				PRODUCT_NAME = movez;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		A812D797E3DFF58896994F4D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Sources/movez/movez.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Sources/movez/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.kylemack.movez;
+				PRODUCT_NAME = movez;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		E970C23C8BE4D13218A8C62C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kylemack.movezTests;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/movez.app/Contents/MacOS/movez";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		22C38E498791DA51F261B555 /* Build configuration list for PBXNativeTarget "movezTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E970C23C8BE4D13218A8C62C /* Debug */,
+				6E1B8BC7AB1F2F828EA2C992 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		327550F3CA1978949E93BA10 /* Build configuration list for PBXNativeTarget "movez" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				87AF56CF321E2F590C065CC9 /* Debug */,
+				A812D797E3DFF58896994F4D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B148E78305BF15A73F66F198 /* Build configuration list for PBXProject "movez" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2997C24E6C12A268D4A0E913 /* Debug */,
+				3718C54794A5D112CAEA2B69 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F5E0D58E994FA64CA3A98CB3 /* Project object */;
+}

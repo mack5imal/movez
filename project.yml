@@ -1,0 +1,81 @@
+name: movez
+
+options:
+  bundleIdPrefix: com.kylemack
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5"
+    SWIFT_STRICT_CONCURRENCY: targeted
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    CODE_SIGN_IDENTITY: "-"
+    CODE_SIGN_STYLE: Manual
+    DEVELOPMENT_TEAM: ""
+    ENABLE_HARDENED_RUNTIME: NO
+    SWIFT_TREAT_WARNINGS_AS_ERRORS: NO
+    GCC_TREAT_WARNINGS_AS_ERRORS: NO
+    ALWAYS_SEARCH_USER_PATHS: NO
+
+targets:
+  movez:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources/movez
+        excludes:
+          - "Resources/Info.plist"
+          - "Resources/Fonts"
+          - "Resources/Chimes"
+          - "movez.entitlements"
+      - path: Sources/movez/Resources/Fonts
+        type: folder
+        buildPhase: resources
+      - path: Sources/movez/Resources/Chimes
+        type: folder
+        buildPhase: resources
+      - path: movement-library-v4.json
+        buildPhase: resources
+    settings:
+      base:
+        INFOPLIST_FILE: Sources/movez/Resources/Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+        PRODUCT_BUNDLE_IDENTIFIER: com.kylemack.movez
+        PRODUCT_NAME: movez
+        CODE_SIGN_ENTITLEMENTS: Sources/movez/movez.entitlements
+        COMBINE_HIDPI_IMAGES: YES
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/../Frameworks"
+      configs:
+        Debug:
+          ENABLE_TESTABILITY: YES
+
+  movezTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: Tests/movezTests
+    dependencies:
+      - target: movez
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.kylemack.movezTests
+        GENERATE_INFOPLIST_FILE: YES
+        SWIFT_VERSION: "5"
+
+schemes:
+  movez:
+    build:
+      targets:
+        movez: all
+        movezTests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      gatherCoverageData: false
+      targets:
+        - movezTests
