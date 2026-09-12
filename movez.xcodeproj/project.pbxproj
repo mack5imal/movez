@@ -8,25 +8,37 @@
 
 /* Begin PBXBuildFile section */
 		0029928374647F3135541973 /* SubstitutionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A9EBE441108D20D23E7CCC0 /* SubstitutionsTests.swift */; };
+		014CD8EA300813175B68DB40 /* RoutineNaming.swift in Sources */ = {isa = PBXBuildFile; fileRef = 081C0DC27F0E07B390673A5A /* RoutineNaming.swift */; };
 		0A594F456CB2C473CB12952C /* LaunchArguments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5829A9C4500C849FB13FEFAD /* LaunchArguments.swift */; };
+		0F074C7F41A3C8C7849C2F95 /* RoutineBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64B812A24864DC7766D2B8E2 /* RoutineBuilder.swift */; };
 		17BBAC1362BB4FB7E6E5F809 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD9EEE57E8EDF899EE10357B /* AppDelegate.swift */; };
 		1F539EFD5D18C4F5ABE07347 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DDDDC773AAE7422F7A1D24 /* SmokeTests.swift */; };
+		24A56B2FADD5631DAF0DFD13 /* RoutineValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5BD6A2AA7A23D4AC1BABB /* RoutineValidator.swift */; };
 		25E93322972C26948D469154 /* RoutineTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B18D9238BAD43644A6B180B1 /* RoutineTemplate.swift */; };
 		2F5A321C9F100BE43451B406 /* Setting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338688FA6237BBEDF3C03670 /* Setting.swift */; };
+		3096DA29B7430245E2D89B1A /* RoutineBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2636E7E2FEA7389160E0CC2 /* RoutineBuilderTests.swift */; };
 		3A1BB6EDE397350F51E3479E /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = E34A24AFC078FC0BFEFF7291 /* Fonts */; };
+		442929D6E726EE59E03D8B07 /* RegionRotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F09EC25E84D897D4FA79FBB /* RegionRotation.swift */; };
 		47D730F2B581C31604F130CC /* Preset.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4DFD6E3893BC494249C0377 /* Preset.swift */; };
+		50D4E872D82B1BD926667F7A /* RoutineContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F16E197BB8CBCF7D345DCC /* RoutineContext.swift */; };
 		55074040540FC506FB3D1593 /* movezApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E025EF728AA5019AE530696 /* movezApp.swift */; };
 		61F812800D92C69E54FD7CDE /* LibraryMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54B929FFC124423F85034C3A /* LibraryMetadata.swift */; };
 		6325C7101E9E02B9C9A49E3B /* Equipment.swift in Sources */ = {isa = PBXBuildFile; fileRef = A270094632CC887D16A9B2D2 /* Equipment.swift */; };
 		71A239A7D8F88B6323D2EDD9 /* Region.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F75D6C7814FDA37FB714DD /* Region.swift */; };
+		766E97E004686AB8163D46E1 /* RoutineFixturesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B577EE28A8F593F5FF18F4 /* RoutineFixturesTests.swift */; };
 		7E4EE203AAA5BFB4E8F1C3CE /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0540DC096C801998998E1E5 /* Fonts.swift */; };
 		930E072744DEE5F4050F35E3 /* MovezBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EE54B4CE88693D730866958 /* MovezBundle.swift */; };
+		93E96C660961E469EC1C53D3 /* Routine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52237A737E2C1AFF6A78303C /* Routine.swift */; };
+		944B9718DB251BD9E1744647 /* SeededRandom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E47EF436BDD3C23084D28F4 /* SeededRandom.swift */; };
+		A1139C1975FC8C947D0EE8B0 /* RoutineTestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9B9838D81524A40DB3881AB /* RoutineTestSupport.swift */; };
 		ADD0D0E44651BF36B3CDA5D8 /* Substitutions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EDEE7F8CC2A8806107B9E5 /* Substitutions.swift */; };
 		AED7B97C500E48E342DFCE4F /* Chimes in Resources */ = {isa = PBXBuildFile; fileRef = A053CED1DBBFDC22F031D6FB /* Chimes */; };
 		B026DE4B18272944666811A4 /* movement-library-v4.json in Resources */ = {isa = PBXBuildFile; fileRef = F14A2D2340D0DA758E7380B8 /* movement-library-v4.json */; };
 		B32E6AC45DA1AAB0B4AE1BD1 /* MovementLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABFC20128A308BD74AD1E790 /* MovementLibrary.swift */; };
+		B9D41EEFC7605CAFEDBB00CC /* MicroBreakBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FDDD314F5FCB09D7D7D496 /* MicroBreakBuilderTests.swift */; };
 		C0CE23AE79FE5163DF44F90C /* LibraryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1637897564C21375102AE856 /* LibraryTests.swift */; };
 		CFA086FFD3DC582124770DD7 /* Bucket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FD4162D0EEB338461E7A53C /* Bucket.swift */; };
+		D82D8E877AC0EE6B93652726 /* MicroBreakBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0358B4658CB12F9685A9098 /* MicroBreakBuilder.swift */; };
 		F16080DCF0D5B3FC40836C96 /* Movement.swift in Sources */ = {isa = PBXBuildFile; fileRef = E362393507283AB751AFD135 /* Movement.swift */; };
 		FDBB7E5A18656F9D53CA2DA2 /* LibraryLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A6BEA1E29B3BDA91DF3B33 /* LibraryLoader.swift */; };
 /* End PBXBuildFile section */
@@ -42,27 +54,39 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		081C0DC27F0E07B390673A5A /* RoutineNaming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineNaming.swift; sourceTree = "<group>"; };
+		0F09EC25E84D897D4FA79FBB /* RegionRotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegionRotation.swift; sourceTree = "<group>"; };
 		1637897564C21375102AE856 /* LibraryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryTests.swift; sourceTree = "<group>"; };
 		1FD4162D0EEB338461E7A53C /* Bucket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bucket.swift; sourceTree = "<group>"; };
 		338688FA6237BBEDF3C03670 /* Setting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Setting.swift; sourceTree = "<group>"; };
 		4EE54B4CE88693D730866958 /* MovezBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovezBundle.swift; sourceTree = "<group>"; };
+		52237A737E2C1AFF6A78303C /* Routine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Routine.swift; sourceTree = "<group>"; };
 		54B929FFC124423F85034C3A /* LibraryMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryMetadata.swift; sourceTree = "<group>"; };
 		56A6BEA1E29B3BDA91DF3B33 /* LibraryLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryLoader.swift; sourceTree = "<group>"; };
 		5829A9C4500C849FB13FEFAD /* LaunchArguments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchArguments.swift; sourceTree = "<group>"; };
 		5E025EF728AA5019AE530696 /* movezApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = movezApp.swift; sourceTree = "<group>"; };
+		64B812A24864DC7766D2B8E2 /* RoutineBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineBuilder.swift; sourceTree = "<group>"; };
+		6E47EF436BDD3C23084D28F4 /* SeededRandom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeededRandom.swift; sourceTree = "<group>"; };
 		8A9EBE441108D20D23E7CCC0 /* SubstitutionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubstitutionsTests.swift; sourceTree = "<group>"; };
 		A053CED1DBBFDC22F031D6FB /* Chimes */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Chimes; path = Sources/movez/Resources/Chimes; sourceTree = SOURCE_ROOT; };
 		A270094632CC887D16A9B2D2 /* Equipment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Equipment.swift; sourceTree = "<group>"; };
 		A3F75D6C7814FDA37FB714DD /* Region.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Region.swift; sourceTree = "<group>"; };
 		A4DFD6E3893BC494249C0377 /* Preset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preset.swift; sourceTree = "<group>"; };
+		A9B9838D81524A40DB3881AB /* RoutineTestSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineTestSupport.swift; sourceTree = "<group>"; };
 		ABFC20128A308BD74AD1E790 /* MovementLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovementLibrary.swift; sourceTree = "<group>"; };
 		AD9EEE57E8EDF899EE10357B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B18D9238BAD43644A6B180B1 /* RoutineTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineTemplate.swift; sourceTree = "<group>"; };
+		BED5BD6A2AA7A23D4AC1BABB /* RoutineValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineValidator.swift; sourceTree = "<group>"; };
+		C0B577EE28A8F593F5FF18F4 /* RoutineFixturesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineFixturesTests.swift; sourceTree = "<group>"; };
 		C8C62D9F791457B612525A3B /* movez.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = movez.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C8F16E197BB8CBCF7D345DCC /* RoutineContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineContext.swift; sourceTree = "<group>"; };
+		D2636E7E2FEA7389160E0CC2 /* RoutineBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineBuilderTests.swift; sourceTree = "<group>"; };
+		E0358B4658CB12F9685A9098 /* MicroBreakBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroBreakBuilder.swift; sourceTree = "<group>"; };
 		E34A24AFC078FC0BFEFF7291 /* Fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Fonts; path = Sources/movez/Resources/Fonts; sourceTree = SOURCE_ROOT; };
 		E362393507283AB751AFD135 /* Movement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Movement.swift; sourceTree = "<group>"; };
 		E5218DC9337ADC8083520BD0 /* movezTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = movezTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E6EDEE7F8CC2A8806107B9E5 /* Substitutions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Substitutions.swift; sourceTree = "<group>"; };
+		E6FDDD314F5FCB09D7D7D496 /* MicroBreakBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroBreakBuilderTests.swift; sourceTree = "<group>"; };
 		F0540DC096C801998998E1E5 /* Fonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fonts.swift; sourceTree = "<group>"; };
 		F14A2D2340D0DA758E7380B8 /* movement-library-v4.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "movement-library-v4.json"; sourceTree = "<group>"; };
 		F1DDDDC773AAE7422F7A1D24 /* SmokeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmokeTests.swift; sourceTree = "<group>"; };
@@ -75,6 +99,7 @@
 				39574247522A2FF00EDAAEC6 /* App */,
 				79848EC3BAB4DFEFF848B418 /* Library */,
 				C3925A8B36DE132C0847976A /* Resources */,
+				3B8406736C75074B51E0B431 /* Routine */,
 				80BC2BFC9DD9C48F42BC087A /* UI */,
 			);
 			path = movez;
@@ -84,6 +109,10 @@
 			isa = PBXGroup;
 			children = (
 				1637897564C21375102AE856 /* LibraryTests.swift */,
+				E6FDDD314F5FCB09D7D7D496 /* MicroBreakBuilderTests.swift */,
+				D2636E7E2FEA7389160E0CC2 /* RoutineBuilderTests.swift */,
+				C0B577EE28A8F593F5FF18F4 /* RoutineFixturesTests.swift */,
+				A9B9838D81524A40DB3881AB /* RoutineTestSupport.swift */,
 				F1DDDDC773AAE7422F7A1D24 /* SmokeTests.swift */,
 				8A9EBE441108D20D23E7CCC0 /* SubstitutionsTests.swift */,
 			);
@@ -117,6 +146,21 @@
 				4EE54B4CE88693D730866958 /* MovezBundle.swift */,
 			);
 			path = App;
+			sourceTree = "<group>";
+		};
+		3B8406736C75074B51E0B431 /* Routine */ = {
+			isa = PBXGroup;
+			children = (
+				E0358B4658CB12F9685A9098 /* MicroBreakBuilder.swift */,
+				0F09EC25E84D897D4FA79FBB /* RegionRotation.swift */,
+				52237A737E2C1AFF6A78303C /* Routine.swift */,
+				64B812A24864DC7766D2B8E2 /* RoutineBuilder.swift */,
+				C8F16E197BB8CBCF7D345DCC /* RoutineContext.swift */,
+				081C0DC27F0E07B390673A5A /* RoutineNaming.swift */,
+				BED5BD6A2AA7A23D4AC1BABB /* RoutineValidator.swift */,
+				6E47EF436BDD3C23084D28F4 /* SeededRandom.swift */,
+			);
+			path = Routine;
 			sourceTree = "<group>";
 		};
 		79848EC3BAB4DFEFF848B418 /* Library */ = {
@@ -282,12 +326,20 @@
 				0A594F456CB2C473CB12952C /* LaunchArguments.swift in Sources */,
 				FDBB7E5A18656F9D53CA2DA2 /* LibraryLoader.swift in Sources */,
 				61F812800D92C69E54FD7CDE /* LibraryMetadata.swift in Sources */,
+				D82D8E877AC0EE6B93652726 /* MicroBreakBuilder.swift in Sources */,
 				F16080DCF0D5B3FC40836C96 /* Movement.swift in Sources */,
 				B32E6AC45DA1AAB0B4AE1BD1 /* MovementLibrary.swift in Sources */,
 				930E072744DEE5F4050F35E3 /* MovezBundle.swift in Sources */,
 				47D730F2B581C31604F130CC /* Preset.swift in Sources */,
 				71A239A7D8F88B6323D2EDD9 /* Region.swift in Sources */,
+				442929D6E726EE59E03D8B07 /* RegionRotation.swift in Sources */,
+				93E96C660961E469EC1C53D3 /* Routine.swift in Sources */,
+				0F074C7F41A3C8C7849C2F95 /* RoutineBuilder.swift in Sources */,
+				50D4E872D82B1BD926667F7A /* RoutineContext.swift in Sources */,
+				014CD8EA300813175B68DB40 /* RoutineNaming.swift in Sources */,
 				25E93322972C26948D469154 /* RoutineTemplate.swift in Sources */,
+				24A56B2FADD5631DAF0DFD13 /* RoutineValidator.swift in Sources */,
+				944B9718DB251BD9E1744647 /* SeededRandom.swift in Sources */,
 				2F5A321C9F100BE43451B406 /* Setting.swift in Sources */,
 				ADD0D0E44651BF36B3CDA5D8 /* Substitutions.swift in Sources */,
 				55074040540FC506FB3D1593 /* movezApp.swift in Sources */,
@@ -299,6 +351,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				C0CE23AE79FE5163DF44F90C /* LibraryTests.swift in Sources */,
+				B9D41EEFC7605CAFEDBB00CC /* MicroBreakBuilderTests.swift in Sources */,
+				3096DA29B7430245E2D89B1A /* RoutineBuilderTests.swift in Sources */,
+				766E97E004686AB8163D46E1 /* RoutineFixturesTests.swift in Sources */,
+				A1139C1975FC8C947D0EE8B0 /* RoutineTestSupport.swift in Sources */,
 				1F539EFD5D18C4F5ABE07347 /* SmokeTests.swift in Sources */,
 				0029928374647F3135541973 /* SubstitutionsTests.swift in Sources */,
 			);
