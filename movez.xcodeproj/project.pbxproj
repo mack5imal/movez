@@ -9,9 +9,12 @@
 /* Begin PBXBuildFile section */
 		0029928374647F3135541973 /* SubstitutionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A9EBE441108D20D23E7CCC0 /* SubstitutionsTests.swift */; };
 		014CD8EA300813175B68DB40 /* RoutineNaming.swift in Sources */ = {isa = PBXBuildFile; fileRef = 081C0DC27F0E07B390673A5A /* RoutineNaming.swift */; };
+		05C2300393C6D87593D7781D /* ClockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86A1502B4366E217FC27D92F /* ClockTests.swift */; };
 		0A594F456CB2C473CB12952C /* LaunchArguments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5829A9C4500C849FB13FEFAD /* LaunchArguments.swift */; };
 		0F074C7F41A3C8C7849C2F95 /* RoutineBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64B812A24864DC7766D2B8E2 /* RoutineBuilder.swift */; };
+		12A569A63B9D80B070A91B73 /* SignalSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D24389D182EC724A1CFC3A /* SignalSnapshot.swift */; };
 		17BBAC1362BB4FB7E6E5F809 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD9EEE57E8EDF899EE10357B /* AppDelegate.swift */; };
+		1BDCADC884E2EDDA6CE12624 /* SchedulerTestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E039EE67EC22D7EDCFDF48A2 /* SchedulerTestSupport.swift */; };
 		1F539EFD5D18C4F5ABE07347 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DDDDC773AAE7422F7A1D24 /* SmokeTests.swift */; };
 		24A56B2FADD5631DAF0DFD13 /* RoutineValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5BD6A2AA7A23D4AC1BABB /* RoutineValidator.swift */; };
 		25E93322972C26948D469154 /* RoutineTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B18D9238BAD43644A6B180B1 /* RoutineTemplate.swift */; };
@@ -20,27 +23,40 @@
 		3A1BB6EDE397350F51E3479E /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = E34A24AFC078FC0BFEFF7291 /* Fonts */; };
 		442929D6E726EE59E03D8B07 /* RegionRotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F09EC25E84D897D4FA79FBB /* RegionRotation.swift */; };
 		47D730F2B581C31604F130CC /* Preset.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4DFD6E3893BC494249C0377 /* Preset.swift */; };
+		4C0067EE2D2F0D172E5BAFC7 /* SchedulerMicroTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62B4AC6C3F66A7E5ABB97CFF /* SchedulerMicroTests.swift */; };
+		4FE06E2578B3E44232996091 /* Scheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1357C14B78E301196BDC5185 /* Scheduler.swift */; };
 		50D4E872D82B1BD926667F7A /* RoutineContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F16E197BB8CBCF7D345DCC /* RoutineContext.swift */; };
 		55074040540FC506FB3D1593 /* movezApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E025EF728AA5019AE530696 /* movezApp.swift */; };
+		5987DDB5C15A06E93AD17AE8 /* SchedulerEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD7E4757BE6870716B20B25A /* SchedulerEvent.swift */; };
+		5DB3F9562B633581A83E2DAF /* Clock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B38057FE27BFBA4B888F5B0 /* Clock.swift */; };
+		6144F8A35500D2DA0410DD2B /* StatePersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = A49E80929BB51EEDA20B470F /* StatePersistence.swift */; };
 		61F812800D92C69E54FD7CDE /* LibraryMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54B929FFC124423F85034C3A /* LibraryMetadata.swift */; };
 		6325C7101E9E02B9C9A49E3B /* Equipment.swift in Sources */ = {isa = PBXBuildFile; fileRef = A270094632CC887D16A9B2D2 /* Equipment.swift */; };
+		64220A63A12C495222F60DC7 /* TransitionLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A36C066F3C6A50DD09893FA1 /* TransitionLog.swift */; };
+		69986D5FCA4CADB4AAE14600 /* SchedulerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A277DB86AA6B3984DC78F694 /* SchedulerState.swift */; };
 		71A239A7D8F88B6323D2EDD9 /* Region.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F75D6C7814FDA37FB714DD /* Region.swift */; };
 		766E97E004686AB8163D46E1 /* RoutineFixturesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B577EE28A8F593F5FF18F4 /* RoutineFixturesTests.swift */; };
 		7E4EE203AAA5BFB4E8F1C3CE /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0540DC096C801998998E1E5 /* Fonts.swift */; };
+		80FCE6948F1D4D0A3C500F3A /* SchedulerEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06CE8997B39FFB560CC27EC0 /* SchedulerEffect.swift */; };
+		87848EA5BF6191E1B7ADB5C1 /* SchedulerConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7931632856036648A3777A7 /* SchedulerConfig.swift */; };
+		8E2B50A1C0B30940F1637281 /* PersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 202C50EE6CC441F2982008AB /* PersistenceTests.swift */; };
 		930E072744DEE5F4050F35E3 /* MovezBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EE54B4CE88693D730866958 /* MovezBundle.swift */; };
 		93E96C660961E469EC1C53D3 /* Routine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52237A737E2C1AFF6A78303C /* Routine.swift */; };
 		944B9718DB251BD9E1744647 /* SeededRandom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E47EF436BDD3C23084D28F4 /* SeededRandom.swift */; };
 		A1139C1975FC8C947D0EE8B0 /* RoutineTestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9B9838D81524A40DB3881AB /* RoutineTestSupport.swift */; };
+		ABB604BF42B752AA858F04BC /* SchedulerSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5789AEACEFAA9758E0145C9A /* SchedulerSnapshot.swift */; };
 		ADD0D0E44651BF36B3CDA5D8 /* Substitutions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EDEE7F8CC2A8806107B9E5 /* Substitutions.swift */; };
 		AED7B97C500E48E342DFCE4F /* Chimes in Resources */ = {isa = PBXBuildFile; fileRef = A053CED1DBBFDC22F031D6FB /* Chimes */; };
 		B026DE4B18272944666811A4 /* movement-library-v4.json in Resources */ = {isa = PBXBuildFile; fileRef = F14A2D2340D0DA758E7380B8 /* movement-library-v4.json */; };
 		B32E6AC45DA1AAB0B4AE1BD1 /* MovementLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABFC20128A308BD74AD1E790 /* MovementLibrary.swift */; };
 		B9D41EEFC7605CAFEDBB00CC /* MicroBreakBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FDDD314F5FCB09D7D7D496 /* MicroBreakBuilderTests.swift */; };
 		C0CE23AE79FE5163DF44F90C /* LibraryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1637897564C21375102AE856 /* LibraryTests.swift */; };
+		C7FD8B58088A2CD47C915509 /* SchedulerCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CFDF85D71146981530D4EAA /* SchedulerCoreTests.swift */; };
 		CFA086FFD3DC582124770DD7 /* Bucket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FD4162D0EEB338461E7A53C /* Bucket.swift */; };
 		D82D8E877AC0EE6B93652726 /* MicroBreakBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0358B4658CB12F9685A9098 /* MicroBreakBuilder.swift */; };
 		F16080DCF0D5B3FC40836C96 /* Movement.swift in Sources */ = {isa = PBXBuildFile; fileRef = E362393507283AB751AFD135 /* Movement.swift */; };
 		FDBB7E5A18656F9D53CA2DA2 /* LibraryLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A6BEA1E29B3BDA91DF3B33 /* LibraryLoader.swift */; };
+		FFFA726A1E5C0A77083C6E51 /* Scheduler+Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93382A4F69A62588E48F0722 /* Scheduler+Actions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,34 +70,50 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		06CE8997B39FFB560CC27EC0 /* SchedulerEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerEffect.swift; sourceTree = "<group>"; };
 		081C0DC27F0E07B390673A5A /* RoutineNaming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineNaming.swift; sourceTree = "<group>"; };
 		0F09EC25E84D897D4FA79FBB /* RegionRotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegionRotation.swift; sourceTree = "<group>"; };
+		1357C14B78E301196BDC5185 /* Scheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scheduler.swift; sourceTree = "<group>"; };
 		1637897564C21375102AE856 /* LibraryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryTests.swift; sourceTree = "<group>"; };
+		1CFDF85D71146981530D4EAA /* SchedulerCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerCoreTests.swift; sourceTree = "<group>"; };
 		1FD4162D0EEB338461E7A53C /* Bucket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bucket.swift; sourceTree = "<group>"; };
+		202C50EE6CC441F2982008AB /* PersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceTests.swift; sourceTree = "<group>"; };
 		338688FA6237BBEDF3C03670 /* Setting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Setting.swift; sourceTree = "<group>"; };
 		4EE54B4CE88693D730866958 /* MovezBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovezBundle.swift; sourceTree = "<group>"; };
 		52237A737E2C1AFF6A78303C /* Routine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Routine.swift; sourceTree = "<group>"; };
 		54B929FFC124423F85034C3A /* LibraryMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryMetadata.swift; sourceTree = "<group>"; };
 		56A6BEA1E29B3BDA91DF3B33 /* LibraryLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryLoader.swift; sourceTree = "<group>"; };
+		5789AEACEFAA9758E0145C9A /* SchedulerSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerSnapshot.swift; sourceTree = "<group>"; };
 		5829A9C4500C849FB13FEFAD /* LaunchArguments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchArguments.swift; sourceTree = "<group>"; };
 		5E025EF728AA5019AE530696 /* movezApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = movezApp.swift; sourceTree = "<group>"; };
+		62B4AC6C3F66A7E5ABB97CFF /* SchedulerMicroTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerMicroTests.swift; sourceTree = "<group>"; };
 		64B812A24864DC7766D2B8E2 /* RoutineBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineBuilder.swift; sourceTree = "<group>"; };
+		6B38057FE27BFBA4B888F5B0 /* Clock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Clock.swift; sourceTree = "<group>"; };
 		6E47EF436BDD3C23084D28F4 /* SeededRandom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeededRandom.swift; sourceTree = "<group>"; };
+		86A1502B4366E217FC27D92F /* ClockTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClockTests.swift; sourceTree = "<group>"; };
 		8A9EBE441108D20D23E7CCC0 /* SubstitutionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubstitutionsTests.swift; sourceTree = "<group>"; };
+		93382A4F69A62588E48F0722 /* Scheduler+Actions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Scheduler+Actions.swift"; sourceTree = "<group>"; };
 		A053CED1DBBFDC22F031D6FB /* Chimes */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Chimes; path = Sources/movez/Resources/Chimes; sourceTree = SOURCE_ROOT; };
 		A270094632CC887D16A9B2D2 /* Equipment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Equipment.swift; sourceTree = "<group>"; };
+		A277DB86AA6B3984DC78F694 /* SchedulerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerState.swift; sourceTree = "<group>"; };
+		A36C066F3C6A50DD09893FA1 /* TransitionLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitionLog.swift; sourceTree = "<group>"; };
 		A3F75D6C7814FDA37FB714DD /* Region.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Region.swift; sourceTree = "<group>"; };
+		A49E80929BB51EEDA20B470F /* StatePersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatePersistence.swift; sourceTree = "<group>"; };
 		A4DFD6E3893BC494249C0377 /* Preset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preset.swift; sourceTree = "<group>"; };
 		A9B9838D81524A40DB3881AB /* RoutineTestSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineTestSupport.swift; sourceTree = "<group>"; };
+		A9D24389D182EC724A1CFC3A /* SignalSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalSnapshot.swift; sourceTree = "<group>"; };
 		ABFC20128A308BD74AD1E790 /* MovementLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovementLibrary.swift; sourceTree = "<group>"; };
 		AD9EEE57E8EDF899EE10357B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B18D9238BAD43644A6B180B1 /* RoutineTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineTemplate.swift; sourceTree = "<group>"; };
+		B7931632856036648A3777A7 /* SchedulerConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerConfig.swift; sourceTree = "<group>"; };
 		BED5BD6A2AA7A23D4AC1BABB /* RoutineValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineValidator.swift; sourceTree = "<group>"; };
 		C0B577EE28A8F593F5FF18F4 /* RoutineFixturesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineFixturesTests.swift; sourceTree = "<group>"; };
 		C8C62D9F791457B612525A3B /* movez.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = movez.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8F16E197BB8CBCF7D345DCC /* RoutineContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineContext.swift; sourceTree = "<group>"; };
 		D2636E7E2FEA7389160E0CC2 /* RoutineBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineBuilderTests.swift; sourceTree = "<group>"; };
+		DD7E4757BE6870716B20B25A /* SchedulerEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerEvent.swift; sourceTree = "<group>"; };
 		E0358B4658CB12F9685A9098 /* MicroBreakBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroBreakBuilder.swift; sourceTree = "<group>"; };
+		E039EE67EC22D7EDCFDF48A2 /* SchedulerTestSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerTestSupport.swift; sourceTree = "<group>"; };
 		E34A24AFC078FC0BFEFF7291 /* Fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Fonts; path = Sources/movez/Resources/Fonts; sourceTree = SOURCE_ROOT; };
 		E362393507283AB751AFD135 /* Movement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Movement.swift; sourceTree = "<group>"; };
 		E5218DC9337ADC8083520BD0 /* movezTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = movezTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -100,6 +132,7 @@
 				79848EC3BAB4DFEFF848B418 /* Library */,
 				C3925A8B36DE132C0847976A /* Resources */,
 				3B8406736C75074B51E0B431 /* Routine */,
+				984174BA2E01DFB10313C338 /* Scheduler */,
 				80BC2BFC9DD9C48F42BC087A /* UI */,
 			);
 			path = movez;
@@ -108,11 +141,16 @@
 		1C9532C0576C5A15AB57A8D0 /* movezTests */ = {
 			isa = PBXGroup;
 			children = (
+				86A1502B4366E217FC27D92F /* ClockTests.swift */,
 				1637897564C21375102AE856 /* LibraryTests.swift */,
 				E6FDDD314F5FCB09D7D7D496 /* MicroBreakBuilderTests.swift */,
+				202C50EE6CC441F2982008AB /* PersistenceTests.swift */,
 				D2636E7E2FEA7389160E0CC2 /* RoutineBuilderTests.swift */,
 				C0B577EE28A8F593F5FF18F4 /* RoutineFixturesTests.swift */,
 				A9B9838D81524A40DB3881AB /* RoutineTestSupport.swift */,
+				1CFDF85D71146981530D4EAA /* SchedulerCoreTests.swift */,
+				62B4AC6C3F66A7E5ABB97CFF /* SchedulerMicroTests.swift */,
+				E039EE67EC22D7EDCFDF48A2 /* SchedulerTestSupport.swift */,
 				F1DDDDC773AAE7422F7A1D24 /* SmokeTests.swift */,
 				8A9EBE441108D20D23E7CCC0 /* SubstitutionsTests.swift */,
 			);
@@ -187,6 +225,24 @@
 				EFF9C23AE5620C29C9B23D42 /* DesignSystem */,
 			);
 			path = UI;
+			sourceTree = "<group>";
+		};
+		984174BA2E01DFB10313C338 /* Scheduler */ = {
+			isa = PBXGroup;
+			children = (
+				6B38057FE27BFBA4B888F5B0 /* Clock.swift */,
+				1357C14B78E301196BDC5185 /* Scheduler.swift */,
+				93382A4F69A62588E48F0722 /* Scheduler+Actions.swift */,
+				B7931632856036648A3777A7 /* SchedulerConfig.swift */,
+				06CE8997B39FFB560CC27EC0 /* SchedulerEffect.swift */,
+				DD7E4757BE6870716B20B25A /* SchedulerEvent.swift */,
+				5789AEACEFAA9758E0145C9A /* SchedulerSnapshot.swift */,
+				A277DB86AA6B3984DC78F694 /* SchedulerState.swift */,
+				A9D24389D182EC724A1CFC3A /* SignalSnapshot.swift */,
+				A49E80929BB51EEDA20B470F /* StatePersistence.swift */,
+				A36C066F3C6A50DD09893FA1 /* TransitionLog.swift */,
+			);
+			path = Scheduler;
 			sourceTree = "<group>";
 		};
 		C1F3A2880F9EE65E5404C18A /* Tests */ = {
@@ -321,6 +377,7 @@
 			files = (
 				17BBAC1362BB4FB7E6E5F809 /* AppDelegate.swift in Sources */,
 				CFA086FFD3DC582124770DD7 /* Bucket.swift in Sources */,
+				5DB3F9562B633581A83E2DAF /* Clock.swift in Sources */,
 				6325C7101E9E02B9C9A49E3B /* Equipment.swift in Sources */,
 				7E4EE203AAA5BFB4E8F1C3CE /* Fonts.swift in Sources */,
 				0A594F456CB2C473CB12952C /* LaunchArguments.swift in Sources */,
@@ -339,9 +396,19 @@
 				014CD8EA300813175B68DB40 /* RoutineNaming.swift in Sources */,
 				25E93322972C26948D469154 /* RoutineTemplate.swift in Sources */,
 				24A56B2FADD5631DAF0DFD13 /* RoutineValidator.swift in Sources */,
+				FFFA726A1E5C0A77083C6E51 /* Scheduler+Actions.swift in Sources */,
+				4FE06E2578B3E44232996091 /* Scheduler.swift in Sources */,
+				87848EA5BF6191E1B7ADB5C1 /* SchedulerConfig.swift in Sources */,
+				80FCE6948F1D4D0A3C500F3A /* SchedulerEffect.swift in Sources */,
+				5987DDB5C15A06E93AD17AE8 /* SchedulerEvent.swift in Sources */,
+				ABB604BF42B752AA858F04BC /* SchedulerSnapshot.swift in Sources */,
+				69986D5FCA4CADB4AAE14600 /* SchedulerState.swift in Sources */,
 				944B9718DB251BD9E1744647 /* SeededRandom.swift in Sources */,
 				2F5A321C9F100BE43451B406 /* Setting.swift in Sources */,
+				12A569A63B9D80B070A91B73 /* SignalSnapshot.swift in Sources */,
+				6144F8A35500D2DA0410DD2B /* StatePersistence.swift in Sources */,
 				ADD0D0E44651BF36B3CDA5D8 /* Substitutions.swift in Sources */,
+				64220A63A12C495222F60DC7 /* TransitionLog.swift in Sources */,
 				55074040540FC506FB3D1593 /* movezApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -350,11 +417,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				05C2300393C6D87593D7781D /* ClockTests.swift in Sources */,
 				C0CE23AE79FE5163DF44F90C /* LibraryTests.swift in Sources */,
 				B9D41EEFC7605CAFEDBB00CC /* MicroBreakBuilderTests.swift in Sources */,
+				8E2B50A1C0B30940F1637281 /* PersistenceTests.swift in Sources */,
 				3096DA29B7430245E2D89B1A /* RoutineBuilderTests.swift in Sources */,
 				766E97E004686AB8163D46E1 /* RoutineFixturesTests.swift in Sources */,
 				A1139C1975FC8C947D0EE8B0 /* RoutineTestSupport.swift in Sources */,
+				C7FD8B58088A2CD47C915509 /* SchedulerCoreTests.swift in Sources */,
+				4C0067EE2D2F0D172E5BAFC7 /* SchedulerMicroTests.swift in Sources */,
+				1BDCADC884E2EDDA6CE12624 /* SchedulerTestSupport.swift in Sources */,
 				1F539EFD5D18C4F5ABE07347 /* SmokeTests.swift in Sources */,
 				0029928374647F3135541973 /* SubstitutionsTests.swift in Sources */,
 			);

@@ -1,0 +1,207 @@
+import Foundation
+
+/// The sitting → break loop as a pure state machine.
+///
+/// `handle` is total: every unhandled combination of state and event returns no effects and
+/// changes nothing. There are no timers here — the coordinator sends `.tick` — and no calls to
+/// `Date()`, which is what lets a whole working day be replayed in milliseconds.
+struct Scheduler {
+    var snapshot: SchedulerSnapshot
+    private(set) var config: SchedulerConfig
+
+    init(config: SchedulerConfig = SchedulerConfig(), now: Date) {
+        self.config = config
+        snapshot = SchedulerSnapshot(now: now, dayKey: DayKey.key(for: now, calendar: config.calendar))
+        snapshot.configHash = config.stableHash
+        startFreshInterval(now: now)
+    }
+
+    init(snapshot: SchedulerSnapshot, config: SchedulerConfig = SchedulerConfig()) {
+        self.snapshot = snapshot
+        self.config = config
+    }
+
+    var state: SchedulerState { snapshot.state }
+
+    /// The signal monitors idle their polling loop entirely while the scheduler cannot act on
+    /// what they would report.
+    var pollingRequired: Bool {
+        switch snapshot.state {
+        case .paused, .offHours: return false
+        default: return true
+        }
+    }
+
+    /// Snoozes left for the break currently being negotiated.
+    var snoozesLeft: Int {
+        max(0, (snapshot.snoozeAllowanceThisBreak ?? config.maxSnoozesPerBreak) - snapshot.snoozesUsedThisBreak)
+    }
+
+    // MARK: - Event dispatch
+
+    mutating func handle(_ event: SchedulerEvent, now: Date) -> [SchedulerEffect] {
+        if let effects = handleClockEvents(event, now: now) { return effects }
+        if let effects = handleBreakActions(event, now: now) { return effects }
+        if let effects = handleMicroActions(event, now: now) { return effects }
+        return []
+    }
+
+    private mutating func handleClockEvents(_ event: SchedulerEvent, now: Date) -> [SchedulerEffect]? {
+        switch event {
+        case .tick: return tick(now: now)
+        case .input(let age): return handleInput(lastEventAgeSeconds: age, now: now)
+        case .settingsChanged(let updated): return apply(updated, now: now)
+        default: return nil
+        }
+    }
+
+    private mutating func handleBreakActions(_ event: SchedulerEvent, now: Date) -> [SchedulerEffect]? {
+        switch event {
+        case .userTakeBreakNow: return takeBreakNow(now: now)
+        case .userMakeDueIn(let seconds): return makeDue(in: seconds, now: now)
+        case .userStartNow: return startBreakNow(now: now)
+        case .userSnooze: return snooze(now: now)
+        case .userSkip: return skip(now: now)
+        case .userNextBlock: return nextBlock()
+        case .userDone(let completed, let total, let elapsed):
+            return finishBreak(completed: completed, total: total, elapsed: elapsed, now: now, userInitiated: true)
+        case .breakEnded(let completed, let total, let elapsed):
+            return finishBreak(completed: completed, total: total, elapsed: elapsed, now: now, userInitiated: false)
+        default: return nil
+        }
+    }
+
+    private mutating func handleMicroActions(_ event: SchedulerEvent, now: Date) -> [SchedulerEffect]? {
+        switch event {
+        case .userMicroStartNow: return startMicroNow(now: now)
+        case .userMicroSnooze: return snoozeMicro(now: now)
+        case .userMicroSkip: return skipMicro(now: now)
+        case .microEnded: return endMicro(now: now)
+        default: return nil
+        }
+    }
+
+    // MARK: - Tick
+
+    private mutating func tick(now: Date) -> [SchedulerEffect] {
+        if let effects = tickBreakStates(now: now) { return effects }
+        if let effects = tickMicroStates(now: now) { return effects }
+        return []
+    }
+
+    private mutating func tickBreakStates(now: Date) -> [SchedulerEffect]? {
+        switch snapshot.state {
+        case .sitting:
+            return tickSitting(now: now)
+        case .pendingFull(let since):
+            guard now.timeIntervalSince(since) >= Double(config.inputWaitCapSeconds) else { return [] }
+            return enterHeadsUp(now: now, reason: "input wait capped")
+        case .headsUp(let startedAt, let deferredSince):
+            guard now.timeIntervalSince(startedAt) >= Double(config.headsUpSeconds) else { return [] }
+            return enterFullBreak(now: now, deferred: deferredSince != nil, reason: "heads-up elapsed")
+        case .snoozed(let until):
+            guard now >= until else { return [] }
+            return enterHeadsUp(now: now, reason: "snooze elapsed")
+        default:
+            return nil
+        }
+    }
+
+    private mutating func tickMicroStates(now: Date) -> [SchedulerEffect]? {
+        switch snapshot.state {
+        case .microCountIn(let startedAt):
+            guard now.timeIntervalSince(startedAt) >= Double(config.microCountInSeconds) else { return [] }
+            return enterMicroRunning(now: now)
+        case .microRunning(let startedAt):
+            guard now.timeIntervalSince(startedAt) >= Double(config.microSeconds) else { return [] }
+            return endMicro(now: now)
+        default:
+            return nil
+        }
+    }
+
+    private mutating func tickSitting(now: Date) -> [SchedulerEffect] {
+        if let due = snapshot.nextFullDueAt, now >= due {
+            return enterPendingFull(now: now)
+        }
+        guard config.microEnabled, let micro = snapshot.nextMicroDueAt, now >= micro else { return [] }
+        if let full = snapshot.nextFullDueAt,
+           full.timeIntervalSince(now) < Double(config.microMinGapBeforeFullSeconds) {
+            // Too close to the full break to be worth interrupting for.
+            snapshot.nextMicroDueAt = nil
+            return [.persist]
+        }
+        return enterMicroCountIn(now: now)
+    }
+
+    private mutating func handleInput(lastEventAgeSeconds age: Int, now: Date) -> [SchedulerEffect] {
+        guard case .pendingFull = snapshot.state, age >= config.inputPauseSeconds else { return [] }
+        return enterHeadsUp(now: now, reason: "input paused for \(age) s")
+    }
+
+    // MARK: - Interval bookkeeping
+
+    /// Starts a new sitting bout: the countdown, the micro anchor and the per-break allowances
+    /// all reset together.
+    mutating func startFreshInterval(now: Date) {
+        snapshot.boutStartedAt = now
+        snapshot.nextFullDueAt = now.addingTimeInterval(TimeInterval(config.sitSeconds))
+        snapshot.microAnchorAt = nil
+        snapshot.microSnoozeUsed = false
+        snapshot.snoozesUsedThisBreak = 0
+        snapshot.snoozeAllowanceThisBreak = nil
+        snapshot.pendingInputWaitStartedAt = nil
+        snapshot.nextMicroDueAt = microDue(anchoredAt: now)
+    }
+
+    /// The next micro-break time for an anchor, or nil when it would land inside the ten-minute
+    /// quiet zone before the full break — or when micro-breaks are off.
+    func microDue(anchoredAt anchor: Date) -> Date? {
+        guard config.microEnabled else { return nil }
+        let candidate = anchor.addingTimeInterval(TimeInterval(config.microEverySeconds))
+        guard let full = snapshot.nextFullDueAt else { return candidate }
+        guard full.timeIntervalSince(candidate) >= Double(config.microMinGapBeforeFullSeconds) else { return nil }
+        return candidate
+    }
+
+    mutating func recordBout(endingAt end: Date) {
+        let seconds = Int(end.timeIntervalSince(snapshot.boutStartedAt))
+        snapshot.longestBoutSeconds = max(snapshot.longestBoutSeconds, max(0, seconds))
+    }
+
+    mutating func transition(to newState: SchedulerState, reason: String, at now: Date) {
+        let from = snapshot.state
+        snapshot.state = newState
+        snapshot.transitions.append(Transition(at: now, from: from, to: newState, reason: reason))
+    }
+
+    // MARK: - Settings
+
+    /// Settings apply live. The due times are re-planned from the bout that is already running,
+    /// so changing the preset never costs the user the time they have already sat.
+    mutating func apply(_ updated: SchedulerConfig, now: Date) -> [SchedulerEffect] {
+        let wasPolling = pollingRequired
+        config = updated
+        snapshot.configHash = updated.stableHash
+
+        if snapshot.state.countdownRuns || snapshot.state == .sitting {
+            snapshot.nextFullDueAt = snapshot.boutStartedAt.addingTimeInterval(TimeInterval(updated.sitSeconds))
+            snapshot.nextMicroDueAt = microDue(anchoredAt: snapshot.microAnchorAt ?? snapshot.boutStartedAt)
+        }
+
+        var effects: [SchedulerEffect] = [.persist, .menuRefresh]
+        if wasPolling != pollingRequired { effects.append(.pollingChanged(pollingRequired)) }
+        return effects
+    }
+
+    /// Research §4.11: a break counts as done at half the movements or half the time.
+    static func meetsCompletionRule(
+        completed: Int,
+        total: Int,
+        elapsed: Int,
+        config: SchedulerConfig
+    ) -> Bool {
+        let required = Int((Double(total) * config.completionFraction).rounded(.up))
+        return completed >= max(1, required) || elapsed >= config.completionSeconds
+    }
+}
