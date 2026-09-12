@@ -1,0 +1,3801 @@
+{
+  "library": "movez movement library",
+  "version": "4",
+  "source": "movement-library-v4.md",
+  "generated": "2026-09-11",
+  "schema": {
+    "movement": {
+      "id": "bucket prefix + 2-digit number",
+      "bucket": "FLX|CIR|STR|BAL|HWF|EYE|BRE",
+      "regions": "list of body regions",
+      "dose": "human-readable time or reps; per_side=true means both sides and block_seconds already includes both",
+      "block_seconds": "approximate total block time",
+      "difficulty": "1 easy, 2 moderate, 3 harder / more control",
+      "settings": "where it can be done: Stand, Chair, Wall, Desk, Floor, Any",
+      "equipment_optional": "optional equipment; every item has a bodyweight substitute per chaining rule 6",
+      "micro_eligible": "true if allowed in the 1-minute micro-break",
+      "counteracts": "sitting effect targeted",
+      "instructions": "in-app instruction text"
+    },
+    "regions": [
+      "Adductor",
+      "Breath",
+      "Calf/Ankle",
+      "Chest",
+      "Eyes",
+      "Foot/Shin",
+      "Full",
+      "Glute",
+      "Ham",
+      "Hip",
+      "L-spine/Core",
+      "Neck",
+      "Quad",
+      "Shoulder",
+      "T-spine",
+      "Wrist/Forearm"
+    ],
+    "settings": [
+      "Any",
+      "Chair",
+      "Desk",
+      "Floor",
+      "Stand",
+      "Wall"
+    ],
+    "equipment": [
+      "ball",
+      "band",
+      "foam_roller",
+      "kettlebell_or_dumbbell"
+    ]
+  },
+  "design_rules": {
+    "full_break_seconds": 300,
+    "blocks_per_break": {
+      "default": 4,
+      "min": 3,
+      "max": 5
+    },
+    "block_seconds_range": [
+      60,
+      90
+    ],
+    "micro_break_seconds": 60,
+    "intensity": "low-sweat, RPE 5-6, 1-2 sets, no grip/forearm fatigue before typing",
+    "goal": "maintain or gradually increase strength; not hypertrophy"
+  },
+  "sitting_effects": [
+    {
+      "effect": "Glute inhibition (\"gluteal amnesia\"), weak posterior chain",
+      "primary": "STR (glutes/hamstrings)",
+      "secondary": "CIR"
+    },
+    {
+      "effect": "Thoracic kyphosis, rounded shoulders, tight pecs",
+      "primary": "FLX (T-spine/chest), STR (upper back)",
+      "secondary": "BRE"
+    },
+    {
+      "effect": "Forward head, tight upper traps / levator, weak deep neck flexors",
+      "primary": "FLX (neck), STR (chin tucks)",
+      "secondary": "EYE"
+    },
+    {
+      "effect": "Venous pooling in calves, low metabolic rate, sluggishness",
+      "primary": "CIR",
+      "secondary": "STR (calves)"
+    },
+    {
+      "effect": "Stiff ankles and weak feet/shins from no walking",
+      "primary": "FLX (ankles), STR (calves/tibialis)",
+      "secondary": "BAL"
+    },
+    {
+      "effect": "Loss of balance and proprioceptive input from static posture",
+      "primary": "BAL",
+      "secondary": "STR (single-leg)"
+    },
+    {
+      "effect": "Wrist/forearm load from keyboard and mouse, finger flexor dominance",
+      "primary": "HWF",
+      "secondary": "CIR"
+    },
+    {
+      "effect": "Eye strain, reduced blink rate, fixed near focus",
+      "primary": "EYE",
+      "secondary": "BRE"
+    },
+    {
+      "effect": "Shallow apical breathing, rib cage immobility",
+      "primary": "BRE",
+      "secondary": "FLX (T-spine)"
+    }
+  ],
+  "buckets": [
+    {
+      "id": "FLX",
+      "name": "Flexibility & mobility",
+      "count": 38
+    },
+    {
+      "id": "CIR",
+      "name": "Blood flow & circulation",
+      "count": 20
+    },
+    {
+      "id": "STR",
+      "name": "Strength",
+      "count": 38
+    },
+    {
+      "id": "BAL",
+      "name": "Balance & proprioception",
+      "count": 29
+    },
+    {
+      "id": "HWF",
+      "name": "Hands, wrists & forearms",
+      "count": 11
+    },
+    {
+      "id": "EYE",
+      "name": "Eyes",
+      "count": 5
+    },
+    {
+      "id": "BRE",
+      "name": "Breathing",
+      "count": 6
+    }
+  ],
+  "presets": [
+    {
+      "id": "25/5",
+      "sit_minutes": 25,
+      "break_minutes": 5,
+      "cycle_minutes": 30,
+      "micro_breaks_at_minutes": [],
+      "micro_default_on": false,
+      "label": "Evidence-optimal",
+      "description": "Matches the ~30-minute sitting-bout threshold in the research"
+    },
+    {
+      "id": "55/5",
+      "sit_minutes": 55,
+      "break_minutes": 5,
+      "cycle_minutes": 60,
+      "micro_breaks_at_minutes": [
+        30
+      ],
+      "micro_default_on": true,
+      "label": "Default",
+      "description": "Full dose every hour; micro-break keeps bouts under 30 min",
+      "default": true
+    },
+    {
+      "id": "85/5",
+      "sit_minutes": 85,
+      "break_minutes": 5,
+      "cycle_minutes": 90,
+      "micro_breaks_at_minutes": [
+        30,
+        60
+      ],
+      "micro_default_on": true,
+      "label": "Deep work",
+      "description": "Long focus blocks, micro-breaks on by default"
+    }
+  ],
+  "custom_preset_rule": "micro-break every 30 minutes of sitting; drop any that would fall within 10 minutes of the full break",
+  "micro_break": {
+    "seconds": 60,
+    "structure": "one 60 s block or two 30 s blocks",
+    "eligibility": {
+      "max_block_seconds": 60,
+      "no_floor": true,
+      "no_equipment": true,
+      "no_warmup": true,
+      "no_sweat": true
+    },
+    "rules": [
+      "Optional but on by default for 55/5 and 85/5. Not offered on 25/5, which needs none.",
+      "Duration: ~60 s. One 60 s block, or two 30 s blocks. The sitting timer keeps running; the micro-break does not reset it.",
+      "Eligibility: only movements tagged Micro (list below). No floor, no equipment, no warm-up, nothing that leaves the user flushed or with tired forearms.",
+      "Priority: the point of the micro-break is to interrupt the sitting bout, so it should be at least partly upright. Prefer a CIR item first (stand up, get blood moving), and use HWF, EYE, and BRE items as the second half-block or as the whole break when the user is mid-call and can't stand.",
+      "Rotation across the day: alternate the emphasis — circulation → eyes/hands → posture (neck, T-spine, hips) → circulation — so the same micro-break isn't served twice in a row. Don't repeat a movement across consecutive micro-breaks.",
+      "Coordination with full breaks: a micro-break should not use a movement that the next scheduled full break already contains.",
+      "Post-lunch: the first micro-break after lunch is CIR-heavy (walk lap, march, calf pumps), since post-meal glucose is where breaking up sitting shows the largest metabolic benefit.",
+      "Snooze: a micro-break can be deferred 5 minutes once; a second deferral skips it."
+    ],
+    "eligible_ids": [
+      "FLX-01",
+      "FLX-05",
+      "FLX-06",
+      "FLX-10",
+      "FLX-14",
+      "FLX-18",
+      "FLX-19",
+      "FLX-20",
+      "FLX-21",
+      "FLX-22",
+      "FLX-23",
+      "FLX-24",
+      "FLX-27",
+      "FLX-31",
+      "FLX-36",
+      "FLX-37",
+      "CIR-01",
+      "CIR-02",
+      "CIR-04",
+      "CIR-05",
+      "CIR-06",
+      "CIR-07",
+      "CIR-11",
+      "CIR-12",
+      "CIR-13",
+      "CIR-15",
+      "CIR-16",
+      "CIR-20",
+      "STR-11",
+      "STR-20",
+      "STR-31",
+      "STR-34",
+      "STR-35",
+      "BAL-01",
+      "BAL-04",
+      "BAL-11",
+      "BAL-14",
+      "BAL-17",
+      "BAL-18",
+      "BAL-20",
+      "BAL-22",
+      "BAL-23",
+      "BAL-24",
+      "BAL-25",
+      "BAL-26",
+      "BAL-28",
+      "BAL-29",
+      "HWF-01",
+      "HWF-02",
+      "HWF-03",
+      "HWF-04",
+      "HWF-05",
+      "HWF-06",
+      "HWF-07",
+      "HWF-08",
+      "HWF-10",
+      "HWF-11",
+      "EYE-01",
+      "EYE-02",
+      "EYE-03",
+      "EYE-04",
+      "EYE-05",
+      "BRE-01",
+      "BRE-02",
+      "BRE-03"
+    ]
+  },
+  "chaining_rules": [
+    "Break = 4 blocks by default (range 3–5), target 270–330 s including ~5 s transitions.",
+    "Block mix per break: 1 FLX + 1 CIR + 1 STR + 1 from {BAL, HWF, EYE, BRE}. A 5th block, when used, is a second FLX or a BRE closer.",
+    "Order within a break: CIR first (warm up), then FLX, then STR or BAL, then HWF/EYE/BRE last so the user returns to the desk calm.",
+    "Region rotation across the day: cycle the FLX and STR regions through Hip → T-spine/Chest → Neck/Shoulder → Posterior chain → Core → Ankle/Foot before repeating. Don't hit the same STR region in consecutive breaks.",
+    "Time-of-day weighting: first break of the day skews CIR-heavy; last break of the day skews FLX + BRE; mid-afternoon (post-lunch) break skews CIR + BAL.",
+    "Equipment filter: if equipment is unavailable, substitute the bodyweight peer with the same Counteracts value (e.g. STR-17 → FLX-18 + STR-16; STR-09 → STR-04; CIR-18 → CIR-12).",
+    "Difficulty ramp: default to Diff 1–2. Introduce Diff 3 items only after the user has completed the Diff 2 item in the same region several times (tracked per movement).",
+    "Variety: avoid repeating any movement within the same day except CIR-01, EYE-01, and BRE-01, which can recur freely."
+  ],
+  "balance_progression": [
+    "fingertip on wall",
+    "hands free",
+    "arms moving",
+    "head turning",
+    "eyes closed",
+    "soft surface"
+  ],
+  "movements": [
+    {
+      "id": "FLX-01",
+      "name": "Standing hip flexor stretch",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "Hip"
+      ],
+      "dose": "30 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "hip flexor shortening",
+      "instructions": "Step one foot back about a metre, both feet pointing forward, rear heel up. Tuck your tailbone under (as if zipping tight jeans), squeeze the rear glute, and reach the same-side arm overhead. You should feel the front of the rear hip, not the low back. Keep the front knee over the ankle."
+    },
+    {
+      "id": "FLX-02",
+      "name": "Half-kneeling hip flexor stretch",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "Hip"
+      ],
+      "dose": "30 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "hip flexor shortening",
+      "instructions": "Kneel on one knee with the other foot flat in front, both knees at 90°. Tuck the pelvis under and squeeze the glute on the kneeling side, then shift forward an inch or two without arching the back. Stay tall; the stretch is in the front of the kneeling-side hip."
+    },
+    {
+      "id": "FLX-03",
+      "name": "Couch stretch",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "Hip",
+        "Quad"
+      ],
+      "dose": "30 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor",
+        "Wall"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "hip flexor + rectus femoris tightness",
+      "instructions": "Kneel facing away from a wall or chair and put one shin up against it, knee on the floor, foot pointing up. Step the other foot forward flat. Squeeze the rear glute, tuck the pelvis, and slowly raise your torso toward upright. Stop where you feel a strong stretch in the front of the thigh and hip."
+    },
+    {
+      "id": "FLX-04",
+      "name": "World's greatest stretch",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "Full"
+      ],
+      "dose": "3 reps/side",
+      "per_side": true,
+      "block_seconds": 90,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "hips, T-spine, hamstrings at once",
+      "instructions": "From a push-up position, step the right foot outside the right hand. Drop the right elbow toward the instep, then rotate and reach the right arm to the ceiling, eyes following the hand. Bring the hand down, push the hips back and straighten the front leg to feel the hamstring, then return to the lunge. That's one rep."
+    },
+    {
+      "id": "FLX-05",
+      "name": "Standing figure-4",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "Glute"
+      ],
+      "dose": "30 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "glute/piriformis tightness",
+      "instructions": "Stand on one leg and cross the other ankle over the standing knee. Push the hips back and bend the standing knee as if sitting into a chair, keeping the chest up, until you feel the outer hip and glute of the crossed leg. Hold something for balance if needed."
+    },
+    {
+      "id": "FLX-06",
+      "name": "Seated figure-4 lean",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "Glute"
+      ],
+      "dose": "30 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Chair"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "glute/piriformis tightness",
+      "instructions": "Sit tall and place one ankle on the opposite knee, letting the raised knee drop out. Keeping the back straight, hinge forward from the hips until you feel the stretch in the raised-leg glute. Gently press the raised knee down for more."
+    },
+    {
+      "id": "FLX-07",
+      "name": "90/90 hip switches",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "Hip"
+      ],
+      "dose": "8 switches",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "lost hip rotation",
+      "instructions": "Sit on the floor with the front leg bent 90° in front of you and the back leg bent 90° out to the side, torso tall. Without using your hands, lift both knees and rotate them together to the other side so the leg positions swap. Move slowly; going all the way over is not required."
+    },
+    {
+      "id": "FLX-08",
+      "name": "Deep squat hold with elbow pry",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "Hip",
+        "Calf/Ankle",
+        "T-spine"
+      ],
+      "dose": "45–60 s",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "compressed hips, stiff ankles",
+      "instructions": "Feet slightly wider than the hips and turned out a little, sink as low as you can with heels down. Bring the palms together at the chest and use the elbows to gently push the knees outward. Keep the chest lifted and breathe. If heels lift, put a book under them."
+    },
+    {
+      "id": "FLX-09",
+      "name": "Cossack squat (slow)",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "Adductor",
+        "Hip"
+      ],
+      "dose": "5 reps/side",
+      "per_side": true,
+      "block_seconds": 75,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "adductor and hip stiffness",
+      "instructions": "Take a wide stance, toes pointed slightly out. Shift your weight to one side and bend that knee deeply while the other leg stays straight, toes pointing up. Keep the bent-side heel down and the chest up, then push back to centre and go the other way. Depth comes with practice."
+    },
+    {
+      "id": "FLX-10",
+      "name": "Active hamstring sweep",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "Ham"
+      ],
+      "dose": "6 reps/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "hamstring tightness",
+      "instructions": "Place one heel on the floor a step in front of you, toes up, that leg straight. Hinge at the hips with a flat back and sweep both hands down past the toes and forward, as if scooping the floor, then stand tall. It's a rhythmic movement, not a long hold."
+    },
+    {
+      "id": "FLX-11",
+      "name": "Cat-cow",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "T-spine",
+        "L-spine/Core"
+      ],
+      "dose": "10 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "spinal stiffness",
+      "instructions": "On hands and knees, wrists under shoulders and knees under hips. Exhale and round the whole back toward the ceiling, tucking chin and tailbone. Inhale and let the belly drop, lifting the chest and tailbone. Move slowly so every part of the spine takes part."
+    },
+    {
+      "id": "FLX-12",
+      "name": "Open book",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "T-spine"
+      ],
+      "dose": "6 reps/side",
+      "per_side": true,
+      "block_seconds": 75,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "thoracic rotation loss",
+      "instructions": "Lie on your side with knees bent to 90° and stacked, both arms straight out in front, palms together. Keeping the knees glued together, lift the top arm and arc it over to the other side like opening a book, letting the eyes and chest follow. Pause, then return."
+    },
+    {
+      "id": "FLX-13",
+      "name": "Thread the needle",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "T-spine",
+        "Shoulder"
+      ],
+      "dose": "6 reps/side",
+      "per_side": true,
+      "block_seconds": 75,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "thoracic rotation loss",
+      "instructions": "On hands and knees, slide one arm palm-up under the body until the shoulder and ear come toward the floor. Then unthread and reach the same arm up to the ceiling, opening the chest. Keep the hips still over the knees the whole time."
+    },
+    {
+      "id": "FLX-14",
+      "name": "Chair-back thoracic extension",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "T-spine"
+      ],
+      "dose": "8 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Chair"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "kyphosis",
+      "instructions": "Sit so the top edge of the chair back is at mid-back level, just below the shoulder blades. Interlace fingers behind the head, keep the ribs and belly relaxed, and lean back over the edge of the chair, looking up. Return to upright and repeat. If your chair is too tall, roll a towel and place it behind the mid-back."
+    },
+    {
+      "id": "FLX-15",
+      "name": "Foam roller thoracic extension",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "T-spine"
+      ],
+      "dose": "8 reps",
+      "per_side": false,
+      "block_seconds": 75,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "equipment_optional": [
+        "foam_roller"
+      ],
+      "micro_eligible": false,
+      "counteracts": "kyphosis",
+      "instructions": "Lie back with the roller across your mid-back, knees bent, hands supporting the head. Keeping the hips on the floor, extend the upper back over the roller and return. Do a few reps, move the roller up a couple of inches, and repeat at two or three spots between the shoulder blades and the base of the neck."
+    },
+    {
+      "id": "FLX-16",
+      "name": "Wall angels",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "Shoulder",
+        "T-spine"
+      ],
+      "dose": "10 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Wall"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "rounded shoulders, weak lower traps",
+      "instructions": "Stand with heels a few inches from the wall, back and head touching it. Put the backs of the hands and forearms against the wall with elbows at shoulder height. Slide the arms slowly up the wall and back down, keeping wrists, elbows, and low back in contact as much as you can. Reduce range rather than let the ribs flare."
+    },
+    {
+      "id": "FLX-17",
+      "name": "Doorway pec stretch",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "Chest"
+      ],
+      "dose": "20 s × 3 heights",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Wall"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "tight pecs",
+      "instructions": "Stand in a doorway with forearms on each side of the frame, elbows at shoulder height. Step one foot through and lean gently until the chest stretches. Then repeat with elbows below shoulder height, then above. Keep the ribs down and chin tucked; don't push the head forward."
+    },
+    {
+      "id": "FLX-18",
+      "name": "Standing chest opener",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "Chest",
+        "Shoulder"
+      ],
+      "dose": "3 × 15 s",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "tight pecs, protracted shoulders",
+      "instructions": "Interlace the fingers behind your back, palms toward each other. Straighten the arms, pull the shoulder blades down and together, and lift the hands away from the body a few inches. Keep the chin tucked and ribs down; the chest opens, the back doesn't arch."
+    },
+    {
+      "id": "FLX-19",
+      "name": "Desk lat stretch",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "Shoulder",
+        "T-spine"
+      ],
+      "dose": "3 × 15 s",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Desk"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "overhead stiffness, lat tightness",
+      "instructions": "Place both hands on the desk edge, shoulder width, and step back until the arms are straight and the torso is parallel to the floor. Push the hips back and let the chest sink toward the floor between the arms. Keep the knees soft and the neck in line with the spine."
+    },
+    {
+      "id": "FLX-20",
+      "name": "Standing side-bend reach",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "L-spine/Core",
+        "Shoulder"
+      ],
+      "dose": "20 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "QL/lat tightness, rib immobility",
+      "instructions": "Reach one arm straight overhead and place the other hand on the hip. Lean sideways away from the raised arm, keeping both feet planted and hips square. Breathe into the ribs on the open side. Come back through centre before switching."
+    },
+    {
+      "id": "FLX-21",
+      "name": "Chin tucks",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "Neck"
+      ],
+      "dose": "10 × 3 s",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Chair",
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "forward head",
+      "instructions": "Sit or stand tall and look straight ahead. Glide the chin straight backward, making a double chin, without tipping the head up or down. Hold for 3 s, feeling the muscles at the front of the neck and a stretch at the base of the skull, then relax."
+    },
+    {
+      "id": "FLX-22",
+      "name": "Active neck range",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "Neck"
+      ],
+      "dose": "5 each way",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Chair",
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "upper trap / levator tightness",
+      "instructions": "Sit tall with shoulders relaxed. Slowly tilt one ear toward the shoulder and back, then the other side. Then turn the chin toward each armpit. Then rotate left and right. Move only as far as feels easy; no hands, no pushing."
+    },
+    {
+      "id": "FLX-23",
+      "name": "Levator scapulae stretch",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "Neck"
+      ],
+      "dose": "20 s/side",
+      "per_side": true,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Chair",
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "levator tightness",
+      "instructions": "Turn your head 45° to the left, then nod the nose down toward the left armpit. Place the left hand on the back of the head and let its weight add gentle pressure. Put the right hand behind your back or hold the chair seat to keep the right shoulder down. Switch sides."
+    },
+    {
+      "id": "FLX-24",
+      "name": "Neck CARs",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "Neck"
+      ],
+      "dose": "3 each way",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "cervical stiffness",
+      "instructions": "Start with a chin tuck. Slowly drop the chin to the chest, roll one ear toward the shoulder, tip the head back to look up, roll the other ear toward its shoulder, and return to the chin at chest. Take about 10 s per circle, keeping the shoulders still. Reverse direction."
+    },
+    {
+      "id": "FLX-25",
+      "name": "Shoulder CARs",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "Shoulder"
+      ],
+      "dose": "3 each way/side",
+      "per_side": true,
+      "block_seconds": 90,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "shoulder capsule stiffness",
+      "instructions": "Stand tall with one arm straight at your side, thumb forward. Slowly raise the arm forward and overhead, rotate the palm outward as it reaches the top, bring it down behind you in a big circle, and return. Take 10 s per circle and keep the torso still; the arm moves, the ribs and head don't. Reverse direction, then switch arms."
+    },
+    {
+      "id": "FLX-26",
+      "name": "Hip CARs (standing)",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "Hip"
+      ],
+      "dose": "3 each way/side",
+      "per_side": true,
+      "block_seconds": 90,
+      "difficulty": 2,
+      "settings": [
+        "Stand",
+        "Wall"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "hip capsule stiffness",
+      "instructions": "Hold a wall or desk with one hand. Lift the opposite knee to hip height in front, swing it out to the side, rotate the knee down and back so the heel points up behind you, then return. Keep the torso upright and still throughout. Reverse the circle, then switch legs."
+    },
+    {
+      "id": "FLX-27",
+      "name": "Standing thoracic rotation",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "T-spine"
+      ],
+      "dose": "8/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "thoracic rotation loss",
+      "instructions": "Stand with feet hip width, knees soft, hands crossed on the chest. Rotate the ribcage as far as you can to one side without moving the hips, pause, and return. Keep the head moving with the chest. Alternate sides."
+    },
+    {
+      "id": "FLX-28",
+      "name": "Downward dog with pedals",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "Ham",
+        "Calf/Ankle",
+        "Shoulder"
+      ],
+      "dose": "45 s",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "posterior chain tightness",
+      "instructions": "From hands and knees, tuck the toes and lift the hips up and back so the body makes an inverted V, arms straight, heels reaching toward the floor. Alternately bend one knee while pressing the other heel down, pedalling slowly. Keep the spine long; a bent knee is fine."
+    },
+    {
+      "id": "FLX-29",
+      "name": "Wall calf stretch",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "Calf/Ankle"
+      ],
+      "dose": "20 s × 2/side",
+      "per_side": true,
+      "block_seconds": 80,
+      "difficulty": 1,
+      "settings": [
+        "Wall"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "gastroc/soleus stiffness",
+      "instructions": "Hands on a wall, step one foot back with the heel down and knee straight, and lean in until the upper calf stretches. Then bend the rear knee while keeping the heel down to stretch the lower calf. Both feet point straight at the wall."
+    },
+    {
+      "id": "FLX-30",
+      "name": "Ankle rocks (knee over toe)",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "Calf/Ankle"
+      ],
+      "dose": "10 reps/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor",
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "dorsiflexion loss",
+      "instructions": "Half-kneel with one foot flat in front, or stand with one foot on a low step. Drive that knee forward over the toes as far as it goes while the heel stays glued down, then rock back. Aim the knee slightly outward, over the small toes."
+    },
+    {
+      "id": "FLX-31",
+      "name": "Standing quad stretch (active)",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "Quad",
+        "Hip"
+      ],
+      "dose": "30 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand",
+        "Wall"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "rectus femoris tightness",
+      "instructions": "Stand on one leg, holding a wall if needed, and grab the other ankle behind you. Tuck the pelvis under and squeeze that glute, keeping the knees close together. Don't pull the heel to the glute; the pelvic tuck is what makes the stretch."
+    },
+    {
+      "id": "FLX-32",
+      "name": "Prone press-up",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "L-spine/Core"
+      ],
+      "dose": "10 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "lumbar flexion posture",
+      "instructions": "Lie face down with hands under the shoulders. Press through the hands to lift the chest while the hips and legs stay relaxed on the floor, letting the low back arch. Go only as high as is comfortable, hold 2 s, and lower."
+    },
+    {
+      "id": "FLX-33",
+      "name": "Child's pose with side reach",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "L-spine/Core",
+        "Shoulder"
+      ],
+      "dose": "20 s centre + 20 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "lumbar and lat stiffness",
+      "instructions": "Kneel and sit back toward the heels, arms stretched forward on the floor, forehead down. Breathe into the low back. Then walk both hands to one side, keeping the hips centred, to stretch the side of the torso. Repeat on the other side."
+    },
+    {
+      "id": "FLX-34",
+      "name": "Squat-to-stand",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "Hip",
+        "Ham",
+        "T-spine"
+      ],
+      "dose": "8 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "whole posterior chain and hips",
+      "instructions": "Stand with feet shoulder width, bend down and grab your toes, legs as straight as they'll go. Keeping the grip, pull the hips down into a deep squat and lift the chest. Then push the hips up and straighten the legs again, still holding the toes. Release and stand."
+    },
+    {
+      "id": "FLX-35",
+      "name": "Elevated pigeon on desk",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "Glute",
+        "Hip"
+      ],
+      "dose": "30 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Desk"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "glute/external rotator tightness",
+      "instructions": "Place one shin on the desk with the knee out to the side and the foot toward the opposite hand, standing on the other leg. Square the hips toward the desk and keep the back straight, then hinge forward slightly. Use a lower surface, like a bed or bench, if the desk is too high."
+    },
+    {
+      "id": "FLX-36",
+      "name": "Standing pelvic tilts",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "L-spine/Core",
+        "Hip"
+      ],
+      "dose": "12 reps",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "lost lumbopelvic control",
+      "instructions": "Stand with knees soft, hands on the hips. Tip the pelvis forward to arch the low back, then tuck the tailbone under to flatten it. Move slowly between the two extremes; the ribs and shoulders stay still."
+    },
+    {
+      "id": "FLX-37",
+      "name": "Segmental roll-down",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "T-spine",
+        "L-spine/Core"
+      ],
+      "dose": "4 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "global spinal stiffness",
+      "instructions": "Stand tall, tuck the chin, and roll forward one vertebra at a time, letting the arms hang, until you're folded as far as comfortable with soft knees. Pause, then rebuild from the tailbone up, stacking each segment, the head arriving last. Take at least 10 s each way."
+    },
+    {
+      "id": "FLX-38",
+      "name": "Foot roll",
+      "bucket": "FLX",
+      "bucket_name": "Flexibility & mobility",
+      "regions": [
+        "Foot/Shin"
+      ],
+      "dose": "30 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand",
+        "Chair"
+      ],
+      "equipment_optional": [
+        "ball"
+      ],
+      "micro_eligible": false,
+      "counteracts": "plantar stiffness",
+      "instructions": "Standing or sitting, place a lacrosse or tennis ball under the arch of one foot. Roll slowly from heel to toes, pausing a few breaths anywhere that feels tight. Use body weight to control pressure. No ball: roll on a water bottle."
+    },
+    {
+      "id": "CIR-01",
+      "name": "Walk lap",
+      "bucket": "CIR",
+      "bucket_name": "Blood flow & circulation",
+      "regions": [
+        "Full"
+      ],
+      "dose": "60–120 s",
+      "per_side": false,
+      "block_seconds": 90,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "low metabolic rate, venous pooling",
+      "instructions": "Get up and walk briskly around the room, down a hallway, or outside. Swing the arms, take full steps, and land heel to toe. If space is tight, walk a loop repeatedly."
+    },
+    {
+      "id": "CIR-02",
+      "name": "March in place",
+      "bucket": "CIR",
+      "bucket_name": "Blood flow & circulation",
+      "regions": [
+        "Full"
+      ],
+      "dose": "60 s",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "venous pooling",
+      "instructions": "March on the spot lifting each knee to about hip height, swinging the opposite arm as the knee rises. Land softly on the ball of the foot and keep a steady, slightly quicker-than-walking rhythm."
+    },
+    {
+      "id": "CIR-03",
+      "name": "Stair climb",
+      "bucket": "CIR",
+      "bucket_name": "Blood flow & circulation",
+      "regions": [
+        "Full"
+      ],
+      "dose": "60–90 s",
+      "per_side": false,
+      "block_seconds": 90,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "sluggish circulation",
+      "instructions": "Climb one or two flights of stairs at a steady pace, pushing through the whole foot and standing tall at the top of each step. Walk down at an easy pace. Repeat if time allows."
+    },
+    {
+      "id": "CIR-04",
+      "name": "Calf pumps",
+      "bucket": "CIR",
+      "bucket_name": "Blood flow & circulation",
+      "regions": [
+        "Calf/Ankle"
+      ],
+      "dose": "30 reps",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Stand",
+        "Desk"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "venous pooling in calves",
+      "instructions": "Stand with fingertips on the desk for balance. Rise onto the balls of both feet and drop back down at a quick, bouncy pace, about one per second. Range doesn't need to be full; rhythm matters more."
+    },
+    {
+      "id": "CIR-05",
+      "name": "Ankle pumps and circles",
+      "bucket": "CIR",
+      "bucket_name": "Blood flow & circulation",
+      "regions": [
+        "Calf/Ankle"
+      ],
+      "dose": "20 pumps + 10 circles each way",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Chair",
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "venous pooling",
+      "instructions": "Seated or standing on one leg, point the toes away then pull them up toward the shin, 20 times. Then draw big slow circles with the foot in each direction. Do both feet."
+    },
+    {
+      "id": "CIR-06",
+      "name": "Arm circles",
+      "bucket": "CIR",
+      "bucket_name": "Blood flow & circulation",
+      "regions": [
+        "Shoulder"
+      ],
+      "dose": "30 s each way",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "shoulder stiffness, upper-body circulation",
+      "instructions": "Arms straight out to the sides, make small circles forward and gradually enlarge them until they're as big as your shoulders allow. Reverse direction and repeat. Keep the ribs down and the neck relaxed."
+    },
+    {
+      "id": "CIR-07",
+      "name": "Step-out jacks",
+      "bucket": "CIR",
+      "bucket_name": "Blood flow & circulation",
+      "regions": [
+        "Full"
+      ],
+      "dose": "45 s",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "heart rate too low",
+      "instructions": "Like a jumping jack without the jump: step one foot out to the side as both arms swing overhead, step it back in as arms come down, then the other foot. Keep a brisk, even rhythm."
+    },
+    {
+      "id": "CIR-08",
+      "name": "Inchworm",
+      "bucket": "CIR",
+      "bucket_name": "Blood flow & circulation",
+      "regions": [
+        "Full",
+        "Ham"
+      ],
+      "dose": "5 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "posterior chain stiffness, low HR",
+      "instructions": "From standing, fold forward and place hands on the floor, bending the knees as needed. Walk the hands forward until you're in a straight-arm plank. Then walk the feet toward the hands in small steps, keeping the legs as straight as you can, and stand up."
+    },
+    {
+      "id": "CIR-09",
+      "name": "Shadow boxing",
+      "bucket": "CIR",
+      "bucket_name": "Blood flow & circulation",
+      "regions": [
+        "Full",
+        "Shoulder"
+      ],
+      "dose": "45 s",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "low HR, shoulder stiffness",
+      "instructions": "Stand in a staggered stance with fists up by the chin. Throw light, loose punches into the air — jab, cross, hook — rotating the torso and shifting weight with each punch, and shuffle the feet between combos. Speed and relaxation over power."
+    },
+    {
+      "id": "CIR-10",
+      "name": "Leg swings",
+      "bucket": "CIR",
+      "bucket_name": "Blood flow & circulation",
+      "regions": [
+        "Hip"
+      ],
+      "dose": "10 each direction/side",
+      "per_side": true,
+      "block_seconds": 75,
+      "difficulty": 1,
+      "settings": [
+        "Stand",
+        "Wall"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "hip stiffness, lower-body circulation",
+      "instructions": "Hold a wall with one hand and swing the outside leg forward and back like a pendulum, letting it swing progressively higher while the torso stays upright. Then face the wall with both hands on it and swing the leg side to side across the body. Switch legs."
+    },
+    {
+      "id": "CIR-11",
+      "name": "Standing hip circles",
+      "bucket": "CIR",
+      "bucket_name": "Blood flow & circulation",
+      "regions": [
+        "Hip",
+        "L-spine/Core"
+      ],
+      "dose": "10 each way",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "lumbopelvic stiffness",
+      "instructions": "Feet hip width, hands on hips, knees soft. Make big slow circles with the hips as if using a hula hoop, pushing them as far forward, sideways, and back as you can while the head stays roughly over the feet. Reverse direction."
+    },
+    {
+      "id": "CIR-12",
+      "name": "Brisk good mornings",
+      "bucket": "CIR",
+      "bucket_name": "Blood flow & circulation",
+      "regions": [
+        "Ham",
+        "Glute"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "glute inhibition, low HR",
+      "instructions": "Stand with feet hip width, hands behind the head, knees slightly bent. Push the hips straight back and hinge the torso forward with a flat back until you feel the hamstrings, then squeeze the glutes to stand up. Move at a brisk pace, about 2 s per rep."
+    },
+    {
+      "id": "CIR-13",
+      "name": "Standing knee-to-elbow",
+      "bucket": "CIR",
+      "bucket_name": "Blood flow & circulation",
+      "regions": [
+        "L-spine/Core",
+        "Hip"
+      ],
+      "dose": "20 reps",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "trunk stiffness, low HR",
+      "instructions": "Stand tall with hands behind the head. Lift one knee while rotating the torso to bring the opposite elbow toward it, then return and switch sides. Keep a steady rhythm and stay tall between reps."
+    },
+    {
+      "id": "CIR-14",
+      "name": "Heel walks and toe walks",
+      "bucket": "CIR",
+      "bucket_name": "Blood flow & circulation",
+      "regions": [
+        "Foot/Shin",
+        "Calf/Ankle"
+      ],
+      "dose": "2 lengths each",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "weak shins, foot circulation",
+      "instructions": "Walk across the room on your heels with the toes pulled up as high as possible, then walk back on the balls of the feet with the heels high. Take short steps and keep the torso tall. Repeat once."
+    },
+    {
+      "id": "CIR-15",
+      "name": "Whole-body shake-out",
+      "bucket": "CIR",
+      "bucket_name": "Blood flow & circulation",
+      "regions": [
+        "Full"
+      ],
+      "dose": "30 s",
+      "per_side": false,
+      "block_seconds": 30,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "static tension",
+      "instructions": "Stand loosely and shake the hands, then the arms from the shoulders, then bounce lightly on the balls of the feet and shake out each leg. Let the jaw and shoulders go slack. Nothing here needs to look tidy."
+    },
+    {
+      "id": "CIR-16",
+      "name": "Air squats (brisk)",
+      "bucket": "CIR",
+      "bucket_name": "Blood flow & circulation",
+      "regions": [
+        "Quad",
+        "Glute"
+      ],
+      "dose": "20 reps",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "low HR, glute inhibition",
+      "instructions": "Feet shoulder width, sit the hips back and down to about a quarter or half squat, arms reaching forward for balance, then stand and squeeze the glutes. Keep the heels down and move at about one rep per 2 s."
+    },
+    {
+      "id": "CIR-17",
+      "name": "Step-ups",
+      "bucket": "CIR",
+      "bucket_name": "Blood flow & circulation",
+      "regions": [
+        "Glute",
+        "Quad"
+      ],
+      "dose": "45 s",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "low HR, glute inhibition",
+      "instructions": "Use the bottom stair or a sturdy step. Step fully onto it with one foot, bring the other up, then step down leading with the same foot. Alternate the leading leg every few reps. Keep the torso upright and the pace moderate."
+    },
+    {
+      "id": "CIR-18",
+      "name": "Light kettlebell swings",
+      "bucket": "CIR",
+      "bucket_name": "Blood flow & circulation",
+      "regions": [
+        "Glute",
+        "Ham"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [
+        "kettlebell_or_dumbbell"
+      ],
+      "micro_eligible": false,
+      "counteracts": "glute inhibition, low HR",
+      "instructions": "Stand with feet slightly wider than hips, bell on the floor a foot in front. Hinge at the hips with a flat back, hike the bell back between the legs, then snap the hips forward to float it to chest height with straight arms. Let it swing back and repeat. The hips do the work; the arms just guide. Use a light bell."
+    },
+    {
+      "id": "CIR-19",
+      "name": "Reverse lunge with overhead reach",
+      "bucket": "CIR",
+      "bucket_name": "Blood flow & circulation",
+      "regions": [
+        "Hip",
+        "Full"
+      ],
+      "dose": "6/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "hip flexor shortening, low HR",
+      "instructions": "Step one foot back into a lunge, lowering the rear knee toward the floor while the front knee stays over the ankle. At the bottom, reach both arms straight overhead and squeeze the rear glute. Drive through the front heel to return. Alternate sides."
+    },
+    {
+      "id": "CIR-20",
+      "name": "Speed skaters (no jump)",
+      "bucket": "CIR",
+      "bucket_name": "Blood flow & circulation",
+      "regions": [
+        "Glute",
+        "Adductor"
+      ],
+      "dose": "30 s",
+      "per_side": false,
+      "block_seconds": 30,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "lateral hip weakness, low HR",
+      "instructions": "Take a wide step to one side, bending that knee and letting the other leg trail behind as the opposite hand reaches toward the planted foot. Push off and step to the other side. Stay low and keep the movement smooth, no hop needed."
+    },
+    {
+      "id": "STR-01",
+      "name": "Glute bridge",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Glute"
+      ],
+      "dose": "12 reps, 2 s hold",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "glute inhibition",
+      "instructions": "Lie on your back, knees bent, feet flat and hip width, arms at the sides. Drive through the heels to lift the hips until the body is straight from shoulders to knees. Squeeze the glutes hard at the top for 2 s, then lower slowly. Don't arch the low back to get higher."
+    },
+    {
+      "id": "STR-02",
+      "name": "Single-leg glute bridge",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Glute"
+      ],
+      "dose": "8/side",
+      "per_side": true,
+      "block_seconds": 75,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "glute inhibition, asymmetry",
+      "instructions": "Same setup as the glute bridge, but lift one foot off the floor with the knee bent. Push through the planted heel to lift the hips, keeping both hip bones level, hold, and lower. Swap sides after the set."
+    },
+    {
+      "id": "STR-03",
+      "name": "Chair-edge hip thrust",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Glute"
+      ],
+      "dose": "12 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Chair"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "glute inhibition",
+      "instructions": "Sit on the floor with your upper back against the front edge of a chair seat, knees bent, feet flat. Tuck the chin and drive through the heels to lift the hips until the thighs are level with the torso, then squeeze the glutes. Lower under control. Brace the chair against a wall so it can't slide."
+    },
+    {
+      "id": "STR-04",
+      "name": "Tempo squat",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Quad",
+        "Glute"
+      ],
+      "dose": "10 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "lower-body deconditioning",
+      "instructions": "Feet shoulder width, toes slightly out. Take 3 s to sit the hips back and down as low as comfortable with heels down and chest up, pause 1 s at the bottom, then stand in 1 s and squeeze the glutes. Arms out in front for balance."
+    },
+    {
+      "id": "STR-05",
+      "name": "Split squat",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Quad",
+        "Glute",
+        "Hip"
+      ],
+      "dose": "8/side",
+      "per_side": true,
+      "block_seconds": 75,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "hip flexor shortening, single-leg weakness",
+      "instructions": "Stand in a long stride stance, rear heel up. Lower straight down until the rear knee nearly touches the floor, keeping the torso upright and the front knee over the ankle. Push through the front heel to stand. Finish all reps on one side before switching."
+    },
+    {
+      "id": "STR-06",
+      "name": "Reverse lunge",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Glute",
+        "Quad"
+      ],
+      "dose": "8/side",
+      "per_side": true,
+      "block_seconds": 75,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "glute inhibition",
+      "instructions": "From standing, step one foot back and lower until both knees are around 90°, torso tall. Push through the front heel to return to standing. Alternate legs or finish one side first. Hold a wall or desk if balance is an issue."
+    },
+    {
+      "id": "STR-07",
+      "name": "Step-up (slow)",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Glute",
+        "Quad"
+      ],
+      "dose": "8/side",
+      "per_side": true,
+      "block_seconds": 75,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "glute inhibition",
+      "instructions": "Stand facing a stair or sturdy step. Place one whole foot on it and, without pushing off the back foot, drive through the front heel to stand fully on the step. Lower the back foot to the floor slowly, taking about 3 s. Do all reps on one leg, then switch."
+    },
+    {
+      "id": "STR-08",
+      "name": "Single-leg RDL",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Ham",
+        "Glute"
+      ],
+      "dose": "8/side",
+      "per_side": true,
+      "block_seconds": 75,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [
+        "kettlebell_or_dumbbell"
+      ],
+      "micro_eligible": false,
+      "counteracts": "posterior chain weakness, balance",
+      "instructions": "Stand on one leg with a soft knee. Hinge at the hip, sending the free leg straight back and the torso forward together, like a see-saw, with a flat back and the hips square. Reach toward the floor, then squeeze the glute to return. A light bell in the opposite hand is optional; a fingertip on the desk is fine for balance."
+    },
+    {
+      "id": "STR-09",
+      "name": "Goblet squat",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Quad",
+        "Glute",
+        "Hip"
+      ],
+      "dose": "10 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [
+        "kettlebell_or_dumbbell"
+      ],
+      "micro_eligible": false,
+      "counteracts": "lower-body strength, hip mobility",
+      "instructions": "Hold a kettlebell or dumbbell against the chest with both hands, elbows pointing down. Feet shoulder width, toes slightly out, squat down as low as comfortable with elbows tracking inside the knees and chest tall. Stand and squeeze the glutes. No weight: hold a full water bottle or just clasp hands at the chest."
+    },
+    {
+      "id": "STR-10",
+      "name": "Kettlebell deadlift",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Ham",
+        "Glute"
+      ],
+      "dose": "10 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [
+        "kettlebell_or_dumbbell"
+      ],
+      "micro_eligible": false,
+      "counteracts": "posterior chain weakness",
+      "instructions": "Stand with the bell between the feet. Push the hips back and bend the knees a little until you can grip the handle with a flat back and the chest up. Stand by driving the hips forward, then hinge back down under control, keeping the bell close to the legs."
+    },
+    {
+      "id": "STR-11",
+      "name": "Wall sit",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Quad"
+      ],
+      "dose": "30–45 s",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Wall"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "quad deconditioning",
+      "instructions": "Lean your back against a wall and walk the feet forward, sliding down until the thighs are roughly parallel to the floor and the knees are over the ankles. Keep the whole back and head against the wall and breathe normally."
+    },
+    {
+      "id": "STR-12",
+      "name": "Bird dog",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "L-spine/Core",
+        "Glute"
+      ],
+      "dose": "6/side, 3 s hold",
+      "per_side": true,
+      "block_seconds": 75,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "weak spinal stabilizers",
+      "instructions": "On hands and knees, brace the belly as if about to be poked. Extend the right arm forward and the left leg back until both are level with the torso, without letting the hips or shoulders tilt. Hold 3 s, return, and switch. Keep the neck neutral, eyes on the floor."
+    },
+    {
+      "id": "STR-13",
+      "name": "Dead bug",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "L-spine/Core"
+      ],
+      "dose": "8/side",
+      "per_side": true,
+      "block_seconds": 75,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "weak anterior core, rib flare",
+      "instructions": "Lie on your back, arms pointing at the ceiling, hips and knees bent to 90°. Press the low back gently into the floor and keep it there. Slowly lower the right arm overhead and the left leg toward the floor together, exhale, then return and switch. Stop the range wherever the low back starts to lift."
+    },
+    {
+      "id": "STR-14",
+      "name": "Side plank",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "L-spine/Core"
+      ],
+      "dose": "20–30 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "lateral core weakness",
+      "instructions": "Lie on one side propped on the forearm, elbow under the shoulder. Lift the hips so the body forms a straight line from head to feet (or head to knees, with knees bent, for an easier version). Squeeze the glutes and don't let the hips sag or roll. Switch sides."
+    },
+    {
+      "id": "STR-15",
+      "name": "Front plank",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "L-spine/Core"
+      ],
+      "dose": "30–45 s",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "core deconditioning",
+      "instructions": "Forearms on the floor, elbows under shoulders, toes tucked. Lift the body into a straight line from head to heels. Squeeze the glutes and quads, push the floor away with the forearms, and keep the neck long with eyes on the floor. Breathe."
+    },
+    {
+      "id": "STR-16",
+      "name": "Prone Y-T-W",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Shoulder",
+        "T-spine"
+      ],
+      "dose": "8 each",
+      "per_side": false,
+      "block_seconds": 75,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "weak lower/mid traps",
+      "instructions": "Lie face down, forehead resting on a folded towel. With thumbs up, lift straight arms off the floor in a Y shape (overhead, wide), lower, then in a T (straight out to the sides), lower, then in a W (elbows bent and pulled toward the hips). Squeeze the shoulder blades on each lift; the head stays down."
+    },
+    {
+      "id": "STR-17",
+      "name": "Band pull-apart",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Shoulder"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [
+        "band"
+      ],
+      "micro_eligible": false,
+      "counteracts": "rounded shoulders",
+      "instructions": "Hold a band in both hands at shoulder height, arms straight out in front, hands about shoulder width. Pull the hands apart until the band touches the chest, squeezing the shoulder blades together, then return slowly. Keep the shoulders down away from the ears."
+    },
+    {
+      "id": "STR-18",
+      "name": "Band face pull",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Shoulder"
+      ],
+      "dose": "12 reps",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [
+        "band"
+      ],
+      "micro_eligible": false,
+      "counteracts": "rounded shoulders, weak external rotators",
+      "instructions": "Anchor a band at about face height (a door handle or hook). Hold both ends with palms facing each other and pull toward the face, letting the elbows flare wide and high, finishing with the hands beside the ears. Squeeze the back of the shoulders, then return slowly."
+    },
+    {
+      "id": "STR-19",
+      "name": "Band row",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Shoulder",
+        "T-spine"
+      ],
+      "dose": "12 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [
+        "band"
+      ],
+      "micro_eligible": false,
+      "counteracts": "weak upper back",
+      "instructions": "Anchor a band at waist height, or loop it around your feet while seated on the floor. Hold both ends with arms straight, then pull the elbows back past the ribs, squeezing the shoulder blades together, and pause. Return slowly. Stay tall; don't lean back to help."
+    },
+    {
+      "id": "STR-20",
+      "name": "Desk incline push-up",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Chest",
+        "Shoulder"
+      ],
+      "dose": "12 reps",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Desk"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "upper-body deconditioning",
+      "instructions": "Hands on the desk edge slightly wider than shoulders, body in a straight line from head to heels, feet back. Bend the elbows to lower the chest to the desk, elbows angled about 45° from the body, then push back up. Squeeze the glutes so the hips don't sag."
+    },
+    {
+      "id": "STR-21",
+      "name": "Push-up",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Chest",
+        "Shoulder",
+        "L-spine/Core"
+      ],
+      "dose": "8–12 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "upper-body deconditioning",
+      "instructions": "Hands on the floor slightly wider than shoulders, body straight from head to heels. Lower the chest until it's a fist's height from the floor, elbows about 45° from the body, then press back up. Take 2 s to lower. Drop to the knees if the hips sag."
+    },
+    {
+      "id": "STR-22",
+      "name": "Scapular push-up",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Shoulder"
+      ],
+      "dose": "12 reps",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "weak serratus, winged scapula",
+      "instructions": "Hold a straight-arm plank. Without bending the elbows, let the chest sink between the shoulders so the shoulder blades pinch together, then push the floor away so the upper back rounds slightly and the blades spread apart. Small, slow movement."
+    },
+    {
+      "id": "STR-23",
+      "name": "Lateral band walk",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Glute"
+      ],
+      "dose": "10 steps each way",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [
+        "band"
+      ],
+      "micro_eligible": false,
+      "counteracts": "weak glute medius",
+      "instructions": "Loop a mini-band just above the knees. Sink into a quarter squat with feet hip width and toes forward. Step sideways, leading with the outside foot and keeping tension on the band, then follow with the other foot without letting the feet touch. Go one way, then back."
+    },
+    {
+      "id": "STR-24",
+      "name": "Clamshell",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Glute"
+      ],
+      "dose": "15/side",
+      "per_side": true,
+      "block_seconds": 75,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "equipment_optional": [
+        "band"
+      ],
+      "micro_eligible": false,
+      "counteracts": "weak glute medius / hip external rotators",
+      "instructions": "Lie on one side with hips and knees bent about 45°, feet together, head on the lower arm. Keeping the feet touching and the pelvis still, lift the top knee as high as it goes, pause, and lower slowly. Add a mini-band above the knees to make it harder. Switch sides."
+    },
+    {
+      "id": "STR-25",
+      "name": "Light suitcase carry",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "L-spine/Core"
+      ],
+      "dose": "20 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [
+        "kettlebell_or_dumbbell"
+      ],
+      "micro_eligible": false,
+      "counteracts": "lateral core weakness",
+      "instructions": "Hold a light kettlebell or dumbbell in one hand at your side like a suitcase. Walk slowly around the room, standing perfectly tall and not letting the torso lean toward or away from the weight. Switch hands. Keep the weight light enough that the grip never fatigues."
+    },
+    {
+      "id": "STR-26",
+      "name": "Single-leg calf raise",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Calf/Ankle"
+      ],
+      "dose": "12/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand",
+        "Wall"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "calf weakness, venous pooling",
+      "instructions": "Stand on one foot with a fingertip on the wall for balance. Rise as high as you can onto the ball of the foot, pause, then lower over 3 s until the heel touches. Keep the ankle from rolling outward. Switch legs."
+    },
+    {
+      "id": "STR-27",
+      "name": "Prone back extension",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "L-spine/Core",
+        "Glute"
+      ],
+      "dose": "10 reps",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "weak spinal extensors",
+      "instructions": "Lie face down with hands at the temples, elbows out, legs straight. Squeeze the glutes and lift the chest a few inches off the floor, keeping the neck in line with the spine and eyes down. Hold 2 s and lower slowly. Height is not the goal."
+    },
+    {
+      "id": "STR-28",
+      "name": "Reverse snow angel",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Shoulder",
+        "T-spine"
+      ],
+      "dose": "10 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "weak posterior shoulder",
+      "instructions": "Lie face down with arms at your sides, palms down, forehead on a towel. Lift both arms an inch off the floor and sweep them slowly out and up overhead like a snow angel, then back to the hips, without letting them touch the floor. Keep the shoulder blades pulled down."
+    },
+    {
+      "id": "STR-29",
+      "name": "Copenhagen plank (short lever)",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Adductor",
+        "L-spine/Core"
+      ],
+      "dose": "15–20 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 3,
+      "settings": [
+        "Floor",
+        "Chair"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "adductor weakness",
+      "instructions": "Lie on one side beside a chair, propped on the forearm. Bend the top leg and rest the inside of that knee and shin on the chair seat; the bottom leg is bent behind you, foot off the floor. Lift the hips so the body is straight from head to top knee, pressing the top knee into the chair. Hold, then switch."
+    },
+    {
+      "id": "STR-30",
+      "name": "Banded good morning",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Ham",
+        "Glute"
+      ],
+      "dose": "12 reps",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [
+        "band"
+      ],
+      "micro_eligible": false,
+      "counteracts": "posterior chain weakness",
+      "instructions": "Stand on the middle of a band and loop the top behind the neck across the upper traps. With soft knees, push the hips back and hinge forward with a flat back until you feel the hamstrings, then squeeze the glutes to stand against the band. Keep the chin tucked."
+    },
+    {
+      "id": "STR-31",
+      "name": "Tibialis raise",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Foot/Shin"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Wall"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "weak shins, ankle stiffness",
+      "instructions": "Lean your back against a wall with feet about a foot in front of it, legs straight. Keeping the heels down, lift the toes and the front of both feet as high as possible, pause, and lower slowly. The further the feet are from the wall, the harder it gets."
+    },
+    {
+      "id": "STR-32",
+      "name": "Light overhead press",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Shoulder"
+      ],
+      "dose": "8/side",
+      "per_side": true,
+      "block_seconds": 75,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [
+        "kettlebell_or_dumbbell"
+      ],
+      "micro_eligible": false,
+      "counteracts": "overhead weakness, kyphosis",
+      "instructions": "Hold a light bell or dumbbell at shoulder height, elbow in front of the body. Brace the belly and squeeze the glutes so the ribs stay down, then press straight up until the arm is locked out beside the ear. Lower slowly. Do all reps on one side, then switch."
+    },
+    {
+      "id": "STR-33",
+      "name": "Bent-over reverse fly",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Shoulder",
+        "T-spine"
+      ],
+      "dose": "12 reps",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [
+        "kettlebell_or_dumbbell",
+        "band"
+      ],
+      "micro_eligible": false,
+      "counteracts": "rounded shoulders",
+      "instructions": "Hinge forward at the hips with a flat back until the torso is near parallel to the floor, light weights or band ends hanging below the shoulders. With slightly bent elbows, raise the arms out to the sides until they form a T, squeezing the shoulder blades together, then lower slowly. No weight: use full water bottles."
+    },
+    {
+      "id": "STR-34",
+      "name": "Bottom squat hold",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Hip",
+        "Quad"
+      ],
+      "dose": "30–40 s",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "hip compression, quad deconditioning",
+      "instructions": "Squat as deep as you can with heels down, feet slightly turned out, and hold there. Keep the chest lifted, push the knees outward, and keep the weight over the middle of the feet. Hands can clasp in front for balance."
+    },
+    {
+      "id": "STR-35",
+      "name": "Standing glute squeezes",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Glute"
+      ],
+      "dose": "10 × 5 s",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "glute inhibition",
+      "instructions": "Stand tall with feet hip width. Squeeze both glutes as hard as you can, as if pinching a coin between them, without tucking the pelvis much or leaning back. Hold 5 s, relax fully, and repeat."
+    },
+    {
+      "id": "STR-36",
+      "name": "Deep neck flexor hold",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Neck"
+      ],
+      "dose": "5 × 10 s",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "weak deep neck flexors, forward head",
+      "instructions": "Lie on your back with knees bent, no pillow. Tuck the chin gently as if nodding \"yes\", then lift the head about a centimetre off the floor, keeping the chin tucked. Hold 10 s without letting the chin poke forward, then rest."
+    },
+    {
+      "id": "STR-37",
+      "name": "Wall slide with lift-off",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Shoulder",
+        "T-spine"
+      ],
+      "dose": "8 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Wall"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "weak lower traps",
+      "instructions": "Face a wall with forearms and hands flat on it, elbows at shoulder height. Slide the arms up the wall until they're nearly straight, then press the forearms lightly into the wall and lift them a centimetre off it, holding 2 s. Return to the wall and slide back down. Keep the ribs down."
+    },
+    {
+      "id": "STR-38",
+      "name": "Hip hinge with band abduction",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "Glute",
+        "Ham"
+      ],
+      "dose": "12 reps",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [
+        "band"
+      ],
+      "micro_eligible": false,
+      "counteracts": "glute inhibition, valgus tendency",
+      "instructions": "Loop a mini-band just above the knees, feet hip width. Push the hips back into a hinge with a flat back while driving the knees outward against the band, then squeeze the glutes to stand tall, keeping the knees pushed out throughout."
+    },
+    {
+      "id": "BAL-01",
+      "name": "Single-leg stand",
+      "bucket": "BAL",
+      "bucket_name": "Balance & proprioception",
+      "regions": [
+        "Full"
+      ],
+      "dose": "30 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "lost proprioception",
+      "instructions": "Stand on one foot with a soft knee, the other foot lifted just off the floor. Keep the hips level, stand tall, and fix your eyes on a point ahead. If you wobble, touch the toe down and resume. Switch legs."
+    },
+    {
+      "id": "BAL-02",
+      "name": "Single-leg stand, eyes closed",
+      "bucket": "BAL",
+      "bucket_name": "Balance & proprioception",
+      "regions": [
+        "Full"
+      ],
+      "dose": "20 s/side",
+      "per_side": true,
+      "block_seconds": 45,
+      "difficulty": 2,
+      "settings": [
+        "Stand",
+        "Wall"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "dependence on vision for balance",
+      "instructions": "Stand on one leg near a wall, then close your eyes. Keep the standing knee soft and feel the foot making small corrections. Open the eyes or touch the wall if needed, then close them again. Switch legs."
+    },
+    {
+      "id": "BAL-03",
+      "name": "Single-leg stand with head turns",
+      "bucket": "BAL",
+      "bucket_name": "Balance & proprioception",
+      "regions": [
+        "Full",
+        "Neck"
+      ],
+      "dose": "20 s/side",
+      "per_side": true,
+      "block_seconds": 45,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "neck stiffness plus balance",
+      "instructions": "Balance on one leg, then slowly turn the head left and right, then nod up and down, while staying balanced. Keep the movement slow and the standing knee soft. Switch legs."
+    },
+    {
+      "id": "BAL-04",
+      "name": "Tandem stance",
+      "bucket": "BAL",
+      "bucket_name": "Balance & proprioception",
+      "regions": [
+        "Full"
+      ],
+      "dose": "20 s each",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "narrow-base instability",
+      "instructions": "Stand with one foot directly in front of the other, heel touching toe, as if on a tightrope, arms at the sides. Hold, then swap which foot is in front. Look ahead, not down."
+    },
+    {
+      "id": "BAL-05",
+      "name": "Heel-to-toe line walk",
+      "bucket": "BAL",
+      "bucket_name": "Balance & proprioception",
+      "regions": [
+        "Full"
+      ],
+      "dose": "10 steps each way",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "gait control loss",
+      "instructions": "Walk forward in a straight line placing the heel of each step directly against the toes of the other foot. Then walk backward the same way, toe to heel. Keep the eyes forward and the arms loose."
+    },
+    {
+      "id": "BAL-06",
+      "name": "Single-leg reach (Y-balance)",
+      "bucket": "BAL",
+      "bucket_name": "Balance & proprioception",
+      "regions": [
+        "Hip",
+        "Glute"
+      ],
+      "dose": "3 rounds/side",
+      "per_side": true,
+      "block_seconds": 90,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "hip control, ankle stability",
+      "instructions": "Stand on one leg with a slight knee bend. Reach the free foot as far as you can straight forward and tap the floor lightly, return to centre, then reach diagonally back to one side, return, then diagonally back to the other side. Keep the standing heel down and hips level. Switch legs."
+    },
+    {
+      "id": "BAL-07",
+      "name": "Airplane / single-leg hinge hold",
+      "bucket": "BAL",
+      "bucket_name": "Balance & proprioception",
+      "regions": [
+        "Ham",
+        "Glute"
+      ],
+      "dose": "20 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "posterior chain control",
+      "instructions": "Stand on one leg and hinge forward at the hip, extending the free leg behind you and the arms out to the sides, until the torso and leg are near parallel to the floor. Keep the hips square to the floor and the back flat. Hold, then rise and switch."
+    },
+    {
+      "id": "BAL-08",
+      "name": "Towel or cushion single-leg stand",
+      "bucket": "BAL",
+      "bucket_name": "Balance & proprioception",
+      "regions": [
+        "Foot/Shin",
+        "Calf/Ankle"
+      ],
+      "dose": "20 s/side",
+      "per_side": true,
+      "block_seconds": 45,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "ankle stabilizer weakness",
+      "instructions": "Fold a towel a few times or use a firm cushion and stand on it on one foot. The soft surface makes the ankle work harder; keep the knee soft and the hips level. Switch feet."
+    },
+    {
+      "id": "BAL-09",
+      "name": "Clock toe taps",
+      "bucket": "BAL",
+      "bucket_name": "Balance & proprioception",
+      "regions": [
+        "Hip",
+        "Glute"
+      ],
+      "dose": "2 rounds/side",
+      "per_side": true,
+      "block_seconds": 75,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "hip control",
+      "instructions": "Imagine standing at the centre of a clock face on one leg. With the free foot, tap lightly to 12 o'clock, then 3, 6, and 9 (going behind or across the body as needed), returning to centre between taps. Keep the standing knee soft and the torso upright. Switch legs."
+    },
+    {
+      "id": "BAL-10",
+      "name": "Single-leg mini-squat",
+      "bucket": "BAL",
+      "bucket_name": "Balance & proprioception",
+      "regions": [
+        "Quad",
+        "Glute"
+      ],
+      "dose": "8/side",
+      "per_side": true,
+      "block_seconds": 75,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "knee and hip control",
+      "instructions": "Stand on one leg and bend that knee to lower a few inches, like a quarter squat, keeping the knee pointed over the middle toes and the hips level. Stand back up. Use a fingertip on the desk for balance if needed. Switch legs."
+    },
+    {
+      "id": "BAL-11",
+      "name": "Marching hold",
+      "bucket": "BAL",
+      "bucket_name": "Balance & proprioception",
+      "regions": [
+        "Hip",
+        "L-spine/Core"
+      ],
+      "dose": "5 × 5 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "hip flexor strength, balance",
+      "instructions": "Stand tall and lift one knee to hip height, thigh parallel to the floor, foot relaxed. Hold 5 s without leaning back or letting the hips tilt, then lower slowly and switch. Hands on hips."
+    },
+    {
+      "id": "BAL-12",
+      "name": "Step-back lunge with pause",
+      "bucket": "BAL",
+      "bucket_name": "Balance & proprioception",
+      "regions": [
+        "Glute",
+        "Quad"
+      ],
+      "dose": "5/side",
+      "per_side": true,
+      "block_seconds": 75,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "single-leg control",
+      "instructions": "Step one foot back into a lunge and lower until the rear knee hovers just above the floor. Hold that bottom position for 3 s, keeping the torso tall and still, then drive through the front heel to stand. Alternate sides."
+    },
+    {
+      "id": "BAL-13",
+      "name": "Single-leg calf raise hold",
+      "bucket": "BAL",
+      "bucket_name": "Balance & proprioception",
+      "regions": [
+        "Calf/Ankle"
+      ],
+      "dose": "3 × 10 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand",
+        "Wall"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "ankle stability, venous pooling",
+      "instructions": "Stand on one foot with a fingertip on the wall. Rise as high as possible onto the ball of the foot and hold there for 10 s, keeping the ankle straight (not rolling outward). Lower, rest a moment, and repeat. Switch legs."
+    },
+    {
+      "id": "BAL-14",
+      "name": "Tree pose",
+      "bucket": "BAL",
+      "bucket_name": "Balance & proprioception",
+      "regions": [
+        "Hip",
+        "Glute",
+        "Full"
+      ],
+      "dose": "30 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand",
+        "Wall"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "lost single-leg stability, hip rotator weakness",
+      "instructions": "Stand tall and place the sole of one foot on the inside of the opposite calf or inner thigh (not on the knee), knee pointing out to the side. Press the foot and the standing leg into each other, bring the palms together at the chest or reach them overhead, and fix your eyes on one point. Fingertips on a wall are fine at first. Switch sides."
+    },
+    {
+      "id": "BAL-15",
+      "name": "Warrior III",
+      "bucket": "BAL",
+      "bucket_name": "Balance & proprioception",
+      "regions": [
+        "Ham",
+        "Glute",
+        "L-spine/Core"
+      ],
+      "dose": "20 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 3,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "posterior chain control, hip stability",
+      "instructions": "Stand on one leg and hinge forward at the hip while the other leg extends straight back, until the torso and the raised leg are close to parallel with the floor and the body forms a T. Arms can reach forward, out to the sides, or stay at the hips. Keep the hips level (toes of the raised foot pointing down), the standing knee soft, and the neck long. Switch sides."
+    },
+    {
+      "id": "BAL-16",
+      "name": "Half moon (supported)",
+      "bucket": "BAL",
+      "bucket_name": "Balance & proprioception",
+      "regions": [
+        "Hip",
+        "Glute",
+        "L-spine/Core"
+      ],
+      "dose": "20 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 3,
+      "settings": [
+        "Desk",
+        "Wall"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "lateral hip weakness, rotational balance",
+      "instructions": "Stand sideways to the desk. Place the near hand on the desk and shift weight onto the near leg, then lift the far leg out to the side until it's roughly level with the hip, foot flexed. Open the chest and top arm toward the ceiling, stacking the shoulders and hips. Look forward or down to start; up when steady. Switch sides."
+    },
+    {
+      "id": "BAL-17",
+      "name": "Eagle pose",
+      "bucket": "BAL",
+      "bucket_name": "Balance & proprioception",
+      "regions": [
+        "Hip",
+        "Shoulder",
+        "Full"
+      ],
+      "dose": "20 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "narrow-base instability, shoulder and hip stiffness",
+      "instructions": "Bend the knees slightly and cross one thigh over the other, hooking the foot behind the calf if it reaches (toes on the floor beside the standing foot is fine). Cross the arms in front of the chest with the opposite arm on top, wrap the forearms so the palms or backs of the hands touch, and lift the elbows to shoulder height. Sit a little lower into the standing leg and hold. Switch sides."
+    },
+    {
+      "id": "BAL-18",
+      "name": "Crescent lunge hold",
+      "bucket": "BAL",
+      "bucket_name": "Balance & proprioception",
+      "regions": [
+        "Hip",
+        "Quad",
+        "Glute"
+      ],
+      "dose": "20 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "hip flexor shortening, single-leg control",
+      "instructions": "Step one foot back into a long lunge with the rear heel lifted and the rear leg straight, front knee over the ankle. Reach both arms overhead, tuck the tailbone slightly, and squeeze the rear glute. Hold, staying tall and steady on the ball of the rear foot. Switch sides."
+    },
+    {
+      "id": "BAL-19",
+      "name": "Dancer prep",
+      "bucket": "BAL",
+      "bucket_name": "Balance & proprioception",
+      "regions": [
+        "Hip",
+        "Quad",
+        "Full"
+      ],
+      "dose": "20 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 3,
+      "settings": [
+        "Stand",
+        "Wall"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "hip flexor tightness, single-leg control under a moving load",
+      "instructions": "Stand on one leg and hold the other ankle behind you with the same-side hand, knees close together. Reach the free arm forward and, keeping the chest lifted, press the held foot gently back into the hand so the torso tips forward a few inches. Hold, then return upright. A hand on the wall for the free arm is fine to start. Switch sides."
+    },
+    {
+      "id": "BAL-20",
+      "name": "Hand-to-knee hold",
+      "bucket": "BAL",
+      "bucket_name": "Balance & proprioception",
+      "regions": [
+        "Hip",
+        "L-spine/Core"
+      ],
+      "dose": "20 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "hip flexor strength through range, standing stability",
+      "instructions": "Stand on one leg and hold the other knee with the same-side hand, thigh at hip height. Once steady, open the knee out to the side, keeping the hips square and the standing leg straight. Hold, bring the knee back to centre, and lower. Switch sides."
+    },
+    {
+      "id": "BAL-21",
+      "name": "Chair-to-single-leg stand",
+      "bucket": "BAL",
+      "bucket_name": "Balance & proprioception",
+      "regions": [
+        "Glute",
+        "Quad",
+        "Full"
+      ],
+      "dose": "5/side",
+      "per_side": true,
+      "block_seconds": 75,
+      "difficulty": 2,
+      "settings": [
+        "Chair"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "weak sit-to-stand, single-leg control",
+      "instructions": "Sit near the front of the chair, feet flat, arms crossed on the chest. Lean forward and stand up without using the hands, and as you reach the top, lift one foot off the floor and balance for 3 s. Place the foot down and sit back down slowly. Alternate which leg you finish on."
+    },
+    {
+      "id": "BAL-22",
+      "name": "Heel-toe rock",
+      "bucket": "BAL",
+      "bucket_name": "Balance & proprioception",
+      "regions": [
+        "Calf/Ankle",
+        "Foot/Shin"
+      ],
+      "dose": "30 s + 30 s eyes closed",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "reduced ankle strategy for balance",
+      "instructions": "Stand with feet hip width and rock slowly forward onto the balls of the feet, then back onto the heels with toes lifted, without bending at the hips. After 30 s, close the eyes and continue, keeping the rocking smooth. Stand near a wall the first few times."
+    },
+    {
+      "id": "BAL-23",
+      "name": "Single-leg stand with arm reaches",
+      "bucket": "BAL",
+      "bucket_name": "Balance & proprioception",
+      "regions": [
+        "Full",
+        "Shoulder"
+      ],
+      "dose": "30 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "balance while the upper body moves",
+      "instructions": "Balance on one leg, then slowly reach both arms overhead, then across the body to one side and the other, then behind you, keeping the standing knee soft and the hips level. The point is staying steady while the arms shift your weight. Switch sides."
+    },
+    {
+      "id": "BAL-24",
+      "name": "Backward walking",
+      "bucket": "BAL",
+      "bucket_name": "Balance & proprioception",
+      "regions": [
+        "Full"
+      ],
+      "dose": "60 s",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "gait control, reduced awareness of the body in space",
+      "instructions": "Walk slowly backward across the room, reaching each foot back and landing toe first, then rolling to the heel. Keep the torso tall and the eyes forward, not over the shoulder. Turn and repeat. Clear the path first."
+    },
+    {
+      "id": "BAL-25",
+      "name": "Quick side-steps",
+      "bucket": "BAL",
+      "bucket_name": "Balance & proprioception",
+      "regions": [
+        "Glute",
+        "Full"
+      ],
+      "dose": "30 s",
+      "per_side": false,
+      "block_seconds": 30,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "slow stepping reactions",
+      "instructions": "Stand with knees soft. Take two or three quick small steps to the right, pause and settle, then two or three to the left. Speed up gradually so each stop requires a small catch. The goal is fast feet and a quiet upper body."
+    },
+    {
+      "id": "BAL-26",
+      "name": "Tandem stance, eyes closed",
+      "bucket": "BAL",
+      "bucket_name": "Balance & proprioception",
+      "regions": [
+        "Full"
+      ],
+      "dose": "15 s each",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 2,
+      "settings": [
+        "Stand",
+        "Wall"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "dependence on vision for balance",
+      "instructions": "Stand heel to toe as in the tandem stance, near a wall, and close the eyes. Feel the ankles and hips making small corrections. Open the eyes or touch the wall whenever needed, then continue. Swap the front foot."
+    },
+    {
+      "id": "BAL-27",
+      "name": "Single-leg RDL to knee drive",
+      "bucket": "BAL",
+      "bucket_name": "Balance & proprioception",
+      "regions": [
+        "Ham",
+        "Glute",
+        "Hip"
+      ],
+      "dose": "6/side",
+      "per_side": true,
+      "block_seconds": 75,
+      "difficulty": 3,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "posterior chain control, dynamic balance",
+      "instructions": "Stand on one leg and hinge forward into a single-leg RDL, free leg extending behind. Then, without setting the foot down, rise and drive that knee up in front to hip height and pause. Lower back into the next hinge. Keep the standing knee soft and the hips square. Switch sides."
+    },
+    {
+      "id": "BAL-28",
+      "name": "Chair pose to toe raise",
+      "bucket": "BAL",
+      "bucket_name": "Balance & proprioception",
+      "regions": [
+        "Quad",
+        "Calf/Ankle",
+        "L-spine/Core"
+      ],
+      "dose": "3 × 10 s",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "quad and calf control, ankle stability",
+      "instructions": "Feet together or hip width, sit the hips back and down into a half squat with the arms reaching overhead, weight in the heels. Hold, then rise onto the balls of both feet while staying in the squat, and hold there for 10 s. Lower the heels and stand. Repeat."
+    },
+    {
+      "id": "BAL-29",
+      "name": "Slow 360° turns",
+      "bucket": "BAL",
+      "bucket_name": "Balance & proprioception",
+      "regions": [
+        "Full"
+      ],
+      "dose": "3 each way",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "turning-related instability, vestibular under-use",
+      "instructions": "From standing, turn a full circle in place using small, deliberate steps, taking about 5 s per turn. Pause and let your balance settle before turning the other way. Once easy, keep the eyes fixed on one point for as long as possible during the turn, then snap them to the next point."
+    },
+    {
+      "id": "HWF-01",
+      "name": "Wrist flexor stretch",
+      "bucket": "HWF",
+      "bucket_name": "Hands, wrists & forearms",
+      "regions": [
+        "Wrist/Forearm"
+      ],
+      "dose": "20 s/side",
+      "per_side": true,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Stand",
+        "Chair"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "keyboard flexor tension",
+      "instructions": "Extend one arm straight in front, palm up. With the other hand, gently pull the fingers back and down toward the floor until you feel a stretch along the inside of the forearm. Keep the elbow straight. Switch arms."
+    },
+    {
+      "id": "HWF-02",
+      "name": "Wrist extensor stretch",
+      "bucket": "HWF",
+      "bucket_name": "Hands, wrists & forearms",
+      "regions": [
+        "Wrist/Forearm"
+      ],
+      "dose": "20 s/side",
+      "per_side": true,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Stand",
+        "Chair"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "mouse extensor tension",
+      "instructions": "Extend one arm straight in front, palm down, and let the hand hang. With the other hand, gently press the back of the hand toward the body until you feel the top of the forearm stretch. Keep the elbow straight. Switch arms."
+    },
+    {
+      "id": "HWF-03",
+      "name": "Prayer and reverse prayer",
+      "bucket": "HWF",
+      "bucket_name": "Hands, wrists & forearms",
+      "regions": [
+        "Wrist/Forearm"
+      ],
+      "dose": "20 s each",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Stand",
+        "Chair"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "wrist stiffness",
+      "instructions": "Press the palms together in front of the chest, fingers pointing up, and lower the hands toward the waist while keeping the palms together until the wrists stretch. Then turn the hands so the backs are pressed together, fingers pointing down, and raise them toward the chest."
+    },
+    {
+      "id": "HWF-04",
+      "name": "Wrist circles and figure-8s",
+      "bucket": "HWF",
+      "bucket_name": "Hands, wrists & forearms",
+      "regions": [
+        "Wrist/Forearm"
+      ],
+      "dose": "30 s",
+      "per_side": false,
+      "block_seconds": 30,
+      "difficulty": 1,
+      "settings": [
+        "Stand",
+        "Chair"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "wrist stiffness",
+      "instructions": "Interlace the fingers and make slow circles with the wrists in one direction, then the other. Then trace a sideways figure-8 in the air with the clasped hands, letting the wrists lead."
+    },
+    {
+      "id": "HWF-05",
+      "name": "Finger spreads",
+      "bucket": "HWF",
+      "bucket_name": "Hands, wrists & forearms",
+      "regions": [
+        "Wrist/Forearm"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 30,
+      "difficulty": 1,
+      "settings": [
+        "Stand",
+        "Chair"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "finger flexor dominance",
+      "instructions": "Hold the hands in front of you and spread the fingers as wide apart as they'll go, straightening them fully, hold 2 s, then relax into a loose fist. A rubber band around the fingertips adds resistance to the spread."
+    },
+    {
+      "id": "HWF-06",
+      "name": "Tendon glides",
+      "bucket": "HWF",
+      "bucket_name": "Hands, wrists & forearms",
+      "regions": [
+        "Wrist/Forearm"
+      ],
+      "dose": "8 cycles",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Stand",
+        "Chair"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "tendon gliding restriction",
+      "instructions": "Start with the fingers straight. Bend only the top two joints into a hook, keeping the knuckles straight; then close into a full fist; then bend only at the knuckles so the fingers form a flat tabletop; then straighten again. Move slowly through each shape, both hands together."
+    },
+    {
+      "id": "HWF-07",
+      "name": "Forearm pronation/supination",
+      "bucket": "HWF",
+      "bucket_name": "Hands, wrists & forearms",
+      "regions": [
+        "Wrist/Forearm"
+      ],
+      "dose": "15 reps/side",
+      "per_side": true,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Stand",
+        "Chair"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "forearm rotation stiffness",
+      "instructions": "Tuck the elbow against your side, bent to 90°, hand in front like holding a tray. Turn the palm fully up, then fully down, rotating the forearm as far as it goes each way while the elbow stays pinned. Switch arms."
+    },
+    {
+      "id": "HWF-08",
+      "name": "Thumb CARs and stretch",
+      "bucket": "HWF",
+      "bucket_name": "Hands, wrists & forearms",
+      "regions": [
+        "Wrist/Forearm"
+      ],
+      "dose": "30 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand",
+        "Chair"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "trackpad/thumb overuse",
+      "instructions": "Make slow big circles with the thumb in both directions, keeping the rest of the hand still. Then tuck the thumb inside a loose fist and gently tilt the wrist toward the little-finger side until the base of the thumb stretches; hold 10 s. Switch hands."
+    },
+    {
+      "id": "HWF-09",
+      "name": "Forearm roll on ball",
+      "bucket": "HWF",
+      "bucket_name": "Hands, wrists & forearms",
+      "regions": [
+        "Wrist/Forearm"
+      ],
+      "dose": "30 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Desk"
+      ],
+      "equipment_optional": [
+        "ball"
+      ],
+      "micro_eligible": false,
+      "counteracts": "forearm soft-tissue tension",
+      "instructions": "Rest one forearm on the desk, palm down, with a lacrosse or tennis ball under the fleshy upper part of the forearm. Press down with the other hand and roll slowly toward the wrist and back, pausing on tender spots. Flip the arm palm-up and repeat on the underside. Switch arms."
+    },
+    {
+      "id": "HWF-10",
+      "name": "Median nerve glide",
+      "bucket": "HWF",
+      "bucket_name": "Hands, wrists & forearms",
+      "regions": [
+        "Wrist/Forearm",
+        "Neck"
+      ],
+      "dose": "10/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand",
+        "Chair"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "nerve tension from fixed elbow and wrist posture",
+      "instructions": "Extend one arm out to the side at shoulder height, palm up, elbow straight. Bend the wrist so the fingers point down toward the floor while tilting the head away from that arm; then release the wrist and tilt the head toward the arm. Rock gently between the two positions; it should feel like a mild pull, never sharp. Switch arms."
+    },
+    {
+      "id": "HWF-11",
+      "name": "Hand shake-out",
+      "bucket": "HWF",
+      "bucket_name": "Hands, wrists & forearms",
+      "regions": [
+        "Wrist/Forearm"
+      ],
+      "dose": "20 s",
+      "per_side": false,
+      "block_seconds": 20,
+      "difficulty": 1,
+      "settings": [
+        "Stand",
+        "Chair"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "static grip tension",
+      "instructions": "Let the arms hang and shake the hands loosely and quickly from the wrists, as if flicking off water, letting the shaking travel up into the forearms. Keep the shoulders relaxed."
+    },
+    {
+      "id": "EYE-01",
+      "name": "Distance gaze (20-20-20)",
+      "bucket": "EYE",
+      "bucket_name": "Eyes",
+      "regions": [
+        "Eyes"
+      ],
+      "dose": "30 s",
+      "per_side": false,
+      "block_seconds": 30,
+      "difficulty": 1,
+      "settings": [
+        "Any"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "fixed near focus",
+      "instructions": "Look away from the screen at something at least 20 feet (6 m) away, ideally out a window, and let the eyes rest on it. Blink normally and let the face relax."
+    },
+    {
+      "id": "EYE-02",
+      "name": "Near-far focus shifts",
+      "bucket": "EYE",
+      "bucket_name": "Eyes",
+      "regions": [
+        "Eyes"
+      ],
+      "dose": "15 shifts",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Any"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "ciliary muscle fatigue",
+      "instructions": "Hold a thumb up at arm's length and focus on it until it's sharp. Then shift focus to an object far across the room or out the window until that's sharp. Alternate slowly, giving each target 2–3 s to come into focus."
+    },
+    {
+      "id": "EYE-03",
+      "name": "Eye tracking",
+      "bucket": "EYE",
+      "bucket_name": "Eyes",
+      "regions": [
+        "Eyes"
+      ],
+      "dose": "30 s",
+      "per_side": false,
+      "block_seconds": 30,
+      "difficulty": 1,
+      "settings": [
+        "Any"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "ocular muscle stiffness",
+      "instructions": "Keeping the head perfectly still, move the eyes slowly in a big circle, then reverse. Then trace a wide sideways figure-8, as far to the edges as you can see. Move slowly enough that it doesn't feel jerky."
+    },
+    {
+      "id": "EYE-04",
+      "name": "Palming",
+      "bucket": "EYE",
+      "bucket_name": "Eyes",
+      "regions": [
+        "Eyes"
+      ],
+      "dose": "30–45 s",
+      "per_side": false,
+      "block_seconds": 45,
+      "difficulty": 1,
+      "settings": [
+        "Chair"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "eye strain, light overload",
+      "instructions": "Rub the palms together until warm, then cup them over the closed eyes without pressing on the eyeballs, fingers overlapping on the forehead, blocking out all light. Rest the elbows on the desk and breathe slowly."
+    },
+    {
+      "id": "EYE-05",
+      "name": "Blink sets",
+      "bucket": "EYE",
+      "bucket_name": "Eyes",
+      "regions": [
+        "Eyes"
+      ],
+      "dose": "20 s",
+      "per_side": false,
+      "block_seconds": 20,
+      "difficulty": 1,
+      "settings": [
+        "Any"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "reduced blink rate, dry eye",
+      "instructions": "Close the eyes slowly and fully, hold for a second, and open — 10 times. Then blink quickly and lightly 10 times. The slow blinks spread tear film; the fast ones wake the lids up."
+    },
+    {
+      "id": "BRE-01",
+      "name": "Diaphragmatic breathing",
+      "bucket": "BRE",
+      "bucket_name": "Breathing",
+      "regions": [
+        "Breath"
+      ],
+      "dose": "6–8 breaths",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Chair",
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "shallow apical breathing",
+      "instructions": "Place one hand on the belly and one on the chest. Breathe in slowly through the nose so the belly hand rises first and the chest hand barely moves; let the lower ribs widen too. Exhale slowly through the mouth, letting the belly fall. Keep the shoulders down."
+    },
+    {
+      "id": "BRE-02",
+      "name": "Box breathing",
+      "bucket": "BRE",
+      "bucket_name": "Breathing",
+      "regions": [
+        "Breath"
+      ],
+      "dose": "4 rounds",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Chair",
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "stress breathing pattern",
+      "instructions": "Inhale through the nose for a count of 4, hold for 4, exhale for 4, hold empty for 4. Keep the counts even and the breath quiet. Shorten to 3 counts if 4 feels strained."
+    },
+    {
+      "id": "BRE-03",
+      "name": "Extended-exhale breathing",
+      "bucket": "BRE",
+      "bucket_name": "Breathing",
+      "regions": [
+        "Breath"
+      ],
+      "dose": "6 breaths",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Chair",
+        "Stand"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "sympathetic overdrive",
+      "instructions": "Inhale through the nose for 4 counts, then exhale through pursed lips (as if blowing through a straw) for 6 to 8 counts, longer than the inhale. Let the shoulders drop on each exhale. Don't force air out; just lengthen it."
+    },
+    {
+      "id": "BRE-04",
+      "name": "Crocodile breathing",
+      "bucket": "BRE",
+      "bucket_name": "Breathing",
+      "regions": [
+        "Breath",
+        "L-spine/Core"
+      ],
+      "dose": "8 breaths",
+      "per_side": false,
+      "block_seconds": 75,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "rib cage immobility",
+      "instructions": "Lie face down, forehead resting on stacked hands, legs relaxed. Breathe in through the nose so the belly presses into the floor and the low back and sides expand, then exhale slowly. The floor gives feedback that the breath is going low rather than into the chest."
+    },
+    {
+      "id": "BRE-05",
+      "name": "90/90 breathing",
+      "bucket": "BRE",
+      "bucket_name": "Breathing",
+      "regions": [
+        "Breath",
+        "L-spine/Core"
+      ],
+      "dose": "8 breaths",
+      "per_side": false,
+      "block_seconds": 75,
+      "difficulty": 1,
+      "settings": [
+        "Floor",
+        "Chair"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "rib flare, anterior tilt",
+      "instructions": "Lie on your back with the calves resting on a chair seat, hips and knees at 90°. Flatten the low back gently toward the floor and keep it there. Inhale through the nose into the belly and sides, then exhale fully and slowly through the mouth until the ribs drop down, pausing briefly before the next breath."
+    },
+    {
+      "id": "BRE-06",
+      "name": "Banded lateral rib breathing",
+      "bucket": "BRE",
+      "bucket_name": "Breathing",
+      "regions": [
+        "Breath",
+        "T-spine"
+      ],
+      "dose": "8 breaths",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Chair",
+        "Stand"
+      ],
+      "equipment_optional": [
+        "band"
+      ],
+      "micro_eligible": false,
+      "counteracts": "lateral rib immobility",
+      "instructions": "Wrap a band snugly around the lower ribs and hold the ends in front. Inhale through the nose and try to push the ribs sideways and backward into the band, then exhale slowly. No band: use your own hands on the sides of the lower ribs."
+    }
+  ],
+  "routines": [
+    {
+      "id": "R1",
+      "name": "Hip reset",
+      "focus": "hip flexors, glutes",
+      "target_seconds": 300,
+      "sum_of_blocks": 300,
+      "blocks": [
+        {
+          "movement_id": "CIR-19",
+          "seconds": 60
+        },
+        {
+          "movement_id": "FLX-01",
+          "seconds": 60
+        },
+        {
+          "movement_id": "FLX-05",
+          "seconds": 60
+        },
+        {
+          "movement_id": "STR-01",
+          "seconds": 60
+        },
+        {
+          "movement_id": "BRE-05",
+          "seconds": 60,
+          "note": "trim to 60"
+        }
+      ]
+    },
+    {
+      "id": "R2",
+      "name": "Upper back & neck",
+      "focus": "kyphosis, forward head",
+      "target_seconds": 300,
+      "sum_of_blocks": 300,
+      "blocks": [
+        {
+          "movement_id": "CIR-06",
+          "seconds": 60
+        },
+        {
+          "movement_id": "FLX-14",
+          "seconds": 60
+        },
+        {
+          "movement_id": "FLX-17",
+          "seconds": 60
+        },
+        {
+          "movement_id": "STR-17",
+          "seconds": 45
+        },
+        {
+          "movement_id": "FLX-21",
+          "seconds": 45
+        },
+        {
+          "movement_id": "EYE-01",
+          "seconds": 30
+        }
+      ]
+    },
+    {
+      "id": "R3",
+      "name": "Full-body wake-up",
+      "focus": "first break of the day",
+      "target_seconds": 300,
+      "sum_of_blocks": 300,
+      "blocks": [
+        {
+          "movement_id": "CIR-01",
+          "seconds": 90
+        },
+        {
+          "movement_id": "FLX-04",
+          "seconds": 90
+        },
+        {
+          "movement_id": "CIR-16",
+          "seconds": 45
+        },
+        {
+          "movement_id": "STR-15",
+          "seconds": 45
+        },
+        {
+          "movement_id": "CIR-15",
+          "seconds": 30
+        }
+      ]
+    },
+    {
+      "id": "R4",
+      "name": "Posterior chain",
+      "focus": "glute inhibition, hamstrings",
+      "target_seconds": 300,
+      "sum_of_blocks": 300,
+      "blocks": [
+        {
+          "movement_id": "CIR-12",
+          "seconds": 45
+        },
+        {
+          "movement_id": "FLX-10",
+          "seconds": 60
+        },
+        {
+          "movement_id": "STR-08",
+          "seconds": 75
+        },
+        {
+          "movement_id": "STR-03",
+          "seconds": 60
+        },
+        {
+          "movement_id": "FLX-33",
+          "seconds": 60
+        }
+      ]
+    },
+    {
+      "id": "R5",
+      "name": "Deep-focus day",
+      "focus": "hands, eyes, breath; low arousal",
+      "target_seconds": 285,
+      "sum_of_blocks": 285,
+      "blocks": [
+        {
+          "movement_id": "CIR-02",
+          "seconds": 60
+        },
+        {
+          "movement_id": "HWF-06",
+          "seconds": 45
+        },
+        {
+          "movement_id": "HWF-01",
+          "seconds": 45
+        },
+        {
+          "movement_id": "HWF-02",
+          "seconds": 45
+        },
+        {
+          "movement_id": "EYE-02",
+          "seconds": 45
+        },
+        {
+          "movement_id": "BRE-03",
+          "seconds": 45
+        }
+      ]
+    },
+    {
+      "id": "R6",
+      "name": "Balance & ankles",
+      "focus": "post-lunch",
+      "target_seconds": 300,
+      "sum_of_blocks": 300,
+      "blocks": [
+        {
+          "movement_id": "CIR-14",
+          "seconds": 60
+        },
+        {
+          "movement_id": "FLX-30",
+          "seconds": 60
+        },
+        {
+          "movement_id": "BAL-06",
+          "seconds": 90
+        },
+        {
+          "movement_id": "STR-26",
+          "seconds": 60
+        },
+        {
+          "movement_id": "EYE-03",
+          "seconds": 30
+        }
+      ]
+    },
+    {
+      "id": "R7",
+      "name": "Spine & rotation",
+      "focus": "thoracic stiffness",
+      "target_seconds": 300,
+      "sum_of_blocks": 300,
+      "blocks": [
+        {
+          "movement_id": "CIR-11",
+          "seconds": 45
+        },
+        {
+          "movement_id": "FLX-11",
+          "seconds": 60
+        },
+        {
+          "movement_id": "FLX-12",
+          "seconds": 75
+        },
+        {
+          "movement_id": "STR-12",
+          "seconds": 75
+        },
+        {
+          "movement_id": "FLX-37",
+          "seconds": 45
+        }
+      ]
+    },
+    {
+      "id": "R8",
+      "name": "Wind-down",
+      "focus": "last break of the day",
+      "target_seconds": 285,
+      "sum_of_blocks": 285,
+      "blocks": [
+        {
+          "movement_id": "CIR-01",
+          "seconds": 60
+        },
+        {
+          "movement_id": "FLX-03",
+          "seconds": 60
+        },
+        {
+          "movement_id": "FLX-19",
+          "seconds": 60
+        },
+        {
+          "movement_id": "FLX-22",
+          "seconds": 60
+        },
+        {
+          "movement_id": "BRE-01",
+          "seconds": 45
+        }
+      ]
+    },
+    {
+      "id": "R9",
+      "name": "Balance builder",
+      "focus": "single-leg stability, yoga postures",
+      "target_seconds": 300,
+      "sum_of_blocks": 300,
+      "blocks": [
+        {
+          "movement_id": "CIR-10",
+          "seconds": 75
+        },
+        {
+          "movement_id": "FLX-26",
+          "seconds": 45,
+          "note": "one direction only"
+        },
+        {
+          "movement_id": "BAL-14",
+          "seconds": 60
+        },
+        {
+          "movement_id": "BAL-15",
+          "seconds": 60
+        },
+        {
+          "movement_id": "BAL-22",
+          "seconds": 60
+        }
+      ]
+    }
+  ],
+  "micro_routines": [
+    {
+      "id": "M1",
+      "name": "Stand and pump",
+      "target_seconds": 60,
+      "sum_of_blocks": 60,
+      "blocks": [
+        {
+          "movement_id": "CIR-04",
+          "seconds": 30
+        },
+        {
+          "movement_id": "EYE-01",
+          "seconds": 30
+        }
+      ]
+    },
+    {
+      "id": "M2",
+      "name": "Neck and eyes",
+      "target_seconds": 60,
+      "sum_of_blocks": 60,
+      "blocks": [
+        {
+          "movement_id": "FLX-21",
+          "seconds": 30
+        },
+        {
+          "movement_id": "EYE-02",
+          "seconds": 30
+        }
+      ]
+    },
+    {
+      "id": "M3",
+      "name": "Hips",
+      "target_seconds": 60,
+      "sum_of_blocks": 60,
+      "blocks": [
+        {
+          "movement_id": "FLX-01",
+          "seconds": 60
+        }
+      ]
+    },
+    {
+      "id": "M4",
+      "name": "Hands",
+      "target_seconds": 60,
+      "sum_of_blocks": 60,
+      "blocks": [
+        {
+          "movement_id": "HWF-06",
+          "seconds": 30
+        },
+        {
+          "movement_id": "HWF-11",
+          "seconds": 20
+        },
+        {
+          "movement_id": "HWF-05",
+          "seconds": 10
+        }
+      ]
+    },
+    {
+      "id": "M5",
+      "name": "Upper back",
+      "target_seconds": 60,
+      "sum_of_blocks": 60,
+      "blocks": [
+        {
+          "movement_id": "FLX-27",
+          "seconds": 30
+        },
+        {
+          "movement_id": "FLX-18",
+          "seconds": 30
+        }
+      ]
+    },
+    {
+      "id": "M6",
+      "name": "On a call, seated",
+      "target_seconds": 60,
+      "sum_of_blocks": 60,
+      "blocks": [
+        {
+          "movement_id": "FLX-22",
+          "seconds": 30
+        },
+        {
+          "movement_id": "BRE-03",
+          "seconds": 30
+        }
+      ]
+    },
+    {
+      "id": "M7",
+      "name": "Post-lunch",
+      "target_seconds": 60,
+      "sum_of_blocks": 60,
+      "blocks": [
+        {
+          "movement_id": "CIR-02",
+          "seconds": 60
+        }
+      ]
+    },
+    {
+      "id": "M8",
+      "name": "Legs awake",
+      "target_seconds": 60,
+      "sum_of_blocks": 60,
+      "blocks": [
+        {
+          "movement_id": "CIR-16",
+          "seconds": 30
+        },
+        {
+          "movement_id": "STR-35",
+          "seconds": 30
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Region labels normalised from the markdown: 'Core' -> 'L-spine/Core'; 'Full spine' -> ['T-spine','L-spine/Core'].",
+    "block_seconds is the scheduling unit; dose is display text.",
+    "Routine block 'note' carries per-routine adjustments (e.g. 'trim to 60', 'one direction only')."
+  ]
+}

@@ -1,0 +1,12 @@
+# Build products
+build/
+DerivedData/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+xcuserdata/
+
+# macOS
+.DS_Store
+
+# Supergoal run evidence
+.supergoal/**/evidence/
