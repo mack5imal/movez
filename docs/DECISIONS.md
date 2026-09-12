@@ -70,6 +70,17 @@ Sources of truth, in order: `product-brief-v1.md`, `scheduler-research-v1.md`,
 
 20. **Defer, never reset.** A break that comes due during a call, a screen share or a fullscreen
     app waits; the countdown keeps running underneath it.
+20a. **Midnight rolls the counters, not the countdown.** A sitting bout that crosses the day
+    boundary keeps its start time, its due time and its state; only the day-scoped counters, the
+    routine seed and the streak key start over. Fifteen minutes from a break at 23:45 is fifteen
+    minutes from a break at 00:01, and the alternative — handing back a fresh fifty-five minutes —
+    is the one thing a break reminder must never do. This matters most to anyone working across
+    midnight, for whom the old behaviour cost a break every night.
+20b. **Time movez was not running is moved past, not judged.** The state file records when it was
+    written, so a relaunch knows whether it was gone for two minutes or two days. A gap under four
+    hours shifts the whole bout forward by its length; four hours or more starts the day over. It
+    is never credited as a break: a running app can tell from the idle clock whether the user was
+    at the keyboard, and an app that was not running cannot.
 21. **Nothing is polled while paused or off hours.** The signal monitors stop outright rather than
     sampling into a void; a thirty-second wake-check notices when the pause runs out.
 22. **A break counts as done at half the movements or half the time** (research §4.11).

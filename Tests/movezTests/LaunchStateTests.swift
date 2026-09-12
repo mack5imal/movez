@@ -16,6 +16,163 @@ final class LaunchStateTests: XCTestCase {
         SettingsStore(defaults: UserDefaults(suiteName: "movez.tests.\(UUID().uuidString)") ?? .standard)
     }
 
+    // MARK: - Relaunching into a running session
+
+    /// A coordinator built the way `AppDelegate` builds one, on a seeded state file.
+    private func relaunch(
+        seed: SchedulerSnapshot,
+        at now: Date,
+        workingHours: WorkingHours = .alwaysOn
+    ) -> (coordinator: AppCoordinator, sink: RecordingEffectSink) {
+        let store = InMemorySnapshotStore(seed: seed)
+        let sink = RecordingEffectSink()
+        let settings = self.settings()
+        settings.workingHours = workingHours
+        let coordinator = AppCoordinator(
+            library: RoutineTestSupport.library,
+            settings: settings,
+            history: HistoryStore(store: InMemoryHistoryStore()),
+            clock: ManualClock(now: now),
+            snapshotStore: store,
+            sink: sink
+        )
+        coordinator.applyLaunchGap()
+        return (coordinator, sink)
+    }
+
+    /// A snapshot mid-bout: sat down at `boutStartedAt`, break due 55 minutes later.
+    private func sitting(boutStartedAt: Date, savedAt: Date?, doneToday: Int = 0) -> SchedulerSnapshot {
+        var snapshot = SchedulerSnapshot(
+            now: boutStartedAt,
+            dayKey: DayKey.key(for: boutStartedAt, calendar: .current)
+        )
+        snapshot.state = .sitting
+        snapshot.nextFullDueAt = boutStartedAt.addingTimeInterval(55 * 60)
+        snapshot.nextMicroDueAt = boutStartedAt.addingTimeInterval(30 * 60)
+        snapshot.doneToday = doneToday
+        snapshot.savedAt = savedAt
+        return snapshot
+    }
+
+    private static func date(month: Int = 9, day: Int, hour: Int, minute: Int = 0) -> Date {
+        var components = DateComponents()
+        components.year = 2026
+        components.month = month
+        components.day = day
+        components.hour = hour
+        components.minute = minute
+        return Calendar.current.date(from: components) ?? Date(timeIntervalSince1970: 1_767_225_600)
+    }
+
+    func testASnapshotSavedMinutesAgoResumesWithTheTimeItHadLeft() {
+        let satDown = Self.date(day: 7, hour: 23, minute: 30)
+        let saved = Self.date(day: 7, hour: 23, minute: 50)
+        let launch = Self.date(day: 7, hour: 23, minute: 52)
+
+        let (coordinator, sink) = relaunch(seed: sitting(boutStartedAt: satDown, savedAt: saved, doneToday: 3), at: launch)
+
+        XCTAssertEqual(coordinator.scheduler.state.name, "sitting")
+        // Two minutes off, so the break that was due at 00:25 is now due at 00:27.
+        XCTAssertDate(
+            coordinator.scheduler.snapshot.nextFullDueAt,
+            satDown.addingTimeInterval(55 * 60 + 120),
+            accuracy: 2,
+            "the countdown moves out by the gap, it does not restart"
+        )
+        XCTAssertEqual(coordinator.scheduler.snapshot.doneToday, 3, "and the day is untouched")
+        XCTAssertFalse(sink.names.contains("showToast"))
+    }
+
+    func testAQuitWhileWorkingIsNeverCreditedAsABreak() {
+        let satDown = Self.date(day: 7, hour: 14)
+        let saved = Self.date(day: 7, hour: 14, minute: 20)
+        let launch = Self.date(day: 7, hour: 14, minute: 30)   // ten minutes gone
+
+        let (coordinator, sink) = relaunch(seed: sitting(boutStartedAt: satDown, savedAt: saved, doneToday: 2), at: launch)
+
+        XCTAssertEqual(coordinator.scheduler.snapshot.doneToday, 2,
+                       "movez was not watching, so it does not get to say a break happened")
+        XCTAssertFalse(sink.names.contains("showToast"))
+        XCTAssertDate(
+            coordinator.scheduler.snapshot.nextFullDueAt,
+            satDown.addingTimeInterval(55 * 60 + 600),
+            accuracy: 2
+        )
+    }
+
+    func testASnapshotRestoredAfterTheWeekendDoesNotFireABreakAtLaunch() {
+        let friday = Self.date(day: 4, hour: 17)
+        let (coordinator, sink) = relaunch(
+            seed: sitting(boutStartedAt: friday, savedAt: friday.addingTimeInterval(30 * 60), doneToday: 5),
+            at: Self.date(day: 7, hour: 9)
+        )
+
+        XCTAssertFalse(sink.names.contains("showHeadsUp"), "no break at the moment of launch")
+        XCTAssertFalse(sink.names.contains("startFullBreak"))
+        XCTAssertEqual(coordinator.scheduler.state.name, "sitting")
+        XCTAssertEqual(coordinator.scheduler.snapshot.doneToday, 0, "Monday does not open with Friday's numbers")
+        XCTAssertDate(
+            coordinator.scheduler.snapshot.nextFullDueAt,
+            Self.date(day: 7, hour: 9).addingTimeInterval(55 * 60),
+            accuracy: 2
+        )
+    }
+
+    /// Quit after midnight and relaunched the same evening: the calendar day never changed, so
+    /// nothing used to notice that the session had ended hours ago.
+    func testASnapshotRestoredLaterTheSameDayDoesNotFireABreakAtLaunch() {
+        let earlyHours = Self.date(day: 7, hour: 0, minute: 30)
+        let (coordinator, sink) = relaunch(
+            seed: sitting(boutStartedAt: earlyHours, savedAt: earlyHours.addingTimeInterval(20 * 60)),
+            at: Self.date(day: 7, hour: 23)
+        )
+
+        XCTAssertFalse(sink.names.contains("showHeadsUp"))
+        XCTAssertFalse(sink.names.contains("startFullBreak"))
+        XCTAssertDate(
+            coordinator.scheduler.snapshot.nextFullDueAt,
+            Self.date(day: 7, hour: 23).addingTimeInterval(55 * 60),
+            accuracy: 2,
+            "twenty-two hours is a new session by any reading"
+        )
+    }
+
+    func testAStateFileWithNoSavedTimeStillDoesNotFireABreakAtLaunch() {
+        let satDown = Self.date(day: 7, hour: 6)
+        let (coordinator, sink) = relaunch(
+            seed: sitting(boutStartedAt: satDown, savedAt: nil),   // written by an older build
+            at: Self.date(day: 7, hour: 9)
+        )
+
+        XCTAssertFalse(sink.names.contains("showHeadsUp"))
+        XCTAssertFalse(sink.names.contains("startFullBreak"))
+        XCTAssertEqual(coordinator.scheduler.state.name, "sitting")
+    }
+
+    func testABreakRestoredWithNothingOnScreenIsResolvedAtLaunch() {
+        let satDown = Self.date(day: 7, hour: 10)
+        var seed = sitting(boutStartedAt: satDown, savedAt: Self.date(day: 7, hour: 10, minute: 55))
+        seed.state = .fullBreak(startedAt: Self.date(day: 7, hour: 10, minute: 55))
+
+        let (coordinator, _) = relaunch(seed: seed, at: Self.date(day: 7, hour: 11, minute: 15))
+
+        XCTAssertEqual(coordinator.scheduler.state.name, "sitting",
+                       "the overlay died with the process; movez must not sit in `full_break` forever")
+    }
+
+    func testTheStateFileIsRefreshedWhileTheAppIsQuiet() {
+        let harness = CoordinatorHarness(workingHours: .alwaysOn)
+        let before = harness.snapshotStore.saveCount
+
+        harness.run(seconds: 3 * 60)   // no transitions in three quiet minutes
+
+        XCTAssertGreaterThanOrEqual(
+            harness.snapshotStore.saveCount - before, 5,
+            "the state file is the app's proof of life and has to be kept warm"
+        )
+        XCTAssertDate(harness.snapshotStore.saved?.savedAt, harness.now, accuracy: 31)
+    }
+
     // MARK: - First launch
 
     func testAFirstLaunchWithNoFilesStartsAFreshDay() throws {

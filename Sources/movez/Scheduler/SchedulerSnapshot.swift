@@ -35,6 +35,14 @@ struct SchedulerSnapshot: Codable, Equatable {
     var postLunchPending: Bool = false
 
     var pendingInputWaitStartedAt: Date?
+    /// When the file this snapshot came from was written — the app's proof of life, so a relaunch
+    /// can tell whether it was gone for two minutes or two days.
+    ///
+    /// Optional, and it must stay Optional: the synthesized decoder uses `decodeIfPresent` for
+    /// Optionals, so a `state.json` written before this field existed still loads. It is stamped
+    /// on the way to disk and cleared on the way back, so it is nil in memory by design — which
+    /// also means two snapshots that differ only in `savedAt` are not `==`.
+    var savedAt: Date?
     var microEmphasisIndex: Int = 0
     var configHash: UInt64 = 0
     var transitions = TransitionLog()

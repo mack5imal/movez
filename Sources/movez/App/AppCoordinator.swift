@@ -76,6 +76,11 @@ final class AppCoordinator: ObservableObject {
     var powerMonitor: PowerMonitor?
     private var tickTimer: DispatchSourceTimer?
     private var wakeCheckTimer: DispatchSourceTimer?
+    /// When the state file was last written, so the heartbeat knows whether it is due.
+    /// Written by `persistSnapshot()` in the effects extension.
+    var lastPersistAt: Date?
+    /// How long the app was not running, measured at launch and spent once by `applyLaunchGap`.
+    private var launchGapSeconds: Int?
     private var cancellables: Set<AnyCancellable> = []
 
     /// Routines already served today, so the builder can avoid repeats and know whether balance
@@ -89,6 +94,14 @@ final class AppCoordinator: ObservableObject {
 
     /// How often the coordinator asks the scheduler to look at the clock.
     static let tickSeconds: TimeInterval = 2
+    /// How often the state file is refreshed while nothing is transitioning.
+    ///
+    /// The file doubles as the app's proof of life, and transitions alone are far too sparse to
+    /// serve as one — a quiet bout with micro-breaks off writes nothing for the best part of an
+    /// hour. This must stay comfortably under the smallest away threshold the settings allow
+    /// (two minutes, `SettingsStore.awayThresholdRange`), or a quick relaunch would look like an
+    /// absence.
+    static let heartbeatSeconds: TimeInterval = 30
     /// The slowest the tick may become, so a 60x debug clock still gets ticks that matter.
     static let minimumTickSeconds: TimeInterval = 0.25
     /// While paused or off-hours nothing is polled, but something still has to notice when the
@@ -114,7 +127,15 @@ final class AppCoordinator: ObservableObject {
 
         let config = settings.schedulerConfig
         if let restored = AppCoordinator.restore(from: snapshotStore) {
-            scheduler = Scheduler(snapshot: restored, config: config)
+            var snapshot = restored
+            // `boutStartedAt` is the fallback for a file written before movez recorded when it
+            // saved. It is always earlier than the real save, so the first launch on this build
+            // over-states the gap rather than under-stating it — which under a policy that only
+            // ever moves the countdown outwards is the harmless direction to be wrong in.
+            let aliveAt = snapshot.savedAt ?? snapshot.boutStartedAt
+            snapshot.savedAt = nil
+            launchGapSeconds = max(0, Int(clock.now.timeIntervalSince(aliveAt)))
+            scheduler = Scheduler(snapshot: snapshot, config: config)
         } else {
             scheduler = Scheduler(config: config, now: clock.now)
         }
@@ -145,8 +166,18 @@ final class AppCoordinator: ObservableObject {
     func start() {
         AppCoordinator.shared = self
         applyTimeScale()
+        // Before the timers: a tick that ran first could fire a break off a due time that belongs
+        // to a session which ended whenever the app went down.
+        applyLaunchGap()
         restartTimers()
         refreshPublished()
+    }
+
+    /// Hands the scheduler the stretch the app was not running for. Spent once, at launch.
+    func applyLaunchGap() {
+        defer { launchGapSeconds = nil }
+        guard let seconds = launchGapSeconds else { return }
+        deliver(scheduler.applyLaunchGap(seconds: seconds, now: clock.now))
     }
 
     /// Wires the real macOS monitors in. Tests drive the scheduler directly and never call this.
@@ -189,6 +220,12 @@ final class AppCoordinator: ObservableObject {
     /// One pass of the clock. Exposed so the tests can drive a whole day in milliseconds.
     func tick() {
         deliver(scheduler.handle(.tick, now: clock.now))
+        // Nothing is written while paused or off hours: there is no session to be alive in, and a
+        // gap in those states is ignored anyway.
+        if scheduler.pollingRequired,
+           clock.now.timeIntervalSince(lastPersistAt ?? .distantPast) >= Self.heartbeatSeconds {
+            deliver([.persist])
+        }
         // The countdown in the menu bar moves every tick even when no effect fires.
         menuState = makeMenuState(now: clock.now)
     }

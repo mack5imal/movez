@@ -4,6 +4,32 @@ import XCTest
 final class PersistenceTests: XCTestCase {
     private let minute: TimeInterval = 60
 
+    /// The on-disk contract. Every movez install in the world has a `state.json` with no
+    /// `savedAt` key in it; if that stops decoding, those users silently lose their day.
+    func testAStateFileWrittenBeforeMovezRecordedTheSaveTimeStillDecodes() throws {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+
+        var snapshot = SchedulerSnapshot(now: SchedulerHarness.mondayMorning, dayKey: "2026-09-07")
+        snapshot.doneToday = 3
+        snapshot.savedAt = Date()
+
+        // Round-trip through a dictionary with the key removed, the way an older build wrote it.
+        let data = try encoder.encode(snapshot)
+        guard var object = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            return XCTFail("the snapshot did not encode as a JSON object")
+        }
+        XCTAssertNotNil(object.removeValue(forKey: "savedAt"), "the key must be there to remove")
+        let older = try JSONSerialization.data(withJSONObject: object)
+
+        let decoded = try decoder.decode(SchedulerSnapshot.self, from: older)
+        XCTAssertNil(decoded.savedAt)
+        XCTAssertEqual(decoded.doneToday, 3, "and everything else survives")
+        XCTAssertEqual(decoded.dayKey, "2026-09-07")
+    }
+
     func testSnapshotRoundTripsThroughJSON() throws {
         let harness = SchedulerHarness()
         harness.run(until: { $0.isHeadsUp }, limit: 60 * minute)

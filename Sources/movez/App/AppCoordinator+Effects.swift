@@ -39,12 +39,23 @@ extension AppCoordinator {
             reverseCreditRecord()
             toastInfo = nil
         case .persist:
-            try? snapshotStore?.save(scheduler.snapshot)
+            persistSnapshot()
         case .pollingChanged(let enabled):
             aggregator?.setPolling(enabled)
         default:
             break
         }
+    }
+
+    /// Writes the snapshot, stamped with the moment it was written.
+    ///
+    /// The stamp is applied here rather than inside the scheduler so that `Scheduler` stays a pure
+    /// function of (snapshot, event, now) and no in-memory snapshot ever carries one.
+    func persistSnapshot() {
+        var snapshot = scheduler.snapshot
+        snapshot.savedAt = clock.now
+        lastPersistAt = clock.now
+        try? snapshotStore?.save(snapshot)
     }
 
     // MARK: - Breaks

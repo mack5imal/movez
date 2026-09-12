@@ -35,22 +35,20 @@ extension Scheduler {
     }
 
     /// The working day opens with a clean interval and clean counters.
+    ///
+    /// One branch, not two: midnight has usually rolled the counters already (`rollDayIfStale`),
+    /// so a "is this a new day?" test would read false by 09:00 and skip the roll that a session
+    /// running through the night still needs.
     private mutating func openWorkingDay(now: Date) -> [SchedulerEffect] {
-        let newDay = DayKey.key(for: now, calendar: config.calendar) != snapshot.dayKey
-        var effects: [SchedulerEffect] = [.pollingChanged(true)]
-        if newDay {
-            effects += resetDay(now: now, reason: "working hours started")
-        } else {
-            startFreshInterval(now: now)
-            transition(to: .sitting, reason: "working hours started", at: now)
-            effects += [.persist, .menuRefresh]
-        }
-        return effects
+        rollDayCountersIfStale(now: now)
+        return [.pollingChanged(true)] + startFreshSession(now: now, reason: "working hours started")
     }
 
     mutating func beginAdHocSession(now: Date) -> [SchedulerEffect] {
         snapshot.adHocSession = true
         snapshot.adHocSessionStartedAt = now
+        // Rolls as well as stamps: a session started at 00:30 must not carry yesterday's counters.
+        rollDayCountersIfStale(now: now)
         snapshot.dayKey = DayKey.key(for: now, calendar: config.calendar)
         startFreshInterval(now: now)
         transition(to: .sitting, reason: "session started by hand", at: now)

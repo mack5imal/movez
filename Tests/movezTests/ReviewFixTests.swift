@@ -49,6 +49,24 @@ final class ReviewFixTests: XCTestCase {
         XCTAssertEqual(harness.snapshot.doneToday, 0, "and nothing is credited")
     }
 
+    /// The mirror of the sleep guard: `PowerMonitor` fires a wake on the other side of the lid,
+    /// and without a guard it cancelled the pause and credited a break.
+    func testWakingWhilePausedKeepsThePause() {
+        let harness = SchedulerHarness()
+        harness.send(.userPause(seconds: 60 * 60))
+        guard case .paused(let until) = harness.state else {
+            return XCTFail("expected paused, got \(harness.state)")
+        }
+
+        harness.send(.wake(gapSeconds: 2 * 3600))
+
+        guard case .paused(let stillUntil) = harness.state else {
+            return XCTFail("a pause outlasts a closed lid in both directions, got \(harness.state)")
+        }
+        XCTAssertDate(stillUntil, until, accuracy: 2)
+        XCTAssertEqual(harness.snapshot.doneToday, 0, "and nothing is credited")
+    }
+
     func testSleepingOffHoursChangesNothing() {
         let harness = SchedulerHarness(workingHours: .standard, startAt: Self.date(month: 9, day: 12, hour: 10))
         harness.send(.tick)
@@ -104,7 +122,7 @@ final class ReviewFixTests: XCTestCase {
 
     // MARK: - A day that ended before the app came back
 
-    func testASnapshotRestoredOnALaterDayStartsTheDayOver() {
+    func testASnapshotRestoredOnALaterDayRollsTheCountersWithoutRestartingTheCountdown() {
         let friday = Self.date(month: 9, day: 11, hour: 17)
         var scheduler = Scheduler(config: SchedulerConfig(workingHours: .alwaysOn), now: friday)
         scheduler.snapshot.doneToday = 6
@@ -119,6 +137,9 @@ final class ReviewFixTests: XCTestCase {
         XCTAssertEqual(restored.snapshot.skipsToday, 0)
         XCTAssertEqual(restored.snapshot.snoozedToday, 0)
         XCTAssertEqual(restored.snapshot.dayKey, DayKey.key(for: monday, calendar: .current))
+        XCTAssertDate(restored.snapshot.nextFullDueAt, scheduler.snapshot.nextFullDueAt, accuracy: 1,
+                      "rolling the day is not licence to restart the countdown")
+        XCTAssertDate(restored.snapshot.boutStartedAt, scheduler.snapshot.boutStartedAt, accuracy: 1)
     }
 
     func testASnapshotRestoredOnTheSameDayKeepsItsCounters() {

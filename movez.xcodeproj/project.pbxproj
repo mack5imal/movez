@@ -90,6 +90,7 @@
 		85B8825DC779DAD33A43DA6C /* FullscreenExceptionsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FD246AC8810A0376212F6B6 /* FullscreenExceptionsSheet.swift */; };
 		87848EA5BF6191E1B7ADB5C1 /* SchedulerConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7931632856036648A3777A7 /* SchedulerConfig.swift */; };
 		8E2B50A1C0B30940F1637281 /* PersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 202C50EE6CC441F2982008AB /* PersistenceTests.swift */; };
+		8EA99BD28816371FF2EFBD7B /* SchedulerDayBoundaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13DE805FBC3C0DA9C2B42248 /* SchedulerDayBoundaryTests.swift */; };
 		8F8398E8242463D8C3A39A92 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E13952F4D1F735C7AE7CD53 /* AppCoordinator.swift */; };
 		8FEDBCC1F3261A4DCB5D81E7 /* Launch.swift in Sources */ = {isa = PBXBuildFile; fileRef = D05C2D41B0C04B35926E979A /* Launch.swift */; };
 		922F54ED2000DE09F7E20538 /* DebugViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1C39C16928E2C74070FA61B /* DebugViewModelTests.swift */; };
@@ -174,6 +175,7 @@
 		12186C3EB10709B6CBD27A71 /* TimerDisc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerDisc.swift; sourceTree = "<group>"; };
 		1357C14B78E301196BDC5185 /* Scheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scheduler.swift; sourceTree = "<group>"; };
 		139F174AFC2AD7EFB2B40268 /* Scheduler+Idle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Scheduler+Idle.swift"; sourceTree = "<group>"; };
+		13DE805FBC3C0DA9C2B42248 /* SchedulerDayBoundaryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerDayBoundaryTests.swift; sourceTree = "<group>"; };
 		1530AF4774CBB0768D96CBB4 /* AppCoordinator+Effects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppCoordinator+Effects.swift"; sourceTree = "<group>"; };
 		1637897564C21375102AE856 /* LibraryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryTests.swift; sourceTree = "<group>"; };
 		180B30CF41793D9CAE5D22C8 /* Chimes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Chimes.swift; sourceTree = "<group>"; };
@@ -361,6 +363,7 @@
 				C0B577EE28A8F593F5FF18F4 /* RoutineFixturesTests.swift */,
 				A9B9838D81524A40DB3881AB /* RoutineTestSupport.swift */,
 				1CFDF85D71146981530D4EAA /* SchedulerCoreTests.swift */,
+				13DE805FBC3C0DA9C2B42248 /* SchedulerDayBoundaryTests.swift */,
 				DCB939E301141030A259C591 /* SchedulerInterruptionTests.swift */,
 				62B4AC6C3F66A7E5ABB97CFF /* SchedulerMicroTests.swift */,
 				E039EE67EC22D7EDCFDF48A2 /* SchedulerTestSupport.swift */,
@@ -865,6 +868,7 @@
 				766E97E004686AB8163D46E1 /* RoutineFixturesTests.swift in Sources */,
 				A1139C1975FC8C947D0EE8B0 /* RoutineTestSupport.swift in Sources */,
 				C7FD8B58088A2CD47C915509 /* SchedulerCoreTests.swift in Sources */,
+				8EA99BD28816371FF2EFBD7B /* SchedulerDayBoundaryTests.swift in Sources */,
 				7001EDB68E7070C58A31F3A9 /* SchedulerInterruptionTests.swift in Sources */,
 				4C0067EE2D2F0D172E5BAFC7 /* SchedulerMicroTests.swift in Sources */,
 				1BDCADC884E2EDDA6CE12624 /* SchedulerTestSupport.swift in Sources */,
