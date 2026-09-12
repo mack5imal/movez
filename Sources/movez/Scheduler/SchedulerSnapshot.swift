@@ -20,6 +20,19 @@ struct SchedulerSnapshot: Codable, Equatable {
     var longestBoutSeconds: Int = 0
     var dayKey: String = ""
 
+    /// The countdown as it stood when the user walked away or paused, so it can be handed back
+    /// untouched rather than restarted.
+    var remainingAtAwaySeconds: Int?
+    var dueAtAway: Date?
+    var remainingAtPauseSeconds: Int?
+    var pauseIsFocusInitiated: Bool = false
+    var interruptedBreak: InterruptedBreak?
+    var deferredFullDueAt: Date?
+    var creditRestore: CreditRestore?
+    var adHocSession: Bool = false
+    var adHocSessionStartedAt: Date?
+    var postLunchPending: Bool = false
+
     var pendingInputWaitStartedAt: Date?
     var microEmphasisIndex: Int = 0
     var configHash: UInt64 = 0
@@ -39,6 +52,26 @@ struct SchedulerSnapshot: Codable, Equatable {
     func secondsUntilFullBreak(at now: Date) -> Int? {
         nextFullDueAt.map { max(0, Int($0.timeIntervalSince(now))) }
     }
+}
+
+/// A full break that sleep or a locked screen cut short.
+struct InterruptedBreak: Codable, Equatable {
+    var startedAt: Date
+    var plannedEnd: Date
+    var elapsedSeconds: Int
+    var completedBlocks: Int
+    var totalBlocks: Int
+}
+
+/// Enough of the snapshot to undo an away credit when the user taps "I was sitting".
+struct CreditRestore: Codable, Equatable {
+    var boutStartedAt: Date
+    var nextFullDueAt: Date?
+    var nextMicroDueAt: Date?
+    var lastCompletedBreakAt: Date?
+    var doneToday: Int
+    var longestBoutSeconds: Int
+    var expiresAt: Date
 }
 
 /// The day a date falls on, in the user's calendar. Used as the reset key for daily counters.

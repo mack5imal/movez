@@ -10,6 +10,7 @@
 		0029928374647F3135541973 /* SubstitutionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A9EBE441108D20D23E7CCC0 /* SubstitutionsTests.swift */; };
 		014CD8EA300813175B68DB40 /* RoutineNaming.swift in Sources */ = {isa = PBXBuildFile; fileRef = 081C0DC27F0E07B390673A5A /* RoutineNaming.swift */; };
 		05C2300393C6D87593D7781D /* ClockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86A1502B4366E217FC27D92F /* ClockTests.swift */; };
+		0866803C21557AB19497146D /* Scheduler+Hours.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27909D93B5772796C24BB3DA /* Scheduler+Hours.swift */; };
 		0A594F456CB2C473CB12952C /* LaunchArguments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5829A9C4500C849FB13FEFAD /* LaunchArguments.swift */; };
 		0F074C7F41A3C8C7849C2F95 /* RoutineBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64B812A24864DC7766D2B8E2 /* RoutineBuilder.swift */; };
 		12A569A63B9D80B070A91B73 /* SignalSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D24389D182EC724A1CFC3A /* SignalSnapshot.swift */; };
@@ -18,6 +19,7 @@
 		1F539EFD5D18C4F5ABE07347 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1DDDDC773AAE7422F7A1D24 /* SmokeTests.swift */; };
 		24A56B2FADD5631DAF0DFD13 /* RoutineValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5BD6A2AA7A23D4AC1BABB /* RoutineValidator.swift */; };
 		25E93322972C26948D469154 /* RoutineTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B18D9238BAD43644A6B180B1 /* RoutineTemplate.swift */; };
+		2AEB596035AF78E4A520FB5B /* Scheduler+Suppression.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4880E3A5C4CA66BFA31A1C1D /* Scheduler+Suppression.swift */; };
 		2F5A321C9F100BE43451B406 /* Setting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338688FA6237BBEDF3C03670 /* Setting.swift */; };
 		3096DA29B7430245E2D89B1A /* RoutineBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2636E7E2FEA7389160E0CC2 /* RoutineBuilderTests.swift */; };
 		3A1BB6EDE397350F51E3479E /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = E34A24AFC078FC0BFEFF7291 /* Fonts */; };
@@ -34,6 +36,8 @@
 		6325C7101E9E02B9C9A49E3B /* Equipment.swift in Sources */ = {isa = PBXBuildFile; fileRef = A270094632CC887D16A9B2D2 /* Equipment.swift */; };
 		64220A63A12C495222F60DC7 /* TransitionLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A36C066F3C6A50DD09893FA1 /* TransitionLog.swift */; };
 		69986D5FCA4CADB4AAE14600 /* SchedulerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A277DB86AA6B3984DC78F694 /* SchedulerState.swift */; };
+		6DCA26B931AAD67AA77E1122 /* WorkingHoursTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B26EB18454874DCDF33AEBC8 /* WorkingHoursTests.swift */; };
+		7001EDB68E7070C58A31F3A9 /* SchedulerInterruptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB939E301141030A259C591 /* SchedulerInterruptionTests.swift */; };
 		71A239A7D8F88B6323D2EDD9 /* Region.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F75D6C7814FDA37FB714DD /* Region.swift */; };
 		766E97E004686AB8163D46E1 /* RoutineFixturesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B577EE28A8F593F5FF18F4 /* RoutineFixturesTests.swift */; };
 		7E4EE203AAA5BFB4E8F1C3CE /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0540DC096C801998998E1E5 /* Fonts.swift */; };
@@ -43,6 +47,7 @@
 		930E072744DEE5F4050F35E3 /* MovezBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EE54B4CE88693D730866958 /* MovezBundle.swift */; };
 		93E96C660961E469EC1C53D3 /* Routine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52237A737E2C1AFF6A78303C /* Routine.swift */; };
 		944B9718DB251BD9E1744647 /* SeededRandom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E47EF436BDD3C23084D28F4 /* SeededRandom.swift */; };
+		98DE7999C2C09A0317A37B16 /* WorkingHours.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E8D6FE10268C25790DA8F2 /* WorkingHours.swift */; };
 		A1139C1975FC8C947D0EE8B0 /* RoutineTestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9B9838D81524A40DB3881AB /* RoutineTestSupport.swift */; };
 		ABB604BF42B752AA858F04BC /* SchedulerSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5789AEACEFAA9758E0145C9A /* SchedulerSnapshot.swift */; };
 		ADD0D0E44651BF36B3CDA5D8 /* Substitutions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EDEE7F8CC2A8806107B9E5 /* Substitutions.swift */; };
@@ -51,11 +56,14 @@
 		B32E6AC45DA1AAB0B4AE1BD1 /* MovementLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABFC20128A308BD74AD1E790 /* MovementLibrary.swift */; };
 		B9D41EEFC7605CAFEDBB00CC /* MicroBreakBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FDDD314F5FCB09D7D7D496 /* MicroBreakBuilderTests.swift */; };
 		C0CE23AE79FE5163DF44F90C /* LibraryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1637897564C21375102AE856 /* LibraryTests.swift */; };
+		C3FB9705D873F4D2C369CC09 /* Scheduler+Idle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 139F174AFC2AD7EFB2B40268 /* Scheduler+Idle.swift */; };
 		C7FD8B58088A2CD47C915509 /* SchedulerCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CFDF85D71146981530D4EAA /* SchedulerCoreTests.swift */; };
+		C92EE5DA15BB0E4F1982652E /* Scheduler+Pause.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED2AB704FE14787E6C39A2A8 /* Scheduler+Pause.swift */; };
 		CFA086FFD3DC582124770DD7 /* Bucket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FD4162D0EEB338461E7A53C /* Bucket.swift */; };
 		D82D8E877AC0EE6B93652726 /* MicroBreakBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0358B4658CB12F9685A9098 /* MicroBreakBuilder.swift */; };
 		F16080DCF0D5B3FC40836C96 /* Movement.swift in Sources */ = {isa = PBXBuildFile; fileRef = E362393507283AB751AFD135 /* Movement.swift */; };
 		FDBB7E5A18656F9D53CA2DA2 /* LibraryLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A6BEA1E29B3BDA91DF3B33 /* LibraryLoader.swift */; };
+		FEBDA6D5BF56DA4A36013848 /* Scheduler+Sleep.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC4CA026FFB71298413BD92 /* Scheduler+Sleep.swift */; };
 		FFFA726A1E5C0A77083C6E51 /* Scheduler+Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93382A4F69A62588E48F0722 /* Scheduler+Actions.swift */; };
 /* End PBXBuildFile section */
 
@@ -74,11 +82,14 @@
 		081C0DC27F0E07B390673A5A /* RoutineNaming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineNaming.swift; sourceTree = "<group>"; };
 		0F09EC25E84D897D4FA79FBB /* RegionRotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegionRotation.swift; sourceTree = "<group>"; };
 		1357C14B78E301196BDC5185 /* Scheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scheduler.swift; sourceTree = "<group>"; };
+		139F174AFC2AD7EFB2B40268 /* Scheduler+Idle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Scheduler+Idle.swift"; sourceTree = "<group>"; };
 		1637897564C21375102AE856 /* LibraryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryTests.swift; sourceTree = "<group>"; };
 		1CFDF85D71146981530D4EAA /* SchedulerCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerCoreTests.swift; sourceTree = "<group>"; };
 		1FD4162D0EEB338461E7A53C /* Bucket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bucket.swift; sourceTree = "<group>"; };
 		202C50EE6CC441F2982008AB /* PersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceTests.swift; sourceTree = "<group>"; };
+		27909D93B5772796C24BB3DA /* Scheduler+Hours.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Scheduler+Hours.swift"; sourceTree = "<group>"; };
 		338688FA6237BBEDF3C03670 /* Setting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Setting.swift; sourceTree = "<group>"; };
+		4880E3A5C4CA66BFA31A1C1D /* Scheduler+Suppression.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Scheduler+Suppression.swift"; sourceTree = "<group>"; };
 		4EE54B4CE88693D730866958 /* MovezBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovezBundle.swift; sourceTree = "<group>"; };
 		52237A737E2C1AFF6A78303C /* Routine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Routine.swift; sourceTree = "<group>"; };
 		54B929FFC124423F85034C3A /* LibraryMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryMetadata.swift; sourceTree = "<group>"; };
@@ -105,12 +116,15 @@
 		ABFC20128A308BD74AD1E790 /* MovementLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovementLibrary.swift; sourceTree = "<group>"; };
 		AD9EEE57E8EDF899EE10357B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B18D9238BAD43644A6B180B1 /* RoutineTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineTemplate.swift; sourceTree = "<group>"; };
+		B26EB18454874DCDF33AEBC8 /* WorkingHoursTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkingHoursTests.swift; sourceTree = "<group>"; };
 		B7931632856036648A3777A7 /* SchedulerConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerConfig.swift; sourceTree = "<group>"; };
+		B7E8D6FE10268C25790DA8F2 /* WorkingHours.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkingHours.swift; sourceTree = "<group>"; };
 		BED5BD6A2AA7A23D4AC1BABB /* RoutineValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineValidator.swift; sourceTree = "<group>"; };
 		C0B577EE28A8F593F5FF18F4 /* RoutineFixturesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineFixturesTests.swift; sourceTree = "<group>"; };
 		C8C62D9F791457B612525A3B /* movez.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = movez.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8F16E197BB8CBCF7D345DCC /* RoutineContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineContext.swift; sourceTree = "<group>"; };
 		D2636E7E2FEA7389160E0CC2 /* RoutineBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineBuilderTests.swift; sourceTree = "<group>"; };
+		DCB939E301141030A259C591 /* SchedulerInterruptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerInterruptionTests.swift; sourceTree = "<group>"; };
 		DD7E4757BE6870716B20B25A /* SchedulerEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerEvent.swift; sourceTree = "<group>"; };
 		E0358B4658CB12F9685A9098 /* MicroBreakBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroBreakBuilder.swift; sourceTree = "<group>"; };
 		E039EE67EC22D7EDCFDF48A2 /* SchedulerTestSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerTestSupport.swift; sourceTree = "<group>"; };
@@ -119,9 +133,11 @@
 		E5218DC9337ADC8083520BD0 /* movezTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = movezTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E6EDEE7F8CC2A8806107B9E5 /* Substitutions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Substitutions.swift; sourceTree = "<group>"; };
 		E6FDDD314F5FCB09D7D7D496 /* MicroBreakBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroBreakBuilderTests.swift; sourceTree = "<group>"; };
+		ED2AB704FE14787E6C39A2A8 /* Scheduler+Pause.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Scheduler+Pause.swift"; sourceTree = "<group>"; };
 		F0540DC096C801998998E1E5 /* Fonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fonts.swift; sourceTree = "<group>"; };
 		F14A2D2340D0DA758E7380B8 /* movement-library-v4.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "movement-library-v4.json"; sourceTree = "<group>"; };
 		F1DDDDC773AAE7422F7A1D24 /* SmokeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmokeTests.swift; sourceTree = "<group>"; };
+		FFC4CA026FFB71298413BD92 /* Scheduler+Sleep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Scheduler+Sleep.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -149,10 +165,12 @@
 				C0B577EE28A8F593F5FF18F4 /* RoutineFixturesTests.swift */,
 				A9B9838D81524A40DB3881AB /* RoutineTestSupport.swift */,
 				1CFDF85D71146981530D4EAA /* SchedulerCoreTests.swift */,
+				DCB939E301141030A259C591 /* SchedulerInterruptionTests.swift */,
 				62B4AC6C3F66A7E5ABB97CFF /* SchedulerMicroTests.swift */,
 				E039EE67EC22D7EDCFDF48A2 /* SchedulerTestSupport.swift */,
 				F1DDDDC773AAE7422F7A1D24 /* SmokeTests.swift */,
 				8A9EBE441108D20D23E7CCC0 /* SubstitutionsTests.swift */,
+				B26EB18454874DCDF33AEBC8 /* WorkingHoursTests.swift */,
 			);
 			path = movezTests;
 			sourceTree = "<group>";
@@ -233,6 +251,11 @@
 				6B38057FE27BFBA4B888F5B0 /* Clock.swift */,
 				1357C14B78E301196BDC5185 /* Scheduler.swift */,
 				93382A4F69A62588E48F0722 /* Scheduler+Actions.swift */,
+				27909D93B5772796C24BB3DA /* Scheduler+Hours.swift */,
+				139F174AFC2AD7EFB2B40268 /* Scheduler+Idle.swift */,
+				ED2AB704FE14787E6C39A2A8 /* Scheduler+Pause.swift */,
+				FFC4CA026FFB71298413BD92 /* Scheduler+Sleep.swift */,
+				4880E3A5C4CA66BFA31A1C1D /* Scheduler+Suppression.swift */,
 				B7931632856036648A3777A7 /* SchedulerConfig.swift */,
 				06CE8997B39FFB560CC27EC0 /* SchedulerEffect.swift */,
 				DD7E4757BE6870716B20B25A /* SchedulerEvent.swift */,
@@ -241,6 +264,7 @@
 				A9D24389D182EC724A1CFC3A /* SignalSnapshot.swift */,
 				A49E80929BB51EEDA20B470F /* StatePersistence.swift */,
 				A36C066F3C6A50DD09893FA1 /* TransitionLog.swift */,
+				B7E8D6FE10268C25790DA8F2 /* WorkingHours.swift */,
 			);
 			path = Scheduler;
 			sourceTree = "<group>";
@@ -397,6 +421,11 @@
 				25E93322972C26948D469154 /* RoutineTemplate.swift in Sources */,
 				24A56B2FADD5631DAF0DFD13 /* RoutineValidator.swift in Sources */,
 				FFFA726A1E5C0A77083C6E51 /* Scheduler+Actions.swift in Sources */,
+				0866803C21557AB19497146D /* Scheduler+Hours.swift in Sources */,
+				C3FB9705D873F4D2C369CC09 /* Scheduler+Idle.swift in Sources */,
+				C92EE5DA15BB0E4F1982652E /* Scheduler+Pause.swift in Sources */,
+				FEBDA6D5BF56DA4A36013848 /* Scheduler+Sleep.swift in Sources */,
+				2AEB596035AF78E4A520FB5B /* Scheduler+Suppression.swift in Sources */,
 				4FE06E2578B3E44232996091 /* Scheduler.swift in Sources */,
 				87848EA5BF6191E1B7ADB5C1 /* SchedulerConfig.swift in Sources */,
 				80FCE6948F1D4D0A3C500F3A /* SchedulerEffect.swift in Sources */,
@@ -409,6 +438,7 @@
 				6144F8A35500D2DA0410DD2B /* StatePersistence.swift in Sources */,
 				ADD0D0E44651BF36B3CDA5D8 /* Substitutions.swift in Sources */,
 				64220A63A12C495222F60DC7 /* TransitionLog.swift in Sources */,
+				98DE7999C2C09A0317A37B16 /* WorkingHours.swift in Sources */,
 				55074040540FC506FB3D1593 /* movezApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -425,10 +455,12 @@
 				766E97E004686AB8163D46E1 /* RoutineFixturesTests.swift in Sources */,
 				A1139C1975FC8C947D0EE8B0 /* RoutineTestSupport.swift in Sources */,
 				C7FD8B58088A2CD47C915509 /* SchedulerCoreTests.swift in Sources */,
+				7001EDB68E7070C58A31F3A9 /* SchedulerInterruptionTests.swift in Sources */,
 				4C0067EE2D2F0D172E5BAFC7 /* SchedulerMicroTests.swift in Sources */,
 				1BDCADC884E2EDDA6CE12624 /* SchedulerTestSupport.swift in Sources */,
 				1F539EFD5D18C4F5ABE07347 /* SmokeTests.swift in Sources */,
 				0029928374647F3135541973 /* SubstitutionsTests.swift in Sources */,
+				6DCA26B931AAD67AA77E1122 /* WorkingHoursTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

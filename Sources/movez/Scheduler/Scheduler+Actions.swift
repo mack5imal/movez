@@ -12,37 +12,59 @@ extension Scheduler {
 
     mutating func enterHeadsUp(now: Date, deferredSince: Date? = nil, reason: String) -> [SchedulerEffect] {
         snapshot.pendingInputWaitStartedAt = nil
-        transition(to: .headsUp(startedAt: now, deferredSince: deferredSince), reason: reason, at: now)
-        return [.showHeadsUp(headsUpInfo(now: now, deferredSince: deferredSince)), .chime(.headsUp), .persist, .menuRefresh]
+        let deferral = deferredSince ?? snapshot.deferredFullDueAt
+        if let deferral, now.timeIntervalSince(deferral) > Double(config.deferredBadgeSeconds) {
+            // A break that has been waiting for half an hour has earned less patience.
+            snapshot.snoozeAllowanceThisBreak = config.deferredSnoozeAllowance
+        }
+        transition(to: .headsUp(startedAt: now, deferredSince: deferral), reason: reason, at: now)
+        let info = headsUpInfo(now: now, deferredSince: deferral)
+        return [.showHeadsUp(info), .chime(.headsUp), .persist, .menuRefresh]
     }
 
     mutating func enterFullBreak(now: Date, deferred: Bool, reason: String) -> [SchedulerEffect] {
+        snapshot.deferredFullDueAt = nil
+        snapshot.interruptedBreak = nil
         transition(to: .fullBreak(startedAt: now), reason: reason, at: now)
         let plan = BreakPlan(startedAt: now, seconds: config.breakSeconds, deferred: deferred)
         return [.hideHeadsUp, .startFullBreak(plan), .persist, .menuRefresh]
     }
 
     func headsUpInfo(now: Date, deferredSince: Date?) -> HeadsUpInfo {
-        HeadsUpInfo(
+        let sittingSince = snapshot.lastCompletedBreakAt ?? snapshot.boutStartedAt
+        let deferredFor = deferredSince.map { max(0, Int(now.timeIntervalSince($0))) }
+        let longWait = (deferredFor ?? 0) > config.deferredBadgeSeconds
+        return HeadsUpInfo(
             dueAt: snapshot.nextFullDueAt ?? now,
             startsAt: now.addingTimeInterval(TimeInterval(config.headsUpSeconds)),
-            sittingSeconds: snapshot.sittingSeconds(at: now),
+            sittingSince: sittingSince,
+            sittingSeconds: max(0, Int(now.timeIntervalSince(sittingSince))),
             snoozesLeft: snoozesLeft,
+            maxSnoozes: snapshot.snoozeAllowanceThisBreak ?? config.maxSnoozesPerBreak,
             skipsToday: snapshot.skipsToday,
             deferred: deferredSince != nil,
-            deferredSince: deferredSince
+            deferredSince: deferredSince,
+            deferredForSeconds: deferredFor,
+            showDeferredBadge: longWait
         )
     }
 
     // MARK: - Break actions
 
     mutating func takeBreakNow(now: Date) -> [SchedulerEffect] {
+        var prelude: [SchedulerEffect] = []
         switch snapshot.state {
-        case .sitting, .pendingFull, .headsUp, .snoozed:
-            return enterFullBreak(now: now, deferred: false, reason: "take a break now")
+        case .sitting, .pendingFull, .headsUp, .snoozed, .away, .suppressed, .postBreakGrace:
+            break
+        case .paused:
+            // Taking a break by hand ends the pause rather than sitting behind it.
+            prelude = endPauseBookkeeping(now: now)
+        case .offHours:
+            prelude = beginAdHocSession(now: now)
         default:
             return []
         }
+        return prelude + enterFullBreak(now: now, deferred: false, reason: "take a break now")
     }
 
     mutating func startBreakNow(now: Date) -> [SchedulerEffect] {
@@ -140,6 +162,7 @@ extension Scheduler {
         snapshot.microAnchorAt = nil
         snapshot.microSnoozeUsed = false
         snapshot.pendingInputWaitStartedAt = nil
+        snapshot.deferredFullDueAt = nil
     }
 
     // MARK: - Micro-break actions

@@ -19,11 +19,17 @@ enum Chime: String, Codable, Equatable, CaseIterable {
 struct HeadsUpInfo: Equatable {
     var dueAt: Date
     var startsAt: Date
+    /// When the current sitting stretch began — the last completed break, or the bout start.
+    var sittingSince: Date
     var sittingSeconds: Int
     var snoozesLeft: Int
+    var maxSnoozes: Int
     var skipsToday: Int
     var deferred: Bool = false
     var deferredSince: Date?
+    var deferredForSeconds: Int?
+    /// A break that waited more than half an hour says so, and gets one snooze instead of two.
+    var showDeferredBadge: Bool = false
 }
 
 /// The scheduler's half of a break. The coordinator attaches the generated routine.

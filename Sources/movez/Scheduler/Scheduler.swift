@@ -43,7 +43,38 @@ struct Scheduler {
         if let effects = handleClockEvents(event, now: now) { return effects }
         if let effects = handleBreakActions(event, now: now) { return effects }
         if let effects = handleMicroActions(event, now: now) { return effects }
+        if let effects = handleSignalEvents(event, now: now) { return effects }
+        if let effects = handleSessionEvents(event, now: now) { return effects }
         return []
+    }
+
+    private mutating func handleSignalEvents(_ event: SchedulerEvent, now: Date) -> [SchedulerEffect]? {
+        switch event {
+        case .idle(let seconds): return handleIdle(seconds: seconds, now: now)
+        case .sleep: return handleSleepOrLock(now: now, reason: "machine slept")
+        case .lock: return handleSleepOrLock(now: now, reason: "screen locked")
+        case .wake(let gap): return handleWake(gapSeconds: gap, now: now, reason: "woke after \(gap) s")
+        case .unlock(let gap): return handleWake(gapSeconds: gap, now: now, reason: "unlocked after \(gap) s")
+        case .gapDetected(let gap): return handleWake(gapSeconds: gap, now: now, reason: "tick gap of \(gap) s")
+        case .signals(let signals): return handleSignals(signals, now: now)
+        case .toastReverse: return reverseCredit(now: now)
+        default: return nil
+        }
+    }
+
+    private mutating func handleSessionEvents(_ event: SchedulerEvent, now: Date) -> [SchedulerEffect]? {
+        switch event {
+        case .userPause(let seconds): return pause(seconds: seconds, focusInitiated: false, now: now)
+        case .userResume: return resumeFromPause(now: now, focusInitiated: false, reason: "resumed by hand")
+        case .userExtendPause(let seconds): return extendPause(seconds: seconds, now: now)
+        case .focusFilter(let paused):
+            return paused
+                ? pause(seconds: nil, focusInitiated: true, now: now)
+                : resumeFromPause(now: now, focusInitiated: true, reason: "focus filter cleared")
+        case .userStartSession: return beginAdHocSession(now: now)
+        case .userEndSession: return endAdHocSession(now: now)
+        default: return nil
+        }
     }
 
     private mutating func handleClockEvents(_ event: SchedulerEvent, now: Date) -> [SchedulerEffect]? {
@@ -84,9 +115,28 @@ struct Scheduler {
     // MARK: - Tick
 
     private mutating func tick(now: Date) -> [SchedulerEffect] {
+        let hours = applyWorkingHours(now: now)
+        if !hours.isEmpty { return hours }
         if let effects = tickBreakStates(now: now) { return effects }
         if let effects = tickMicroStates(now: now) { return effects }
+        if let effects = tickInterruptedStates(now: now) { return effects }
         return []
+    }
+
+    private mutating func tickInterruptedStates(now: Date) -> [SchedulerEffect]? {
+        switch snapshot.state {
+        case .paused(let until):
+            return tickPaused(until: until, now: now)
+        case .suppressed(let since, let deferred):
+            return tickSuppressed(since: since, deferredFullDue: deferred, now: now)
+        case .postBreakGrace(let until, let resume):
+            guard now >= until else { return [] }
+            return applyGrace(resume, now: now)
+        case .away, .offHours:
+            return []
+        default:
+            return nil
+        }
     }
 
     private mutating func tickBreakStates(now: Date) -> [SchedulerEffect]? {
@@ -135,6 +185,7 @@ struct Scheduler {
     }
 
     private mutating func handleInput(lastEventAgeSeconds age: Int, now: Date) -> [SchedulerEffect] {
+        if case .away(let since) = snapshot.state { return returnFromAway(since: since, now: now) }
         guard case .pendingFull = snapshot.state, age >= config.inputPauseSeconds else { return [] }
         return enterHeadsUp(now: now, reason: "input paused for \(age) s")
     }

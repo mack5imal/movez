@@ -23,6 +23,7 @@ struct SchedulerConfig: Codable, Equatable, Hashable {
     var postSuppressionGraceSeconds: Int = 120
     var deferredBadgeSeconds: Int = 1800
     var deferredSnoozeAllowance: Int = 1
+    var workingHours: WorkingHours = .standard
     var calendar: Calendar = .current
 
     /// The smallest sit interval a break can be completed at, in seconds — used by the
@@ -84,6 +85,11 @@ struct SchedulerConfig: Codable, Equatable, Hashable {
         mix(awayThresholdSeconds)
         mix(fullCreditSeconds)
         mix(postSuppressionGraceSeconds)
+        for day in workingHours.days {
+            mix(day.enabled ? 1 : 0)
+            mix(day.startMinutes)
+            mix(day.endMinutes)
+        }
         return hash
     }
 }

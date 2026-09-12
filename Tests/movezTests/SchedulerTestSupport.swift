@@ -1,4 +1,5 @@
 import Foundation
+import XCTest
 @testable import movez
 
 /// Drives a `Scheduler` the way the coordinator will: a manual clock, a 2 s tick, and a
@@ -6,11 +7,30 @@ import Foundation
 final class SchedulerHarness {
     static let tickSeconds: TimeInterval = 2
 
-    let clock = ManualClock()
+    /// Monday 9 September 2026, 09:00 local — a weekday inside the default working hours.
+    static let mondayMorning: Date = {
+        var components = DateComponents()
+        components.year = 2026
+        components.month = 9
+        components.day = 7
+        components.hour = 9
+        return Calendar.current.date(from: components) ?? Date(timeIntervalSince1970: 1_767_225_600)
+    }()
+
+    let clock: ManualClock
     var scheduler: Scheduler
     private(set) var effects: [SchedulerEffect] = []
 
-    init(config: SchedulerConfig = SchedulerConfig()) {
+    /// Working hours default to always-on so that tests about the core cycle are not cut short by
+    /// the end of the working day; the working-hours tests pass `.standard` explicitly.
+    init(
+        config: SchedulerConfig = SchedulerConfig(),
+        workingHours: WorkingHours = .alwaysOn,
+        startAt: Date? = nil
+    ) {
+        var config = config
+        config.workingHours = workingHours
+        clock = ManualClock(now: startAt ?? Self.mondayMorning)
         scheduler = Scheduler(config: config, now: clock.now)
     }
 
@@ -65,4 +85,21 @@ extension SchedulerState {
     var isMicroCountIn: Bool { if case .microCountIn = self { return true } else { return false } }
     var isMicroRunning: Bool { if case .microRunning = self { return true } else { return false } }
     var isSitting: Bool { self == .sitting }
+}
+
+/// `XCTAssertEqual` with an accuracy needs a number, not a `Date` — this keeps the intent
+/// readable when a tick's granularity makes an exact match the wrong assertion.
+func XCTAssertDate(
+    _ actual: Date?,
+    _ expected: Date?,
+    accuracy: TimeInterval = 1,
+    _ message: @autoclosure () -> String = "",
+    file: StaticString = #filePath,
+    line: UInt = #line
+) {
+    guard let actual, let expected else {
+        return XCTAssertEqual(actual, expected, message(), file: file, line: line)
+    }
+    XCTAssertEqual(actual.timeIntervalSince1970, expected.timeIntervalSince1970, accuracy: accuracy,
+                   message(), file: file, line: line)
 }

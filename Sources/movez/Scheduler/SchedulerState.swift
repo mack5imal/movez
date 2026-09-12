@@ -1,9 +1,13 @@
 import Foundation
 
 /// Where the scheduler resumes after a grace period ends.
-enum GraceResume: String, Codable, Equatable {
+enum GraceResume: Codable, Equatable {
     case sitting
     case pendingFull
+    /// A wake or unlock: apply the idle table to the gap the machine was away for.
+    case applyGap(seconds: Int)
+    /// A call or screen share ended: serve the deferred break, or go back to sitting.
+    case afterSuppression
 }
 
 /// Every state the scheduler can be in (research §5).
