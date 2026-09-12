@@ -4,6 +4,12 @@ import Foundation
 /// what the menu bar shows.
 extension AppCoordinator {
     func apply(_ effect: SchedulerEffect) {
+        if applySurface(effect) { return }
+        applySideEffect(effect)
+    }
+
+    /// The effects that put a break surface on screen or take it away.
+    private func applySurface(_ effect: SchedulerEffect) -> Bool {
         switch effect {
         case .showHeadsUp(let info):
             headsUpInfo = info
@@ -17,6 +23,15 @@ extension AppCoordinator {
             beginMicro()
         case .hideMicro:
             endMicro()
+        default:
+            return false
+        }
+        return true
+    }
+
+    /// Toasts, persistence and polling.
+    private func applySideEffect(_ effect: SchedulerEffect) {
+        switch effect {
         case .showToast(let info):
             recordCredit(info)
             toastInfo = info
@@ -25,7 +40,9 @@ extension AppCoordinator {
             toastInfo = nil
         case .persist:
             try? snapshotStore?.save(scheduler.snapshot)
-        case .chime, .showMicroRunning, .pollingChanged, .menuRefresh:
+        case .pollingChanged(let enabled):
+            aggregator?.setPolling(enabled)
+        default:
             break
         }
     }

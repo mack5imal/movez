@@ -55,6 +55,10 @@ final class AppCoordinator: ObservableObject {
     @Published var streak = 0
     @Published var nextRoutinePreview: Routine?
 
+    /// The running coordinator. App Intents are created by the system with no way to be handed
+    /// dependencies, so the Focus Filter needs a way home.
+    @MainActor private(set) static weak var shared: AppCoordinator?
+
     let clock: Clock
     let library: MovementLibrary
     let history: HistoryStore
@@ -65,6 +69,9 @@ final class AppCoordinator: ObservableObject {
 
     let snapshotStore: SnapshotStore?
     private let sink: EffectSink
+    /// The real system monitors, attached at launch and absent in tests.
+    var aggregator: SignalAggregator?
+    var powerMonitor: PowerMonitor?
     private var tickTimer: DispatchSourceTimer?
     private var wakeCheckTimer: DispatchSourceTimer?
     private var cancellables: Set<AnyCancellable> = []
@@ -117,12 +124,43 @@ final class AppCoordinator: ObservableObject {
 
     /// Starts the timers. Head-less command-line runs never call this.
     func start() {
+        AppCoordinator.shared = self
         applyTimeScale()
         restartTimers()
         refreshPublished()
     }
 
+    /// Wires the real macOS monitors in. Tests drive the scheduler directly and never call this.
+    func attachSystemSignals() {
+        let aggregator = SignalAggregator(
+            idle: IdleMonitor(),
+            mic: MicrophoneMonitor(),
+            capture: ScreenCaptureMonitor(),
+            fullscreen: FullscreenMonitor(),
+            clock: clock,
+            settings: settings,
+            dispatch: { [weak self] event in self?.inject(event) }
+        )
+        self.aggregator = aggregator
+
+        let power = PowerMonitor(
+            now: { [weak self] in self?.clock.now ?? Date() },
+            lastActivity: { [weak self] in self?.aggregator?.lastPollAt ?? self?.clock.now ?? Date() },
+            onEvent: { [weak self] event in
+                guard let self else { return }
+                if case .wake = event { self.aggregator?.noteRealWake(at: self.clock.now) }
+                if case .unlock = event { self.aggregator?.noteRealWake(at: self.clock.now) }
+                self.inject(event)
+            }
+        )
+        power.start()
+        powerMonitor = power
+        aggregator.setPolling(scheduler.pollingRequired)
+    }
+
     func stop() {
+        aggregator?.stop()
+        powerMonitor?.stop()
         tickTimer?.cancel()
         tickTimer = nil
         wakeCheckTimer?.cancel()

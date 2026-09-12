@@ -1,0 +1,71 @@
+{
+  "note": "macOS exposes no public API that reports whether the screen is being captured, so this is a heuristic. It is deliberately conservative: a false positive silently postpones a break, which is worse than missing one share. Signatures whose app runs persistently in the background — Loom, CleanShot X, Kap — are listed with \"enabled\": false, because the app merely running is not evidence that anything is being recorded, and no process that appears only during a recording has been verified for them. Zoom and Teams run all day too, but both spawn a share helper that exists only while a share is live, so they are gated on that.",
+  "signatures": [
+    {
+      "name": "Zoom screen share",
+      "bundleIds": ["us.zoom.xos"],
+      "processNames": ["CptHost", "ZoomClips"],
+      "requireProcessName": true,
+      "enabled": true
+    },
+    {
+      "name": "Microsoft Teams screen share",
+      "bundleIds": ["com.microsoft.teams2", "com.microsoft.teams"],
+      "processNames": ["Microsoft Teams (Screen Share)", "TeamsScreenShare"],
+      "requireProcessName": true,
+      "enabled": true
+    },
+    {
+      "name": "QuickTime Player screen recording",
+      "bundleIds": ["com.apple.QuickTimePlayerX"],
+      "processNames": ["screencapture"],
+      "requireProcessName": true,
+      "enabled": true
+    },
+    {
+      "name": "OBS Studio",
+      "bundleIds": ["com.obsproject.obs-studio"],
+      "processNames": [],
+      "requireProcessName": false,
+      "enabled": true
+    },
+    {
+      "name": "ScreenFlow",
+      "bundleIds": ["net.telestream.screenflow4", "net.telestream.screenflow10"],
+      "processNames": [],
+      "requireProcessName": false,
+      "enabled": true
+    },
+    {
+      "name": "macOS screen recording",
+      "bundleIds": [],
+      "processNames": ["screencapture"],
+      "requireProcessName": false,
+      "enabled": true
+    },
+    {
+      "name": "Loom",
+      "bundleIds": ["com.loom.desktop"],
+      "processNames": [],
+      "requireProcessName": false,
+      "enabled": false,
+      "disabledReason": "Loom idles in the background with its recorder helper already running, so its presence says nothing about whether a recording is live."
+    },
+    {
+      "name": "CleanShot X",
+      "bundleIds": ["pl.maczarnik.cleanshot"],
+      "processNames": ["CleanShotXRecorder"],
+      "requireProcessName": true,
+      "enabled": false,
+      "disabledReason": "Runs as a menu-bar agent all day; the recorder helper name has not been verified against a live recording."
+    },
+    {
+      "name": "Kap",
+      "bundleIds": ["com.wulkano.kap"],
+      "processNames": [],
+      "requireProcessName": false,
+      "enabled": false,
+      "disabledReason": "Runs as a menu-bar agent all day."
+    }
+  ]
+}

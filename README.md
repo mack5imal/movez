@@ -48,5 +48,18 @@ no second copy to keep in sync.
   tell whether you are presenting or screen-sharing, and reads microphone activity state, all of
   which the sandbox blocks. It makes no network calls and writes only to its own Application
   Support directory.
+- **Screen-capture detection is a heuristic.** macOS has no public API that reports whether the
+  screen is being recorded or shared, so movez watches for the tools people actually use
+  (`Sources/movez/Resources/capture-signatures.json`). It is deliberately conservative: a false
+  positive silently postpones a break, which is worse than missing one share. Tools that sit in
+  the menu bar all day — Loom, CleanShot X, Kap — are listed but disabled, because their merely
+  running says nothing about whether a recording is live. Zoom and Teams run all day too, but
+  both spawn a share helper that exists only while a share is live, so they are gated on that.
+  Add your own signatures to that file if you use something else.
+- **Focus.** There is no supported way to read the current Focus, so movez ships a Focus Filter
+  instead: System Settings → Focus → *your Focus* → Focus Filters → Add Filter → movez. Turn
+  "Pause breaks" on and movez waits until that Focus ends.
+- `movez --probe-signals` prints one line per monitor for five seconds, which is how to check the
+  adapters on a new machine. `movez --smoke` is the build's readiness check.
 - Manrope is bundled under the SIL Open Font License 1.1 (`Sources/movez/Resources/Fonts/OFL.txt`).
 - The chimes are synthesised locally by `scripts/gen_chimes.py`; no audio is downloaded.

@@ -85,6 +85,9 @@ extension AppCoordinator {
     func microSnooze() { inject(.userMicroSnooze) }
     func microSkip() { inject(.userMicroSkip) }
 
+    /// A Focus turning on or off.
+    func focusFilter(paused: Bool) { inject(.focusFilter(paused: paused)) }
+
     // MARK: - Toast
 
     func reverseToast() {

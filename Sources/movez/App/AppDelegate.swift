@@ -19,6 +19,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             startCoordinator()
             return
         }
+        if arguments.probeSignals {
+            SignalProbe.run { exit($0) }
+            return
+        }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [arguments] in
             if arguments.smoke {
                 // Intentional stdout line: the build harness asserts on it.
@@ -51,6 +55,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 clock: SystemClock(),
                 snapshotStore: snapshotStore
             )
+            coordinator.attachSystemSignals()
             coordinator.start()
             self.coordinator = coordinator
         } catch {
