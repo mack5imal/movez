@@ -20,6 +20,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // The unit-test bundle is hosted by this app, so `xcodebuild test` launches it for real.
+        // Left to itself it would build a coordinator on the developer's own state and history
+        // files and count phantom breaks into them — every test run inflating the numbers the
+        // menu bar shows. Tests build their own coordinators against in-memory stores.
+        guard !Self.isHostingTests else { return }
+
         guard arguments.isHeadless else {
             startCoordinator()
             return
@@ -48,6 +54,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
             }
             exit(0)
         }
+    }
+
+    /// True when this process exists to host an XCTest bundle rather than to serve the user.
+    static var isHostingTests: Bool {
+        let environment = ProcessInfo.processInfo.environment
+        return environment["XCTestConfigurationFilePath"] != nil
+            || environment["XCTestBundlePath"] != nil
+            || environment["XCTestSessionIdentifier"] != nil
     }
 
     func applicationWillTerminate(_ notification: Notification) {
