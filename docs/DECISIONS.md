@@ -98,5 +98,10 @@ Sources of truth, in order: `product-brief-v1.md`, `scheduler-research-v1.md`,
     idle in the menu bar all day (Loom, CleanShot X, Kap) are listed but disabled.
 26. **Focus is read through a Focus Filter, not the system.** There is no supported way to read
     the current Focus, so movez ships a `SetFocusFilterIntent` the user adds to their own Focus.
-27. **Launch at login needs a signed build.** `SMAppService` can refuse on an ad-hoc-signed Debug
-    build; the refusal is shown under the toggle rather than letting it spring back silently.
+27. **Launch at login needs a permanent home, not a signed build.** `SMAppService` records the
+    bundle's path, so an app registered out of `build/DerivedData` stops launching the moment
+    `make clean` removes it — install it to `/Applications` before turning the toggle on.
+    Registration itself needs no Developer ID: measured on macOS 15.6, an ad-hoc signature with no
+    team identifier registers, with and without the `get-task-allow` a Debug build carries, and
+    the login item survives a rebuild that changes the code hash. The refusal is still shown under
+    the toggle rather than letting it spring back silently, for the systems where macOS says no.
