@@ -35,8 +35,19 @@ app:
 run: build
 	open $(APP)
 
-snapshots:
-	@echo "snapshots: no surfaces yet"
+snapshots: build
+	@rm -rf build/snapshots
+	@$(BIN) --snapshot all --out build/snapshots
+	@expected=$$($(BIN) --snapshot list); \
+	missing=""; \
+	for surface in $$expected; do \
+	  [ -f "build/snapshots/$$surface.png" ] || missing="$$missing $$surface"; \
+	done; \
+	if [ -n "$$missing" ]; then echo "missing snapshots:$$missing" >&2; exit 1; fi; \
+	echo "--- build/snapshots ---"; \
+	for surface in $$expected; do \
+	  printf '%-28s %s\n' "$$surface.png" "$$(sips -g pixelWidth -g pixelHeight build/snapshots/$$surface.png | tail -2 | tr -d ' \n')"; \
+	done
 
 assets:
 	bash scripts/fetch_font.sh

@@ -23,6 +23,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             SignalProbe.run { exit($0) }
             return
         }
+        if let surface = arguments.snapshot {
+            SnapshotRenderer.runCLI(surface: surface, out: arguments.out) { exit($0) }
+            return
+        }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [arguments] in
             if arguments.smoke {
                 // Intentional stdout line: the build harness asserts on it.
