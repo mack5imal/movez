@@ -27,6 +27,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             OverlayHygiene.run(outPath: arguments.out) { exit($0) }
             return
         }
+        if arguments.panelHygiene {
+            PanelHygiene.run { exit($0) }
+            return
+        }
         if let surface = arguments.snapshot {
             SnapshotRenderer.runCLI(surface: surface, out: arguments.out) { exit($0) }
             return
@@ -76,7 +80,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func attachUI(to coordinator: AppCoordinator, settings: SettingsStore) {
         let chimes = AudioChimePlayer(isEnabled: { settings.soundsEnabled })
         let sink = CompositeEffectSink([
-            OverlayEffectSink(controller: OverlayWindowController(), chimes: chimes)
+            OverlayEffectSink(controller: OverlayWindowController(), chimes: chimes),
+            PanelEffectSink(controller: PanelWindowController())
         ])
         coordinator.register(sink: sink)
     }

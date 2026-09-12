@@ -28,6 +28,7 @@ struct SchedulerSnapshot: Codable, Equatable {
     var pauseIsFocusInitiated: Bool = false
     var interruptedBreak: InterruptedBreak?
     var deferredFullDueAt: Date?
+    var deferredReason: SuppressionReason?
     var creditRestore: CreditRestore?
     var adHocSession: Bool = false
     var adHocSessionStartedAt: Date?

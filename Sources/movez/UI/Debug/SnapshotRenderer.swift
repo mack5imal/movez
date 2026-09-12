@@ -12,28 +12,31 @@ enum SnapshotSurface: String, CaseIterable {
     case overlaySide = "overlay-side"
     case overlayEnd = "overlay-end"
     case overlayOtherDisplay = "overlay-other-display"
+    case headsUp = "headsup"
+    case headsUpDeferred = "headsup-deferred"
+    case microCountIn = "micro-countin"
+    case microRunning = "micro-running"
+    case toast
 
     /// A 1440×900 display, which is what the handoff's overlay screenshots are drawn on.
     static let screen = CGSize(width: 1440, height: 900)
+    /// Enough of a desktop around a floating panel to show where on it the panel sits.
+    static let panelCanvas = CGSize(width: 680, height: 420)
+    static let toastCanvas = CGSize(width: 680, height: 320)
 
     /// The point size the surface is rendered at.
     var size: CGSize {
         switch self {
         case .gallery: return CGSize(width: 1400, height: 2900)
+        case .headsUp, .headsUpDeferred, .microCountIn, .microRunning: return Self.panelCanvas
+        case .toast: return Self.toastCanvas
         case .overlayFull, .overlayCollapsed, .overlaySide, .overlayEnd, .overlayOtherDisplay:
             return Self.screen
         }
     }
 
     /// The colour behind the surface, so panels are legible against something.
-    var backdrop: MovezColor {
-        switch self {
-        case .gallery: return Tokens.panelSolid
-        default: return Tokens.panelSolid
-        }
-    }
-
-    var isOverlay: Bool { self != .gallery }
+    var backdrop: MovezColor { Tokens.panelSolid }
 }
 
 enum SnapshotError: LocalizedError {
@@ -58,11 +61,31 @@ enum SnapshotRenderer {
     static let scale: CGFloat = 2
 
     static func view(for surface: SnapshotSurface) -> AnyView {
+        panelView(for: surface) ?? overlayView(for: surface)
+    }
+
+    /// The gallery and the floating panels.
+    private static func panelView(for surface: SnapshotSurface) -> AnyView? {
         switch surface {
         case .gallery:
             return AnyView(GalleryView())
-        case .overlayFull:
-            return AnyView(OverlaySnapshot(state: SnapshotFixtures.overlayRunning()))
+        case .headsUp:
+            return AnyView(PanelSnapshot(viewModel: SnapshotFixtures.headsUp()))
+        case .headsUpDeferred:
+            return AnyView(PanelSnapshot(viewModel: SnapshotFixtures.headsUp(deferred: true)))
+        case .microCountIn:
+            return AnyView(PanelSnapshot(viewModel: SnapshotFixtures.microCountIn()))
+        case .microRunning:
+            return AnyView(PanelSnapshot(viewModel: SnapshotFixtures.microRunning()))
+        case .toast:
+            return AnyView(PanelSnapshot(viewModel: SnapshotFixtures.awayToast(), placement: .bottomRight))
+        default:
+            return nil
+        }
+    }
+
+    private static func overlayView(for surface: SnapshotSurface) -> AnyView {
+        switch surface {
         case .overlayCollapsed:
             return AnyView(OverlaySnapshot(state: SnapshotFixtures.overlayCollapsed()))
         case .overlaySide:
@@ -71,6 +94,8 @@ enum SnapshotRenderer {
             return AnyView(OverlaySnapshot(state: SnapshotFixtures.overlayEnd()))
         case .overlayOtherDisplay:
             return AnyView(OverlaySnapshot(state: SnapshotFixtures.overlayRunning(), otherDisplay: true))
+        default:
+            return AnyView(OverlaySnapshot(state: SnapshotFixtures.overlayRunning()))
         }
     }
 

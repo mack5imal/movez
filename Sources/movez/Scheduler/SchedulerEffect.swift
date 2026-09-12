@@ -28,6 +28,7 @@ struct HeadsUpInfo: Equatable {
     var deferred: Bool = false
     var deferredSince: Date?
     var deferredForSeconds: Int?
+    var deferredReason: SuppressionReason?
     /// A break that waited more than half an hour says so, and gets one snooze instead of two.
     var showDeferredBadge: Bool = false
 }

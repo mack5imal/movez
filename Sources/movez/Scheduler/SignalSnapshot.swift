@@ -17,5 +17,29 @@ struct SignalSnapshot: Codable, Equatable, Hashable {
     /// True when any suppression signal is raised.
     var suppressing: Bool { microphoneActive || screenCaptureActive || fullscreenActive }
 
+    /// Which signal to blame, for the deferred-break badge.
+    var reason: SuppressionReason? {
+        if microphoneActive { return .microphone }
+        if screenCaptureActive { return .screenCapture }
+        if fullscreenActive { return .fullscreen }
+        return nil
+    }
+
     static let quiet = SignalSnapshot()
+}
+
+/// Why a break was held back, phrased the way the heads-up badge says it.
+enum SuppressionReason: String, Codable, Equatable, CaseIterable {
+    case microphone
+    case screenCapture
+    case fullscreen
+
+    /// "break waited for your call"
+    var phrase: String {
+        switch self {
+        case .microphone: return "your call"
+        case .screenCapture: return "your screen share"
+        case .fullscreen: return "your fullscreen app"
+        }
+    }
 }

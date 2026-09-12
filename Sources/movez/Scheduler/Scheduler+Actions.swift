@@ -24,6 +24,7 @@ extension Scheduler {
 
     mutating func enterFullBreak(now: Date, deferred: Bool, reason: String) -> [SchedulerEffect] {
         snapshot.deferredFullDueAt = nil
+        snapshot.deferredReason = nil
         snapshot.interruptedBreak = nil
         transition(to: .fullBreak(startedAt: now), reason: reason, at: now)
         let plan = BreakPlan(startedAt: now, seconds: config.breakSeconds, deferred: deferred)
@@ -45,6 +46,7 @@ extension Scheduler {
             deferred: deferredSince != nil,
             deferredSince: deferredSince,
             deferredForSeconds: deferredFor,
+            deferredReason: snapshot.deferredReason,
             showDeferredBadge: longWait
         )
     }

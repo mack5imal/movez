@@ -11,7 +11,7 @@ BIN := $(APP)/Contents/MacOS/movez
 XCB := xcodebuild -project $(PROJECT) -scheme $(SCHEME) -configuration Debug \
 	-destination 'platform=macOS' -derivedDataPath $(DERIVED)
 
-.PHONY: gen build test lint app run snapshots hygiene assets clean
+.PHONY: gen build test lint app run snapshots hygiene panel-hygiene assets clean
 
 gen:
 	xcodegen generate --spec project.yml
@@ -61,6 +61,11 @@ hygiene: build
 	@grep -q "key=true" "$(HYGIENE_REPORT)" || { echo "overlay never became key" >&2; exit 1; }
 	@grep -q "windowsAfterSleep=0" "$(HYGIENE_REPORT)" || { echo "overlay left windows behind" >&2; exit 1; }
 	@grep -q "focusRestored=true" "$(HYGIENE_REPORT)" || { echo "focus was not restored" >&2; exit 1; }
+
+# The panels must never activate the app, so this one is run straight from the shell: whatever
+# was frontmost before should still be frontmost after.
+panel-hygiene: build
+	@$(BIN) --panel-hygiene
 
 assets:
 	bash scripts/fetch_font.sh

@@ -100,6 +100,10 @@ extension AppCoordinator {
     func microSnooze() { inject(.userMicroSnooze) }
     func microSkip() { inject(.userMicroSkip) }
 
+    /// The micro-break's minute ran out. The panel owns its own countdown, the way the overlay
+    /// owns the break's, so it is the panel that says when the minute is done.
+    func microEnded() { inject(.microEnded) }
+
     /// A Focus turning on or off.
     func focusFilter(paused: Bool) { inject(.focusFilter(paused: paused)) }
 

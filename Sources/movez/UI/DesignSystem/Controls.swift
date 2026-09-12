@@ -127,6 +127,8 @@ struct InfoBadge: View {
             MovezText(text, MovezType.badge, color: Tokens.text2)
         }
         .padding(EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12))
+        // The badge spans its panel. A pill that hugged its text would read as another button.
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: Tokens.Radius.badge, style: .continuous)
                 .fill(Tokens.accentTintBadge.color)

@@ -5,10 +5,10 @@ import Foundation
 /// running; only the interruption waits.
 extension Scheduler {
     mutating func handleSignals(_ signals: SignalSnapshot, now: Date) -> [SchedulerEffect] {
-        signals.suppressing ? beginSuppression(now: now) : endSuppression(now: now)
+        signals.suppressing ? beginSuppression(signals.reason, now: now) : endSuppression(now: now)
     }
 
-    private mutating func beginSuppression(now: Date) -> [SchedulerEffect] {
+    private mutating func beginSuppression(_ reason: SuppressionReason?, now: Date) -> [SchedulerEffect] {
         var deferred: Date?
         var effects: [SchedulerEffect] = []
 
@@ -28,6 +28,7 @@ extension Scheduler {
         }
 
         snapshot.deferredFullDueAt = deferred ?? snapshot.deferredFullDueAt
+        snapshot.deferredReason = reason ?? snapshot.deferredReason
         transition(to: .suppressed(since: now, deferredFullDue: deferred), reason: "call or screen share", at: now)
         return effects + [.persist, .menuRefresh]
     }
