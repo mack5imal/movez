@@ -21,6 +21,11 @@ enum SnapshotSurface: String, CaseIterable {
     case menuPaused = "menu-paused"
     case menuOffHours = "menu-offhours"
     case menuIcon = "menu-icon"
+    case settings
+    case settingsHours = "settings-hours"
+    case settingsLibrary = "settings-library"
+    case settingsExceptions = "settings-exceptions"
+    case settingsCustom = "settings-custom"
 
     /// A 1440×900 display, which is what the handoff's overlay screenshots are drawn on.
     static let screen = CGSize(width: 1440, height: 900)
@@ -38,6 +43,8 @@ enum SnapshotSurface: String, CaseIterable {
         case .toast: return Self.toastCanvas
         case .menuSitting, .menuPaused, .menuOffHours: return Self.menuCanvas
         case .menuIcon: return CGSize(width: 880, height: 260)
+        case .settings, .settingsHours, .settingsLibrary, .settingsExceptions, .settingsCustom:
+            return SettingsScreen.size
         case .overlayFull, .overlayCollapsed, .overlaySide, .overlayEnd, .overlayOtherDisplay:
             return Self.screen
         }
@@ -69,7 +76,30 @@ enum SnapshotRenderer {
     static let scale: CGFloat = 2
 
     static func view(for surface: SnapshotSurface) -> AnyView {
-        panelView(for: surface) ?? menuView(for: surface) ?? overlayView(for: surface)
+        panelView(for: surface) ?? menuView(for: surface) ?? settingsView(for: surface) ?? overlayView(for: surface)
+    }
+
+    /// The settings window, and the three sheets that open over it.
+    private static func settingsView(for surface: SnapshotSurface) -> AnyView? {
+        let viewModel: SettingsViewModel?
+        switch surface {
+        case .settings:
+            viewModel = SnapshotFixtures.settingsViewModel()
+        case .settingsHours:
+            viewModel = SnapshotFixtures.settingsViewModel(sheet: .workingHours)
+        case .settingsLibrary:
+            viewModel = SnapshotFixtures.settingsViewModel(sheet: .library, search: "hip")
+        case .settingsExceptions:
+            viewModel = SnapshotFixtures.settingsViewModel(sheet: .exceptions)
+        case .settingsCustom:
+            viewModel = SnapshotFixtures.settingsViewModel(preset: .custom)
+        default:
+            return nil
+        }
+        guard let viewModel else {
+            return AnyView(MovezText("The bundled movement library did not load.", MovezType.panelTitle))
+        }
+        return AnyView(SettingsScreen(viewModel: viewModel))
     }
 
     /// The gallery and the floating panels.

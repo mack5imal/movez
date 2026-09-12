@@ -284,3 +284,44 @@ extension SnapshotFixtures {
         return Calendar.current.date(from: components) ?? panelInstant
     }
 }
+
+/// The settings window as the handoff draws it: a kettlebell to hand, Moderate, three movements
+/// excluded, upper-back focus, two fullscreen exceptions and a three-minute away threshold.
+@MainActor
+extension SnapshotFixtures {
+    /// A defaults suite of its own, wiped on every render so the PNGs never drift with use.
+    static let settingsSuite = "movez.snapshots"
+
+    static let excludedFixtureIds = ["FLX-03", "STR-07", "BAL-12"]
+    static let exceptionFixtureIds = ["com.apple.iWork.Keynote", "us.zoom.xos"]
+
+    static func settingsViewModel(
+        sheet: SettingsViewModel.Sheet? = nil,
+        preset: PresetId = .fiftyFiveFive,
+        search: String = ""
+    ) -> SettingsViewModel? {
+        guard let library = try? LibraryLoader.loadBundled() else { return nil }
+
+        UserDefaults().removePersistentDomain(forName: settingsSuite)
+        let settings = SettingsStore(defaults: UserDefaults(suiteName: settingsSuite) ?? .standard)
+        settings.preset = preset
+        settings.customSitMinutes = 45
+        // Band is what the handoff shows filled; the kettlebell is the intake's example.
+        settings.equipment = [.band, .kettlebellOrDumbbell]
+        settings.difficultyCap = 2
+        settings.excludedMovementIds = Set(excludedFixtureIds)
+        settings.focus = .moreUpperBack
+        settings.fullscreenExceptions = exceptionFixtureIds
+        settings.awayThresholdMinutes = 3
+
+        let viewModel = SettingsViewModel(
+            settings: settings,
+            library: library,
+            launchAtLogin: FakeLaunchAtLogin()
+        )
+        viewModel.librarySearch = search
+        viewModel.hoursDraft = settings.workingHours
+        viewModel.openSheet = sheet
+        return viewModel
+    }
+}

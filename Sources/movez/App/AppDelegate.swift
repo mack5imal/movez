@@ -10,6 +10,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     private(set) var coordinator: AppCoordinator?
     /// Published so the menu-bar scene picks the view model up the moment the coordinator exists.
     @Published private(set) var menuBar: MenuBarViewModel?
+    private var settingsWindow: SettingsWindowController?
 
     func applicationWillFinishLaunching(_ notification: Notification) {
         MovezFont.register()
@@ -74,6 +75,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
             coordinator.start()
             self.coordinator = coordinator
             menuBar = MenuBarViewModel(coordinator: coordinator)
+            settingsWindow = SettingsWindowController(viewModel: SettingsViewModel(
+                settings: settings,
+                library: library,
+                onChange: { [weak coordinator] in coordinator?.settingsChanged() }
+            ))
         } catch {
             presentFatal(error)
         }
@@ -81,7 +87,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
 
     /// Registers the surfaces that turn scheduler effects into windows and sound.
     private func attachUI(to coordinator: AppCoordinator, settings: SettingsStore) {
-        let chimes = AudioChimePlayer(isEnabled: { settings.soundsEnabled })
+        let chimes = GatedChimePlayer(wrapping: AudioChimePlayer(), isEnabled: { settings.soundsEnabled })
         let sink = CompositeEffectSink([
             OverlayEffectSink(controller: OverlayWindowController(), chimes: chimes),
             PanelEffectSink(controller: PanelWindowController())

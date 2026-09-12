@@ -322,7 +322,7 @@ final class OverlayViewModelTests: XCTestCase {
     }
 
     func testTheRealPlayerLoadsAllThreeChimes() {
-        let player = AudioChimePlayer(isEnabled: { true })
+        let player = AudioChimePlayer()
         XCTAssertEqual(player.loadedChimes, Chime.allCases.count)
     }
 

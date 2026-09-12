@@ -93,19 +93,24 @@ struct SelectField<Value: Hashable>: View {
                 Button(option.label) { selection = option.value }
             }
         } label: {
-            HStack(spacing: 8) {
-                MovezText(label(for: selection), MovezType.settingsRow, color: Tokens.text)
-                Spacer(minLength: 4)
-                Image(systemName: "chevron.up.chevron.down")
-                    .font(.system(size: 9, weight: .semibold))
-                    .foregroundStyle(Tokens.text3.color)
-            }
+            // Text only. A menu style re-composes its label — an Image put inside lands on the
+            // leading edge however the stack is written, and the label's own padding is dropped —
+            // so the field's shape and its chevron are built around the menu, not inside it.
+            MovezText(label(for: selection), MovezType.settingsRow, color: Tokens.text)
         }
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
-        .padding(.horizontal, 12)
+        .padding(.leading, 12)
+        .padding(.trailing, 30)
         .padding(.vertical, 7)
         .frame(width: minWidth, alignment: .leading)
+        .overlay(alignment: .trailing) {
+            Image(systemName: "chevron.up.chevron.down")
+                .font(.system(size: 9, weight: .semibold))
+                .foregroundStyle(Tokens.text3.color)
+                .padding(.trailing, 12)
+                .allowsHitTesting(false)
+        }
         .background(
             RoundedRectangle(cornerRadius: Tokens.Radius.select, style: .continuous)
                 .strokeBorder(Tokens.panelBorder.color, lineWidth: 1)
