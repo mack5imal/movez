@@ -71,6 +71,21 @@ extension AppCoordinator {
         ))
     }
 
+    /// The overlay owns block progression while a break is on screen — it is the only thing that
+    /// knows about blocks — so this records what it did without driving the scheduler.
+    func recordOverlayBlock(_ block: RoutineBlock) {
+        guard var current = currentBreak else { return }
+        recordBlockCompletion(block, routineId: current.routine.id)
+        current.completedBlocks += 1
+        current.blockIndex = min(current.blockIndex + 1, max(0, current.totalBlocks - 1))
+        currentBreak = current
+    }
+
+    /// Ends a break the overlay finished. The scheduler decides whether that counts.
+    func finishOverlayBreak(completed: Int, total: Int) {
+        inject(.breakEnded(completedBlocks: completed, totalBlocks: total, elapsed: elapsedInBreak))
+    }
+
     func setCollapsed(_ movementId: String, _ collapsed: Bool) {
         history.setCollapsed(movementId, collapsed)
     }

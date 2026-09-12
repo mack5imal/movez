@@ -13,7 +13,15 @@ struct MovezTextStyle: Equatable {
     var nsFont: NSFont { MovezFont.nsFont(size, weight: weight) }
     /// The handoff writes tracking in em; SwiftUI wants points.
     var tracking: CGFloat { trackingEm * size }
-    var lineSpacing: CGFloat { max(0, size * (lineHeight - 1)) }
+
+    /// The handoff writes line height as a multiple of the font size, but SwiftUI's `lineSpacing`
+    /// is the gap *between* line boxes. Subtracting the font's own line box is what makes a
+    /// 28 px / 1.45 paragraph actually set at 1.45.
+    var lineSpacing: CGFloat {
+        guard lineHeight > 1 else { return 0 }
+        let naturalLineBox = nsFont.ascender - nsFont.descender + nsFont.leading
+        return max(0, size * lineHeight - naturalLineBox)
+    }
 }
 
 /// The full type scale. Every surface pulls from here so no screen invents its own size.

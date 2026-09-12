@@ -32,7 +32,13 @@ final class FontsTests: XCTestCase {
         XCTAssertEqual(MovezType.eyebrowOverlay.tracking, 1.8, accuracy: 0.001)
         XCTAssertEqual(MovezType.overlayName.tracking, -2.8, accuracy: 0.001)
         XCTAssertEqual(MovezType.discNumerals.tracking, -3.36, accuracy: 0.001)
-        XCTAssertEqual(MovezType.instruction.lineSpacing, 28 * 0.45, accuracy: 0.001)
+        // lineSpacing is the gap between line boxes, so a 28 pt / 1.45 paragraph asks for
+        // 40.6 pt of line box and the font already supplies most of it.
+        let instruction = MovezType.instruction
+        let naturalLineBox = instruction.nsFont.ascender - instruction.nsFont.descender + instruction.nsFont.leading
+        XCTAssertEqual(instruction.lineSpacing, 28 * 1.45 - naturalLineBox, accuracy: 0.001)
+        XCTAssertGreaterThan(instruction.lineSpacing, 0)
+        XCTAssertLessThan(instruction.lineSpacing, 28 * 0.45, "the font's own line box already covers part of it")
         XCTAssertEqual(MovezType.overlayName.lineSpacing, 0, accuracy: 0.001)
     }
 

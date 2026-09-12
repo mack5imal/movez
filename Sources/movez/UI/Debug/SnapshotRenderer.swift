@@ -7,11 +7,21 @@ import SwiftUI
 /// fixture data, and looked at — by a person or by a build — without waiting an hour for a break.
 enum SnapshotSurface: String, CaseIterable {
     case gallery
+    case overlayFull = "overlay-full"
+    case overlayCollapsed = "overlay-collapsed"
+    case overlaySide = "overlay-side"
+    case overlayEnd = "overlay-end"
+    case overlayOtherDisplay = "overlay-other-display"
+
+    /// A 1440×900 display, which is what the handoff's overlay screenshots are drawn on.
+    static let screen = CGSize(width: 1440, height: 900)
 
     /// The point size the surface is rendered at.
     var size: CGSize {
         switch self {
         case .gallery: return CGSize(width: 1400, height: 2900)
+        case .overlayFull, .overlayCollapsed, .overlaySide, .overlayEnd, .overlayOtherDisplay:
+            return Self.screen
         }
     }
 
@@ -19,8 +29,11 @@ enum SnapshotSurface: String, CaseIterable {
     var backdrop: MovezColor {
         switch self {
         case .gallery: return Tokens.panelSolid
+        default: return Tokens.panelSolid
         }
     }
+
+    var isOverlay: Bool { self != .gallery }
 }
 
 enum SnapshotError: LocalizedError {
@@ -46,7 +59,18 @@ enum SnapshotRenderer {
 
     static func view(for surface: SnapshotSurface) -> AnyView {
         switch surface {
-        case .gallery: return AnyView(GalleryView())
+        case .gallery:
+            return AnyView(GalleryView())
+        case .overlayFull:
+            return AnyView(OverlaySnapshot(state: SnapshotFixtures.overlayRunning()))
+        case .overlayCollapsed:
+            return AnyView(OverlaySnapshot(state: SnapshotFixtures.overlayCollapsed()))
+        case .overlaySide:
+            return AnyView(OverlaySnapshot(state: SnapshotFixtures.overlaySide()))
+        case .overlayEnd:
+            return AnyView(OverlaySnapshot(state: SnapshotFixtures.overlayEnd()))
+        case .overlayOtherDisplay:
+            return AnyView(OverlaySnapshot(state: SnapshotFixtures.overlayRunning(), otherDisplay: true))
         }
     }
 

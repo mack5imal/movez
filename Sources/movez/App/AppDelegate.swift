@@ -23,6 +23,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             SignalProbe.run { exit($0) }
             return
         }
+        if arguments.overlayHygiene {
+            OverlayHygiene.run(outPath: arguments.out) { exit($0) }
+            return
+        }
         if let surface = arguments.snapshot {
             SnapshotRenderer.runCLI(surface: surface, out: arguments.out) { exit($0) }
             return
@@ -60,11 +64,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 snapshotStore: snapshotStore
             )
             coordinator.attachSystemSignals()
+            attachUI(to: coordinator, settings: settings)
             coordinator.start()
             self.coordinator = coordinator
         } catch {
             presentFatal(error)
         }
+    }
+
+    /// Registers the surfaces that turn scheduler effects into windows and sound.
+    private func attachUI(to coordinator: AppCoordinator, settings: SettingsStore) {
+        let chimes = AudioChimePlayer(isEnabled: { settings.soundsEnabled })
+        let sink = CompositeEffectSink([
+            OverlayEffectSink(controller: OverlayWindowController(), chimes: chimes)
+        ])
+        coordinator.register(sink: sink)
     }
 
     private func presentFatal(_ error: Error) {

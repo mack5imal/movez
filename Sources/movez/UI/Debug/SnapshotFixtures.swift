@@ -41,3 +41,65 @@ enum SnapshotFixtures {
     static let streak = 4
     static let skipsToday = 1
 }
+
+/// The overlay states the snapshots render, built by hand so the PNGs can be held next to
+/// `screenshots/2a-full-break-overlay.png` and compared line for line.
+extension SnapshotFixtures {
+    static func overlayRunning() -> OverlayState {
+        var state = OverlayState()
+        state.eyebrow = eyebrow
+        state.headerTrailing = breakRemaining
+        state.discNumerals = blockNumerals
+        state.discLabel = "NEXT →"
+        state.discProgress = 0.3
+        state.movementName = movementName
+        state.instruction = movementInstruction
+        state.strip = strip(currentIndex: 0)
+        state.snoozeAvailable = true
+        state.skipEnabled = true
+        state.skipsToday = skipsToday
+        state.streak = streak
+        return state
+    }
+
+    static func overlayCollapsed() -> OverlayState {
+        var state = overlayRunning()
+        state.headerTrailing = "1:52 LEFT"
+        state.discNumerals = "0:27"
+        state.discProgress = 0.55
+        state.movementName = collapsedMovementName
+        state.instruction = "Back flat against the wall, knees at ninety degrees, weight through the heels."
+        state.instructionCollapsed = true
+        state.strip = strip(currentIndex: 2)
+        state.snoozeAvailable = false
+        state.doneAvailable = true
+        return state
+    }
+
+    static func overlaySide() -> OverlayState {
+        var state = overlayRunning()
+        state.headerTrailing = "3:20 LEFT"
+        state.discNumerals = "0:19"
+        state.discLabel = "THEN RIGHT"
+        state.discProgress = 0.62
+        state.discMode = .halfShare(sideIndex: 0)
+        state.movementName = sideMovementName
+        state.instruction = sideInstruction
+        state.isSideBlock = true
+        state.side = .left
+        state.strip = strip(currentIndex: 1, sideIndex: 0)
+        return state
+    }
+
+    static func overlayEnd() -> OverlayState {
+        var state = OverlayState()
+        state.phase = .complete
+        state.eyebrow = "HIP RESET · COMPLETE"
+        state.headerTrailing = "NEXT BREAK \(nextBreakAt)"
+        state.completionTitle = completionTitle
+        state.endSummary = endSummary
+        state.streak = streak
+        state.strip = strip(currentIndex: 4)
+        return state
+    }
+}

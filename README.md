@@ -17,6 +17,7 @@ make lint       # swiftlint --strict
 make snapshots  # render every UI surface to PNG
 make run        # launch the built app
 make app        # print the path of the built .app
+make hygiene    # open the break overlay on every display and check its window hygiene
 make assets     # re-fetch Manrope and regenerate the chimes
 ```
 
@@ -61,5 +62,9 @@ no second copy to keep in sync.
   "Pause breaks" on and movez waits until that Focus ends.
 - `movez --probe-signals` prints one line per monitor for five seconds, which is how to check the
   adapters on a new machine. `movez --smoke` is the build's readiness check.
+- **Run `--overlay-hygiene` through `open`, not the raw binary** (`make hygiene` does). macOS 14
+  grants activation rights through Launch Services; a binary exec'd from a shell never becomes the
+  active app, so its overlay can never take keyboard focus and the check reports `key=false` even
+  though the shipped app is fine.
 - Manrope is bundled under the SIL Open Font License 1.1 (`Sources/movez/Resources/Fonts/OFL.txt`).
 - The chimes are synthesised locally by `scripts/gen_chimes.py`; no audio is downloaded.

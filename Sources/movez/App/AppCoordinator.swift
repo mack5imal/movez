@@ -68,7 +68,7 @@ final class AppCoordinator: ObservableObject {
     var scheduler: Scheduler
 
     let snapshotStore: SnapshotStore?
-    private let sink: EffectSink
+    private var sink: EffectSink
     /// The real system monitors, attached at launch and absent in tests.
     var aggregator: SignalAggregator?
     var powerMonitor: PowerMonitor?
@@ -121,6 +121,11 @@ final class AppCoordinator: ObservableObject {
     }
 
     // MARK: - Lifecycle
+
+    /// Attaches the UI sinks. Called once at launch, after the coordinator exists.
+    func register(sink: EffectSink) {
+        self.sink = sink
+    }
 
     /// Starts the timers. Head-less command-line runs never call this.
     func start() {
