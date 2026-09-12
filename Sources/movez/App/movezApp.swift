@@ -6,21 +6,44 @@ struct MovezApp: App {
 
     var body: some Scene {
         MenuBarExtra {
-            if let menuBar = appDelegate.menuBar {
-                MenuBarContent(viewModel: menuBar)
-            } else {
-                MovezText("movez is starting…", MovezType.menuRow, color: Tokens.text2)
-                    .padding(12)
-            }
+            MenuBarRoot(delegate: appDelegate)
         } label: {
-            if let menuBar = appDelegate.menuBar {
-                MenuBarLabel(viewModel: menuBar)
-            } else {
-                Image(nsImage: MenuBarIcon.image(mode: .offHours, fraction: 0))
-            }
+            MenuBarLabelRoot(delegate: appDelegate)
         }
         .menuBarExtraStyle(.window)
         .commands { MovezCommands() }
+    }
+}
+
+/// The delegate builds the coordinator a beat after launch, so both menu-bar surfaces start out
+/// with nothing to show. The wait is held here, in a `View`, rather than in the `Scene` above:
+/// `@NSApplicationDelegateAdaptor` re-runs a view body when the delegate publishes but not a
+/// scene body, so a scene that branches on `menuBar` keeps the placeholder it built at launch for
+/// as long as the app runs.
+struct MenuBarRoot: View {
+    @ObservedObject var delegate: AppDelegate
+
+    var body: some View {
+        if let menuBar = delegate.menuBar {
+            MenuBarContent(viewModel: menuBar)
+        } else {
+            MovezText("movez is starting…", MovezType.menuRow, color: Tokens.text2)
+                .padding(12)
+        }
+    }
+}
+
+/// The glyph, with the same wait. Until the coordinator exists there is no countdown to draw, so
+/// it shows the off-hours ring.
+struct MenuBarLabelRoot: View {
+    @ObservedObject var delegate: AppDelegate
+
+    var body: some View {
+        if let menuBar = delegate.menuBar {
+            MenuBarLabel(viewModel: menuBar)
+        } else {
+            Image(nsImage: MenuBarIcon.image(mode: .offHours, fraction: 0))
+        }
     }
 }
 
