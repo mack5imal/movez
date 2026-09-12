@@ -25,6 +25,22 @@ make assets     # re-fetch Manrope and regenerate the chimes
 `make gen` alone regenerates `movez.xcodeproj` from `project.yml`. The generated project is
 committed so the repo opens in Xcode without XcodeGen, but `project.yml` is the source of truth.
 
+## Install
+
+`make run` launches the app out of the build directory, which is right for development and wrong
+for daily use: the path is a build artifact, and a login item pointing into it breaks at the next
+`make clean`. To actually live with movez, install a Release build and run that one:
+
+```sh
+xcodebuild -project movez.xcodeproj -scheme movez -configuration Release \
+  -destination 'platform=macOS' -derivedDataPath build/DerivedData build
+ditto build/DerivedData/Build/Products/Release/movez.app /Applications/movez.app
+open /Applications/movez.app
+```
+
+Then turn on Launch at Login in Settings. Re-run those three lines to update the installed copy;
+the login item follows the path, so it keeps working.
+
 ## Repo layout
 
 ```
@@ -69,9 +85,13 @@ screen is reviewed without waiting an hour for a break to come round.
   not in `capture-signatures.json`.
 - **Fullscreen detection is a guess about intent.** A maximised editor looks exactly like a
   presentation, which is what the per-app exceptions list in Settings is for.
-- **Launch at login needs a signed build.** `SMAppService.mainApp.register()` refuses on an
-  ad-hoc-signed Debug build on some systems; movez shows the refusal under the toggle rather than
-  letting it silently spring back.
+- **Launch at login needs the app to live somewhere permanent.** `SMAppService` records the
+  bundle's path, so an app registered out of `build/DerivedData` stops launching the moment
+  `make clean` removes it. Install it (see **Install** above) before turning the toggle on.
+  Registration itself does not need a Developer ID: on macOS 15.6 an ad-hoc signature with no
+  team identifier registers fine, and the login item survives a rebuild that changes the code
+  hash. Should macOS refuse anyway, movez shows the refusal under the toggle rather than letting
+  it silently spring back.
 - **Working hours are one window a day.** A split shift has to be handled by pausing.
 - **The break overlay covers every display but the menu bar.** That is deliberate: a break must
   never trap the user.
