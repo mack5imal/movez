@@ -102,6 +102,29 @@ extension SnapshotFixtures {
         state.strip = strip(currentIndex: 4)
         return state
     }
+
+    /// Among the longest names in the library, under one of its longest instructions — the
+    /// combination that used to cut the name off with an ellipsis instead of shrinking it.
+    static let longStripNames = [
+        "Reverse lunge with overhead reach",
+        "Half-kneeling hip flexor stretch",
+        "Single-leg stand with arm reaches",
+        "Towel or cushion single-leg stand"
+    ]
+
+    static func overlayLongName() -> OverlayState {
+        var state = overlayRunning()
+        state.movementName = longStripNames[0]
+        state.instruction = """
+            Step one foot back into a lunge, lowering the rear knee toward the floor while the front \
+            knee stays over the ankle. At the bottom, reach both arms straight overhead and squeeze \
+            the rear glute. Drive through the front heel to return. Alternate sides.
+            """
+        state.strip = longStripNames.enumerated().map { index, name in
+            StripItem(number: index + 1, name: name, state: index == 0 ? .current : .upcoming)
+        }
+        return state
+    }
 }
 
 /// The panel states the snapshots render.

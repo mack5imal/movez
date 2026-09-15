@@ -81,7 +81,8 @@ struct SequenceStrip: View {
 
     @ViewBuilder
     private func name(_ item: StripItem) -> some View {
-        let text = MovezText(item.name, MovezType.stripName, color: numberColor(item))
+        // Two lines, then smaller type, and never an ellipsis: the column is a quarter of the card.
+        let text = MovezText(item.name, MovezType.stripName, color: numberColor(item), lineLimit: 2, minimumScaleFactor: 0.7)
         if item.state == .done, !allAccent {
             text.strikethrough(true, color: Tokens.text3.color)
         } else {

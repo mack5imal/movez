@@ -84,8 +84,13 @@ struct OverlayView: View {
                 state.movementName,
                 state.isSideBlock ? MovezType.overlayNameSide : MovezType.overlayName,
                 color: Tokens.text,
-                alignment: .center
+                alignment: .center,
+                // One line that shrinks to fit. Allowed to wrap, a long name took two lines and the
+                // card's fixed height squeezed it down to one with an ellipsis.
+                lineLimit: 1,
+                minimumScaleFactor: 0.5
             )
+            .layoutPriority(1)
 
             if state.isSideBlock {
                 SideToggle(side: state.side, choose: actions.chooseSide)

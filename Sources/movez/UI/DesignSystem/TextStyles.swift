@@ -113,12 +113,26 @@ struct MovezText: View {
     let style: MovezTextStyle
     var color: MovezColor = Tokens.text
     var alignment: TextAlignment = .leading
+    /// nil lets the text wrap onto as many lines as it needs.
+    var lineLimit: Int?
+    /// Below 1, text too long for its lines shrinks towards this fraction of its size instead of
+    /// being cut off with an ellipsis.
+    var minimumScaleFactor: CGFloat = 1
 
-    init(_ content: String, _ style: MovezTextStyle, color: MovezColor = Tokens.text, alignment: TextAlignment = .leading) {
+    init(
+        _ content: String,
+        _ style: MovezTextStyle,
+        color: MovezColor = Tokens.text,
+        alignment: TextAlignment = .leading,
+        lineLimit: Int? = nil,
+        minimumScaleFactor: CGFloat = 1
+    ) {
         self.content = content
         self.style = style
         self.color = color
         self.alignment = alignment
+        self.lineLimit = lineLimit
+        self.minimumScaleFactor = minimumScaleFactor
     }
 
     var body: some View {
@@ -126,5 +140,7 @@ struct MovezText: View {
             .movezType(style)
             .foregroundStyle(color.color)
             .multilineTextAlignment(alignment)
+            .lineLimit(lineLimit)
+            .minimumScaleFactor(minimumScaleFactor)
     }
 }

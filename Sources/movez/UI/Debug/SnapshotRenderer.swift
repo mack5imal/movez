@@ -12,6 +12,7 @@ enum SnapshotSurface: String, CaseIterable {
     case overlaySide = "overlay-side"
     case overlayEnd = "overlay-end"
     case overlayOtherDisplay = "overlay-other-display"
+    case overlayLongName = "overlay-long-name"
     case headsUp = "headsup"
     case headsUpDeferred = "headsup-deferred"
     case microCountIn = "micro-countin"
@@ -48,7 +49,7 @@ enum SnapshotSurface: String, CaseIterable {
             return SettingsScreen.size
         case .debug:
             return CGSize(width: SettingsScreen.size.width, height: 1_500)
-        case .overlayFull, .overlayCollapsed, .overlaySide, .overlayEnd, .overlayOtherDisplay:
+        case .overlayFull, .overlayCollapsed, .overlaySide, .overlayEnd, .overlayOtherDisplay, .overlayLongName:
             return Self.screen
         }
     }
@@ -153,6 +154,8 @@ enum SnapshotRenderer {
             return AnyView(OverlaySnapshot(state: SnapshotFixtures.overlayEnd()))
         case .overlayOtherDisplay:
             return AnyView(OverlaySnapshot(state: SnapshotFixtures.overlayRunning(), otherDisplay: true))
+        case .overlayLongName:
+            return AnyView(OverlaySnapshot(state: SnapshotFixtures.overlayLongName()))
         default:
             return AnyView(OverlaySnapshot(state: SnapshotFixtures.overlayRunning()))
         }
