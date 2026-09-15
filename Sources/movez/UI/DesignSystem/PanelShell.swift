@@ -25,7 +25,7 @@ struct PanelShell<Content: View>: View {
     }
 }
 
-/// The away toast: a small panel with a hairline that shrinks away over its six seconds.
+/// The away toast: a small panel with a hairline that shrinks away over its time on screen.
 struct ToastShell<Content: View>: View {
     var width: CGFloat = Tokens.Metric.toastWidth
     /// 1 when the toast appears, 0 as it leaves.

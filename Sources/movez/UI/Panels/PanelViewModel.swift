@@ -254,4 +254,10 @@ final class PanelViewModel: ObservableObject {
         actions.reverseToast()
         actions.dismiss()
     }
+
+    /// "Dismiss" — take the toast away and keep the credit, exactly as running out of time does.
+    func dismissToast() {
+        guard phase == .toast else { return }
+        actions.dismiss()
+    }
 }

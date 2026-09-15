@@ -118,7 +118,8 @@ extension SnapshotFixtures {
     static let deferredSittingSeconds: TimeInterval = 5_700
     static let microCountInRemaining: TimeInterval = 21
     static let microRunningRemaining: TimeInterval = 44
-    static let toastRemaining: TimeInterval = 3.6
+    /// Sixty percent of the toast's time left, which is where the handoff draws its hairline.
+    static let toastRemaining: TimeInterval = 9
 
     static func headsUp(deferred: Bool = false) -> PanelViewModel {
         let clock = ManualClock(now: panelInstant)
@@ -167,8 +168,8 @@ extension SnapshotFixtures {
         let model = PanelViewModel(
             phase: .toast,
             clock: clock,
-            startedAt: clock.now.addingTimeInterval(toastRemaining - 6),
-            totalSeconds: 6
+            startedAt: clock.now.addingTimeInterval(toastRemaining - TimeInterval(ToastInfo.defaultSecondsOnScreen)),
+            totalSeconds: ToastInfo.defaultSecondsOnScreen
         )
         model.toast = ToastInfo(
             kind: .creditedFullBreak,

@@ -49,7 +49,12 @@ final class PanelViewModelTests: XCTestCase {
     }
 
     private func toast(clock: ManualClock, kind: ToastInfo.Kind, awaySeconds: Int) -> PanelViewModel {
-        let model = PanelViewModel(phase: .toast, clock: clock, startedAt: clock.now, totalSeconds: 6)
+        let model = PanelViewModel(
+            phase: .toast,
+            clock: clock,
+            startedAt: clock.now,
+            totalSeconds: ToastInfo.defaultSecondsOnScreen
+        )
         model.toast = ToastInfo(
             kind: kind,
             awaySeconds: awaySeconds,
@@ -279,15 +284,16 @@ final class PanelViewModelTests: XCTestCase {
         )
     }
 
-    func testTheHairlineShrinksOverSixSeconds() {
+    func testTheHairlineShrinksOverFifteenSeconds() {
         let clock = ManualClock(now: start)
         let model = toast(clock: clock, kind: .creditedFullBreak, awaySeconds: 420)
+        XCTAssertEqual(ToastInfo.defaultSecondsOnScreen, 15)
 
         XCTAssertEqual(model.progress, 1, accuracy: 0.001)
-        clock.advance(3)
+        clock.advance(7.5)
         model.tick()
         XCTAssertEqual(model.progress, 0.5, accuracy: 0.001)
-        clock.advance(3)
+        clock.advance(7.5)
         model.tick()
         XCTAssertEqual(model.progress, 0, accuracy: 0.001)
     }
@@ -298,9 +304,25 @@ final class PanelViewModelTests: XCTestCase {
         var dismissed = 0
         model.actions.dismiss = { dismissed += 1 }
 
-        clock.advance(6)
+        clock.advance(14)
+        model.tick()
+        XCTAssertEqual(dismissed, 0, "six seconds was too short to reach; fifteen is not up yet")
+        clock.advance(1)
         model.tick()
         XCTAssertEqual(dismissed, 1)
+    }
+
+    func testDismissTakesTheToastAwayAndKeepsTheCredit() {
+        let clock = ManualClock(now: start)
+        let model = toast(clock: clock, kind: .creditedFullBreak, awaySeconds: 420)
+        var reversed = 0
+        var dismissed = 0
+        model.actions.reverseToast = { reversed += 1 }
+        model.actions.dismiss = { dismissed += 1 }
+
+        model.dismissToast()
+        XCTAssertEqual(dismissed, 1)
+        XCTAssertEqual(reversed, 0, "dismissing is not reversing")
     }
 
     func testIWasSittingReversesTheCreditAndTakesTheToastAway() {
