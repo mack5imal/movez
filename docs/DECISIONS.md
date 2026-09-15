@@ -93,8 +93,21 @@ Sources of truth, in order: `product-brief-v1.md`, `scheduler-research-v1.md`,
     sampling into a void; a thirty-second wake-check notices when the pause runs out.
 22. **A break counts as done at half the movements or half the time** (research §4.11).
 23. **Idle is credited in two tiers**: three to five minutes hands the countdown back with the
-    time it had left; five minutes or more is a full break. Both are reversible for six seconds,
-    because movez cannot tell a walk to the kitchen from a long read on paper.
+    time it had left; five minutes or more is a full break. Both are reversible while the away
+    toast is up, because movez cannot tell a walk to the kitchen from a long read on paper.
+23a. **The away toast stays fifteen seconds, chimes, and can be dismissed.** The research (§4.2)
+    and the handoff say six seconds. In use the toast nearly always appears the moment a display
+    wakes, and six seconds had gone before a hand reached the trackpad. Fifteen seconds is also
+    how long "I was sitting" stays valid. A Dismiss link closes the toast and keeps the credit,
+    and a single soft A5 note announces it, under the Sounds setting like the other chimes.
+23b. **An absence ends only on evidence that the user is back.** The monitors report the input
+    age every two seconds whether or not anyone is there, so only an input age lower than the last
+    one seen counts as a return. And macOS sends several notifications for one wake, each
+    measuring its gap from a poll that has already run, so an absence is measured from when it
+    began, and a later, smaller report never shrinks it. Treating every poll as a return credited
+    a break every two seconds of every absence — 78,000 records in four days — and letting a later
+    notification overwrite the gap put a break prompt in front of someone who had been gone twenty
+    hours.
 24. **Settings apply live.** The scheduler re-plans from the bout that is already running, so
     changing a preset never costs the user the time they have already sat.
 

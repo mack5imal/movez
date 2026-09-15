@@ -5,12 +5,16 @@ enum Chime: String, Codable, Equatable, CaseIterable {
     case headsUp
     case transition
     case completion
+    /// One soft note as the away toast appears, so a toast that lands while the user is still
+    /// turning back to the screen is not missed.
+    case toast
 
     var resourceName: String {
         switch self {
         case .headsUp: return "headsup"
         case .transition: return "transition"
         case .completion: return "completion"
+        case .toast: return "toast"
         }
     }
 }
@@ -63,7 +67,10 @@ struct ToastInfo: Equatable {
     }
 
     /// How long the credit stays reversible, which is how long the toast stays on screen.
-    static let defaultSecondsOnScreen = 6
+    ///
+    /// Fifteen, not the handoff's six: the toast usually lands the moment a display wakes, and six
+    /// seconds had gone before a hand reached the trackpad (`docs/DECISIONS.md` 23a).
+    static let defaultSecondsOnScreen = 15
 
     var kind: Kind
     var awaySeconds: Int

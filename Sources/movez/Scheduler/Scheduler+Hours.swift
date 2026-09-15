@@ -28,6 +28,7 @@ extension Scheduler {
         var effects = dismissSurfaces(now: now)
         snapshot.adHocSession = false
         snapshot.adHocSessionStartedAt = nil
+        clearAwayMarkers()
         transition(to: .offHours, reason: reason, at: now)
         effects += [.persist, .menuRefresh]
         if wasPolling { effects.append(.pollingChanged(false)) }

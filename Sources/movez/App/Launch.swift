@@ -58,4 +58,6 @@ enum Launch {
 /// be crashed by — a state file that will not parse, most of all.
 enum MovezLog {
     static let store = Logger(subsystem: "com.kylemack.movez", category: "store")
+    /// Every scheduler transition, so an overnight sleep bug can be read back days later.
+    static let scheduler = Logger(subsystem: "com.kylemack.movez", category: "scheduler")
 }

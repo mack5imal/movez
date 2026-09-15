@@ -12,7 +12,9 @@ final class SignalAggregator {
     static let pollSeconds: TimeInterval = 2
     static let minimumPollSeconds: TimeInterval = 0.25
     /// A gap larger than this between polls means the machine was asleep, not busy.
-    static let tickGapThresholdSeconds: TimeInterval = 10
+    ///
+    /// Nonisolated because the scheduler, which is not on the main actor, reads it too.
+    nonisolated static let tickGapThresholdSeconds: TimeInterval = 10
     /// A synthesized wake this close to a real one is a duplicate.
     static let wakeCoalesceSeconds: TimeInterval = 5
 

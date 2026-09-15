@@ -4,7 +4,13 @@ import Foundation
 enum GraceResume: Codable, Equatable {
     case sitting
     case pendingFull
-    /// A wake or unlock: apply the idle table to the gap the machine was away for.
+    /// A wake or unlock: judge the absence from when it began to when the machine came back.
+    ///
+    /// Dates rather than a length, so a later notification for the same wake can keep the
+    /// earliest start instead of overwriting the whole absence with its own, smaller gap.
+    case returnFromAbsence(since: Date, returnedAt: Date)
+    /// What earlier builds wrote for a wake. Still decoded, so a `state.json` saved mid-grace by
+    /// one of them loads; nothing writes it any more.
     case applyGap(seconds: Int)
     /// A call or screen share ended: serve the deferred break, or go back to sitting.
     case afterSuppression

@@ -26,6 +26,7 @@ extension Scheduler {
         snapshot.deferredFullDueAt = nil
         snapshot.deferredReason = nil
         snapshot.interruptedBreak = nil
+        clearAwayMarkers()
         transition(to: .fullBreak(startedAt: now), reason: reason, at: now)
         let plan = BreakPlan(startedAt: now, seconds: config.breakSeconds, deferred: deferred)
         return [.hideHeadsUp, .startFullBreak(plan), .persist, .menuRefresh]

@@ -55,7 +55,8 @@ struct Scheduler {
         case .lock: return handleSleepOrLock(now: now, reason: "screen locked")
         case .wake(let gap): return handleWake(gapSeconds: gap, now: now, reason: "woke after \(gap) s")
         case .unlock(let gap): return handleWake(gapSeconds: gap, now: now, reason: "unlocked after \(gap) s")
-        case .gapDetected(let gap): return handleWake(gapSeconds: gap, now: now, reason: "tick gap of \(gap) s")
+        case .gapDetected(let gap):
+            return handleWake(gapSeconds: gap, now: now, reason: "tick gap of \(gap) s", fromTickGap: true)
         case .signals(let signals): return handleSignals(signals, now: now)
         case .toastReverse: return reverseCredit(now: now)
         default: return nil
@@ -192,7 +193,7 @@ struct Scheduler {
     }
 
     private mutating func handleInput(lastEventAgeSeconds age: Int, now: Date) -> [SchedulerEffect] {
-        if case .away(let since) = snapshot.state { return returnFromAway(since: since, now: now) }
+        if case .away(let since) = snapshot.state { return handleInputWhileAway(age: age, since: since, now: now) }
         guard case .pendingFull = snapshot.state, age >= config.inputPauseSeconds else { return [] }
         return enterHeadsUp(now: now, reason: "input paused for \(age) s")
     }

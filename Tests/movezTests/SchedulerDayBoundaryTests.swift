@@ -193,8 +193,8 @@ final class SchedulerDayBoundaryTests: XCTestCase {
         harness.run(seconds: 70)
 
         XCTAssertTrue(harness.state.isSitting, "got \(harness.state)")
-        // Measured from the bout, not from `now`: the interval starts when the wake-quiet minute
-        // ends, which is ten seconds before this assertion runs.
+        // Off hours the wake itself changes nothing; the first tick inside working hours opens the
+        // day with a fresh interval. Measured from the bout, not from `now`, which has moved on.
         XCTAssertDate(harness.snapshot.nextFullDueAt, harness.start.addingTimeInterval(55 * 60), accuracy: 4)
     }
 

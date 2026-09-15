@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Synthesise the three movez chimes as 44.1 kHz 16-bit mono WAV files.
+"""Synthesise the four movez chimes as 44.1 kHz 16-bit mono WAV files.
 
 Stdlib only. Re-running is idempotent: the same bytes are produced every time.
 
     headsup.wav     two soft notes, E5 then G5, 120 ms each, -12 dBFS
     transition.wav  a single C6 note, 150 ms, -14 dBFS
     completion.wav  three ascending notes, C5-E5-G5, 140 ms each, 60 ms apart, -12 dBFS
+    toast.wav       a single A5 note, 220 ms, -16 dBFS — the quietest, for the away toast
 """
 
 from __future__ import annotations
@@ -19,7 +20,7 @@ SAMPLE_RATE = 44_100
 ATTACK_SECONDS = 0.008
 DECAY_TAU = 0.09
 
-NOTES = {"C5": 523.2511, "E5": 659.2551, "G5": 783.9909, "C6": 1046.5023}
+NOTES = {"C5": 523.2511, "E5": 659.2551, "G5": 783.9909, "A5": 880.0000, "C6": 1046.5023}
 
 
 def dbfs_to_amplitude(dbfs: float) -> float:
@@ -72,9 +73,11 @@ def main() -> None:
 
     soft = dbfs_to_amplitude(-12.0)
     softer = dbfs_to_amplitude(-14.0)
+    softest = dbfs_to_amplitude(-16.0)
 
     headsup = note(NOTES["E5"], 0.120, soft) + note(NOTES["G5"], 0.120, soft)
     transition = note(NOTES["C6"], 0.150, softer)
+    toast = note(NOTES["A5"], 0.220, softest)
     completion: list[float] = []
     for index, name in enumerate(("C5", "E5", "G5")):
         if index:
@@ -85,6 +88,7 @@ def main() -> None:
         ("headsup.wav", headsup),
         ("transition.wav", transition),
         ("completion.wav", completion),
+        ("toast.wav", toast),
     ):
         size = write_wav(out_dir / name, fade_tail(list(samples)))
         seconds = len(samples) / SAMPLE_RATE

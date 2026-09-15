@@ -16,6 +16,12 @@ extension Scheduler {
             // A pause outlasts a closed lid, and off hours there is nothing to interrupt. Going
             // away here would cancel the pause and credit a break the user never took.
             return []
+        case .postBreakGrace(_, .returnFromAbsence(let since, _)):
+            // Woke and went straight back to sleep inside the quiet minute. The absence being
+            // resolved is still going, and it began when the user first left, not now.
+            snapshot.awayInputAge = nil
+            transition(to: .away(since: since), reason: reason, at: now)
+            return [.persist, .menuRefresh]
         default:
             break
         }
@@ -38,26 +44,68 @@ extension Scheduler {
         }
         snapshot.dueAtAway = snapshot.nextFullDueAt
         snapshot.remainingAtAwaySeconds = snapshot.nextFullDueAt.map { max(0, Int($0.timeIntervalSince(now))) }
+        // The idle age at the moment of locking is unknown here; the next poll sets the baseline.
+        snapshot.awayInputAge = nil
         transition(to: .away(since: now), reason: reason, at: now)
         effects += [.persist, .menuRefresh]
         return effects
     }
 
-    mutating func handleWake(gapSeconds: Int, now: Date, reason: String) -> [SchedulerEffect] {
-        // A pause outlasts a closed lid in both directions. `handleSleepOrLock` already refuses to
-        // go away while paused; without the mirror of that guard here, the wake on the other side
-        // cancels the pause and credits a break the user never took.
-        if case .paused = snapshot.state { return [] }
+    /// The machine or the screen came back.
+    ///
+    /// macOS sends several notifications for one return — wake, screens wake, session active,
+    /// unlock — and each measures its gap from the last poll, which the monitors take again within
+    /// two seconds of waking. A later notification therefore routinely reports a gap of nothing
+    /// for an absence of hours. So the absence is measured from when it began, which the scheduler
+    /// already knows, and a later, smaller report can never shrink it.
+    mutating func handleWake(
+        gapSeconds: Int,
+        now: Date,
+        reason: String,
+        fromTickGap: Bool = false
+    ) -> [SchedulerEffect] {
+        let reportedStart = now.addingTimeInterval(-Double(gapSeconds))
+        switch snapshot.state {
+        case .paused, .offHours:
+            // A pause outlasts a closed lid in both directions, and off hours there is nothing to
+            // come back to — the mirrors of the guards in `handleSleepOrLock`. Without them the
+            // wake cancels the pause, or leaves off hours with the monitors still stopped.
+            return []
+        case .away(let since):
+            // A poll that ran late is App Nap, not the user. Input or a real wake ends an absence.
+            if fromTickGap { return [] }
+            return enterAbsenceGrace(since: min(since, reportedStart), returnedAt: now, now: now, reason: reason)
+        case .postBreakGrace(_, .returnFromAbsence(let since, let returnedAt)):
+            return enterAbsenceGrace(since: min(since, reportedStart), returnedAt: returnedAt, now: now, reason: reason)
+        default:
+            // Nothing was away, so a gap no longer than a poll is the notification for a return
+            // that has already been handled. Treating it as a wake would throw away a heads-up, a
+            // snooze or a deferred break for a quiet minute that protects nothing.
+            guard Double(gapSeconds) > SignalAggregator.tickGapThresholdSeconds else { return [] }
+            return enterAbsenceGrace(since: reportedStart, returnedAt: now, now: now, reason: reason)
+        }
+    }
+
+    private mutating func enterAbsenceGrace(
+        since: Date,
+        returnedAt: Date,
+        now: Date,
+        reason: String
+    ) -> [SchedulerEffect] {
         let until = now.addingTimeInterval(TimeInterval(config.wakeQuietSeconds))
-        transition(to: .postBreakGrace(until: until, resumeTo: .applyGap(seconds: gapSeconds)), reason: reason, at: now)
+        let resume = GraceResume.returnFromAbsence(since: since, returnedAt: returnedAt)
+        transition(to: .postBreakGrace(until: until, resumeTo: resume), reason: reason, at: now)
         return [.persist, .menuRefresh]
     }
 
     /// The quiet minute is over. Decide what the gap meant.
     mutating func applyGrace(_ resume: GraceResume, now: Date) -> [SchedulerEffect] {
         switch resume {
+        case .returnFromAbsence(let since, let returnedAt):
+            return endAbsence(since: since, returnedAt: returnedAt, now: now)
         case .applyGap(let seconds):
-            return applyGap(seconds: seconds, now: now)
+            // Written by an earlier build, which measured the gap back from the end of the grace.
+            return endAbsence(since: now.addingTimeInterval(-Double(seconds)), returnedAt: now, now: now)
         case .afterSuppression:
             return resumeAfterSuppression(now: now)
         case .pendingFull:
@@ -68,26 +116,9 @@ extension Scheduler {
         }
     }
 
-    private mutating func applyGap(seconds: Int, now: Date) -> [SchedulerEffect] {
-        if shouldResetDay(gapSeconds: seconds, now: now) {
-            return resetDay(now: now, reason: "gap of \(seconds / 3600) h — new day")
-        }
-
-        // A break that was on screen when the lid closed is the credit for that absence; the
-        // idle table must not credit the same minutes a second time.
-        if snapshot.interruptedBreak != nil {
-            transition(to: .sitting, reason: "back after \(seconds) s", at: now)
-            snapshot.nextFullDueAt = snapshot.dueAtAway ?? snapshot.nextFullDueAt
-            return [.persist, .menuRefresh] + resumeInterruptedBreak(now: now)
-        }
-
-        let since = now.addingTimeInterval(-Double(seconds))
-        return returnFromAway(since: since, now: now)
-    }
-
     /// A break cut short by a closed lid picks up where it left off if the machine came back
     /// before the break was due to end; otherwise it is judged by the completion rule.
-    private mutating func resumeInterruptedBreak(now: Date) -> [SchedulerEffect] {
+    mutating func resumeInterruptedBreak(now: Date) -> [SchedulerEffect] {
         guard let interrupted = snapshot.interruptedBreak else { return [] }
         snapshot.interruptedBreak = nil
 
@@ -234,6 +265,7 @@ extension Scheduler {
         snapshot.interruptedBreak = nil
         snapshot.creditRestore = nil
         snapshot.deferredFullDueAt = nil
+        clearAwayMarkers()
         startFreshInterval(now: now)
         transition(to: .sitting, reason: reason, at: now)
         return [.persist, .menuRefresh]

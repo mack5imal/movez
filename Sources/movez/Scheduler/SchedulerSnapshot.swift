@@ -24,6 +24,10 @@ struct SchedulerSnapshot: Codable, Equatable {
     /// untouched rather than restarted.
     var remainingAtAwaySeconds: Int?
     var dueAtAway: Date?
+    /// The largest input age seen since the user went away. Idle time only grows until something
+    /// is touched, so a reading below it is the evidence of a return. Optional so older state
+    /// files still decode.
+    var awayInputAge: Int?
     var remainingAtPauseSeconds: Int?
     var pauseIsFocusInitiated: Bool = false
     var interruptedBreak: InterruptedBreak?

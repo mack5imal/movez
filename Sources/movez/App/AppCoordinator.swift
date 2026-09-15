@@ -82,6 +82,11 @@ final class AppCoordinator: ObservableObject {
     /// How long the app was not running, measured at launch and spent once by `applyLaunchGap`.
     private var launchGapSeconds: Int?
     private var cancellables: Set<AnyCancellable> = []
+    /// Whether the monitors were last told to run, so `deliver` can notice a state that needs
+    /// them without an effect having said so.
+    private var pollingActive = true
+    /// The newest transition already written to the unified log.
+    private var lastLoggedTransition: Transition?
 
     /// Routines already served today, so the builder can avoid repeats and know whether balance
     /// has been covered.
@@ -140,6 +145,9 @@ final class AppCoordinator: ObservableObject {
             scheduler = Scheduler(config: config, now: clock.now)
         }
         routinesDayKey = DayKey.key(for: clock.now, calendar: config.calendar)
+        pollingActive = scheduler.pollingRequired
+        // A restored log was written to the unified log the first time round.
+        lastLoggedTransition = scheduler.snapshot.transitions.transitions.last
         refreshPublished()
     }
 
@@ -294,8 +302,31 @@ final class AppCoordinator: ObservableObject {
             if case .pollingChanged = effect { pollingChanged = true }
             sink.apply(effect, coordinator: self)
         }
+        logNewTransitions()
+        // Whether the monitors run is a fact about the state the scheduler is in, not about which
+        // effects it remembered to emit on the way there. A wake that took the scheduler out of
+        // off hours without `.pollingChanged` used to leave them stopped in a state that needs them.
+        if scheduler.pollingRequired != pollingActive {
+            if !pollingChanged { aggregator?.setPolling(scheduler.pollingRequired) }
+            pollingChanged = true
+        }
+        pollingActive = scheduler.pollingRequired
         if pollingChanged, tickTimer != nil || wakeCheckTimer != nil { restartTimers() }
         refreshPublished()
+    }
+
+    /// Writes each transition the scheduler has just made to the unified log.
+    ///
+    /// The snapshot keeps only the last twenty, which a flapping microphone uses up within the
+    /// hour; the unified log keeps days, which is what an overnight sleep bug needs to be read.
+    private func logNewTransitions() {
+        let transitions = scheduler.snapshot.transitions.transitions
+        let fresh = transitions.reversed().prefix { $0 != lastLoggedTransition }.reversed()
+        for transition in fresh {
+            let line = "\(transition.from.name) → \(transition.to.name) (\(transition.reason))"
+            MovezLog.scheduler.notice("\(line, privacy: .public)")
+        }
+        lastLoggedTransition = transitions.last
     }
 
     /// Republishes what an effect may have changed.
