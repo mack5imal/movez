@@ -21,6 +21,36 @@ enum RoutineNaming {
         return slotName(slot)
     }
 
+    /// The slot a built routine is named for: the one whose regions its stretch and
+    /// strength-or-balance blocks work for the most seconds.
+    ///
+    /// The rotation slot only weights selection, so the movements often come from elsewhere, and
+    /// naming by the planned slot put "Upper back opener" over leg swings and squats. Ties go to
+    /// the planned slot. A routine whose working blocks match no slot is named for its warm-up,
+    /// and failing that for the plan.
+    static func contentSlot(for blocks: [RoutineBlock], planned: RotationSlot) -> RotationSlot {
+        let working = blocks.filter { workingBuckets.contains($0.movement.bucket) }
+        let warmUp = blocks.filter { $0.movement.bucket == .cir }
+        return bestSlot(for: working, planned: planned) ?? bestSlot(for: warmUp, planned: planned) ?? planned
+    }
+
+    private static let workingBuckets: Set<Bucket> = [.flx, .str, .bal]
+
+    private static func bestSlot(for blocks: [RoutineBlock], planned: RotationSlot) -> RotationSlot? {
+        var best: RotationSlot?
+        var bestSeconds = 0
+        for slot in RotationSlot.allCases {
+            let seconds = blocks
+                .filter { !Set($0.movement.regions).isDisjoint(with: slot.regions) }
+                .reduce(0) { $0 + $1.seconds }
+            if seconds > bestSeconds || (seconds > 0 && seconds == bestSeconds && slot == planned) {
+                best = slot
+                bestSeconds = seconds
+            }
+        }
+        return best
+    }
+
     static func slotName(_ slot: RotationSlot) -> RoutineName {
         switch slot {
         case .hip:

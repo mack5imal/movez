@@ -37,7 +37,10 @@ struct RoutineBuilder {
         blocks = repairShortfall(blocks, in: selection)
         blocks = trimToFit(blocks)
 
-        let naming = RoutineNaming.name(slot: context.slot, timeOfDay: context.timeOfDay)
+        // Named for what it works, not for the slot that biased it; `slot` stays the planned one,
+        // because that is what the rotation walks.
+        let named = RoutineNaming.contentSlot(for: blocks, planned: context.slot)
+        let naming = RoutineNaming.name(slot: named, timeOfDay: context.timeOfDay)
         return Routine(
             id: UUID(),
             name: naming.name,

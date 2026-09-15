@@ -215,6 +215,30 @@ final class RoutineBuilderTests: XCTestCase {
 
     // MARK: - Determinism and naming
 
+    /// The slot only weights selection, so naming by slot once put "Upper back opener" over leg
+    /// swings and squats. Every ordinary routine must now work the regions its name claims.
+    func testARoutineIsNamedForTheRegionsItActuallyWorks() {
+        var renamed = 0
+        for day in 0..<30 {
+            var options = RoutineTestSupport.DayOptions()
+            options.breaks = 8
+            for routine in RoutineTestSupport.simulateDay(seed: UInt64(day &* 613 &+ 17), options: options)
+            where RoutineNaming.timeOfDayName(routine.timeOfDay) == nil {
+                guard let named = RotationSlot.allCases.first(where: { RoutineNaming.slotName($0).name == routine.name }) else {
+                    XCTFail("day \(day): \(routine.name) is not a slot name")
+                    continue
+                }
+                if named != routine.slot { renamed += 1 }
+                let worked = Set(routine.blocks.flatMap(\.movement.regions))
+                XCTAssertFalse(
+                    worked.isDisjoint(with: named.regions),
+                    "day \(day): \(routine.name) works \(worked.map(\.rawValue).sorted())"
+                )
+            }
+        }
+        XCTAssertGreaterThan(renamed, 0, "the sweep should include routines the old naming got wrong")
+    }
+
     func testSameSeedProducesTheSameRoutine() {
         let first = RoutineTestSupport.routine(seed: 4_242)
         let second = RoutineTestSupport.routine(seed: 4_242)

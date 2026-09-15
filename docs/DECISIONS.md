@@ -32,6 +32,12 @@ Sources of truth, in order: `product-brief-v1.md`, `scheduler-research-v1.md`,
 7. **Other displays show the dim and a small label**, not a second copy of the card.
 8. **A deferred break is never shortened.** It waits, at full length. What it loses is patience:
    a break that has waited more than half an hour gets one snooze instead of two.
+8a. **A routine is named for what it actually works.** The rotation slot biases selection but
+   does not force it, so naming by slot put "Upper back opener · t-spine and chest" over leg
+   swings and squats. The name comes from the slot whose regions the stretch and
+   strength-or-balance blocks work for the most seconds, ties going to the planned slot. The
+   rotation itself and the chaining rules are unchanged, and the first, last and post-lunch
+   breaks keep their time-of-day names.
 
 ## The micro-break
 
