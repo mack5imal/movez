@@ -134,9 +134,123 @@ final class AwayReturnTests: XCTestCase {
         return harness
     }
 
+    // MARK: - Standby
+
+    /// The line between a credited break and standby is the sitting interval itself, whatever
+    /// that interval has been set to.
+    func testJustUnderTheSittingIntervalIsCreditedAndJustOverIsStandby() {
+        let credited = SchedulerHarness()
+        credited.run(seconds: 10 * minute)
+        credited.clearEffects()
+        _ = stayAway(credited, for: 54 * minute)
+        credited.clock.advance(2)
+        poll(credited, idle: 0)
+
+        XCTAssertEqual(credited.snapshot.doneToday, 1, "54 minutes is still a break")
+        XCTAssertEqual(toastCount(credited.effects), 1)
+
+        let standby = SchedulerHarness()
+        standby.run(seconds: 10 * minute)
+        standby.clearEffects()
+        _ = stayAway(standby, for: 56 * minute)
+        let back = standby.now
+        standby.clock.advance(2)
+        poll(standby, idle: 0)
+
+        XCTAssertEqual(standby.snapshot.doneToday, 0, "56 minutes is standby")
+        XCTAssertEqual(toastCount(standby.effects), 0, "standby says nothing")
+        XCTAssertFalse(standby.effects.contains(.chime(.toast)))
+        XCTAssertTrue(standby.state.isSitting)
+        XCTAssertDate(standby.snapshot.boutStartedAt, back, accuracy: 6, "the countdown starts again")
+        XCTAssertDate(standby.snapshot.nextFullDueAt, back.addingTimeInterval(55 * minute), accuracy: 6)
+    }
+
+    func testTheStandbyThresholdFollowsThePreset() {
+        let harness = SchedulerHarness(config: .from(preset: .twentyFiveFive))
+        harness.run(seconds: 5 * minute)
+        harness.clearEffects()
+        _ = stayAway(harness, for: 26 * minute)
+        harness.clock.advance(2)
+        poll(harness, idle: 0)
+
+        XCTAssertEqual(harness.snapshot.doneToday, 0, "26 minutes is a whole 25/5 interval")
+        XCTAssertEqual(toastCount(harness.effects), 0)
+        XCTAssertDate(harness.snapshot.nextFullDueAt, harness.now.addingTimeInterval(25 * minute), accuracy: 6)
+    }
+
+    /// The bout the user was in when they left is still time spent sitting, and the longest bout
+    /// of the day has to remember it.
+    func testStandbyKeepsTheBoutThatEndedWhenTheUserLeft() {
+        let harness = SchedulerHarness()
+        harness.run(seconds: 40 * minute)
+        _ = stayAway(harness, for: 90 * minute)
+        harness.clock.advance(2)
+        poll(harness, idle: 0)
+
+        XCTAssertEqual(harness.snapshot.longestBoutSeconds, 40 * 60, accuracy: 10)
+    }
+
+    func testStandbyRollsTheCountersOnlyWhenTheAbsenceCrossedMidnight() {
+        let afternoon = SchedulerHarness(startAt: SchedulerHarness.mondayMorning.addingTimeInterval(5 * 3600))
+        afternoon.scheduler.snapshot.snoozedToday = 3
+        afternoon.run(seconds: 2 * minute)
+        _ = stayAway(afternoon, for: 5 * 3600)
+        afternoon.clock.advance(2)
+        poll(afternoon, idle: 0)
+        XCTAssertEqual(afternoon.snapshot.snoozedToday, 3, "14:00 to 19:00 is one day")
+
+        let overnight = SchedulerHarness(startAt: SchedulerHarness.mondayMorning.addingTimeInterval(14 * 3600 + 30 * 60))
+        overnight.scheduler.snapshot.snoozedToday = 3
+        overnight.run(seconds: 2 * minute)
+        _ = stayAway(overnight, for: 90 * minute)
+        overnight.clock.advance(2)
+        poll(overnight, idle: 0)
+        XCTAssertEqual(overnight.snapshot.snoozedToday, 0, "23:30 to 01:00 crosses into a new day")
+    }
+
+    /// A break that was on screen when the lid closed is resumed only if the user comes back to
+    /// it. An hour later there is nothing to come back to.
+    func testStandbyDiscardsABreakTheLidClosedOn() {
+        let harness = SchedulerHarness()
+        harness.run(until: { $0.isHeadsUp }, limit: 60 * minute)
+        harness.send(.userStartNow)
+        harness.clock.advance(minute)
+        harness.send(.sleep)
+        XCTAssertNotNil(harness.snapshot.interruptedBreak)
+
+        harness.clock.advance(2 * 3600)
+        harness.send(.wake(gapSeconds: 2 * 3600))
+        harness.run(seconds: 70)
+
+        XCTAssertNil(harness.snapshot.interruptedBreak)
+        XCTAssertTrue(harness.state.isSitting, "got \(harness.state)")
+        XCTAssertEqual(harness.snapshot.doneToday, 0)
+    }
+
+    /// The app was not running at all. It knows nothing about those minutes, so it judges them
+    /// the same way it judges a stretch of idle: long enough, and the interval starts again.
+    func testALaunchGapAsLongAsTheIntervalStartsTheIntervalAgain() {
+        let harness = SchedulerHarness()
+        harness.scheduler.snapshot.skipsToday = 1
+        harness.run(seconds: 10 * minute)
+        _ = harness.scheduler.applyLaunchGap(seconds: 70 * 60, now: harness.now)
+
+        XCTAssertDate(harness.snapshot.nextFullDueAt, harness.now.addingTimeInterval(55 * minute), accuracy: 6)
+        XCTAssertEqual(harness.snapshot.skipsToday, 1, "a gap is not a new day")
+    }
+
+    func testAShortLaunchGapStillOnlyMovesTheCountdownOn() {
+        let harness = SchedulerHarness()
+        harness.run(seconds: 10 * minute)
+        let due = harness.snapshot.nextFullDueAt
+        _ = harness.scheduler.applyLaunchGap(seconds: 20 * 60, now: harness.now)
+
+        XCTAssertDate(harness.snapshot.nextFullDueAt, (due ?? harness.now).addingTimeInterval(20 * minute), accuracy: 2)
+    }
+
     // MARK: - Display sleep without system sleep
 
-    func testThreeHoursWithTheDisplayAsleepIsOneCreditWhenInputArrivesFirst() {
+    func testThreeHoursWithTheDisplayAsleepIsStandbyWhenInputArrivesFirst() {
         let harness = displayAsleep(hours: 3)
         let back = harness.now
         harness.clock.advance(2)
@@ -146,12 +260,13 @@ final class AwayReturnTests: XCTestCase {
         harness.clearEffects()
         harness.run(seconds: 70)
 
-        XCTAssertEqual(harness.snapshot.doneToday, 1)
+        XCTAssertEqual(harness.snapshot.doneToday, 0, "three hours away is standby, not a break")
         XCTAssertDate(harness.snapshot.boutStartedAt, back, accuracy: 4, "a fresh bout from the return")
+        XCTAssertFalse(harness.effectNames.contains("showToast"), "standby says nothing")
         XCTAssertFalse(harness.effectNames.contains("showHeadsUp"), "no break prompt for someone just back")
     }
 
-    func testThreeHoursWithTheDisplayAsleepIsOneCreditWhenTheWakeArrivesFirst() {
+    func testThreeHoursWithTheDisplayAsleepIsStandbyWhenTheWakeArrivesFirst() {
         let harness = displayAsleep(hours: 3)
         harness.clock.advance(2)
         harness.send(.wake(gapSeconds: 2))
@@ -159,13 +274,14 @@ final class AwayReturnTests: XCTestCase {
         harness.clearEffects()
         harness.run(seconds: 70)
 
-        XCTAssertEqual(harness.snapshot.doneToday, 1)
+        XCTAssertEqual(harness.snapshot.doneToday, 0)
         XCTAssertTrue(harness.state.isSitting)
         XCTAssertGreaterThan(harness.snapshot.nextFullDueAt ?? .distantPast, harness.now.addingTimeInterval(50 * minute))
+        XCTAssertFalse(harness.effectNames.contains("showToast"))
         XCTAssertFalse(harness.effectNames.contains("showHeadsUp"))
     }
 
-    func testFourAndAHalfHoursAwayWithInputFirstStartsTheDayOver() {
+    func testFourAndAHalfHoursAwayWithInputFirstIsStandbyAndKeepsTheDay() {
         let harness = SchedulerHarness()
         harness.run(seconds: 10 * minute)
         harness.scheduler.snapshot.skipsToday = 2
@@ -174,8 +290,9 @@ final class AwayReturnTests: XCTestCase {
         poll(harness, idle: 0)
 
         XCTAssertTrue(harness.state.isSitting)
-        XCTAssertEqual(harness.snapshot.skipsToday, 0, "the same reset a wake after four hours gives")
-        XCTAssertEqual(harness.snapshot.doneToday, 0)
+        XCTAssertEqual(harness.snapshot.skipsToday, 2, "only midnight ends a day, however long the absence")
+        XCTAssertEqual(harness.snapshot.doneToday, 0, "and an absence is never credited as a break")
+        XCTAssertDate(harness.snapshot.nextFullDueAt, harness.now.addingTimeInterval(55 * minute), accuracy: 12)
     }
 
     private func displayAsleep(hours: Double) -> SchedulerHarness {
@@ -205,7 +322,7 @@ final class AwayReturnTests: XCTestCase {
         harness.run(seconds: 70)
 
         XCTAssertTrue(harness.state.isSitting, "got \(harness.state)")
-        XCTAssertEqual(harness.snapshot.skipsToday, 0, "five hours is a new day, whatever came after")
+        XCTAssertEqual(harness.snapshot.skipsToday, 2, "five hours is standby, and standby keeps the day")
         XCTAssertGreaterThan(harness.snapshot.nextFullDueAt ?? .distantPast, harness.now)
         XCTAssertFalse(harness.effectNames.contains("showHeadsUp"))
     }
@@ -227,7 +344,7 @@ final class AwayReturnTests: XCTestCase {
         harness.clock.advance(60)
         harness.send(.wake(gapSeconds: 3))
         harness.run(seconds: 70)
-        XCTAssertEqual(harness.snapshot.skipsToday, 0)
+        XCTAssertEqual(harness.snapshot.skipsToday, 2)
         XCTAssertTrue(harness.state.isSitting)
     }
 

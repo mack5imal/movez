@@ -36,7 +36,6 @@ struct SchedulerSnapshot: Codable, Equatable {
     var creditRestore: CreditRestore?
     var adHocSession: Bool = false
     var adHocSessionStartedAt: Date?
-    var postLunchPending: Bool = false
 
     var pendingInputWaitStartedAt: Date?
     /// When the file this snapshot came from was written — the app's proof of life, so a relaunch

@@ -94,10 +94,10 @@ extension Scheduler {
     /// through the heads-up rather than straight to the overlay.
     mutating func snooze(now: Date) -> [SchedulerEffect] {
         guard snoozesLeft > 0 else { return [] }
-        let dismissal: SchedulerEffect
+        var dismissal: [SchedulerEffect]
         switch snapshot.state {
-        case .headsUp: dismissal = .hideHeadsUp
-        case .fullBreak: dismissal = .endFullBreak(.snoozed)
+        case .headsUp: dismissal = [.hideHeadsUp, .recordHeadsUpOutcome(.snoozed)]
+        case .fullBreak: dismissal = [.endFullBreak(.snoozed)]
         default: return []
         }
 
@@ -105,20 +105,20 @@ extension Scheduler {
         snapshot.snoozedToday += 1
         let until = now.addingTimeInterval(TimeInterval(config.snoozeSeconds))
         transition(to: .snoozed(until: until), reason: "snoozed \(config.snoozeSeconds / 60) min", at: now)
-        return [dismissal, .persist, .menuRefresh]
+        return dismissal + [.persist, .menuRefresh]
     }
 
     /// Skipping starts a fresh interval from now but leaves the sitting bout running — the body
     /// has still been in the chair the whole time.
     mutating func skip(now: Date) -> [SchedulerEffect] {
-        let dismissal: SchedulerEffect
+        var dismissal: [SchedulerEffect]
         switch snapshot.state {
         case .headsUp(let startedAt, _):
             guard now.timeIntervalSince(startedAt) >= Double(config.skipDelaySeconds) else { return [] }
-            dismissal = .hideHeadsUp
+            dismissal = [.hideHeadsUp, .recordHeadsUpOutcome(.skipped)]
         case .fullBreak(let startedAt):
             guard now.timeIntervalSince(startedAt) >= Double(config.skipDelaySeconds) else { return [] }
-            dismissal = .endFullBreak(.skipped(completedBlocks: 0))
+            dismissal = [.endFullBreak(.skipped(completedBlocks: 0))]
         default:
             return []
         }
@@ -126,7 +126,7 @@ extension Scheduler {
         snapshot.skipsToday += 1
         rescheduleAfterSkip(now: now)
         transition(to: .sitting, reason: "skipped", at: now)
-        return [dismissal, .persist, .menuRefresh]
+        return dismissal + [.persist, .menuRefresh]
     }
 
     mutating func finishBreak(

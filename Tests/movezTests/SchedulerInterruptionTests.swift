@@ -92,20 +92,6 @@ final class SchedulerInterruptionTests: XCTestCase {
         XCTAssertEqual(harness.snapshot.doneToday, 1)
     }
 
-    func testPostLunchIsFlaggedOnlyAroundLunchtime() {
-        let lunch = SchedulerHarness(startAt: SchedulerHarness.mondayMorning.addingTimeInterval(3 * 3600))
-        lunch.clock.advance(25 * minute)
-        lunch.send(.idle(seconds: 25 * 60))
-        lunch.send(.input(lastEventAgeSeconds: 0))
-        XCTAssertTrue(lunch.snapshot.postLunchPending, "12:25 return after 25 min away is lunch")
-
-        let afternoon = SchedulerHarness(startAt: SchedulerHarness.mondayMorning.addingTimeInterval(7 * 3600))
-        afternoon.clock.advance(25 * minute)
-        afternoon.send(.idle(seconds: 25 * 60))
-        afternoon.send(.input(lastEventAgeSeconds: 0))
-        XCTAssertFalse(afternoon.snapshot.postLunchPending, "16:25 is not lunch")
-    }
-
     // MARK: - Sleep, lock and wake
 
     func testSleepDuringABreakInterruptsItAndAShortGapResumesIt() {
@@ -152,7 +138,7 @@ final class SchedulerInterruptionTests: XCTestCase {
         XCTAssertNil(harness.snapshot.interruptedBreak)
     }
 
-    func testAFiveHourGapResetsTheDay() {
+    func testAFiveHourGapIsStandby() {
         let harness = SchedulerHarness()
         harness.run(until: { $0.isHeadsUp }, limit: 60 * minute)
         harness.clock.advance(4)
@@ -165,9 +151,8 @@ final class SchedulerInterruptionTests: XCTestCase {
         harness.run(seconds: 70)
 
         XCTAssertTrue(harness.state.isSitting)
-        XCTAssertEqual(harness.snapshot.skipsToday, 0)
+        XCTAssertEqual(harness.snapshot.skipsToday, 1, "the day's counters outlast any absence; only midnight rolls them")
         XCTAssertEqual(harness.snapshot.doneToday, 0)
-        XCTAssertEqual(harness.snapshot.longestBoutSeconds, 0)
         XCTAssertDate(harness.snapshot.nextFullDueAt, harness.now.addingTimeInterval(55 * minute), accuracy: 12)
     }
 

@@ -64,7 +64,6 @@ final class CoordinatorSimulatedDayTests: XCTestCase {
         XCTAssertEqual(stats.done, 9)
         XCTAssertEqual(harness.history.streak(on: harness.now), 9)
 
-        XCTAssertEqual(breaks[0].routine.timeOfDay, .first)
         XCTAssertEqual(breaks[8].routine.timeOfDay, .last, "the 17:55 break is the last of the day")
         XCTAssertEqual(
             breaks.prefix(7).map(\.routine.slot),
@@ -228,5 +227,48 @@ final class CoordinatorSimulatedDayTests: XCTestCase {
         harness.coordinator.reverseToast()
         XCTAssertEqual(harness.history.stats(on: harness.now).done, 0)
         XCTAssertNil(harness.coordinator.toastInfo)
+    }
+
+    /// A break turned away at the heads-up never becomes a session, so the coordinator used to
+    /// see nothing but `hideHeadsUp` — which sleep, idle and a pause all send too — and the
+    /// day's snoozes and skips were the overlay's alone.
+    func testSnoozingAndSkippingAtTheHeadsUpIsRecorded() {
+        let snoozed = CoordinatorHarness()
+        _ = snoozed.run(until: { $0.isHeadsUp }, limit: 90 * minute)
+        let advertised = snoozed.coordinator.nextRoutinePreview?.name
+        snoozed.coordinator.inject(.userSnooze)
+
+        let snoozeStats = snoozed.history.stats(on: snoozed.now)
+        XCTAssertEqual(snoozeStats.snoozed, 1)
+        XCTAssertEqual(snoozeStats.done, 0)
+        XCTAssertEqual(snoozed.history.breaks(on: snoozed.now).last?.routineName, advertised)
+
+        let skipped = CoordinatorHarness()
+        _ = skipped.run(until: { $0.isHeadsUp }, limit: 90 * minute)
+        skipped.run(seconds: 6)
+        skipped.coordinator.inject(.userSkip)
+
+        XCTAssertEqual(skipped.history.stats(on: skipped.now).skipped, 1)
+        XCTAssertEqual(skipped.history.streak(on: skipped.now), 0, "a skip ends the streak wherever it is made")
+    }
+
+    /// The region rotation is a cursor over routines actually done, not a counter that starts
+    /// again each morning: two breaks a day used to mean the first two slots, for ever.
+    func testTheRotationCarriesOnIntoTheNextDay() {
+        let harness = CoordinatorHarness()
+        var slots: [RotationSlot] = []
+
+        for _ in 0..<2 {
+            _ = harness.run(until: { $0.isFullBreak }, limit: 90 * minute)
+            slots.append(harness.coordinator.currentBreak?.routine.slot ?? .hip)
+            harness.completeBreak()
+        }
+
+        // Tomorrow morning, from the history the first day left behind.
+        harness.clock.advance(20 * 3600)
+        harness.coordinator.tick()
+        slots.append(harness.coordinator.nextRoutinePreview?.slot ?? .hip)
+
+        XCTAssertEqual(slots, [.hip, .tSpineChest, .neckShoulder])
     }
 }

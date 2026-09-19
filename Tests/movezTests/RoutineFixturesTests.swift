@@ -55,9 +55,8 @@ final class RoutineFixturesTests: XCTestCase {
             "block count 6 is outside 3…5",
             "shape standard has no plan for 6 blocks"
         ]),
-        "R3": (.wakeUp, [
-            "block 2 is FLX, expected CIR",
-            "block 3 is CIR, expected FLX",
+        "R3": (.standard, [
+            "block 3 is CIR, expected STR|BAL",
             "block 4 is STR, expected FLX",
             "block 5 is CIR, expected HWF|EYE|BRE"
         ]),

@@ -90,14 +90,13 @@ final class DebugViewModel: ObservableObject {
         static let skipsToday = "skips today"
         static let doneToday = "done today"
         static let snoozedToday = "snoozed today"
-        static let postLunchPending = "post-lunch"
         static let polling = "polling"
         static let adHocSession = "ad-hoc session"
         static let overrides = "overrides"
 
         static let all = [
             state, boutStartedAt, lastCompletedBreakAt, nextFullDueAt, nextMicroDueAt, pauseUntil,
-            snoozesLeft, skipsToday, doneToday, snoozedToday, postLunchPending, polling,
+            snoozesLeft, skipsToday, doneToday, snoozedToday, polling,
             adHocSession, overrides
         ]
     }
@@ -126,7 +125,6 @@ final class DebugViewModel: ObservableObject {
             InspectorRow(label: Field.skipsToday, value: "\(snapshot.skipsToday)"),
             InspectorRow(label: Field.doneToday, value: "\(snapshot.doneToday)"),
             InspectorRow(label: Field.snoozedToday, value: "\(snapshot.snoozedToday)"),
-            InspectorRow(label: Field.postLunchPending, value: yesNo(snapshot.postLunchPending)),
             InspectorRow(label: Field.polling, value: pollingValue(input.polling, pollCount: input.pollCount)),
             InspectorRow(label: Field.adHocSession, value: yesNo(snapshot.adHocSession)),
             InspectorRow(label: Field.overrides, value: input.overrides)

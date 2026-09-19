@@ -59,7 +59,7 @@ final class HistoryStoreTests: XCTestCase {
         XCTAssertEqual(stats.skipped, 1)
         XCTAssertEqual(stats.snoozed, 1)
         XCTAssertEqual(stats.longestBoutSeconds, 4_320, "the longest bout only ever grows")
-        XCTAssertEqual(stats.summary, "1 done · 1 snoozed · 1 skipped")
+        XCTAssertEqual(stats.summary, "1 snoozed · 1 skipped")
 
         let tomorrow = day.addingTimeInterval(24 * 3600)
         XCTAssertEqual(store.stats(on: tomorrow), .empty)

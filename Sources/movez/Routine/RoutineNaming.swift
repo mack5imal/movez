@@ -70,12 +70,8 @@ enum RoutineNaming {
 
     static func timeOfDayName(_ timeOfDay: TimeOfDay) -> RoutineName? {
         switch timeOfDay {
-        case .first:
-            return RoutineName(name: "Wake-up", focus: "full body", completionTitle: "Awake")
         case .last:
             return RoutineName(name: "Wind-down", focus: "flexibility and breath", completionTitle: "Wound down")
-        case .postLunch:
-            return RoutineName(name: "Balance and circulation", focus: "post-lunch", completionTitle: "Blood moving")
         case .mid, .normal:
             return nil
         }

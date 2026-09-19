@@ -19,7 +19,6 @@ struct SchedulerConfig: Codable, Equatable, Hashable {
     var awayThresholdSeconds: Int = 180
     var fullCreditSeconds: Int = 300
     var wakeQuietSeconds: Int = 60
-    var dayResetGapSeconds: Int = 14_400
     var postSuppressionGraceSeconds: Int = 120
     var deferredBadgeSeconds: Int = 1800
     var deferredSnoozeAllowance: Int = 1

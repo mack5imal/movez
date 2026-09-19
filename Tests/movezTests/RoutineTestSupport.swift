@@ -22,8 +22,11 @@ enum RoutineTestSupport {
         var excluded: Set<String> = []
         var difficultyCap = 2
         var unlockedDiff3: Set<String> = []
-        var postLunchIndex: Int?
         var balanceServedToday = false
+        /// How recently each movement was served, as the coordinator reads it out of history.
+        var recency: [String: Double] = [:]
+        /// Where the region rotation stood when the day started.
+        var rotationCursor = 0
     }
 
     /// Runs a day of breaks the way the coordinator will, threading the day's history forward.
@@ -45,7 +48,8 @@ enum RoutineTestSupport {
             context.focus = options.focus
             context.difficultyCap = options.difficultyCap
             context.unlockedDiff3 = options.unlockedDiff3
-            context.rotationIndex = index
+            context.recency = options.recency
+            context.rotationIndex = options.rotationCursor + index
             context.seed = seed &+ UInt64(index &* 7919)
 
             let routine = builder.build(context: context)
@@ -59,10 +63,7 @@ enum RoutineTestSupport {
     }
 
     static func timeOfDay(index: Int, options: DayOptions) -> TimeOfDay {
-        if index == 0 { return .first }
-        if index == options.breaks - 1 { return .last }
-        if index == options.postLunchIndex { return .postLunch }
-        return .normal
+        index == options.breaks - 1 ? .last : .normal
     }
 
     /// A single routine with everything else left at its default.

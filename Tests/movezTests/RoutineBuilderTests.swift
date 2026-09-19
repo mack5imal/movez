@@ -12,7 +12,6 @@ final class RoutineBuilderTests: XCTestCase {
         for day in 0..<125 {
             var options = RoutineTestSupport.DayOptions()
             options.breaks = 8
-            options.postLunchIndex = 4
             options.focus = Focus.allCases[day % Focus.allCases.count]
             options.equipment = day.isMultiple(of: 3) ? [.band, .ball] : []
             for routine in RoutineTestSupport.simulateDay(seed: UInt64(day &* 104_729 &+ 11), options: options) {
@@ -31,7 +30,6 @@ final class RoutineBuilderTests: XCTestCase {
         for day in 0..<40 {
             var options = RoutineTestSupport.DayOptions()
             options.breaks = 8
-            options.postLunchIndex = 4
             let routines = RoutineTestSupport.simulateDay(seed: UInt64(day &* 7_919 &+ 3), options: options)
             var seen: [String: Int] = [:]
             for id in routines.flatMap(\.movementIds) {
@@ -76,17 +74,91 @@ final class RoutineBuilderTests: XCTestCase {
 
     func testTimeOfDayShapes() {
         for seed in 0..<50 {
-            let first = RoutineTestSupport.routine(seed: UInt64(seed &* 13 &+ 1), timeOfDay: .first)
-            XCTAssertGreaterThanOrEqual(first.buckets.filter { $0 == .cir }.count, 2, "wake-up needs two CIR blocks")
+            let normal = RoutineTestSupport.routine(seed: UInt64(seed &* 13 &+ 1), timeOfDay: .normal)
+            XCTAssertEqual(normal.buckets.first, .cir, "every routine opens on circulation")
 
             let last = RoutineTestSupport.routine(seed: UInt64(seed &* 17 &+ 2), timeOfDay: .last)
             XCTAssertGreaterThanOrEqual(last.buckets.filter { $0 == .flx }.count, 2, "wind-down needs two FLX blocks")
             XCTAssertEqual(last.buckets.last, .bre, "wind-down must close on breath")
-
-            let postLunch = RoutineTestSupport.routine(seed: UInt64(seed &* 19 &+ 3), timeOfDay: .postLunch)
-            XCTAssertTrue(postLunch.buckets.contains(.cir), "post-lunch needs circulation")
-            XCTAssertTrue(postLunch.buckets.contains(.bal), "post-lunch needs balance")
         }
+    }
+
+    // MARK: - Variety across days
+
+    /// Thirty days of two breaks a day, with the history threaded forward the way the coordinator
+    /// threads it, and the rotation carrying on across days.
+    ///
+    /// This is the shape of a real week for someone who takes one or two breaks a day, and it is
+    /// where the old builder was at its worst: 39 of the 124 eligible movements ever appeared, and
+    /// one circulation movement was in 38% of routines, because selection took whichever movement
+    /// was closest to an ideal length and broke ties by id.
+    private func simulateMonth(breaksPerDay: Int) -> [Routine] {
+        var served: [(id: String, day: Int)] = []
+        var cursor = 0
+        var routines: [Routine] = []
+
+        for day in 0..<30 {
+            var options = RoutineTestSupport.DayOptions()
+            options.breaks = breaksPerDay
+            options.difficultyCap = 3
+            options.rotationCursor = cursor
+            options.recency = served.reduce(into: [String: Double]()) { scores, entry in
+                scores[entry.id, default: 0] += Recency.weight(daysAgo: day - entry.day)
+            }
+
+            let today = RoutineTestSupport.simulateDay(seed: UInt64(day &* 104_729 &+ 17), options: options)
+            routines += today
+            cursor += today.count
+            served += today.flatMap(\.movementIds).map { (id: $0, day: day) }
+        }
+        return routines
+    }
+
+    func testAMonthOfBreaksReachesMostOfTheLibrary() {
+        let routines = simulateMonth(breaksPerDay: 2)
+        let ids = routines.flatMap(\.movementIds)
+        var counts: [String: Int] = [:]
+        for id in ids { counts[id, default: 0] += 1 }
+
+        XCTAssertEqual(routines.count, 60)
+        XCTAssertGreaterThanOrEqual(Set(ids).count, 80, "only \(Set(ids).count) distinct movements in a month")
+
+        let topShare = Double(counts.values.max() ?? 0) / Double(routines.count)
+        XCTAssertLessThanOrEqual(topShare, 0.2, "one movement is in \(Int(topShare * 100))% of routines")
+    }
+
+    func testNoRoutineIsServedTwiceInAMonth() {
+        let routines = simulateMonth(breaksPerDay: 3)
+        var seen: [String: Int] = [:]
+        for routine in routines { seen[routine.movementIds.joined(separator: ","), default: 0] += 1 }
+        let repeated = seen.filter { $0.value > 1 }.keys.sorted()
+        XCTAssertEqual(repeated, [], "repeated routines: \(repeated)")
+    }
+
+    /// Yesterday's movements are the ones a user notices coming round again.
+    func testYesterdaysMovementsAreRarerThanTheRest() {
+        var yesterdayCount = 0
+        var total = 0
+
+        for day in 0..<40 {
+            var options = RoutineTestSupport.DayOptions()
+            options.breaks = 2
+            options.difficultyCap = 3
+            let yesterday = RoutineTestSupport.simulateDay(seed: UInt64(day &* 7_919 &+ 5), options: options)
+            let served = Set(yesterday.flatMap(\.movementIds))
+
+            options.recency = served.reduce(into: [String: Double]()) { $0[$1] = Recency.weight(daysAgo: 1) }
+            options.rotationCursor = yesterday.count
+            let today = RoutineTestSupport.simulateDay(seed: UInt64(day &* 7_919 &+ 6), options: options)
+
+            for id in today.flatMap(\.movementIds) {
+                total += 1
+                if served.contains(id) { yesterdayCount += 1 }
+            }
+        }
+
+        let share = Double(yesterdayCount) / Double(total)
+        XCTAssertLessThan(share, 0.1, "\(Int(share * 100))% of today came from yesterday")
     }
 
     func testBalanceIsServedEveryDay() {
@@ -257,9 +329,7 @@ final class RoutineBuilderTests: XCTestCase {
         XCTAssertEqual(hip.eyebrow, "HIP RESET · HIPS AND GLUTES")
         XCTAssertEqual(hip.subtitle, "Hip reset · hips and glutes")
 
-        XCTAssertEqual(RoutineNaming.name(slot: .hip, timeOfDay: .first).name, "Wake-up")
         XCTAssertEqual(RoutineNaming.name(slot: .hip, timeOfDay: .last).completionTitle, "Wound down")
-        XCTAssertEqual(RoutineNaming.name(slot: .core, timeOfDay: .postLunch).name, "Balance and circulation")
         XCTAssertEqual(RoutineNaming.slotName(.ankleFoot).completionTitle, "Feet awake")
 
         let routine = RoutineTestSupport.routine(seed: 7, rotationIndex: 0)
@@ -270,7 +340,6 @@ final class RoutineBuilderTests: XCTestCase {
     func testWritesSampleRoutinesForEvidence() {
         var options = RoutineTestSupport.DayOptions()
         options.breaks = 6
-        options.postLunchIndex = 3
         let routines = RoutineTestSupport.simulateDay(seed: 2_026, options: options)
         let samples = [routines[0], routines[1], routines[3]]
         RoutineTestSupport.write(

@@ -2,9 +2,7 @@ import Foundation
 
 /// Where a break falls in the working day. Each value selects a routine shape.
 enum TimeOfDay: String, Hashable, Codable, CaseIterable {
-    case first
     case mid
-    case postLunch
     case last
     case normal
 }
@@ -57,6 +55,8 @@ struct RoutineContext: Hashable {
     var difficultyCap: Int = 2
     var unlockedDiff3: Set<String> = []
     var rotationIndex: Int = 0
+    /// How recently each movement was served, as `Recency` scores it.
+    var recency: [String: Double] = [:]
     var seed: UInt64 = 0
 
     /// Movements the chaining rules allow to recur inside one day.
@@ -82,9 +82,10 @@ struct MicroContext: Hashable {
     var emphasisIndex: Int = 0
     var lastMicroMovementIds: Set<String> = []
     var nextFullRoutineIds: Set<String> = []
-    var isPostLunch: Bool = false
     var excluded: Set<String> = []
     var equipment: Set<Equipment> = []
+    /// How recently each movement was served, as `Recency` scores it.
+    var recency: [String: Double] = [:]
     var seed: UInt64 = 0
 
     var emphasis: Emphasis { Emphasis.emphasis(forIndex: emphasisIndex) }

@@ -38,6 +38,8 @@ extension AppCoordinator {
         case .hideToast:
             reverseCreditRecord()
             toastInfo = nil
+        case .recordHeadsUpOutcome(let outcome):
+            recordHeadsUpOutcome(outcome)
         case .persist:
             persistSnapshot()
         case .pollingChanged(let enabled):
@@ -79,7 +81,6 @@ extension AppCoordinator {
         rememberRoutine(routine, at: plan.startedAt)
         cachedPreview = nil
         currentBreak = BreakSession(routine: routine, startedAt: plan.startedAt, deferred: plan.deferred)
-        scheduler.snapshot.postLunchPending = false
     }
 
     private func finishBreak(_ outcome: BreakOutcome) {
@@ -123,6 +124,21 @@ extension AppCoordinator {
         }
     }
 
+    /// Writes down a break that was turned away at the heads-up, which never became a session.
+    ///
+    /// The routine named is the one that was about to run, so the record reads the same as one
+    /// written for a break the user actually saw. Nothing was done, so no blocks are claimed.
+    private func recordHeadsUpOutcome(_ outcome: HeadsUpOutcome) {
+        let routine = previewNextRoutine(now: clock.now)
+        history.record(breakRecord: BreakRecord(
+            at: clock.now,
+            routineName: routine?.name ?? "",
+            outcome: outcome == .snoozed ? .snoozed : .skipped,
+            completedBlocks: 0,
+            totalBlocks: routine?.blocks.count ?? 0
+        ))
+    }
+
     /// Writes the block the user just finished to history.
     func recordBlockCompletion(_ block: RoutineBlock, routineId: UUID) {
         history.record(completion: MovementCompletion(
@@ -140,9 +156,9 @@ extension AppCoordinator {
         context.emphasisIndex = scheduler.snapshot.microEmphasisIndex
         context.lastMicroMovementIds = lastMicroIds
         context.nextFullRoutineIds = Set(previewNextRoutine(now: clock.now)?.movementIds ?? [])
-        context.isPostLunch = scheduler.snapshot.postLunchPending
         context.excluded = settings.excludedMovementIds
         context.equipment = settings.equipment
+        context.recency = history.recencyScores(before: clock.now)
         context.seed = SplitMix64.seed(day: scheduler.snapshot.dayKey, index: 1_000 + scheduler.snapshot.microEmphasisIndex)
         currentMicro = microBuilder.build(context: context)
     }
@@ -160,7 +176,6 @@ extension AppCoordinator {
             }
         }
         currentMicro = nil
-        scheduler.snapshot.postLunchPending = false
     }
 
     // MARK: - Credited absences
@@ -214,8 +229,7 @@ extension AppCoordinator {
             String(settings.excludedMovementIds.count),
             settings.focus.rawValue,
             String(settings.difficultyCap),
-            settings.equipment.map(\.rawValue).sorted().joined(separator: "+"),
-            scheduler.snapshot.postLunchPending ? "lunch" : "-"
+            settings.equipment.map(\.rawValue).sorted().joined(separator: "+")
         ].joined(separator: "|")
     }
 
@@ -234,22 +248,28 @@ extension AppCoordinator {
         context.focus = settings.focus
         context.difficultyCap = settings.difficultyCap
         context.unlockedDiff3 = history.unlockedDiff3(library: library)
-        context.rotationIndex = breakIndex
+        // The rotation walks on from wherever it was, rather than restarting at hips every
+        // morning: a day with two breaks in it used to serve the first two slots and nothing else,
+        // for as long as the user kept that pattern up.
+        context.rotationIndex = history.routinesDoneBefore(now) + breakIndex
+        context.recency = history.recencyScores(before: now)
         context.seed = SplitMix64.seed(day: scheduler.snapshot.dayKey, index: breakIndex)
         return context
     }
 
-    /// First break of the day, last one before the working day closes, the one after lunch, or an
-    /// ordinary one.
+    /// The last break before the working day closes, or an ordinary one.
+    ///
+    /// The window has to genuinely close for a break to be the last one. Working hours that run
+    /// the whole day still report an end at midnight, and treating that as a close gave anyone
+    /// working through the evening a wind-down routine every night at eleven.
     func timeOfDay(at now: Date, breakIndex: Int) -> TimeOfDay {
-        if breakIndex == 0 { return .first }
-        if scheduler.snapshot.postLunchPending { return .postLunch }
         let config = settings.schedulerConfig
-        if let end = config.workingHours.nextEnd(after: now, calendar: config.calendar),
-           now.addingTimeInterval(TimeInterval(config.sitSeconds)) > end {
-            return .last
+        guard let end = config.workingHours.nextEnd(after: now, calendar: config.calendar),
+              now.addingTimeInterval(TimeInterval(config.sitSeconds)) > end,
+              !config.workingHours.isWithin(end.addingTimeInterval(1), calendar: config.calendar) else {
+            return .normal
         }
-        return .normal
+        return .last
     }
 
     func breakIndexToday(at now: Date) -> Int {

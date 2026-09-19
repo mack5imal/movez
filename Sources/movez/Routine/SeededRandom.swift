@@ -20,6 +20,26 @@ struct SplitMix64: RandomNumberGenerator {
         return result ^ (result >> 31)
     }
 
+    /// A number in `0..<1`, from the top 53 bits — the ones the generator mixes best.
+    mutating func unitInterval() -> Double {
+        Double(next() >> 11) * (1.0 / 9_007_199_254_740_992.0)
+    }
+
+    /// An index drawn in proportion to `weights`, or nil when there is nothing to draw from.
+    ///
+    /// Selection weights are fractional now that recency divides them, so the draw works in
+    /// `Double` rather than counting integer tickets.
+    mutating func weightedIndex(in weights: [Double]) -> Int? {
+        let total = weights.reduce(0, +)
+        guard total > 0 else { return nil }
+        var ticket = unitInterval() * total
+        for (index, weight) in weights.enumerated() {
+            ticket -= weight
+            if ticket < 0 { return index }
+        }
+        return weights.indices.last
+    }
+
     /// A stable seed for a given day and break index. `hashValue` is not stable across launches,
     /// so the bytes are folded by hand.
     static func seed(day: String, index: Int) -> UInt64 {

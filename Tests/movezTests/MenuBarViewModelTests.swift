@@ -199,7 +199,7 @@ final class MenuBarViewModelTests: XCTestCase {
 
         XCTAssertEqual(menu.state.title, "Off hours")
         XCTAssertEqual(menu.state.subtitle, "Breaks resume Monday at 9:00")
-        XCTAssertEqual(menu.state.stats, "Friday · 1 done · 0 snoozed · 0 skipped")
+        XCTAssertEqual(menu.state.stats, "Friday · 0 snoozed · 0 skipped")
         XCTAssertEqual(menu.state.longestBout, "Longest sitting bout 1 h 35 m")
     }
 
@@ -223,7 +223,7 @@ final class MenuBarViewModelTests: XCTestCase {
 
     func testStatsStrings() {
         let stats = DailyStats(done: 3, snoozed: 1, skipped: 1, longestBoutSeconds: 72 * 60)
-        XCTAssertEqual(MenuBarState.statsLine(day: "Today", stats: stats), "Today · 3 done · 1 snoozed · 1 skipped")
+        XCTAssertEqual(MenuBarState.statsLine(day: "Today", stats: stats), "Today · 1 snoozed · 1 skipped")
         XCTAssertEqual(MenuBarState.longestBoutLine(seconds: 72 * 60), "Longest sitting bout 1 h 12 m")
         XCTAssertEqual(MenuBarState.longestBoutLine(seconds: 35 * 60), "Longest sitting bout 35 m")
     }

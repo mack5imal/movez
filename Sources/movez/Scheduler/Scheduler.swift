@@ -204,10 +204,11 @@ struct Scheduler {
     /// all reset together.
     ///
     /// Defer, never reset. Exactly four things move `boutStartedAt`, and they are all here: a
-    /// completed or credited break, a gap long enough to have ended the session (four hours, or
-    /// one spanning a working-day opening), the working day or an ad-hoc session opening, and the
-    /// launch shift that moves the whole bout forward by time movez was not running. Midnight is
-    /// deliberately not one of them — it rolls the day's counters and leaves the bout alone.
+    /// completed or credited break, a gap long enough to have ended the session (standby — an
+    /// absence at least as long as the sitting interval — or one spanning a working-day opening),
+    /// the working day or an ad-hoc session opening, and the launch shift that moves the whole
+    /// bout forward by time movez was not running. Midnight is deliberately not one of them — it
+    /// rolls the day's counters and leaves the bout alone.
     mutating func startFreshInterval(now: Date) {
         snapshot.boutStartedAt = now
         snapshot.nextFullDueAt = now.addingTimeInterval(TimeInterval(config.sitSeconds))

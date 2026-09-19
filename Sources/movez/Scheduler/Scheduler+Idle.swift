@@ -1,11 +1,15 @@
 import Foundation
 
-/// Idle handling: three thresholds, one policy (research §4.2).
+/// Idle handling: four thresholds, one policy (research §4.2).
 ///
 /// Under three minutes nothing happens. Three to five minutes is treated as a micro-break and the
 /// countdown is handed back with the time that was left on it. Five minutes or more counts as a
 /// full break. Both credits are reversible while the toast is up, because the app cannot tell a
 /// walk to the kitchen from a long read on paper.
+///
+/// An absence as long as the sitting interval itself is none of those: nobody needs to be told
+/// that an hour away from the desk was a break, and crediting one inflates the day's count. That
+/// is standby — the countdown simply starts again, silently, when the user comes back.
 ///
 /// An absence ends only on evidence that the user is back. The monitors report the input age on
 /// every poll whether or not anything was touched, and treating each of those reports as a return
@@ -49,12 +53,16 @@ extension Scheduler {
     /// The user is back — noticed by a keystroke, or by the end of the wake-quiet minute.
     ///
     /// One path for both, so which of the two notices first can never change what the absence
-    /// was worth: a gap long enough to end the session starts the day over, a break the lid closed
-    /// on is the credit for its own absence, and anything else goes through the idle table.
+    /// was worth: an absence as long as the sitting interval is standby, a gap that crossed the
+    /// opening of a working day starts the day over, a break the lid closed on is the credit for
+    /// its own absence, and anything else goes through the idle table.
     mutating func endAbsence(since: Date, returnedAt: Date, now: Date) -> [SchedulerEffect] {
         let absence = max(0, Int(returnedAt.timeIntervalSince(since)))
-        if shouldResetDay(gapSeconds: absence, now: returnedAt) {
-            return resetDay(now: now, reason: "gap of \(absence / 3600) h — new day")
+        if absence >= config.sitSeconds {
+            return enterStandby(absence: absence, since: since, now: now)
+        }
+        if crossedWorkingDayOpening(gapSeconds: absence, now: returnedAt) {
+            return resetDay(now: now, reason: "gap crossed a working-day opening — new day")
         }
 
         // A break that was on screen when the lid closed is the credit for that absence; the
@@ -66,12 +74,22 @@ extension Scheduler {
             return [.persist, .menuRefresh] + resumeInterruptedBreak(now: now)
         }
 
-        return returnFromAway(since: since, absence: absence, returnedAt: returnedAt, now: now)
+        return returnFromAway(since: since, absence: absence, now: now)
     }
 
-    private mutating func returnFromAway(since: Date, absence: Int, returnedAt: Date, now: Date) -> [SchedulerEffect] {
-        notePostLunch(absence: absence, returnedAt: returnedAt)
+    /// Away for at least a whole sitting interval: standby.
+    ///
+    /// Nothing is credited, nothing is said, and nothing is written to history — the user was not
+    /// taking a break, they were not at the desk at all. The one thing kept is the bout that ended
+    /// when they left, which is time they really did spend sitting. The day's counters move only
+    /// if the absence crossed midnight, which is the only thing that ends a day.
+    private mutating func enterStandby(absence: Int, since: Date, now: Date) -> [SchedulerEffect] {
+        recordBout(endingAt: since)
+        rollDayCountersIfStale(now: now)
+        return startFreshSession(now: now, reason: "away \(absence / 60) min — standby")
+    }
 
+    private mutating func returnFromAway(since: Date, absence: Int, now: Date) -> [SchedulerEffect] {
         if absence < config.awayThresholdSeconds {
             snapshot.nextFullDueAt = snapshot.dueAtAway ?? snapshot.nextFullDueAt
             clearAwayMarkers()
@@ -154,15 +172,6 @@ extension Scheduler {
         snapshot.remainingAtAwaySeconds = nil
         snapshot.dueAtAway = nil
         snapshot.awayInputAge = nil
-    }
-
-    /// A long absence ending over the middle of the day is lunch, and the next routine should say
-    /// so with circulation and balance.
-    private mutating func notePostLunch(absence: Int, returnedAt now: Date) {
-        guard absence >= 20 * 60 else { return }
-        let minutes = WorkingHours.minutes(of: now, calendar: config.calendar)
-        guard minutes >= 11 * 60, minutes < 14 * 60 else { return }
-        snapshot.postLunchPending = true
     }
 
     /// Takes every break surface off screen. Used by sleep, lock, pause and idle alike.

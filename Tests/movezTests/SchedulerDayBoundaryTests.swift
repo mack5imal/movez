@@ -59,7 +59,6 @@ final class SchedulerDayBoundaryTests: XCTestCase {
         harness.scheduler.snapshot.snoozedToday = 1
         harness.scheduler.snapshot.longestBoutSeconds = 3000
         harness.scheduler.snapshot.microEmphasisIndex = 3
-        harness.scheduler.snapshot.postLunchPending = true
 
         harness.run(seconds: 4 * minute)
 
@@ -68,7 +67,6 @@ final class SchedulerDayBoundaryTests: XCTestCase {
         XCTAssertEqual(harness.snapshot.snoozedToday, 0)
         XCTAssertEqual(harness.snapshot.longestBoutSeconds, 0)
         XCTAssertEqual(harness.snapshot.microEmphasisIndex, 0)
-        XCTAssertFalse(harness.snapshot.postLunchPending)
         XCTAssertEqual(harness.snapshot.dayKey, DayKey.key(for: harness.now, calendar: .current))
     }
 

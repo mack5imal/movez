@@ -11,7 +11,6 @@ struct RoutineBuilder {
     static let maxTotalSeconds = 330
     /// The smallest a block may be trimmed to, for movements whose natural block is longer.
     static let trimFloorSeconds = 60
-    private static let shortlistSize = 8
     private static let maxRepairPasses = 6
 
     let library: MovementLibrary
@@ -34,7 +33,8 @@ struct RoutineBuilder {
         if total(of: blocks) < Self.minTotalSeconds {
             blocks = assemble(count: 5, in: selection)
         }
-        blocks = repairShortfall(blocks, in: selection)
+        var repairRNG = SplitMix64(seed: context.seed &+ 0x5EED)
+        blocks = repairShortfall(blocks, in: selection, rng: &repairRNG)
         blocks = trimToFit(blocks)
 
         // Named for what it works, not for the slot that biased it; `slot` stays the planned one,
@@ -108,20 +108,16 @@ struct RoutineBuilder {
         var rng = SplitMix64(seed: context.seed &+ UInt64(count))
         let plan = positionPlan(shape: selection.shape, count: count, context: context)
         var chosen: [Movement] = []
-        var budget = Self.targetTotalSeconds - Routine.transitionSeconds * (count - 1)
 
         for position in plan.indices {
-            let remaining = plan.count - position
-            let ideal = max(20, budget / max(1, remaining))
             let allowed = plan[position]
             let available = options(at: position, allowed: allowed, chosen: chosen, in: selection)
-            // The bucket is drawn first so that a short bucket — a 30 s eye break — is not
-            // crowded out by a longer one every time the budget is consulted.
+            // The bucket is drawn first so that a small bucket — the five eye movements — is not
+            // crowded out by a large one every time the position allows both.
             let bucket = chooseBucket(allowed, among: available, context: context, rng: &rng)
             let options = available.filter { bucket == nil || $0.bucket == bucket }
-            guard let pick = pick(from: options, ideal: ideal, context: context, rng: &rng) else { continue }
+            guard let pick = pick(from: options, context: context, rng: &rng) else { continue }
             chosen.append(pick)
-            budget -= pick.blockSeconds
         }
 
         return chosen.map { RoutineBlock(movement: $0, seconds: $0.blockSeconds, trimmedFrom: nil) }
@@ -156,39 +152,22 @@ struct RoutineBuilder {
         return fresh.isEmpty ? base : fresh
     }
 
-    /// Draws a weighted shortlist, then takes the entry closest to the seconds the budget wants.
+    /// Draws one movement, weighted by region, focus and how recently it was served.
+    ///
+    /// Length plays no part. It used to: the draw produced a shortlist and the entry closest to
+    /// the seconds the budget wanted won it, which in a library of 45–60 s movements meant the
+    /// longest one, every time, with ties going to the lowest id. One circulation movement opened
+    /// half of all routines. The 270–330 s window is held afterwards instead, by `repairShortfall`
+    /// and `trimToFit`, which is the only place it belongs.
     private func pick(
         from options: [Movement],
-        ideal: Int,
         context: RoutineContext,
         rng: inout SplitMix64
     ) -> Movement? {
         guard !options.isEmpty else { return nil }
-
-        var remaining = options
-        var weights = remaining.map { weight(for: $0, context: context) }
-        var shortlist: [Movement] = []
-        let size = min(Self.shortlistSize, remaining.count)
-
-        while shortlist.count < size {
-            let total = weights.reduce(0, +)
-            guard total > 0 else { break }
-            var ticket = Int(rng.next() % UInt64(total))
-            var index = 0
-            for (offset, weight) in weights.enumerated() {
-                ticket -= weight
-                if ticket < 0 { index = offset; break }
-            }
-            shortlist.append(remaining.remove(at: index))
-            weights.remove(at: index)
-        }
-
-        guard !shortlist.isEmpty else { return options.first }
-        return shortlist.min { lhs, rhs in
-            let left = abs(lhs.blockSeconds - ideal)
-            let right = abs(rhs.blockSeconds - ideal)
-            return left == right ? lhs.id < rhs.id : left < right
-        }
+        let weights = options.map { weight(for: $0, context: context) }
+        guard let index = rng.weightedIndex(in: weights) else { return options.first }
+        return options[index]
     }
 
     /// Draws one bucket from the position's allowed set, weighted by the user's focus.
@@ -204,17 +183,11 @@ struct RoutineBuilder {
         guard present.count > 1 else { return present.first }
 
         let weights = present.map { bucketWeight($0, context: context) }
-        let total = weights.reduce(0, +)
-        guard total > 0 else { return present.first }
-        var ticket = Int(rng.next() % UInt64(total))
-        for (index, weight) in weights.enumerated() {
-            ticket -= weight
-            if ticket < 0 { return present[index] }
-        }
-        return present.last
+        guard let index = rng.weightedIndex(in: weights) else { return present.first }
+        return present[index]
     }
 
-    private func bucketWeight(_ bucket: Bucket, context: RoutineContext) -> Int {
+    private func bucketWeight(_ bucket: Bucket, context: RoutineContext) -> Double {
         switch context.focus {
         case .moreBalance where bucket == .bal: return 3
         case .moreHandsEyes where bucket == .hwf || bucket == .eye: return 3
@@ -222,9 +195,9 @@ struct RoutineBuilder {
         }
     }
 
-    /// Region rotation and the user's focus both bias selection without ever forcing it.
-    private func weight(for movement: Movement, context: RoutineContext) -> Int {
-        var weight = 1
+    /// Region rotation, the user's focus and recency all bias selection without ever forcing it.
+    private func weight(for movement: Movement, context: RoutineContext) -> Double {
+        var weight = 1.0
         let regions = Set(movement.regions)
         if !regions.isDisjoint(with: context.slot.regions) { weight *= 3 }
         if !context.focus.boostedRegions.isEmpty, !regions.isDisjoint(with: context.focus.boostedRegions) {
@@ -232,7 +205,7 @@ struct RoutineBuilder {
         }
         if context.focus == .moreHandsEyes, movement.bucket == .hwf || movement.bucket == .eye { weight *= 3 }
         if context.focus == .moreBalance, movement.bucket == .bal { weight *= 3 }
-        return weight
+        return weight * Recency.multiplier(score: context.recency[movement.id] ?? 0)
     }
 
     // MARK: - Duration fitting
@@ -241,18 +214,32 @@ struct RoutineBuilder {
         blocks.reduce(0) { $0 + $1.seconds } + Routine.transitionSeconds * max(0, blocks.count - 1)
     }
 
-    /// Swaps short blocks for the longest available alternative until the routine clears 270 s.
-    private func repairShortfall(_ blocks: [RoutineBlock], in selection: Selection) -> [RoutineBlock] {
-        var blocks = lengthen(blocks, in: selection, keepBucket: true)
+    /// Swaps short blocks for longer alternatives until the routine clears 270 s.
+    private func repairShortfall(
+        _ blocks: [RoutineBlock],
+        in selection: Selection,
+        rng: inout SplitMix64
+    ) -> [RoutineBlock] {
+        var blocks = lengthen(blocks, in: selection, keepBucket: true, rng: &rng)
         if total(of: blocks) < Self.minTotalSeconds {
-            blocks = lengthen(blocks, in: selection, keepBucket: false)
+            blocks = lengthen(blocks, in: selection, keepBucket: false, rng: &rng)
         }
         return blocks
     }
 
     /// Swaps the shortest block for a longer alternative, either within the same bucket or
     /// anywhere the position allows.
-    private func lengthen(_ blocks: [RoutineBlock], in selection: Selection, keepBucket: Bool) -> [RoutineBlock] {
+    ///
+    /// The replacement is drawn from every option that is longer than the block it replaces,
+    /// rather than always being the longest one there is: a repair runs on most routines now that
+    /// length no longer steers the draw, and a deterministic answer here would put the same
+    /// handful of long movements back into all of them.
+    private func lengthen(
+        _ blocks: [RoutineBlock],
+        in selection: Selection,
+        keepBucket: Bool,
+        rng: inout SplitMix64
+    ) -> [RoutineBlock] {
         var blocks = blocks
         guard !blocks.isEmpty else { return blocks }
         let plan = positionPlan(shape: selection.shape, count: blocks.count, context: selection.context)
@@ -265,9 +252,9 @@ struct RoutineBuilder {
                 let chosen = blocks.enumerated().filter { $0.offset != index }.map(\.element.movement)
                 let allowed = keepBucket ? [blocks[index].movement.bucket] : plan[index]
                 let options = options(at: index, allowed: allowed, chosen: chosen, in: selection)
-                guard let longest = options.max(by: { ($0.blockSeconds, $1.id) < ($1.blockSeconds, $0.id) }),
-                      longest.blockSeconds > blocks[index].seconds else { continue }
-                blocks[index] = RoutineBlock(movement: longest, seconds: longest.blockSeconds, trimmedFrom: nil)
+                    .filter { $0.blockSeconds > blocks[index].seconds }
+                guard let longer = pick(from: options, context: selection.context, rng: &rng) else { continue }
+                blocks[index] = RoutineBlock(movement: longer, seconds: longer.blockSeconds, trimmedFrom: nil)
                 improved = true
                 break
             }

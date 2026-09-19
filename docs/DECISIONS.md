@@ -36,8 +36,8 @@ Sources of truth, in order: `product-brief-v1.md`, `scheduler-research-v1.md`,
    does not force it, so naming by slot put "Upper back opener · t-spine and chest" over leg
    swings and squats. The name comes from the slot whose regions the stretch and
    strength-or-balance blocks work for the most seconds, ties going to the planned slot. The
-   rotation itself and the chaining rules are unchanged, and the first, last and post-lunch
-   breaks keep their time-of-day names.
+   rotation itself and the chaining rules are unchanged, and the last break of a working day
+   keeps its time-of-day name.
 
 ## The micro-break
 
@@ -83,10 +83,11 @@ Sources of truth, in order: `product-brief-v1.md`, `scheduler-research-v1.md`,
     is the one thing a break reminder must never do. This matters most to anyone working across
     midnight, for whom the old behaviour cost a break every night.
 20b. **Time movez was not running is moved past, not judged.** The state file records when it was
-    written, so a relaunch knows whether it was gone for two minutes or two days. A gap under four
-    hours shifts the whole bout forward by its length; four hours or more starts the day over. It
-    is never credited as a break: a running app can tell from the idle clock whether the user was
-    at the keyboard, and an app that was not running cannot.
+    written, so a relaunch knows whether it was gone for two minutes or two days. A gap shorter
+    than the sitting interval shifts the whole bout forward by its length; a gap at least that
+    long is standby (23c) and the interval starts again. It is never credited as a break: a
+    running app can tell from the idle clock whether the user was at the keyboard, and an app that
+    was not running cannot.
 20c. **The streak and "Today" stay on the calendar day, and reset at midnight mid-session.**
     `HistoryStore` buckets every break by its own calendar day and the streak counts consecutive
     completed breaks within one of them, so someone working 22:00–04:00 sees `Today: 0 · streak 0`
@@ -99,8 +100,9 @@ Sources of truth, in order: `product-brief-v1.md`, `scheduler-research-v1.md`,
     sampling into a void; a thirty-second wake-check notices when the pause runs out.
 22. **A break counts as done at half the movements or half the time** (research §4.11).
 23. **Idle is credited in two tiers**: three to five minutes hands the countdown back with the
-    time it had left; five minutes or more is a full break. Both are reversible while the away
-    toast is up, because movez cannot tell a walk to the kitchen from a long read on paper.
+    time it had left; five minutes up to a whole sitting interval is a full break. Both are
+    reversible while the away toast is up, because movez cannot tell a walk to the kitchen from a
+    long read on paper. Longer than that is standby (23c), and is not credited at all.
 23a. **The away toast stays fifteen seconds, chimes, and can be dismissed.** The research (§4.2)
     and the handoff say six seconds. In use the toast nearly always appears the moment a display
     wakes, and six seconds had gone before a hand reached the trackpad. Fifteen seconds is also
@@ -114,6 +116,46 @@ Sources of truth, in order: `product-brief-v1.md`, `scheduler-research-v1.md`,
     a break every two seconds of every absence — 78,000 records in four days — and letting a later
     notification overwrite the gap put a break prompt in front of someone who had been gone twenty
     hours.
+23c. **An absence as long as the sitting interval is standby.** Not a break — a break is
+    something the user takes at their desk, and being away from the desk for an hour is not it.
+    Standby starts the countdown again from the moment they come back, silently: no toast, no
+    chime, nothing written to history, and the day's counters left alone. Crediting these
+    absences made the day's "done" figure meaningless: in eight days of real use the record held
+    56 credited absences against 5 routines actually done. The threshold follows the preset, so
+    it is 55 minutes on 55/5 and 25 on 25/5, and the same rule judges a gap when the app was not
+    running (20b). What standby does not do is end the day: only midnight does that (20a), and a
+    working day opening while movez was away, which is what a gap crossing working hours means.
+23d. **The menu shows snoozed and skipped, not done.** "Done" counted credited absences beside
+    routines, which made it the one number in the menu that could climb on a day with no movement
+    in it at all. It stays in the record, where the streak and the history read it. A break turned
+    away at the heads-up is now written down too: `hideHeadsUp` is also sent by sleep, idle and a
+    pause, so the coordinator could not tell a snooze from a dismissal and the day's snoozes and
+    skips were the overlay's alone.
+23e. **Movements are drawn at random, weighted, and a three-day memory weighs down what was
+    served recently.** Selection used to draw a shortlist and then take whichever movement was
+    closest to an ideal length, with ties going to the lowest id. In a library where nearly
+    everything runs 45–60 s that meant "the longest one, every time": one circulation movement
+    opened 53% of routines, 39 of 124 eligible movements ever appeared in a month, and the closer
+    was one of three movements 80% of the time. Length is now only a constraint, held afterwards
+    by the repair and trim steps that already enforce the 270–330 s window. A movement served
+    yesterday is worth a third of its weight, and is back to full weight on the fourth day. Over a
+    simulated month the same two-breaks-a-day pattern now reaches 100 movements, with no movement
+    in more than 11% of routines.
+23f. **The region rotation carries on across days, and there is no wake-up routine.** The
+    rotation index was the day's break count, so a user who takes two breaks a day saw the first
+    two slots — hips, then upper back — and no others, for ever. It is now a cursor over the
+    routines actually done, counted from the completions already in history. The wake-up shape
+    went with it: it applied to the first break of every calendar day, which for anyone working
+    odd hours is not the start of anything, and it spent half of its blocks on circulation. The
+    wind-down shape stays, but only when the working day genuinely closes — always-on working
+    hours report an end at midnight, which used to give anyone working late a wind-down routine
+    every night.
+23g. **The post-lunch rule is gone, and micro-breaks draw from more buckets.** A return from
+    twenty minutes away between 11:00 and 14:00 used to mark the next micro-break as post-lunch,
+    however many hours later it came, and that micro-break was a single minute drawn from four
+    movements. Every micro-break also contained a circulation movement, so twelve movements
+    carried all of them, and the balance and strength movements marked micro-eligible were never
+    served at all. Each emphasis now leads with its own buckets and follows with a wider set.
 24. **Settings apply live.** The scheduler re-plans from the bout that is already running, so
     changing a preset never costs the user the time they have already sat.
 

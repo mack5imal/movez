@@ -169,18 +169,18 @@ final class DebugViewModelTests: XCTestCase {
         XCTAssertNotNil(harness.coordinator.currentMicro)
     }
 
-    func testAFourHourGapResetsTheDay() {
+    func testAFourHourGapIsStandby() {
         let harness = harness()
-        harness.coordinator.inject(.userSkip)
+        harness.coordinator.scheduler.snapshot.skipsToday = 1
         debug(harness).fire(.simulateFourHourGap)
         XCTAssertEqual(harness.state.name, "post_break_grace", "a wake is quiet for a minute first")
 
         harness.run(seconds: 90)
         XCTAssertTrue(
-            reasons(harness).contains { $0.contains("new day") },
+            reasons(harness).contains { $0.contains("standby") },
             reasons(harness).joined(separator: " | ")
         )
-        XCTAssertEqual(harness.scheduler.snapshot.skipsToday, 0, "the counters start over")
+        XCTAssertEqual(harness.scheduler.snapshot.skipsToday, 1, "the day's counters are the day's, not the session's")
     }
 
     // MARK: - The inspector

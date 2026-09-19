@@ -152,8 +152,8 @@ extension Scheduler {
     ///
     /// Time movez could not observe is time it will not judge. A running app knows from the idle
     /// clock whether the user was at the keyboard; an app that was not running knows nothing, so
-    /// the countdown is moved forward by the gap rather than credited as a break. Only a gap long
-    /// enough to have ended the session outright starts the day over.
+    /// the countdown is moved forward by the gap rather than credited as a break. A gap as long as
+    /// the sitting interval is standby, exactly as the same stretch of idle would be.
     mutating func applyLaunchGap(seconds: Int, now: Date) -> [SchedulerEffect] {
         guard Double(seconds) > SignalAggregator.tickGapThresholdSeconds else {
             return rollDayIfStale(now: now)
@@ -173,8 +173,12 @@ extension Scheduler {
             return startFreshSession(now: now, reason: "relaunched with a break on screen")
         }
 
-        if seconds >= config.dayResetGapSeconds {
-            return resetDay(now: now, reason: "gone \(seconds / 3600) h — new day")
+        if seconds >= config.sitSeconds {
+            // Standby, applied to a launch: a gap that long has outlasted the interval it
+            // interrupted, so there is nothing left to carry forward. The counters are the day's,
+            // not the session's, and only midnight moves them.
+            rollDayCountersIfStale(now: now)
+            return startFreshSession(now: now, reason: "gone \(seconds / 60) min — standby")
         }
 
         return shiftInterval(by: seconds, now: now)
@@ -223,8 +227,10 @@ extension Scheduler {
         return [.persist, .menuRefresh]
     }
 
-    func shouldResetDay(gapSeconds: Int, now: Date) -> Bool {
-        if gapSeconds >= config.dayResetGapSeconds { return true }
+    /// True when a gap swallowed the opening of a working day, which is the one thing other than
+    /// midnight that ends a day. Length alone no longer resets anything: a long absence is
+    /// standby, and standby leaves the day's counters where they are.
+    func crossedWorkingDayOpening(gapSeconds: Int, now: Date) -> Bool {
         let since = now.addingTimeInterval(-Double(gapSeconds))
         guard let start = config.workingHours.nextStart(after: since, calendar: config.calendar),
               start <= now else { return false }
@@ -242,7 +248,6 @@ extension Scheduler {
         snapshot.skipsToday = 0
         snapshot.longestBoutSeconds = 0
         snapshot.microEmphasisIndex = 0
-        snapshot.postLunchPending = false
         snapshot.dayKey = DayKey.key(for: now, calendar: config.calendar)
     }
 
@@ -271,11 +276,11 @@ extension Scheduler {
         return [.persist, .menuRefresh]
     }
 
-    /// A gap long enough that the session it interrupted is over: the counters start again, the
+    /// A working day that opened while movez was not watching: the counters start again, the
     /// interval starts again, the settings do not.
     mutating func resetDay(now: Date, reason: String) -> [SchedulerEffect] {
-        // Unconditional: a four-hour gap at noon is still a reset, even though the day has not
-        // turned over.
+        // Unconditional: a working day that opened during the gap is a new day, whether or not
+        // the calendar day has turned over with it.
         rollDayCounters(now: now)
         return startFreshSession(now: now, reason: reason)
     }

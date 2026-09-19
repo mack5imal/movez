@@ -50,9 +50,13 @@ struct DailyStats: Codable, Equatable {
 
     static let empty = DailyStats()
 
-    /// "3 done · 1 snoozed · 1 skipped"
+    /// "1 snoozed · 1 skipped".
+    ///
+    /// `done` is deliberately not shown. It counts credited absences as well as routines, and a
+    /// day spent away from the desk can run the figure up without the user having done a single
+    /// movement, which made it the least trustworthy number in the menu.
     var summary: String {
-        "\(done) done · \(snoozed) snoozed · \(skipped) skipped"
+        "\(snoozed) snoozed · \(skipped) skipped"
     }
 }
 
@@ -172,6 +176,37 @@ final class HistoryStore {
 
     func completionCount(movementId: String) -> Int {
         data.completions.filter { $0.movementId == movementId }.count
+    }
+
+    /// How recently and how often each movement was served in the days before `date`, as the
+    /// scores `Recency` turns into selection weights.
+    ///
+    /// Today is left out: the builders already refuse to repeat a movement inside one day, and
+    /// counting today's servings here would only weight down something that cannot be picked.
+    func recencyScores(before date: Date) -> [String: Double] {
+        let today = calendar.startOfDay(for: date)
+        var scores: [String: Double] = [:]
+        for completion in data.completions {
+            let day = calendar.startOfDay(for: completion.at)
+            guard let daysAgo = calendar.dateComponents([.day], from: day, to: today).day else { continue }
+            let weight = Recency.weight(daysAgo: daysAgo)
+            guard weight > 0 else { continue }
+            scores[completion.movementId, default: 0] += weight
+        }
+        return scores
+    }
+
+    /// How many routines were done on the days before `date` — where the region rotation had got
+    /// to when today started.
+    ///
+    /// Counted from the completions rather than a stored number, because they already record which
+    /// routine each movement belonged to and they already survive a relaunch. Micro-breaks have no
+    /// routine id, so they do not move the rotation on. Today is excluded because the coordinator
+    /// adds today's breaks itself, from the routines it has in hand.
+    func routinesDoneBefore(_ date: Date) -> Int {
+        let today = calendar.startOfDay(for: date)
+        let ids = data.completions.filter { $0.at < today }.compactMap(\.routineId)
+        return Set(ids).count
     }
 
     func stats(on date: Date) -> DailyStats {

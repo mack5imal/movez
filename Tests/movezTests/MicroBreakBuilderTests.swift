@@ -35,25 +35,34 @@ final class MicroBreakBuilderTests: XCTestCase {
         }
     }
 
-    func testCirculationEmphasisLeadsWithCirculation() {
+    func testEveryEmphasisLeadsWithItsOwnBuckets() {
         for seed in 0..<100 {
-            let micro = micro(seed: UInt64(seed &* 19 &+ 3)) { $0.emphasisIndex = 0 }
-            XCTAssertEqual(micro.emphasis, .circulation)
-            XCTAssertEqual(micro.blocks.first?.movement.bucket, .cir)
-        }
-    }
+            let circulation = micro(seed: UInt64(seed &* 19 &+ 3)) { $0.emphasisIndex = 0 }
+            XCTAssertEqual(circulation.emphasis, .circulation)
+            XCTAssertTrue(
+                [.cir, .bal, .str].contains(circulation.blocks[0].movement.bucket),
+                "circulation led with \(circulation.blocks[0].movement.bucket)"
+            )
 
-    func testEyesHandsAndPostureEmphasesLeadWithTheirBuckets() {
-        for seed in 0..<100 {
             let eyesHands = micro(seed: UInt64(seed &* 23 &+ 4)) { $0.emphasisIndex = 1 }
             XCTAssertEqual(eyesHands.emphasis, .eyesHands)
             XCTAssertTrue([.eye, .hwf].contains(eyesHands.blocks[0].movement.bucket))
-            XCTAssertEqual(eyesHands.blocks.last?.movement.bucket, .cir, "circulation belongs in the second half")
 
             let posture = micro(seed: UInt64(seed &* 29 &+ 5)) { $0.emphasisIndex = 2 }
             XCTAssertEqual(posture.emphasis, .posture)
             XCTAssertTrue([.flx, .bre].contains(posture.blocks[0].movement.bucket))
         }
+    }
+
+    /// The whole micro-eligible library is reachable, which it was not while every micro-break
+    /// had to contain a circulation movement.
+    func testEveryBucketIsReachableAcrossManyMicroBreaks() {
+        var served: Set<Bucket> = []
+        for seed in 0..<300 {
+            let micro = micro(seed: UInt64(seed &* 31 &+ 6)) { $0.emphasisIndex = seed % 3 }
+            served.formUnion(micro.blocks.map(\.movement.bucket))
+        }
+        XCTAssertEqual(served, Set(Bucket.allCases), "missing \(Set(Bucket.allCases).subtracting(served))")
     }
 
     func testNeverRepeatsTheLastMicroOrTheNextFullBreak() {
@@ -79,22 +88,6 @@ final class MicroBreakBuilderTests: XCTestCase {
             }
             XCTAssertTrue(Set(micro.movementIds).isDisjoint(with: previous), "micro \(index) repeated a movement")
             previous = Set(micro.movementIds)
-        }
-    }
-
-    func testPostLunchIsASingleCirculationMinute() {
-        for seed in 0..<100 {
-            let micro = micro(seed: UInt64(seed &* 41 &+ 8)) { context in
-                context.isPostLunch = true
-                context.emphasisIndex = seed
-            }
-            XCTAssertEqual(micro.blocks.count, 1)
-            XCTAssertEqual(micro.blocks[0].seconds, 60)
-            XCTAssertEqual(micro.blocks[0].movement.bucket, .cir)
-            XCTAssertTrue(
-                MicroBreakBuilder.postLunchPreference.contains(micro.blocks[0].movement.id),
-                "post-lunch served \(micro.blocks[0].movement.id)"
-            )
         }
     }
 

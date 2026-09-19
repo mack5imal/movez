@@ -79,10 +79,21 @@ struct ToastInfo: Equatable {
     var secondsOnScreen: Int = ToastInfo.defaultSecondsOnScreen
 }
 
+/// What became of a break that was never started, so the coordinator can write it down.
+///
+/// A heads-up that is snoozed or skipped leaves nothing on screen to end, so `hideHeadsUp` is all
+/// the coordinator used to see — and that same effect is sent by sleep, idle and a pause. The
+/// outcome has to be named, or the day's snoozes and skips are the overlay's only.
+enum HeadsUpOutcome: String, Equatable {
+    case snoozed
+    case skipped
+}
+
 /// Everything the scheduler asks the world to do. The scheduler itself touches nothing.
 enum SchedulerEffect: Equatable {
     case showHeadsUp(HeadsUpInfo)
     case hideHeadsUp
+    case recordHeadsUpOutcome(HeadsUpOutcome)
     case startFullBreak(BreakPlan)
     case endFullBreak(BreakOutcome)
     case showMicroCountIn(MicroInfo)
@@ -105,6 +116,7 @@ extension SchedulerEffect {
         switch self {
         case .showHeadsUp: return "showHeadsUp"
         case .hideHeadsUp: return "hideHeadsUp"
+        case .recordHeadsUpOutcome(let outcome): return "recordHeadsUpOutcome(\(outcome.rawValue))"
         case .startFullBreak: return "startFullBreak"
         case .endFullBreak: return "endFullBreak"
         case .showMicroCountIn: return "showMicroCountIn"

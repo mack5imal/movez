@@ -1,17 +1,18 @@
 import Foundation
 
 /// The block shapes a generated routine can take. The standard shape is the chaining-rule
-/// default; the other three are the documented time-of-day variants (brief §6, library §13
-/// samples R3, R6 and R8).
+/// default; the wind-down is the documented variant for the last break of a working day (brief §6,
+/// library §13 sample R6).
+///
+/// There is no wake-up shape any more. It applied to the first break of every calendar day, which
+/// for anyone working odd hours is neither the start of their day nor a meaningful moment, and it
+/// spent two of four blocks on circulation, so the twenty circulation movements carried half of
+/// every such routine. Nor is there a post-lunch shape — see `Scheduler+Idle`.
 enum RoutineShape: String, Hashable, Codable, CaseIterable {
     /// CIR → FLX → (STR | BAL) → closer
     case standard
-    /// CIR → CIR → FLX → closer — the first break of the day is circulation-led.
-    case wakeUp
     /// CIR → FLX → FLX → BRE — the last break unwinds and ends on breath.
     case windDown
-    /// CIR → FLX → BAL → closer — after lunch, circulation plus balance.
-    case postLunch
 
     /// Buckets allowed at each position for a routine of `count` blocks.
     ///
@@ -22,9 +23,7 @@ enum RoutineShape: String, Hashable, Codable, CaseIterable {
         var positions: [[Bucket]]
         switch self {
         case .standard: positions = [[.cir], [.flx], [.str, .bal]]
-        case .wakeUp: positions = [[.cir], [.cir], [.flx]]
         case .windDown: positions = [[.cir], [.flx], [.flx]]
-        case .postLunch: positions = [[.cir], [.flx], [.bal]]
         }
         if count <= 3 { positions.removeLast() }
         if count >= 5 { positions.append([.flx]) }
@@ -39,9 +38,7 @@ enum RoutineShape: String, Hashable, Codable, CaseIterable {
 
     static func shape(for timeOfDay: TimeOfDay) -> RoutineShape {
         switch timeOfDay {
-        case .first: return .wakeUp
         case .last: return .windDown
-        case .postLunch: return .postLunch
         case .mid, .normal: return .standard
         }
     }
