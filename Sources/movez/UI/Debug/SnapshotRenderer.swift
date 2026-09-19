@@ -21,6 +21,7 @@ enum SnapshotSurface: String, CaseIterable {
     case menuSitting = "menu-sitting"
     case menuPaused = "menu-paused"
     case menuOffHours = "menu-offhours"
+    case menuAway = "menu-away"
     case menuIcon = "menu-icon"
     case settings
     case settingsHours = "settings-hours"
@@ -43,7 +44,7 @@ enum SnapshotSurface: String, CaseIterable {
         case .gallery: return CGSize(width: 1400, height: 2900)
         case .headsUp, .headsUpDeferred, .microCountIn, .microRunning: return Self.panelCanvas
         case .toast: return Self.toastCanvas
-        case .menuSitting, .menuPaused, .menuOffHours: return Self.menuCanvas
+        case .menuSitting, .menuPaused, .menuOffHours, .menuAway: return Self.menuCanvas
         case .menuIcon: return CGSize(width: 880, height: 260)
         case .settings, .settingsHours, .settingsLibrary, .settingsExceptions, .settingsCustom:
             return SettingsScreen.size
@@ -137,6 +138,8 @@ enum SnapshotRenderer {
             return AnyView(MenuSnapshot(state: SnapshotFixtures.menuPaused()))
         case .menuOffHours:
             return AnyView(MenuSnapshot(state: SnapshotFixtures.menuOffHours()))
+        case .menuAway:
+            return AnyView(MenuSnapshot(state: SnapshotFixtures.menuAway()))
         case .menuIcon:
             return AnyView(MenuIconStrip())
         default:

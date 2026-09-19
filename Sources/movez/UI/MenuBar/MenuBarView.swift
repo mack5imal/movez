@@ -63,7 +63,8 @@ struct MenuBarView: View {
     @ViewBuilder
     private var rows: some View {
         switch state.mode {
-        case .sitting: sittingRows
+        // Away offers exactly what sitting does: someone reading this menu is back at the desk.
+        case .sitting, .away: sittingRows
         case .paused: pausedRows
         case .offHours: offHoursRows
         }

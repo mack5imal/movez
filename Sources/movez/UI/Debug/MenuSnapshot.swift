@@ -61,7 +61,8 @@ struct MenuIconStrip: View {
         Sample(mode: .sitting, fraction: 0.42, caption: "42% elapsed", label: "32m"),
         Sample(mode: .sitting, fraction: 0.9, caption: "90% elapsed", label: "6m"),
         Sample(mode: .paused, fraction: 0, caption: "paused", label: "‖ 42m"),
-        Sample(mode: .offHours, fraction: 0, caption: "off hours", label: "—")
+        Sample(mode: .away, fraction: 0, caption: "away", label: "—"),
+        Sample(mode: .offHours, fraction: 0, caption: "off hours", label: "")
     ]
 
     /// Drawn at four times the menu bar's 12 pt so the arc is actually judgeable.

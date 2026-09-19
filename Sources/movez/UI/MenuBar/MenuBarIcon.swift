@@ -35,6 +35,8 @@ enum MenuBarIcon {
         case .sitting: return trackAlpha
         case .paused: return pausedAlpha
         case .offHours: return offHoursAlpha
+        // The same faint ring a closed day gets: there is no bout to show progress through.
+        case .away: return offHoursAlpha
         }
     }
 

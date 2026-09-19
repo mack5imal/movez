@@ -122,6 +122,7 @@ final class MenuBarViewModel: ObservableObject {
         case .sitting: applySitting(to: &next, now: now)
         case .paused: applyPaused(to: &next, now: now)
         case .offHours: applyOffHours(to: &next, now: now)
+        case .away: applyAway(to: &next, now: now)
         }
         // The coordinator publishes every two seconds; the menu bar only changes once a minute.
         // Assigning an identical state would redraw the menu-bar item for nothing.
@@ -136,6 +137,18 @@ final class MenuBarViewModel: ObservableObject {
         next.elapsedFraction = sitSeconds > 0 ? 1 - Double(remaining) / Double(sitSeconds) : 0
         next.title = MenuBarState.title(mode: .sitting, minutesRemaining: next.minutesRemaining)
         next.subtitle = coordinator.nextRoutinePreview?.subtitle ?? ""
+        applyStats(to: &next, day: "Today", stats: coordinator.history.stats(on: now))
+    }
+
+    /// Away, the countdown on show would be counting down an interval nobody is sitting through,
+    /// and it reached zero and stayed there while the user was gone. The absence is the number
+    /// worth showing instead.
+    private func applyAway(to next: inout MenuBarState, now: Date) {
+        let away = coordinator.menuState.awaySeconds ?? 0
+        next.minutesRemaining = Self.minutes(away)
+        next.elapsedFraction = 0
+        next.title = MenuBarState.awayTitle(seconds: away)
+        next.subtitle = MenuBarState.awaySubtitle
         applyStats(to: &next, day: "Today", stats: coordinator.history.stats(on: now))
     }
 
@@ -179,6 +192,7 @@ final class MenuBarViewModel: ObservableObject {
         switch menuMode {
         case .paused: return .paused
         case .offHours: return .offHours
+        case .away: return .away
         case .sitting, .breaking: return .sitting
         }
     }

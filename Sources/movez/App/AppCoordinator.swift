@@ -20,12 +20,18 @@ enum MenuMode: String, Equatable {
     case paused
     case offHours
     case breaking
+    /// Nobody is at the desk, or the quiet minute after a wake is still deciding what the
+    /// absence meant. Either way the countdown on show belongs to an interval that is not
+    /// running, so the menu counts the absence instead.
+    case away
 }
 
 /// What the menu bar shows, refreshed on every effect.
 struct MenuState: Equatable {
     var mode: MenuMode = .sitting
     var secondsUntilBreak: Int?
+    /// How long the user has been away, while they are.
+    var awaySeconds: Int?
     var nextBreakAt: Date?
     var pausedUntil: Date?
     var nextRoutineSubtitle: String = ""

@@ -219,6 +219,55 @@ final class MenuBarViewModelTests: XCTestCase {
         )
     }
 
+    // MARK: - Away
+
+    /// The bug this covers: an absence outlives the countdown, so the menu counted down to zero
+    /// and sat there claiming a break was due to someone who was not at the desk.
+    func testAwayShowsHowLongTheUserHasBeenGoneRatherThanAStaleCountdown() {
+        let harness = harness()
+        harness.run(seconds: 50 * 60)
+        harness.coordinator.inject(.idle(seconds: 6 * 60))
+        harness.run(seconds: 20 * 60)
+        let menu = viewModel(harness)
+
+        XCTAssertEqual(menu.state.mode, .away)
+        XCTAssertEqual(menu.state.minutesRemaining, 26, "six minutes idle plus twenty more away")
+        XCTAssertEqual(menu.state.title, "Away 26 min")
+        XCTAssertEqual(menu.state.subtitle, "Your countdown is on hold")
+        XCTAssertEqual(menu.labelText, "—")
+        XCTAssertEqual(menu.state.discMode, .empty)
+        XCTAssertEqual(menu.state.discNumerals, "")
+        XCTAssertFalse(menu.state.title.contains("Next break"), "the countdown is not running")
+    }
+
+    /// The quiet minute after a wake still belongs to the absence, which is when the user is most
+    /// likely to be looking at the menu.
+    func testTheQuietMinuteAfterAWakeStillReadsAsAway() {
+        let harness = harness()
+        harness.run(seconds: 10 * 60)
+        harness.coordinator.inject(.sleep)
+        harness.clock.advance(68 * 60)
+        harness.coordinator.inject(.wake(gapSeconds: 68 * 60))
+        harness.run(seconds: 20)
+        let menu = viewModel(harness)
+
+        XCTAssertEqual(menu.state.mode, .away)
+        XCTAssertEqual(menu.state.title, "Away 68 min", "frozen at the length of the absence")
+
+        // The quiet minute ends, standby resolves the absence, and the countdown starts again.
+        harness.run(seconds: 60)
+        menu.refresh()
+        XCTAssertEqual(menu.state.mode, .sitting)
+        XCTAssertEqual(menu.state.minutesRemaining, 55)
+    }
+
+    func testAwayTitleSwitchesToHoursWhenMinutesStopReading() {
+        XCTAssertEqual(MenuBarState.awayTitle(seconds: 7 * 60), "Away 7 min")
+        XCTAssertEqual(MenuBarState.awayTitle(seconds: 119 * 60), "Away 119 min")
+        XCTAssertEqual(MenuBarState.awayTitle(seconds: 200 * 60), "Away 3 h 20 m")
+        XCTAssertEqual(MenuBarState.title(mode: .away, minutesRemaining: 68), "Away 68 min")
+    }
+
     // MARK: - Stats strings
 
     func testStatsStrings() {

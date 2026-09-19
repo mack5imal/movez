@@ -297,6 +297,14 @@ extension AppCoordinator {
         case .paused(let until):
             state.mode = .paused
             state.pausedUntil = until
+        case .away(let since):
+            state.mode = .away
+            state.awaySeconds = max(0, Int(now.timeIntervalSince(since)))
+        case .postBreakGrace(_, .returnFromAbsence(let since, let returnedAt)):
+            // The absence is over and is being judged; the number stops where it stopped rather
+            // than climbing through the quiet minute.
+            state.mode = .away
+            state.awaySeconds = max(0, Int(returnedAt.timeIntervalSince(since)))
         case .offHours:
             state.mode = .offHours
         case .fullBreak, .headsUp, .microCountIn, .microRunning:

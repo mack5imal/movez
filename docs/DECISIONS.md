@@ -96,6 +96,14 @@ Sources of truth, in order: `product-brief-v1.md`, `scheduler-research-v1.md`,
     display disagreeing with it, not the app misbehaving. Aligning it would mean changing the
     on-disk history format, the streak calculation and every surface that reads them, which is a
     great deal of machinery for a number that is only ever glanced at.
+19a. **The menu says when the user is away.** The dropdown had four modes and none of them was
+    "nobody is here", so an absence kept counting the old interval down, reached zero and stayed
+    there — a menu claiming a break was overdue to someone who had been gone an hour, and a "0m"
+    in the menu bar to match. It now reads "Away 68 min · Your countdown is on hold", with an em
+    dash beside an empty ring. Deliberately not "paused": a pause is something the user asks for
+    and the menu can name an end for. The quiet minute after a wake (23b) reads the same way, with
+    the number frozen at the length of the absence being judged, because that minute is exactly
+    when someone is most likely to open the menu.
 21. **Nothing is polled while paused or off hours.** The signal monitors stop outright rather than
     sampling into a void; a thirty-second wake-check notices when the pause runs out.
 22. **A break counts as done at half the movements or half the time** (research §4.11).

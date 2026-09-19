@@ -44,6 +44,8 @@ struct MenuBarState: Equatable {
         case sitting
         case paused
         case offHours
+        /// Away from the desk. `minutesRemaining` carries the minutes gone, not the minutes left.
+        case away
     }
 
     /// The minutes the menu offers to bring the next break forward by.
@@ -74,6 +76,9 @@ struct MenuBarState: Equatable {
         case .sitting: return "\(minutesRemaining)m"
         case .paused: return "‖ \(minutesRemaining)m"
         case .offHours: return ""
+        // A dash rather than a number: the countdown is not running, and it is not nothing
+        // either, which is what an empty label means off hours.
+        case .away: return "—"
         }
     }
 
@@ -87,6 +92,8 @@ struct MenuBarState: Equatable {
         case .sitting: return .full
         case .paused: return .dashed
         case .offHours: return .empty
+        // Empty, not dashed: dashed is the paused ring, and being away is not a pause.
+        case .away: return .empty
         }
     }
 
@@ -104,8 +111,19 @@ struct MenuBarState: Equatable {
         case .sitting: return "Next break in \(minutesRemaining) min"
         case .paused: return indefinite ? "Paused" : "Paused · \(minutesRemaining) min left"
         case .offHours: return "Off hours"
+        case .away: return awayTitle(seconds: minutesRemaining * 60)
         }
     }
+
+    /// "Away 42 min", and "Away 3 h 20 m" once minutes alone stop being readable.
+    static func awayTitle(seconds: Int) -> String {
+        let minutes = max(0, seconds) / 60
+        guard minutes >= 120 else { return "Away \(minutes) min" }
+        return "Away \(AppCoordinator.duration(seconds))"
+    }
+
+    /// Not "paused": a pause is something the user asks for, with an end the menu can name.
+    static let awaySubtitle = "Your countdown is on hold"
 
     /// "Countdown resumes at 15:00 with 23 min left", or without the time when the pause has no
     /// end — a Focus filter decides when that one lifts, not the clock.

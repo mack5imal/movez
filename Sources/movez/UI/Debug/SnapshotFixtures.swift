@@ -274,6 +274,19 @@ extension SnapshotFixtures {
         return state
     }
 
+    /// Just back from an hour away, inside the quiet minute that judges the absence — the state
+    /// that used to read "Next break in 0 min".
+    static func menuAway() -> MenuBarState {
+        var state = MenuBarState()
+        state.mode = .away
+        state.minutesRemaining = 68
+        state.title = MenuBarState.awayTitle(seconds: 68 * 60)
+        state.subtitle = MenuBarState.awaySubtitle
+        state.stats = MenuBarState.statsLine(day: "Today", stats: menuStats)
+        state.longestBout = MenuBarState.longestBoutLine(seconds: menuStats.longestBoutSeconds)
+        return state
+    }
+
     static func menuOffHours() -> MenuBarState {
         var state = MenuBarState()
         state.mode = .offHours
