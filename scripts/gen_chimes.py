@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""Synthesise the four movez chimes as 44.1 kHz 16-bit mono WAV files.
+"""Synthesise the five movez chimes as 44.1 kHz 16-bit mono WAV files.
 
 Stdlib only. Re-running is idempotent: the same bytes are produced every time.
 
-    headsup.wav     two soft notes, E5 then G5, 120 ms each, -12 dBFS
-    transition.wav  a single C6 note, 150 ms, -14 dBFS
-    completion.wav  three ascending notes, C5-E5-G5, 140 ms each, 60 ms apart, -12 dBFS
-    toast.wav       a single A5 note, 220 ms, -16 dBFS — the quietest, for the away toast
+    headsup.wav       two soft notes, E5 then G5, 120 ms each, -12 dBFS
+    transition.wav    a single C6 note, 150 ms, -14 dBFS
+    completion.wav    three ascending notes, C5-E5-G5, 140 ms each, 60 ms apart, -12 dBFS
+    toast.wav         a single A5 note, 220 ms, -16 dBFS — the quietest, for the away toast
+    microcountin.wav  a single E5 note, 180 ms, -18 dBFS — softer still: it announces a minute
 """
 
 from __future__ import annotations
@@ -74,10 +75,14 @@ def main() -> None:
     soft = dbfs_to_amplitude(-12.0)
     softer = dbfs_to_amplitude(-14.0)
     softest = dbfs_to_amplitude(-16.0)
+    quietest = dbfs_to_amplitude(-18.0)
 
     headsup = note(NOTES["E5"], 0.120, soft) + note(NOTES["G5"], 0.120, soft)
     transition = note(NOTES["C6"], 0.150, softer)
     toast = note(NOTES["A5"], 0.220, softest)
+    # One note from the heads-up pair, quieter: the same app clearing its throat, for a minute
+    # rather than five.
+    micro_count_in = note(NOTES["E5"], 0.180, quietest)
     completion: list[float] = []
     for index, name in enumerate(("C5", "E5", "G5")):
         if index:
@@ -89,6 +94,7 @@ def main() -> None:
         ("transition.wav", transition),
         ("completion.wav", completion),
         ("toast.wav", toast),
+        ("microcountin.wav", micro_count_in),
     ):
         size = write_wav(out_dir / name, fade_tail(list(samples)))
         seconds = len(samples) / SAMPLE_RATE

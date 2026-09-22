@@ -179,7 +179,7 @@ extension Scheduler {
             countInSeconds: config.microCountInSeconds,
             seconds: config.microSeconds
         )
-        return [.showMicroCountIn(info), .persist, .menuRefresh]
+        return [.showMicroCountIn(info), .chime(.microCountIn), .persist, .menuRefresh]
     }
 
     mutating func enterMicroRunning(now: Date) -> [SchedulerEffect] {
@@ -197,8 +197,28 @@ extension Scheduler {
         case .microCountIn, .microRunning: break
         default: return []
         }
+        let record = microRecord(now: now)
         closeMicroCycle(now: now, reason: "micro-break finished")
-        return [.hideMicro, .persist, .menuRefresh]
+        return record + [.hideMicro, .persist, .menuRefresh]
+    }
+
+    /// How long the movement itself has been on screen. A count-in is not the micro-break: nothing
+    /// has been asked of the user yet.
+    func microRanSeconds(now: Date) -> Int {
+        guard case .microRunning(let startedAt) = snapshot.state else { return 0 }
+        return max(0, Int(now.timeIntervalSince(startedAt)))
+    }
+
+    /// A micro-break is written to history at half its length, the rule the full break already uses
+    /// (research §4.11).
+    ///
+    /// It has to be a rule rather than "the panel went away", because the panel goes away for a
+    /// snooze, a skip, a closed lid and an idle stretch alike. Recording all four wrote movements
+    /// nobody did into history, where they then weighed themselves down for three days (23e).
+    func microRecord(now: Date) -> [SchedulerEffect] {
+        let ran = microRanSeconds(now: now)
+        guard ran * 2 >= config.microSeconds else { return [] }
+        return [.recordMicroDone(seconds: ran)]
     }
 
     /// One snooze puts the micro-break back in five minutes; a second is a skip.
@@ -209,10 +229,11 @@ extension Scheduler {
         }
         guard !snapshot.microSnoozeUsed else { return skipMicro(now: now) }
 
+        let record = microRecord(now: now)
         snapshot.microSnoozeUsed = true
         snapshot.nextMicroDueAt = now.addingTimeInterval(TimeInterval(config.snoozeSeconds))
         transition(to: .sitting, reason: "micro-break snoozed", at: now)
-        return [.hideMicro, .persist, .menuRefresh]
+        return record + [.hideMicro, .persist, .menuRefresh]
     }
 
     mutating func skipMicro(now: Date) -> [SchedulerEffect] {
@@ -220,8 +241,9 @@ extension Scheduler {
         case .microCountIn, .microRunning: break
         default: return []
         }
+        let record = microRecord(now: now)
         closeMicroCycle(now: now, reason: "micro-break skipped")
-        return [.hideMicro, .persist, .menuRefresh]
+        return record + [.hideMicro, .persist, .menuRefresh]
     }
 
     /// Ends the micro cycle and re-anchors the next one to the cycle's original start, so a

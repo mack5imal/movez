@@ -162,11 +162,15 @@ final class PanelViewModel: ObservableObject {
         micro?.blocks.first?.movement.settings == [.chair] ? "seated" : "standing"
     }
 
-    /// The countdown on the disc. The count-in runs towards the movement, so it wears a minus.
+    /// The countdown on the disc.
+    ///
+    /// A count-in runs towards a break rather than through one, so it wears a minus: the heads-up
+    /// minute and the micro-break's thirty seconds both count down to zero, and without it nothing
+    /// tells them apart from the break time they are about to hand over to.
     var discNumerals: String {
         switch phase {
-        case .headsUp, .microRunning: return OverlayState.clock(remaining)
-        case .microCountIn: return "−\(OverlayState.clock(remaining))"
+        case .microRunning: return OverlayState.clock(remaining)
+        case .headsUp, .microCountIn: return "−\(OverlayState.clock(remaining))"
         case .toast: return ""
         }
     }

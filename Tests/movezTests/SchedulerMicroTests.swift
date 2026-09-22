@@ -96,6 +96,91 @@ final class SchedulerMicroTests: XCTestCase {
         XCTAssertEqual(harness.snapshot.nextMicroDueAt, anchor?.addingTimeInterval(30 * minute))
     }
 
+    // MARK: - A micro-break on screen
+
+    /// A call that starts while the micro-break is up used to take it down, and the re-anchor then
+    /// landed inside the quiet zone before the full break, where a micro-break is dropped — so the
+    /// user lost it altogether. What is on screen is seconds from over; it is allowed to finish.
+    func testSignalsDoNotInterruptAMicroBreakAlreadyOnScreen() {
+        let harness = SchedulerHarness()
+        harness.run(until: { $0.isMicroCountIn }, limit: 40 * minute)
+
+        XCTAssertEqual(harness.send(.signals(SignalSnapshot(microphoneActive: true))), [])
+        XCTAssertTrue(harness.state.isMicroCountIn)
+
+        harness.run(until: { $0.isMicroRunning })
+        XCTAssertEqual(harness.send(.signals(SignalSnapshot(microphoneActive: true))), [])
+        XCTAssertTrue(harness.state.isMicroRunning)
+
+        harness.run(until: { $0.isSitting })
+        XCTAssertNotNil(harness.snapshot.nextMicroDueAt ?? harness.snapshot.nextFullDueAt)
+
+        // Only once it is over does the call take hold.
+        harness.send(.signals(SignalSnapshot(microphoneActive: true)))
+        XCTAssertEqual(harness.state.name, "suppressed")
+    }
+
+    // MARK: - What reaches history
+
+    private func ranSeconds(_ harness: SchedulerHarness) -> [Int] {
+        harness.effects.compactMap { effect in
+            if case .recordMicroDone(let seconds) = effect { return seconds } else { return nil }
+        }
+    }
+
+    func testAMicroBreakThatRanItsMinuteIsRecorded() {
+        let harness = SchedulerHarness()
+        harness.run(until: { $0.isMicroRunning }, limit: 40 * minute)
+        harness.clearEffects()
+
+        harness.run(until: { $0.isSitting })
+        XCTAssertEqual(ranSeconds(harness), [60])
+    }
+
+    func testAMicroBreakSkippedPastHalfItsLengthIsRecorded() {
+        let harness = SchedulerHarness()
+        harness.run(until: { $0.isMicroRunning }, limit: 40 * minute)
+        harness.clock.advance(35)
+        harness.clearEffects()
+
+        harness.send(.userMicroSkip)
+        XCTAssertEqual(ranSeconds(harness), [35], "half the minute is the full break's rule too")
+    }
+
+    /// The count-in is not the micro-break: nothing has been asked of the user yet. Recording it
+    /// put movements nobody did into history, where they weighed themselves down for three days.
+    func testACountInThatNeverStartedRecordsNothing() {
+        let harness = SchedulerHarness()
+        harness.run(until: { $0.isMicroCountIn }, limit: 40 * minute)
+        harness.clearEffects()
+
+        harness.send(.userMicroSkip)
+        XCTAssertEqual(ranSeconds(harness), [])
+        XCTAssertTrue(harness.effectNames.contains("hideMicro"), "the panel still comes down")
+    }
+
+    func testAMicroBreakSkippedAtOnceRecordsNothing() {
+        let harness = SchedulerHarness()
+        harness.run(until: { $0.isMicroRunning }, limit: 40 * minute)
+        harness.clock.advance(2)
+        harness.clearEffects()
+
+        harness.send(.userMicroSkip)
+        XCTAssertEqual(ranSeconds(harness), [])
+    }
+
+    /// Idle, sleep and a pause all take the panel down through `dismissSurfaces`, and are judged on
+    /// the same rule rather than never being recorded at all.
+    func testAnIdleStretchRecordsAMicroBreakThatHadAlreadyRun() {
+        let harness = SchedulerHarness()
+        harness.run(until: { $0.isMicroRunning }, limit: 40 * minute)
+        harness.clock.advance(40)
+        harness.clearEffects()
+
+        harness.send(.idle(seconds: 5 * Int(minute)))
+        XCTAssertEqual(ranSeconds(harness), [40])
+    }
+
     func testMicroDueDuringHeadsUpIsDropped() {
         let harness = SchedulerHarness()
         harness.run(until: { $0.isHeadsUp }, limit: 60 * minute)

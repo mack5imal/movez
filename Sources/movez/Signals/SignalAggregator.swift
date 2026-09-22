@@ -17,6 +17,8 @@ final class SignalAggregator {
     nonisolated static let tickGapThresholdSeconds: TimeInterval = 10
     /// A synthesized wake this close to a real one is a duplicate.
     static let wakeCoalesceSeconds: TimeInterval = 5
+    /// How long the microphone has to be in use before it is treated as a call — see `sustained`.
+    static let micSustainSeconds: TimeInterval = 60
 
     private let idle: IdleSource
     private let mic: MicSource
@@ -27,6 +29,7 @@ final class SignalAggregator {
     private let dispatch: (SchedulerEvent) -> Void
 
     private var timer: DispatchSourceTimer?
+    private var micSustain = SustainedSignal()
     private(set) var pollCount = 0
     private(set) var lastPollAt: Date?
     private(set) var lastWakeAt: Date?
@@ -98,7 +101,7 @@ final class SignalAggregator {
         lastPollAt = now
         pollCount += 1
 
-        let snapshot = read(now: now)
+        let snapshot = sustained(read(now: now), now: now)
         lastSnapshot = snapshot
 
         dispatch(.input(lastEventAgeSeconds: snapshot.idleSeconds))
@@ -125,6 +128,25 @@ final class SignalAggregator {
         )
     }
 
+    /// Holds the microphone to a minute of continuous use before it means a call.
+    ///
+    /// `kAudioDevicePropertyDeviceIsRunningSomewhere` cannot say which process is listening, and a
+    /// dictation tool holds the mic for a few seconds at a time. Each of those bursts used to defer
+    /// every break for the burst plus a two-minute grace, and one of them landed on a micro-break
+    /// and took it off screen. A call outlasts a minute; a dictated sentence does not.
+    ///
+    /// Only the mic is held this way. A screen share and a fullscreen app are steady states that
+    /// mean what they say from the first reading.
+    func sustained(_ snapshot: SignalSnapshot, now: Date) -> SignalSnapshot {
+        var held = snapshot
+        held.microphoneActive = micSustain.isSustained(
+            snapshot.microphoneActive,
+            now: now,
+            threshold: Self.micSustainSeconds
+        )
+        return held
+    }
+
     private func frontmostBundleId() -> String? {
         NSWorkspace.shared.frontmostApplication?.bundleIdentifier
     }
@@ -143,5 +165,24 @@ final class SignalAggregator {
     /// Records that a real wake notification arrived, so the next poll does not synthesize one.
     func noteRealWake(at date: Date) {
         lastWakeAt = date
+    }
+}
+
+/// A signal that has to hold before it is believed.
+///
+/// It keeps the moment the reading first came up and reports nothing until the threshold has
+/// passed, so a burst shorter than that is never seen by anything downstream. Any false reading
+/// puts it back to the start: a signal that flickers off has stopped, whatever comes next.
+struct SustainedSignal {
+    private(set) var since: Date?
+
+    mutating func isSustained(_ raw: Bool, now: Date, threshold: TimeInterval) -> Bool {
+        guard raw else {
+            since = nil
+            return false
+        }
+        let start = since ?? now
+        since = start
+        return now.timeIntervalSince(start) >= threshold
     }
 }

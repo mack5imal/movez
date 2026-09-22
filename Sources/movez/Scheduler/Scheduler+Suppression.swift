@@ -22,10 +22,11 @@ extension Scheduler {
         case .headsUp(_, let deferredSince):
             deferred = deferredSince ?? snapshot.nextFullDueAt
             effects.append(.hideHeadsUp)
-        case .microCountIn, .microRunning:
-            effects += dismissSurfaces(now: now)
         default:
-            // A break already on screen is left alone, and paused or off-hours outrank a call.
+            // A break already on screen is left alone — a micro-break as much as a full one, since
+            // both are a few seconds from over and taking one down loses it entirely: its re-anchor
+            // lands inside the quiet zone before the full break, where a micro-break is dropped.
+            // Paused and off-hours outrank a call too.
             return []
         }
 

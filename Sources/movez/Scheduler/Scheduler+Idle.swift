@@ -185,10 +185,11 @@ extension Scheduler {
         case .fullBreak:
             return [.endFullBreak(.interrupted)]
         case .microCountIn, .microRunning:
+            let record = microRecord(now: now)
             snapshot.nextMicroDueAt = microDue(anchoredAt: snapshot.microAnchorAt ?? now)
             snapshot.microAnchorAt = nil
             snapshot.microSnoozeUsed = false
-            return [.hideMicro]
+            return record + [.hideMicro]
         default:
             return []
         }

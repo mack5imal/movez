@@ -87,25 +87,27 @@ final class PanelViewModelTests: XCTestCase {
         XCTAssertEqual(PanelViewModel.headsUpBody(minutes: 3, movements: 5), "Three minutes, five movements.")
     }
 
+    /// The minute counts down to the break rather than through it, so it wears a minus, exactly as
+    /// the micro-break's count-in does.
     func testTheDiscDrainsOverTheHeadsUpMinute() {
         let clock = ManualClock(now: start)
         let model = headsUp(clock: clock)
 
         XCTAssertEqual(model.remaining, 60)
         XCTAssertEqual(model.progress, 1, accuracy: 0.001)
-        XCTAssertEqual(model.discNumerals, "1:00")
+        XCTAssertEqual(model.discNumerals, "−1:00")
 
         clock.advance(30)
         model.tick()
         XCTAssertEqual(model.remaining, 30)
         XCTAssertEqual(model.progress, 0.5, accuracy: 0.001)
-        XCTAssertEqual(model.discNumerals, "0:30")
+        XCTAssertEqual(model.discNumerals, "−0:30")
 
         clock.advance(30)
         model.tick()
         XCTAssertEqual(model.remaining, 0)
         XCTAssertEqual(model.progress, 0, accuracy: 0.001)
-        XCTAssertEqual(model.discNumerals, "0:00")
+        XCTAssertEqual(model.discNumerals, "−0:00")
     }
 
     func testStartNowGoesToTheCoordinator() {

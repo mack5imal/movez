@@ -115,6 +115,59 @@ final class SignalAggregatorTests: XCTestCase {
         XCTAssertTrue(gapEvents.isEmpty, "the real notification already covered it")
     }
 
+    // MARK: - The microphone has to hold
+
+    /// Dictation holds the mic for a few seconds at a time, and every one of those bursts used to
+    /// defer breaks for the burst plus a two-minute grace.
+    func testAShortMicrophoneBurstNeverSuppresses() {
+        let harness = CoordinatorHarness()
+        let fakes = makeAggregator(harness: harness)
+
+        fakes.mic.inUse = true
+        poll(fakes.aggregator, harness: harness, seconds: 30)
+        XCTAssertFalse(fakes.aggregator.lastSnapshot.microphoneActive, "half a minute is a sentence, not a call")
+        XCTAssertEqual(harness.state.name, "sitting")
+
+        fakes.mic.inUse = false
+        poll(fakes.aggregator, harness: harness, seconds: 4)
+        XCTAssertEqual(harness.state.name, "sitting", "and nothing was deferred on the way out")
+    }
+
+    func testAMicrophoneHeldForAMinuteSuppresses() {
+        let harness = CoordinatorHarness()
+        let fakes = makeAggregator(harness: harness)
+
+        fakes.mic.inUse = true
+        poll(fakes.aggregator, harness: harness, seconds: SignalAggregator.micSustainSeconds + 2)
+        XCTAssertTrue(fakes.aggregator.lastSnapshot.microphoneActive)
+        XCTAssertEqual(harness.state.name, "suppressed", "a call outlasts a minute")
+    }
+
+    /// Two bursts either side of a quiet poll are two bursts, not one long call.
+    func testTheMinuteStartsAgainWheneverTheMicrophoneDropsOut() {
+        let harness = CoordinatorHarness()
+        let fakes = makeAggregator(harness: harness)
+
+        fakes.mic.inUse = true
+        poll(fakes.aggregator, harness: harness, seconds: 40)
+        fakes.mic.inUse = false
+        poll(fakes.aggregator, harness: harness, seconds: 2)
+        fakes.mic.inUse = true
+        poll(fakes.aggregator, harness: harness, seconds: 40)
+
+        XCTAssertFalse(fakes.aggregator.lastSnapshot.microphoneActive, "eighty seconds, but never sixty in a row")
+        XCTAssertEqual(harness.state.name, "sitting")
+    }
+
+    func testAScreenShareStillSuppressesOnTheFirstReading() {
+        let harness = CoordinatorHarness()
+        let fakes = makeAggregator(harness: harness)
+
+        fakes.capture.captured = true
+        poll(fakes.aggregator, harness: harness, seconds: 2)
+        XCTAssertEqual(harness.state.name, "suppressed", "a share means what it says at once")
+    }
+
     func testPollingFollowsTheSchedulersRequirement() {
         let harness = CoordinatorHarness()
         let aggregator = makeAggregator(harness: harness).aggregator

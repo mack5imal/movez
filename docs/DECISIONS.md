@@ -164,6 +164,30 @@ Sources of truth, in order: `product-brief-v1.md`, `scheduler-research-v1.md`,
     movements. Every micro-break also contained a circulation movement, so twelve movements
     carried all of them, and the balance and strength movements marked micro-eligible were never
     served at all. Each emphasis now leads with its own buckets and follows with a wider set.
+23h. **The microphone means a call only after a minute, and a micro-break on screen is left
+    alone.** `kAudioDevicePropertyDeviceIsRunningSomewhere` cannot say which process is listening,
+    and a dictation tool holds the mic for a few seconds at a time. Every one of those bursts used
+    to defer breaks for the burst plus the two-minute grace: twenty of them in an hour of real use,
+    and one landed 28 seconds into a micro-break's count-in, took it off screen, and re-anchored the
+    next one inside the quiet zone before the full break — where research §4.10 says to drop it. So
+    the user lost the micro-break altogether and the next signal any surface gave them was the full
+    break half an hour later. The mic is now held to sixty seconds of continuous use before it
+    counts (`SustainedSignal`, in the aggregator, so the scheduler still sees a plain reading), and
+    suppression no longer takes down a micro-break that is already up, exactly as it already left a
+    running full break alone. A screen share and a fullscreen app still suppress on the first
+    reading: they are steady states that mean what they say. Naming the process that holds the mic
+    (macOS 14.2 can) would be more precise and is the next step if a minute proves too blunt.
+23i. **A micro-break is written to history only if it ran for half its length.** The coordinator
+    used to record its movements whenever the panel came down, and the panel comes down for a
+    snooze, a skip, a closed lid and an idle stretch as well as for a minute of movement — so a
+    micro-break nobody did was recorded as done, and under 23e those movements then weighed
+    themselves down for three days. The scheduler, which is the only thing that knows what just
+    happened, now says so with `recordMicroDone`, on the same half rule the full break uses
+    (research §4.11). A count-in that never reached the movement records nothing at all.
+23j. **The micro-break's count-in chimes.** It is the quietest of the five notes, and it is there
+    because the panel takes no focus and opens on whichever display the pointer is on: in silence
+    its thirty seconds ran out unnoticed, which reads to the user as a micro-break that fired
+    without a count-in, or as one that never fired at all.
 24. **Settings apply live.** The scheduler re-plans from the bout that is already running, so
     changing a preset never costs the user the time they have already sat.
 

@@ -252,6 +252,27 @@ final class CoordinatorSimulatedDayTests: XCTestCase {
         XCTAssertEqual(skipped.history.streak(on: skipped.now), 0, "a skip ends the streak wherever it is made")
     }
 
+    /// History used to be written whenever the panel came down, so a micro-break taken off screen
+    /// by a call — or by a lid, or by an idle stretch — was recorded as done, and its movements
+    /// then weighed themselves down for three days (23e).
+    func testOnlyAMicroBreakThatRanReachesHistory() {
+        let dismissed = CoordinatorHarness()
+        _ = dismissed.run(until: { $0.isMicroCountIn }, limit: 40 * minute)
+        XCTAssertNotNil(dismissed.coordinator.currentMicro)
+        dismissed.coordinator.inject(.userMicroSkip)
+
+        XCTAssertTrue(dismissed.history.data.completions.isEmpty, "a count-in nobody saw through is not a movement")
+        XCTAssertNil(dismissed.coordinator.currentMicro)
+
+        let taken = CoordinatorHarness()
+        _ = taken.run(until: { $0.isMicroRunning }, limit: 40 * minute)
+        let movements = taken.coordinator.currentMicro?.movementIds ?? []
+        XCTAssertFalse(movements.isEmpty)
+        _ = taken.run(until: { $0.isSitting })
+
+        XCTAssertEqual(taken.history.data.completions.map(\.movementId), movements)
+    }
+
     /// The region rotation is a cursor over routines actually done, not a counter that starts
     /// again each morning: two breaks a day used to mean the first two slots, for ever.
     func testTheRotationCarriesOnIntoTheNextDay() {

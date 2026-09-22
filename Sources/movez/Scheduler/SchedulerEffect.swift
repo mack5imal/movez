@@ -8,6 +8,10 @@ enum Chime: String, Codable, Equatable, CaseIterable {
     /// One soft note as the away toast appears, so a toast that lands while the user is still
     /// turning back to the screen is not missed.
     case toast
+    /// The quietest note of the five, as the micro-break's count-in appears. The panel takes no
+    /// focus and opens on whichever display the pointer is on, so in silence its thirty seconds
+    /// run out unnoticed — which is a micro-break lost to a user who would have taken it.
+    case microCountIn
 
     var resourceName: String {
         switch self {
@@ -15,6 +19,7 @@ enum Chime: String, Codable, Equatable, CaseIterable {
         case .transition: return "transition"
         case .completion: return "completion"
         case .toast: return "toast"
+        case .microCountIn: return "microcountin"
         }
     }
 }
@@ -98,6 +103,8 @@ enum SchedulerEffect: Equatable {
     case endFullBreak(BreakOutcome)
     case showMicroCountIn(MicroInfo)
     case showMicroRunning
+    /// The micro-break ran long enough to count, and its movements belong in history.
+    case recordMicroDone(seconds: Int)
     case hideMicro
     case chime(Chime)
     case showToast(ToastInfo)
@@ -121,6 +128,7 @@ extension SchedulerEffect {
         case .endFullBreak: return "endFullBreak"
         case .showMicroCountIn: return "showMicroCountIn"
         case .showMicroRunning: return "showMicroRunning"
+        case .recordMicroDone(let seconds): return "recordMicroDone(\(seconds))"
         case .hideMicro: return "hideMicro"
         case .chime(let chime): return "chime(\(chime.rawValue))"
         case .showToast: return "showToast"
