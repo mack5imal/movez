@@ -132,7 +132,10 @@ final class SchedulerCoreTests: XCTestCase {
         let config = SchedulerConfig()
         XCTAssertFalse(Scheduler.meetsCompletionRule(completed: 1, total: 4, elapsed: 40, config: config))
         XCTAssertTrue(Scheduler.meetsCompletionRule(completed: 2, total: 4, elapsed: 40, config: config))
-        XCTAssertTrue(Scheduler.meetsCompletionRule(completed: 0, total: 4, elapsed: 150, config: config))
+        // Half the planned time, lead-ins included: 162 of 325 s.
+        XCTAssertEqual(config.completionSeconds, 162)
+        XCTAssertFalse(Scheduler.meetsCompletionRule(completed: 0, total: 4, elapsed: 161, config: config))
+        XCTAssertTrue(Scheduler.meetsCompletionRule(completed: 0, total: 4, elapsed: 162, config: config))
         XCTAssertTrue(Scheduler.meetsCompletionRule(completed: 3, total: 5, elapsed: 10, config: config))
 
         let harness = SchedulerHarness()

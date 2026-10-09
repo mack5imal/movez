@@ -19,7 +19,9 @@ enum SnapshotFixtures {
         """
     static let collapsedMovementName = "Wall sit"
 
-    static let stripNames = ["March in place", "Hip flexor /side", "Wall sit", "Box breathing"]
+    /// Circulation first, then balance, flexibility and strength in whatever order the break drew,
+    /// then the closer.
+    static let stripNames = ["March in place", "Single-leg stand", "Hip flexor /side", "Wall sit", "Box breathing"]
 
     static func strip(currentIndex: Int, sideIndex: Int? = nil) -> [StripItem] {
         stripNames.enumerated().map { index, name in
@@ -36,7 +38,7 @@ enum SnapshotFixtures {
     static let breakRemaining = "4:12 LEFT"
     static let blockNumerals = "0:42"
     static let nextBreakAt = "12:05"
-    static let endSummary = "Four movements done. Next break at 12:05."
+    static let endSummary = "Five movements done. Next break at 12:05."
     static let streak = 4
     static let skipsToday = 1
 }
@@ -61,6 +63,18 @@ extension SnapshotFixtures {
         return state
     }
 
+    /// The first movement's lead-in: on screen to read, its minute not yet started.
+    static func overlayLeadIn() -> OverlayState {
+        var state = overlayRunning()
+        state.headerTrailing = "5:22 LEFT"
+        state.discNumerals = OverlayState.untilStart(3)
+        state.discLabel = "GET READY"
+        state.discProgress = 0.6
+        state.discMode = .leadIn
+        state.skipEnabled = true
+        return state
+    }
+
     static func overlayCollapsed() -> OverlayState {
         var state = overlayRunning()
         state.headerTrailing = "1:52 LEFT"
@@ -69,7 +83,7 @@ extension SnapshotFixtures {
         state.movementName = collapsedMovementName
         state.instruction = "Back flat against the wall, knees at ninety degrees, weight through the heels."
         state.instructionCollapsed = true
-        state.strip = strip(currentIndex: 2)
+        state.strip = strip(currentIndex: 3)
         state.snoozeAvailable = false
         state.doneAvailable = true
         return state
@@ -86,7 +100,7 @@ extension SnapshotFixtures {
         state.instruction = sideInstruction
         state.isSideBlock = true
         state.side = .left
-        state.strip = strip(currentIndex: 1, sideIndex: 0)
+        state.strip = strip(currentIndex: 2, sideIndex: 0)
         return state
     }
 
@@ -98,7 +112,7 @@ extension SnapshotFixtures {
         state.completionTitle = completionTitle
         state.endSummary = endSummary
         state.streak = streak
-        state.strip = strip(currentIndex: 4)
+        state.strip = strip(currentIndex: 5)
         return state
     }
 

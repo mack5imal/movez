@@ -3,6 +3,10 @@ import Foundation
 /// Drives the overlay: one tick a second, block by block, with the rules about what the user may
 /// do at each moment.
 ///
+/// Every block opens with a five-second lead-in, the first included, so the movement can be read
+/// before its clock starts. The transition chime plays as a movement appears, at the start of its
+/// lead-in; the first one appears with the overlay and needs no chime.
+///
 /// It owns nothing except the break in front of it. Ending, snoozing and skipping are reported
 /// through `OverlayActions`; recording what was done is the coordinator's job.
 @MainActor
@@ -26,6 +30,7 @@ final class OverlayViewModel: ObservableObject {
     private(set) var completedBlocks = 0
     private(set) var side: BreakSide = .none
     private(set) var phase: OverlayState.Phase = .running
+    /// When the current block appeared, which is when its lead-in began.
     private var blockStartedAt: Date
     private var halfwayChimed = false
     /// The strip only changes when the block or the side does, not on every tick.
@@ -84,7 +89,15 @@ final class OverlayViewModel: ObservableObject {
     /// Animations are the first thing to go when the user has asked the system for less motion.
     var animationsEnabled: Bool { !reduceMotion }
 
-    var blockElapsed: Int { max(0, Int(clock.now.timeIntervalSince(blockStartedAt))) }
+    /// When the movement itself starts, after its lead-in.
+    var movementStartsAt: Date { blockStartedAt.addingTimeInterval(TimeInterval(Routine.leadInSeconds)) }
+    var isLeadIn: Bool { clock.now < movementStartsAt }
+    /// Whole seconds of lead-in left, rounded up like the panels' count-ins, so it reads 0:05 the
+    /// moment the movement appears.
+    var leadInRemaining: Int { max(0, Int(movementStartsAt.timeIntervalSince(clock.now).rounded(.up))) }
+
+    /// Seconds of the movement itself that have run; zero throughout the lead-in.
+    var blockElapsed: Int { max(0, Int(clock.now.timeIntervalSince(movementStartsAt))) }
     var blockRemaining: Int { max(0, (block?.seconds ?? 0) - blockElapsed) }
     var breakRemaining: Int {
         let planned = routine.totalSeconds
@@ -119,6 +132,10 @@ final class OverlayViewModel: ObservableObject {
     /// One second of the break. The overlay's whole clock is this method.
     func tick() {
         guard phase == .running, let block else { return }
+        guard !isLeadIn else {
+            refresh()
+            return
+        }
 
         if block.perSide, !halfwayChimed, blockElapsed >= block.seconds / 2 {
             halfwayChimed = true
@@ -136,7 +153,8 @@ final class OverlayViewModel: ObservableObject {
 
     // MARK: - Actions
 
-    /// The disc, → and Return all land here. There is deliberately no way back.
+    /// The disc, → and Return all land here, in a lead-in as much as in a movement. There is
+    /// deliberately no way back.
     func next() {
         guard phase == .running else { return }
         advance(recordCompletion: true)
@@ -227,10 +245,17 @@ final class OverlayViewModel: ObservableObject {
 
         state.eyebrow = OverlayState.movementBreakEyebrow
         state.headerTrailing = "\(OverlayState.clock(breakRemaining)) LEFT"
-        state.discNumerals = OverlayState.clock(blockRemaining)
-        state.discProgress = discProgress
-        state.discMode = block?.perSide == true ? .halfShare(sideIndex: side.index) : .full
-        state.discLabel = block?.perSide == true && side == .left ? "THEN RIGHT" : "NEXT →"
+        if isLeadIn {
+            state.discNumerals = OverlayState.untilStart(leadInRemaining)
+            state.discProgress = movementStartsAt.timeIntervalSince(clock.now) / Double(Routine.leadInSeconds)
+            state.discMode = .leadIn
+            state.discLabel = "GET READY"
+        } else {
+            state.discNumerals = OverlayState.clock(blockRemaining)
+            state.discProgress = discProgress
+            state.discMode = block?.perSide == true ? .halfShare(sideIndex: side.index) : .full
+            state.discLabel = block?.perSide == true && side == .left ? "THEN RIGHT" : "NEXT →"
+        }
         state.movementName = block?.movement.name ?? ""
         state.instruction = block?.movement.instructions ?? ""
         state.instructionCollapsed = instructionCollapsed

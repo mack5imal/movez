@@ -8,6 +8,7 @@ import SwiftUI
 enum SnapshotSurface: String, CaseIterable {
     case gallery
     case overlayFull = "overlay-full"
+    case overlayLeadIn = "overlay-leadin"
     case overlayCollapsed = "overlay-collapsed"
     case overlaySide = "overlay-side"
     case overlayEnd = "overlay-end"
@@ -50,7 +51,8 @@ enum SnapshotSurface: String, CaseIterable {
             return SettingsScreen.size
         case .debug:
             return CGSize(width: SettingsScreen.size.width, height: 1_500)
-        case .overlayFull, .overlayCollapsed, .overlaySide, .overlayEnd, .overlayOtherDisplay, .overlayLongName:
+        case .overlayFull, .overlayLeadIn, .overlayCollapsed, .overlaySide, .overlayEnd, .overlayOtherDisplay,
+             .overlayLongName:
             return Self.screen
         }
     }
@@ -149,6 +151,8 @@ enum SnapshotRenderer {
 
     private static func overlayView(for surface: SnapshotSurface) -> AnyView {
         switch surface {
+        case .overlayLeadIn:
+            return AnyView(OverlaySnapshot(state: SnapshotFixtures.overlayLeadIn()))
         case .overlayCollapsed:
             return AnyView(OverlaySnapshot(state: SnapshotFixtures.overlayCollapsed()))
         case .overlaySide:

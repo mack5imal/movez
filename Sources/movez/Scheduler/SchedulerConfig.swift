@@ -3,7 +3,10 @@ import Foundation
 /// Every tunable the scheduler reads, with the defaults from research §6.
 struct SchedulerConfig: Codable, Equatable, Hashable {
     var sitSeconds: Int = 55 * 60
-    var breakSeconds: Int = 300
+    /// Five one-minute movements, each after a five-second lead-in. The scheduler never looks
+    /// inside a routine, so the figure is restated here rather than read off one; a test holds the
+    /// two together.
+    var breakSeconds: Int = 325
     var microEnabled: Bool = true
     var microEverySeconds: Int = 1800
     var microMinGapBeforeFullSeconds: Int = 600

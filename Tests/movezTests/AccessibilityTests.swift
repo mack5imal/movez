@@ -60,12 +60,12 @@ final class AccessibilityTests: XCTestCase {
     }
 
     func testTheSequenceStripNamesEachBlockAndWhichIsCurrent() {
-        let items = SnapshotFixtures.strip(currentIndex: 1)
+        let items = SnapshotFixtures.strip(currentIndex: 2)
         let strip = SequenceStrip(items: items)
 
-        XCTAssertEqual(strip.announcement(for: items[0]), "March in place, block 1 of 4, done")
-        XCTAssertEqual(strip.announcement(for: items[1]), "Hip flexor /side, block 2 of 4, current")
-        XCTAssertEqual(strip.announcement(for: items[3]), "Box breathing, block 4 of 4, upcoming")
+        XCTAssertEqual(strip.announcement(for: items[0]), "March in place, block 1 of 5, done")
+        XCTAssertEqual(strip.announcement(for: items[2]), "Hip flexor /side, block 3 of 5, current")
+        XCTAssertEqual(strip.announcement(for: items[4]), "Box breathing, block 5 of 5, upcoming")
     }
 
     // MARK: - Reduce Motion
@@ -93,7 +93,8 @@ final class AccessibilityTests: XCTestCase {
             ("text2 on panel", Contrast.ratio(Tokens.text2, panel)),
             ("text3 on panel", Contrast.ratio(Tokens.text3, panel)),
             ("accent on panel", Contrast.ratio(Tokens.accent, panel)),
-            ("warn on panel", Contrast.ratio(Tokens.warn, panel))
+            ("warn on panel", Contrast.ratio(Tokens.warn, panel)),
+            ("accent on panelSolid", Contrast.ratio(Tokens.accent, Tokens.panelSolid))
         ]
 
         let report = pairs
@@ -105,6 +106,8 @@ final class AccessibilityTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(Contrast.ratio(Tokens.ink, Tokens.accent), 4.5, report)
         XCTAssertGreaterThanOrEqual(Contrast.ratio(Tokens.text, panel), 4.5, report)
         XCTAssertGreaterThanOrEqual(Contrast.ratio(Tokens.text2, panel), 4.5, report)
+        // The hollow lead-in disc draws its numerals in accent on the solid panel colour.
+        XCTAssertGreaterThanOrEqual(Contrast.ratio(Tokens.accent, Tokens.panelSolid), 4.5, report)
         // text3 is decorative — shortcut glyphs, ids, captions — and is recorded, not gated.
         XCTAssertGreaterThan(Contrast.ratio(Tokens.text3, panel), 1)
     }

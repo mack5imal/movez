@@ -80,6 +80,12 @@ struct OverlayState: Equatable {
         let seconds = max(0, seconds)
         return String(format: "%d:%02d", seconds / 60, seconds % 60)
     }
+
+    /// "−0:05": time until something starts, which wears a minus (U+2212) so it never reads as the
+    /// time a movement has left.
+    static func untilStart(_ seconds: Int) -> String {
+        "−\(clock(seconds))"
+    }
 }
 
 /// What the overlay can ask the app to do. Defaults do nothing, which is what snapshots want.

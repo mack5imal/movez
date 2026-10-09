@@ -10,6 +10,10 @@ enum TimerDiscMode: Equatable {
     case dashed
     /// Off hours — an empty ring, no fill, no numerals.
     case empty
+    /// The lead-in before a movement: a hollow disc, teal on the panel colour, so the seconds to
+    /// read what is coming cannot be mistaken for the movement's own countdown. It fills when the
+    /// movement starts.
+    case leadIn
 }
 
 /// The accent disc with a draining ring. It is the overlay's Next button, the heads-up panel's
@@ -87,7 +91,22 @@ struct TimerDisc: View {
             Circle()
                 .fill(Tokens.accent.color)
                 .movezShadow(size >= 200 ? Tokens.Shadow.disc : Tokens.Shadow.panel)
+        case .leadIn:
+            Circle()
+                .fill(Tokens.panelSolid.color)
+                .overlay(Circle().strokeBorder(Tokens.secondaryBorder.color, lineWidth: max(1, ringWidth / 3)))
+                .movezShadow(size >= 200 ? Tokens.Shadow.disc : Tokens.Shadow.panel)
         }
+    }
+
+    /// The ring's track and fill: ink on the teal disc, teal on the hollow one.
+    private var ringColours: (track: MovezColor, fill: MovezColor) {
+        mode == .leadIn ? (Tokens.accentTint, Tokens.accent) : (Tokens.ringTrack, Tokens.ink)
+    }
+
+    /// The numerals' colour: ink on the teal disc, teal on the hollow one.
+    private var numeralColour: MovezColor {
+        mode == .leadIn ? Tokens.accent : Tokens.ink
     }
 
     @ViewBuilder
@@ -95,14 +114,14 @@ struct TimerDisc: View {
         switch mode {
         case .dashed, .empty:
             EmptyView()
-        case .full, .halfShare:
+        case .full, .halfShare, .leadIn:
             ZStack {
                 Circle()
                     .trim(from: arc.start, to: arc.start + arc.span)
-                    .stroke(Tokens.ringTrack.color, style: StrokeStyle(lineWidth: ringWidth, lineCap: .round))
+                    .stroke(ringColours.track.color, style: StrokeStyle(lineWidth: ringWidth, lineCap: .round))
                 Circle()
                     .trim(from: arc.start, to: arc.start + arc.span * max(0, min(1, progress)))
-                    .stroke(Tokens.ink.color, style: StrokeStyle(lineWidth: ringWidth, lineCap: .round))
+                    .stroke(ringColours.fill.color, style: StrokeStyle(lineWidth: ringWidth, lineCap: .round))
             }
             // Rings start at twelve o'clock and drain clockwise.
             .rotationEffect(.degrees(-90))
@@ -117,11 +136,11 @@ struct TimerDisc: View {
             EmptyView()
         case .dashed:
             MovezText("‖", MovezType.menuDisc, color: Tokens.text3)
-        case .full, .halfShare:
+        case .full, .halfShare, .leadIn:
             VStack(spacing: size * 0.008) {
-                MovezText(numerals, numeralStyle ?? defaultNumeralStyle, color: Tokens.ink, alignment: .center)
+                MovezText(numerals, numeralStyle ?? defaultNumeralStyle, color: numeralColour, alignment: .center)
                 if let label, size >= Self.labelThreshold {
-                    MovezText(label, scaled(MovezType.discLabel, Self.labelRatio), color: Tokens.ink.opacity(0.72), alignment: .center)
+                    MovezText(label, scaled(MovezType.discLabel, Self.labelRatio), color: numeralColour.opacity(0.72), alignment: .center)
                 }
             }
         }

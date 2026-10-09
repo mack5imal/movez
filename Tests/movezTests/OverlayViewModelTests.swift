@@ -100,7 +100,7 @@ final class OverlayViewModelTests: XCTestCase {
     func testTicksAdvanceWhenABlockRunsOut() {
         let clock = ManualClock(now: SchedulerHarness.mondayMorning)
         let viewModel = makeViewModel(clock: clock)
-        clock.advance(30)
+        clock.advance(5 + 30)
         viewModel.tick()
         XCTAssertEqual(viewModel.blockIndex, 0)
         XCTAssertEqual(viewModel.state.discNumerals, "0:30")
@@ -108,6 +108,56 @@ final class OverlayViewModelTests: XCTestCase {
         clock.advance(30)
         viewModel.tick()
         XCTAssertEqual(viewModel.blockIndex, 1, "the block ran out")
+    }
+
+    // MARK: - Lead-in
+
+    /// Every movement, the first included, opens with five seconds to read it before its clock
+    /// starts, on a hollow disc counting down with a minus.
+    func testEveryMovementOpensWithAFiveSecondLeadIn() {
+        let clock = ManualClock(now: SchedulerHarness.mondayMorning)
+        let viewModel = makeViewModel(clock: clock)
+
+        XCTAssertTrue(viewModel.isLeadIn)
+        XCTAssertEqual(viewModel.state.discNumerals, "−0:05")
+        XCTAssertEqual(viewModel.state.discMode, .leadIn)
+        XCTAssertEqual(viewModel.state.discLabel, "GET READY")
+        XCTAssertEqual(viewModel.state.movementName, "March in place", "the movement is on screen to read")
+
+        clock.advance(4)
+        viewModel.tick()
+        XCTAssertEqual(viewModel.state.discNumerals, "−0:01")
+
+        clock.advance(1)
+        viewModel.tick()
+        XCTAssertFalse(viewModel.isLeadIn)
+        XCTAssertEqual(viewModel.state.discNumerals, "1:00", "the movement's own minute starts whole")
+        XCTAssertEqual(viewModel.state.discMode, .full)
+        XCTAssertEqual(viewModel.state.discLabel, "NEXT →")
+
+        viewModel.next()
+        XCTAssertTrue(viewModel.isLeadIn, "the next movement opens with its own lead-in")
+        XCTAssertEqual(viewModel.state.discNumerals, "−0:05")
+        XCTAssertEqual(viewModel.state.discMode, .leadIn, "a per-side block's lead-in is not split")
+    }
+
+    func testNextDuringALeadInGoesToTheNextMovement() {
+        let clock = ManualClock(now: SchedulerHarness.mondayMorning)
+        let viewModel = makeViewModel(clock: clock)
+        clock.advance(2)
+        viewModel.next()
+        XCTAssertEqual(viewModel.blockIndex, 1)
+        XCTAssertEqual(viewModel.completedBlocks, 1, "as Next always has, it counts the movement")
+    }
+
+    func testTheBreakIsFiveMovementsAndFiveLeadIns() {
+        let routine = RoutineTestSupport.routine(seed: 1)
+        XCTAssertEqual(routine.totalSeconds, 5 * (60 + 5))
+        XCTAssertEqual(SchedulerConfig().breakSeconds, routine.totalSeconds, "the scheduler's break is the routine's length")
+
+        let clock = ManualClock(now: SchedulerHarness.mondayMorning)
+        let viewModel = OverlayViewModel(routine: routine, startedAt: clock.now, clock: clock)
+        XCTAssertEqual(viewModel.state.headerTrailing, "5:25 LEFT")
     }
 
     // MARK: - Per-side blocks
@@ -120,8 +170,10 @@ final class OverlayViewModelTests: XCTestCase {
         chimes.clear()
 
         XCTAssertEqual(viewModel.side, .left)
-        XCTAssertEqual(viewModel.state.discLabel, "THEN RIGHT")
         XCTAssertEqual(viewModel.state.strip[1].sideIndex, 0, "the strip rule is half filled")
+        clock.advance(5)
+        viewModel.tick()
+        XCTAssertEqual(viewModel.state.discLabel, "THEN RIGHT")
         XCTAssertEqual(viewModel.state.discMode, .halfShare(sideIndex: 0))
 
         clock.advance(29)
@@ -143,7 +195,7 @@ final class OverlayViewModelTests: XCTestCase {
         let viewModel = makeViewModel(clock: clock)
         viewModel.next()
 
-        clock.advance(15)
+        clock.advance(5 + 15)
         viewModel.tick()
         XCTAssertEqual(viewModel.state.discProgress, 0.5, accuracy: 0.02, "half of the left half")
 
@@ -313,14 +365,14 @@ final class OverlayViewModelTests: XCTestCase {
         let chimes = RecordingChimePlayer()
         let viewModel = makeViewModel(clock: clock, chimes: chimes)
 
-        // Run the break in real time so the per-side halfway chime fires too.
-        for _ in 0..<(4 * 60) {
+        // Run the break in real time, lead-ins and all, so the per-side halfway chime fires too.
+        for _ in 0..<(4 * (5 + 60)) {
             clock.advance(1)
             viewModel.tick()
         }
 
         XCTAssertEqual(viewModel.phase, .complete)
-        XCTAssertEqual(chimes.count(of: .transition), 4, "three block changes plus one halfway")
+        XCTAssertEqual(chimes.count(of: .transition), 4, "three movements appearing plus one halfway")
         XCTAssertEqual(chimes.count(of: .completion), 1)
     }
 

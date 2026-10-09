@@ -168,7 +168,7 @@ final class PanelViewModel: ObservableObject {
     var discNumerals: String {
         switch phase {
         case .microRunning: return OverlayState.clock(remaining)
-        case .headsUp, .microCountIn: return "−\(OverlayState.clock(remaining))"
+        case .headsUp, .microCountIn: return OverlayState.untilStart(remaining)
         case .toast: return ""
         }
     }
