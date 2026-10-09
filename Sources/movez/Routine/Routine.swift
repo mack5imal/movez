@@ -65,6 +65,26 @@ struct MicroBreak: Hashable, Identifiable {
 
     var movementIds: [String] { blocks.map(\.movement.id) }
 
+    /// Seconds into the running micro-break at which each block appears; the second one's
+    /// lead-in starts there.
+    func appearsAt(block index: Int) -> Int {
+        let earlier = blocks.prefix(index).reduce(0) { $0 + $1.seconds }
+        return earlier + Routine.leadInSeconds * max(0, index - 1)
+    }
+
+    /// Seconds into the running micro-break at which each block's movement starts.
+    func startsAt(block index: Int) -> Int {
+        appearsAt(block: index) + (index > 0 ? Routine.leadInSeconds : 0)
+    }
+
+    /// The blocks the user got at least halfway through in `seconds` of running time — the rule a
+    /// full break is held to, applied to each movement.
+    func blocksRun(seconds: Int) -> [RoutineBlock] {
+        blocks.indices.filter { index in
+            (seconds - startsAt(block: index)) * 2 >= blocks[index].seconds
+        }.map { blocks[$0] }
+    }
+
     /// "MICRO-BREAK · SHOULDERS", for the block on screen.
     static func eyebrow(for block: RoutineBlock?) -> String {
         "MICRO-BREAK · \(regionWord(for: block).uppercased())"

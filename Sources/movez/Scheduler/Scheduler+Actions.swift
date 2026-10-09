@@ -192,14 +192,19 @@ extension Scheduler {
         return enterMicroRunning(now: now)
     }
 
+    /// The micro-break ran its course. One that got as far as running ends on the completion chime
+    /// a full break ends on; skips and snoozes go through their own paths and stay quiet.
     mutating func endMicro(now: Date) -> [SchedulerEffect] {
+        let ranToTheEnd: Bool
         switch snapshot.state {
-        case .microCountIn, .microRunning: break
+        case .microCountIn: ranToTheEnd = false
+        case .microRunning: ranToTheEnd = true
         default: return []
         }
         let record = microRecord(now: now)
         closeMicroCycle(now: now, reason: "micro-break finished")
-        return record + [.hideMicro, .persist, .menuRefresh]
+        let chime: [SchedulerEffect] = ranToTheEnd ? [.chime(.completion)] : []
+        return record + chime + [.hideMicro, .persist, .menuRefresh]
     }
 
     /// How long the movement itself has been on screen. A count-in is not the micro-break: nothing

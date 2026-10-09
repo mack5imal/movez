@@ -36,8 +36,9 @@ struct PanelHeader: View {
         HStack(alignment: .top, spacing: 14) {
             TimerDisc(
                 size: Tokens.Metric.panelDisc,
-                progress: viewModel.progress,
+                progress: viewModel.discProgress,
                 numerals: viewModel.discNumerals,
+                mode: viewModel.discMode,
                 numeralStyle: MovezType.panelDisc
             )
 

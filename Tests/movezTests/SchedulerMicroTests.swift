@@ -134,7 +134,42 @@ final class SchedulerMicroTests: XCTestCase {
         harness.clearEffects()
 
         harness.run(until: { $0.isSitting })
-        XCTAssertEqual(ranSeconds(harness), [60])
+        // The backstop is the longest micro-break, 65 s, reached on the first two-second tick past it.
+        XCTAssertEqual(ranSeconds(harness), [66])
+    }
+
+    /// A micro-break that runs its course ends on the completion chime a full break ends on.
+    func testAMicroBreakThatRanToTheEndChimes() {
+        let harness = SchedulerHarness()
+        harness.run(until: { $0.isMicroRunning }, limit: 40 * minute)
+        harness.clock.advance(60)
+        harness.clearEffects()
+
+        // The panel ends a single-movement micro-break at sixty seconds.
+        harness.send(.microEnded)
+        XCTAssertTrue(harness.state.isSitting)
+        XCTAssertEqual(harness.effects.filter { $0 == .chime(.completion) }.count, 1)
+    }
+
+    func testSkippingSnoozingOrNeverStartingIsQuiet() {
+        let skipped = SchedulerHarness()
+        skipped.run(until: { $0.isMicroRunning }, limit: 40 * minute)
+        skipped.clock.advance(40)
+        skipped.clearEffects()
+        skipped.send(.userMicroSkip)
+        XCTAssertFalse(skipped.effects.contains(.chime(.completion)), "a skip is not a finish")
+
+        let snoozed = SchedulerHarness()
+        snoozed.run(until: { $0.isMicroRunning }, limit: 40 * minute)
+        snoozed.clearEffects()
+        snoozed.send(.userMicroSnooze)
+        XCTAssertFalse(snoozed.effects.contains(.chime(.completion)))
+
+        let countIn = SchedulerHarness()
+        countIn.run(until: { $0.isMicroCountIn }, limit: 40 * minute)
+        countIn.clearEffects()
+        countIn.send(.microEnded)
+        XCTAssertFalse(countIn.effects.contains(.chime(.completion)), "nothing was done during a count-in")
     }
 
     func testAMicroBreakSkippedPastHalfItsLengthIsRecorded() {

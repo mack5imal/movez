@@ -40,8 +40,8 @@ extension AppCoordinator {
             toastInfo = nil
         case .recordHeadsUpOutcome(let outcome):
             recordHeadsUpOutcome(outcome)
-        case .recordMicroDone:
-            recordMicro()
+        case .recordMicroDone(let seconds):
+            recordMicro(ranSeconds: seconds)
         case .persist:
             persistSnapshot()
         case .pollingChanged(let enabled):
@@ -176,9 +176,12 @@ extension AppCoordinator {
     /// an idle stretch as well as for a minute of movement, and only the scheduler knows which of
     /// those just happened. `.recordMicroDone` arrives ahead of `.hideMicro`, so `currentMicro` is
     /// still here to be read.
-    private func recordMicro() {
+    ///
+    /// Only the movements the user got halfway through are written: a two-movement micro-break
+    /// skipped in its first half did one of them, not both.
+    private func recordMicro(ranSeconds: Int) {
         guard let micro = currentMicro else { return }
-        for block in micro.blocks {
+        for block in micro.blocksRun(seconds: ranSeconds) {
             history.record(completion: MovementCompletion(
                 movementId: block.movement.id,
                 at: clock.now,

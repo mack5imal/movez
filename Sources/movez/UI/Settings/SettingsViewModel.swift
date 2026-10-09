@@ -93,7 +93,7 @@ final class SettingsViewModel: ObservableObject {
         return "Micro-break every \(config.microEverySeconds / 60) min"
     }
 
-    var microRowDetail: String { "· \(settings.schedulerConfig.microSeconds) s" }
+    var microRowDetail: String { "· 1 min" }
 
     var customSitLabel: String { "\(settings.customSitMinutes) min" }
 

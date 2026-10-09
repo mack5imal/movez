@@ -7,9 +7,11 @@ import Foundation
 @MainActor
 final class PanelEffectSink: EffectSink {
     let controller: PanelWindowController
+    private let chimes: ChimePlayer?
 
-    init(controller: PanelWindowController) {
+    init(controller: PanelWindowController, chimes: ChimePlayer? = nil) {
         self.controller = controller
+        self.chimes = chimes
     }
 
     func apply(_ effect: SchedulerEffect, coordinator: AppCoordinator) {
@@ -68,6 +70,7 @@ final class PanelEffectSink: EffectSink {
         )
         model.micro = micro
         model.microSeconds = info.seconds
+        model.chimes = chimes
         model.microSnoozeUsed = coordinator.scheduler.snapshot.microSnoozeUsed
         model.actions.microStartNow = { [weak coordinator] in coordinator?.microStartNow() }
         model.actions.microSnooze = { [weak coordinator] in coordinator?.microSnooze() }

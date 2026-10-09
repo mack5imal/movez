@@ -106,7 +106,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
         let chimes = GatedChimePlayer(wrapping: AudioChimePlayer(), isEnabled: { settings.soundsEnabled })
         let sink = CompositeEffectSink([
             OverlayEffectSink(controller: OverlayWindowController(), chimes: chimes),
-            PanelEffectSink(controller: PanelWindowController())
+            PanelEffectSink(controller: PanelWindowController(), chimes: chimes)
         ])
         coordinator.register(sink: sink)
     }

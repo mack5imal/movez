@@ -272,4 +272,20 @@ final class CoordinatorSimulatedDayTests: XCTestCase {
 
         XCTAssertEqual(taken.history.data.completions.map(\.movementId), movements)
     }
+
+    /// A micro-break left part-way records the movements the user got halfway through, not all
+    /// of them.
+    func testAMicroBreakLeftPartWayRecordsOnlyWhatRan() throws {
+        let harness = CoordinatorHarness()
+        _ = harness.run(until: { $0.isMicroRunning }, limit: 40 * minute)
+        let micro = try XCTUnwrap(harness.coordinator.currentMicro)
+        harness.clock.advance(40)
+        harness.coordinator.inject(.userMicroSkip)
+
+        XCTAssertEqual(
+            harness.history.data.completions.map(\.movementId),
+            micro.blocksRun(seconds: 40).map(\.movement.id)
+        )
+        XCTAssertFalse(harness.history.data.completions.isEmpty, "forty seconds is past half of either kind")
+    }
 }

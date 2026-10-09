@@ -153,7 +153,13 @@ extension SnapshotFixtures {
 
     static let deferredSittingSeconds: TimeInterval = 5_700
     static let microCountInRemaining: TimeInterval = 21
-    static let microRunningRemaining: TimeInterval = 44
+    /// Seconds into the running micro-break each micro snapshot is taken at: the first movement
+    /// with 0:14 left, the second movement's lead-in at −0:03, the second movement with 0:18 left,
+    /// and a per-side movement on its right side with 0:22 left.
+    static let microFirstElapsed: TimeInterval = 16
+    static let microLeadInElapsed: TimeInterval = 32
+    static let microSecondElapsed: TimeInterval = 47
+    static let microSideElapsed: TimeInterval = 38
     /// Sixty percent of the toast's time left, which is where the handoff draws its hairline.
     static let toastRemaining: TimeInterval = 9
 
@@ -180,20 +186,20 @@ extension SnapshotFixtures {
             totalSeconds: 30
         )
         model.micro = microBreak()
-        model.microSeconds = 60
         return model
     }
 
-    static func microRunning() -> PanelViewModel {
+    static func microRunning(elapsed: TimeInterval? = nil, micro: MicroBreak? = nil) -> PanelViewModel {
+        let elapsed = elapsed ?? microFirstElapsed
+        let micro = micro ?? microBreak()
         let clock = ManualClock(now: panelInstant)
         let model = PanelViewModel(
             phase: .microRunning,
             clock: clock,
-            startedAt: clock.now.addingTimeInterval(microRunningRemaining - 60),
-            totalSeconds: 60
+            startedAt: clock.now.addingTimeInterval(-elapsed),
+            totalSeconds: micro.totalSeconds
         )
-        model.micro = microBreak()
-        model.microSeconds = 60
+        model.micro = micro
         return model
     }
 
@@ -217,11 +223,26 @@ extension SnapshotFixtures {
     /// 14:02 on the fixture's day — the time the handoff's toast shows.
     static let toastNextBreak = menuDate(month: 1, day: 1, hour: 14, minute: 2)
 
+    /// Two one-sided halves: Arm circles, then Distance gaze.
     static func microBreak() -> MicroBreak {
         MicroBreak(
             id: UUID(),
-            blocks: [RoutineBlock(movement: armCircles, seconds: 60)]
+            blocks: [
+                RoutineBlock(movement: armCircles, seconds: 30),
+                RoutineBlock(movement: libraryMovement("EYE-01"), seconds: 30)
+            ]
         )
+    }
+
+    /// One per-side movement for the whole minute.
+    static func microSideBreak() -> MicroBreak {
+        MicroBreak(id: UUID(), blocks: [RoutineBlock(movement: libraryMovement("HWF-01"), seconds: 60)])
+    }
+
+    /// A movement from the bundled library, falling back to Arm circles for a snapshot run whose
+    /// bundle cannot be read.
+    static func libraryMovement(_ id: String) -> Movement {
+        (try? LibraryLoader.loadBundled())?.movement(id: id) ?? armCircles
     }
 
     /// CIR-06 from the bundled library. The literal is the fallback for a snapshot run whose

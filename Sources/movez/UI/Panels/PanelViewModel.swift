@@ -52,13 +52,20 @@ final class PanelViewModel: ObservableObject {
     var skipsToday = 0
     var deferred: DeferredInfo?
     var micro: MicroBreak?
-    var microSeconds = 60
+    /// The longest a micro-break runs, from the scheduler. The panel runs the micro-break's own
+    /// length, which is shorter when it is a single movement.
+    var microSeconds = 65
     /// The micro-break's one snooze. A second request is a skip.
     var microSnoozeUsed = false
     var toast: ToastInfo?
 
     var actions = PanelActions()
+    /// Inside a micro-break the panel chimes its own transitions, as the overlay does in a full
+    /// break: the scheduler never knows how a micro-break is made up.
+    var chimes: ChimePlayer?
     private var microEndSent = false
+    private var chimedAppearances: Set<Int> = []
+    private var chimedHalfways: Set<Int> = []
 
     init(phase: Phase, clock: Clock, startedAt: Date, totalSeconds: Int) {
         self.phase = phase
@@ -83,6 +90,7 @@ final class PanelViewModel: ObservableObject {
     /// One tick of whichever panel is on screen.
     func tick() {
         now = clock.now
+        if phase == .microRunning { chimeMicroTransitions() }
         guard remainingExact <= 0 else { return }
         switch phase {
         case .microCountIn:
@@ -105,8 +113,54 @@ final class PanelViewModel: ObservableObject {
         guard phase == .microCountIn else { return }
         phase = .microRunning
         startedAt = date
-        totalSeconds = microSeconds
+        totalSeconds = micro?.totalSeconds ?? microSeconds
         now = clock.now
+    }
+
+    // MARK: - The running micro-break
+
+    /// The block on screen: the count-in shows the first, and each later one takes over as it
+    /// appears, at the start of its lead-in.
+    var microBlockIndex: Int {
+        guard phase == .microRunning, let micro else { return 0 }
+        return micro.blocks.indices.last { Double(micro.appearsAt(block: $0)) <= elapsed } ?? 0
+    }
+
+    var microBlock: RoutineBlock? {
+        guard let micro, micro.blocks.indices.contains(microBlockIndex) else { return nil }
+        return micro.blocks[microBlockIndex]
+    }
+
+    /// Seconds into the running micro-break at which the block on screen starts moving.
+    private var microBlockStart: Double {
+        Double(micro?.startsAt(block: microBlockIndex) ?? 0)
+    }
+
+    /// The five seconds before the second movement starts.
+    var isMicroLeadIn: Bool { phase == .microRunning && elapsed < microBlockStart }
+
+    /// Which side a per-side movement is on.
+    var microSide: BreakSide {
+        guard let block = microBlock, block.perSide else { return .none }
+        return elapsed - microBlockStart >= Double(block.secondsPerSide) ? .right : .left
+    }
+
+    private var microBlockRemainingExact: Double {
+        guard let block = microBlock else { return 0 }
+        if isMicroLeadIn { return microBlockStart - elapsed }
+        return max(0, microBlockStart + Double(block.seconds) - elapsed)
+    }
+
+    /// The transition chime as the second movement appears and at a per-side movement's halfway
+    /// point, as in a full break.
+    private func chimeMicroTransitions() {
+        let index = microBlockIndex
+        if index > 0, chimedAppearances.insert(index).inserted {
+            chimes?.play(.transition)
+        }
+        if microSide == .right, chimedHalfways.insert(index).inserted {
+            chimes?.play(.transition)
+        }
     }
 
     // MARK: - Words
@@ -114,7 +168,11 @@ final class PanelViewModel: ObservableObject {
     var eyebrow: String {
         switch phase {
         case .headsUp: return OverlayState.movementBreakEyebrow
-        case .microCountIn, .microRunning: return MicroBreak.eyebrow(for: micro?.blocks.first)
+        case .microCountIn: return MicroBreak.eyebrow(for: microBlock)
+        case .microRunning:
+            // A per-side movement says which side in the eyebrow, where it fits on one line.
+            let eyebrow = MicroBreak.eyebrow(for: microBlock)
+            return microSide == .none ? eyebrow : "\(eyebrow) · \(microSide.rawValue.uppercased()) SIDE"
         case .toast: return ""
         }
     }
@@ -132,12 +190,13 @@ final class PanelViewModel: ObservableObject {
         switch phase {
         case .headsUp: return Self.headsUpBody(minutes: breakMinutes, movements: blockCount)
         case .microCountIn: return microCountInBody
-        case .microRunning: return micro?.blocks.first?.movement.instructions ?? ""
+        case .microRunning: return microBlock?.movement.instructions ?? ""
         case .toast: return toastSubtitle
         }
     }
 
-    var movementName: String { micro?.blocks.first?.movement.name ?? "" }
+    /// The block on screen.
+    var movementName: String { microBlock?.movement.name ?? "" }
 
     /// "Five minutes, four movements." — counts this small are spelled out.
     static func headsUpBody(minutes: Int, movements: Int) -> String {
@@ -149,15 +208,17 @@ final class PanelViewModel: ObservableObject {
 
     /// "One minute, standing. Starts in 21 seconds." — the seconds count down live.
     var microCountInBody: String {
-        let minutes = max(1, microSeconds / 60)
+        let minutes = max(1, (micro?.totalSeconds ?? microSeconds) / 60)
         let minuteWord = minutes == 1 ? "minute" : "minutes"
         let secondWord = remaining == 1 ? "second" : "seconds"
         return "\(OverlayState.numberWord(minutes)) \(minuteWord), \(posture). Starts in \(remaining) \(secondWord)."
     }
 
-    /// A movement that can only be done in a chair is done seated; everything else is standing.
+    /// A micro-break whose movements can only be done in a chair is done seated; one with anything
+    /// that can be done standing is standing.
     var posture: String {
-        micro?.blocks.first?.movement.settings == [.chair] ? "seated" : "standing"
+        guard let blocks = micro?.blocks, !blocks.isEmpty else { return "standing" }
+        return blocks.allSatisfy { $0.movement.settings == [.chair] } ? "seated" : "standing"
     }
 
     /// The countdown on the disc.
@@ -167,10 +228,29 @@ final class PanelViewModel: ObservableObject {
     /// tells them apart from the break time they are about to hand over to.
     var discNumerals: String {
         switch phase {
-        case .microRunning: return OverlayState.clock(remaining)
+        case .microRunning:
+            let seconds = Int(microBlockRemainingExact.rounded(.up))
+            return isMicroLeadIn ? OverlayState.untilStart(seconds) : OverlayState.clock(seconds)
         case .headsUp, .microCountIn: return OverlayState.untilStart(remaining)
         case .toast: return ""
         }
+    }
+
+    /// The disc's ring. A running micro-break drains it per movement — per side for a per-side
+    /// one, as the overlay does — and the lead-in drains it over its five seconds.
+    var discProgress: Double {
+        guard phase == .microRunning, let block = microBlock else { return progress }
+        if isMicroLeadIn { return microBlockRemainingExact / Double(Routine.leadInSeconds) }
+        guard block.perSide else { return microBlockRemainingExact / Double(max(1, block.seconds)) }
+        let half = Double(max(1, block.secondsPerSide))
+        let sideRemaining = microSide == .left ? microBlockRemainingExact - half : microBlockRemainingExact
+        return max(0, min(1, sideRemaining / half))
+    }
+
+    var discMode: TimerDiscMode {
+        guard phase == .microRunning else { return .full }
+        if isMicroLeadIn { return .leadIn }
+        return microBlock?.perSide == true ? .halfShare(sideIndex: microSide.index) : .full
     }
 
     /// "Sitting for 1 h 35 m · break waited for your call"

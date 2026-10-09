@@ -240,6 +240,94 @@ final class PanelViewModelTests: XCTestCase {
         XCTAssertEqual(ended, 1, "a finished micro-break does not keep reporting itself")
     }
 
+    // MARK: - The running micro-break
+
+    private func running(_ blocks: [(id: String, seconds: Int)], clock: ManualClock, chimes: RecordingChimePlayer) -> PanelViewModel {
+        let model = microCountIn(clock: clock)
+        model.micro = MicroBreak(id: UUID(), blocks: blocks.compactMap { entry in
+            library.movement(id: entry.id).map { RoutineBlock(movement: $0, seconds: entry.seconds) }
+        })
+        model.chimes = chimes
+        model.beginMicroRunning(at: clock.now)
+        return model
+    }
+
+    /// Both movements are on screen in turn. The panel used to run the first for the whole minute
+    /// while history recorded the second as done too.
+    func testATwoMovementMicroBreakShowsBothWithALeadInBetween() {
+        let clock = ManualClock(now: start)
+        let chimes = RecordingChimePlayer()
+        let model = running([("CIR-06", 30), ("EYE-01", 30)], clock: clock, chimes: chimes)
+        var ended = 0
+        model.actions.microEnded = { ended += 1 }
+
+        XCTAssertEqual(model.title, "Arm circles")
+        XCTAssertEqual(model.discNumerals, "0:30")
+        XCTAssertEqual(model.discMode, .full)
+
+        clock.advance(30)
+        model.tick()
+        XCTAssertEqual(model.title, "Distance gaze (20-20-20)", "the second movement appears to be read")
+        XCTAssertEqual(model.eyebrow, "MICRO-BREAK · EYES")
+        XCTAssertEqual(model.discNumerals, "−0:05")
+        XCTAssertEqual(model.discMode, .leadIn)
+        XCTAssertEqual(chimes.count(of: .transition), 1, "the chime plays as it appears")
+
+        clock.advance(5)
+        model.tick()
+        XCTAssertEqual(model.discNumerals, "0:30")
+        XCTAssertEqual(model.discMode, .full)
+        XCTAssertEqual(model.body, library.movement(id: "EYE-01")?.instructions)
+
+        clock.advance(25)
+        model.tick()
+        XCTAssertEqual(ended, 0, "two halves and a lead-in run 65 seconds, not 60")
+
+        clock.advance(5)
+        model.tick()
+        XCTAssertEqual(ended, 1)
+        XCTAssertEqual(chimes.count(of: .transition), 1, "the completion chime is the scheduler's")
+    }
+
+    func testAPerSideMicroBreakSwitchesSidesHalfway() {
+        let clock = ManualClock(now: start)
+        let chimes = RecordingChimePlayer()
+        let model = running([("HWF-01", 60)], clock: clock, chimes: chimes)
+        var ended = 0
+        model.actions.microEnded = { ended += 1 }
+
+        XCTAssertEqual(model.title, "Wrist flexor stretch")
+        XCTAssertEqual(model.eyebrow, "MICRO-BREAK · HANDS · LEFT SIDE")
+        XCTAssertEqual(model.discMode, .halfShare(sideIndex: 0))
+
+        clock.advance(29)
+        model.tick()
+        XCTAssertEqual(chimes.count(of: .transition), 0)
+
+        clock.advance(1)
+        model.tick()
+        XCTAssertEqual(model.eyebrow, "MICRO-BREAK · HANDS · RIGHT SIDE")
+        XCTAssertEqual(model.discMode, .halfShare(sideIndex: 1))
+        XCTAssertEqual(chimes.count(of: .transition), 1, "the halfway chime")
+
+        clock.advance(30)
+        model.tick()
+        XCTAssertEqual(ended, 1, "a single movement runs the minute")
+    }
+
+    func testOnlyTheMovementsThatRanHalfwayAreRecorded() throws {
+        let first = try XCTUnwrap(library.movement(id: "CIR-06"))
+        let second = try XCTUnwrap(library.movement(id: "EYE-01"))
+        let micro = MicroBreak(id: UUID(), blocks: [
+            RoutineBlock(movement: first, seconds: 30),
+            RoutineBlock(movement: second, seconds: 30)
+        ])
+        XCTAssertEqual(micro.totalSeconds, 65)
+        XCTAssertEqual(micro.startsAt(block: 1), 35)
+        XCTAssertEqual(micro.blocksRun(seconds: 40).map(\.movement.id), ["CIR-06"])
+        XCTAssertEqual(micro.blocksRun(seconds: 50).map(\.movement.id), ["CIR-06", "EYE-01"])
+    }
+
     func testTheSecondMicroSnoozeIsASkip() {
         let clock = ManualClock(now: start)
         let model = microCountIn(clock: clock)

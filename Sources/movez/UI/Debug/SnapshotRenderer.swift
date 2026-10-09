@@ -18,6 +18,9 @@ enum SnapshotSurface: String, CaseIterable {
     case headsUpDeferred = "headsup-deferred"
     case microCountIn = "micro-countin"
     case microRunning = "micro-running"
+    case microLeadIn = "micro-leadin"
+    case microSecond = "micro-second"
+    case microSide = "micro-side"
     case toast
     case menuSitting = "menu-sitting"
     case menuPaused = "menu-paused"
@@ -43,7 +46,8 @@ enum SnapshotSurface: String, CaseIterable {
     var size: CGSize {
         switch self {
         case .gallery: return CGSize(width: 1400, height: 2900)
-        case .headsUp, .headsUpDeferred, .microCountIn, .microRunning: return Self.panelCanvas
+        case .headsUp, .headsUpDeferred, .microCountIn, .microRunning, .microLeadIn, .microSecond, .microSide:
+            return Self.panelCanvas
         case .toast: return Self.toastCanvas
         case .menuSitting, .menuPaused, .menuOffHours, .menuAway: return Self.menuCanvas
         case .menuIcon: return CGSize(width: 880, height: 260)
@@ -124,6 +128,15 @@ enum SnapshotRenderer {
             return AnyView(PanelSnapshot(viewModel: SnapshotFixtures.microCountIn()))
         case .microRunning:
             return AnyView(PanelSnapshot(viewModel: SnapshotFixtures.microRunning()))
+        case .microLeadIn:
+            return AnyView(PanelSnapshot(viewModel: SnapshotFixtures.microRunning(elapsed: SnapshotFixtures.microLeadInElapsed)))
+        case .microSecond:
+            return AnyView(PanelSnapshot(viewModel: SnapshotFixtures.microRunning(elapsed: SnapshotFixtures.microSecondElapsed)))
+        case .microSide:
+            return AnyView(PanelSnapshot(viewModel: SnapshotFixtures.microRunning(
+                elapsed: SnapshotFixtures.microSideElapsed,
+                micro: SnapshotFixtures.microSideBreak()
+            )))
         case .toast:
             return AnyView(PanelSnapshot(viewModel: SnapshotFixtures.awayToast(), placement: .bottomRight))
         default:

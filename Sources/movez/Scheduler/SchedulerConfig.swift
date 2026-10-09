@@ -10,7 +10,10 @@ struct SchedulerConfig: Codable, Equatable, Hashable {
     var microEnabled: Bool = true
     var microEverySeconds: Int = 1800
     var microMinGapBeforeFullSeconds: Int = 600
-    var microSeconds: Int = 60
+    /// The longest a micro-break runs: two thirty-second movements and the lead-in between them.
+    /// A single per-side movement runs sixty, and the panel, which knows which it is, ends it
+    /// then; this is the backstop, and the length the half rule is measured against.
+    var microSeconds: Int = 65
     var microCountInSeconds: Int = 30
     var headsUpSeconds: Int = 60
     var inputPauseSeconds: Int = 10
