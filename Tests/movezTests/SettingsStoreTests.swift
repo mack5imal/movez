@@ -37,7 +37,7 @@ final class SettingsStoreTests: XCTestCase {
         settings.equipment = [.band, .ball]
         settings.difficultyCap = 3
         settings.excludedMovementIds = ["FLX-01", "STR-09"]
-        settings.focus = .moreBalance
+        settings.focus = .moreHandsEyes
         settings.suppressMic = false
         settings.fullscreenExceptions = ["us.zoom.xos"]
         settings.awayThresholdMinutes = 6
@@ -56,7 +56,7 @@ final class SettingsStoreTests: XCTestCase {
         XCTAssertEqual(reloaded.equipment, [.band, .ball])
         XCTAssertEqual(reloaded.difficultyCap, 3)
         XCTAssertEqual(reloaded.excludedMovementIds, ["FLX-01", "STR-09"])
-        XCTAssertEqual(reloaded.focus, .moreBalance)
+        XCTAssertEqual(reloaded.focus, .moreHandsEyes)
         XCTAssertFalse(reloaded.suppressMic)
         XCTAssertEqual(reloaded.fullscreenExceptions, ["us.zoom.xos"])
         XCTAssertEqual(reloaded.awayThresholdMinutes, 6)
@@ -65,6 +65,14 @@ final class SettingsStoreTests: XCTestCase {
         XCTAssertEqual(reloaded.debugTimeScale, 60)
         XCTAssertTrue(reloaded.debugExpanded)
         XCTAssertEqual(reloaded.workingHours, hours)
+    }
+
+    /// "More balance" was removed as a focus. A user who had chosen it gets no focus rather than a
+    /// crash or a stuck picker.
+    func testARemovedFocusReadsAsNone() {
+        let (_, suite) = makeStore()
+        suite.set("moreBalance", forKey: "focus")
+        XCTAssertEqual(SettingsStore(defaults: suite).focus, .none)
     }
 
     func testSchedulerConfigDerivation() {

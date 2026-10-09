@@ -64,22 +64,25 @@ final class CoordinatorSimulatedDayTests: XCTestCase {
         XCTAssertEqual(stats.done, 9)
         XCTAssertEqual(harness.history.streak(on: harness.now), 9)
 
-        XCTAssertEqual(breaks[8].routine.timeOfDay, .last, "the 17:55 break is the last of the day")
-        XCTAssertEqual(
-            breaks.prefix(7).map(\.routine.slot),
-            [.hip, .tSpineChest, .neckShoulder, .posteriorChain, .core, .ankleFoot, .hip]
-        )
+        for (index, entry) in breaks.enumerated() {
+            XCTAssertEqual(
+                RoutineValidator.validate(entry.routine, library: harness.coordinator.library),
+                [],
+                "break \(index + 1) does not have the one shape every break takes"
+            )
+        }
 
         var seen: [String: Int] = [:]
         for id in breaks.flatMap(\.routine.movementIds) { seen[id, default: 0] += 1 }
         let repeated = seen.filter { $0.value > 1 }.keys.sorted()
-        XCTAssertTrue(repeated.allSatisfy(RoutineContext.alwaysRepeatable.contains), "repeated \(repeated)")
+        XCTAssertEqual(repeated, [], "nothing is served twice in a day")
 
         let distinctMovements = Set(breaks.flatMap(\.routine.movementIds)).count
         let lines = breaks.enumerated().map { index, entry in
             let start = TransitionLog.timeFormatter.string(from: entry.start)
             let names = entry.routine.blocks.map { "\($0.movement.id) \($0.seconds)s" }.joined(separator: ", ")
-            return "\(index + 1). \(start)  \(entry.routine.subtitle.padded(to: 44))[\(entry.routine.shape.rawValue)] \(names)"
+            let shape = entry.routine.buckets.map(\.rawValue).joined(separator: " ")
+            return "\(index + 1). \(start)  \(shape.padded(to: 22))\(names)"
         }
         RoutineTestSupport.write(
             """
@@ -190,7 +193,6 @@ final class CoordinatorSimulatedDayTests: XCTestCase {
         harness.run(seconds: 10 * minute)
         XCTAssertEqual(harness.coordinator.menuState.mode, .sitting)
         XCTAssertEqual(harness.coordinator.menuState.secondsUntilBreak ?? 0, 45 * 60, accuracy: 2)
-        XCTAssertFalse(harness.coordinator.menuState.nextRoutineSubtitle.isEmpty)
 
         harness.coordinator.pause(forSeconds: 30 * 60)
         XCTAssertEqual(harness.coordinator.menuState.mode, .paused)
@@ -210,7 +212,6 @@ final class CoordinatorSimulatedDayTests: XCTestCase {
 
         _ = harness.run(until: { $0.isFullBreak }, limit: 5 * minute)
         XCTAssertEqual(harness.coordinator.currentBreak?.routine.movementIds, preview?.movementIds)
-        XCTAssertEqual(harness.coordinator.menuState.nextRoutineSubtitle, preview?.subtitle)
     }
 
     func testACreditedAbsenceIsRecordedAndReversible() {
@@ -235,13 +236,12 @@ final class CoordinatorSimulatedDayTests: XCTestCase {
     func testSnoozingAndSkippingAtTheHeadsUpIsRecorded() {
         let snoozed = CoordinatorHarness()
         _ = snoozed.run(until: { $0.isHeadsUp }, limit: 90 * minute)
-        let advertised = snoozed.coordinator.nextRoutinePreview?.name
         snoozed.coordinator.inject(.userSnooze)
 
         let snoozeStats = snoozed.history.stats(on: snoozed.now)
         XCTAssertEqual(snoozeStats.snoozed, 1)
         XCTAssertEqual(snoozeStats.done, 0)
-        XCTAssertEqual(snoozed.history.breaks(on: snoozed.now).last?.routineName, advertised)
+        XCTAssertEqual(snoozed.history.breaks(on: snoozed.now).last?.routineName, "Movement break")
 
         let skipped = CoordinatorHarness()
         _ = skipped.run(until: { $0.isHeadsUp }, limit: 90 * minute)
@@ -271,25 +271,5 @@ final class CoordinatorSimulatedDayTests: XCTestCase {
         _ = taken.run(until: { $0.isSitting })
 
         XCTAssertEqual(taken.history.data.completions.map(\.movementId), movements)
-    }
-
-    /// The region rotation is a cursor over routines actually done, not a counter that starts
-    /// again each morning: two breaks a day used to mean the first two slots, for ever.
-    func testTheRotationCarriesOnIntoTheNextDay() {
-        let harness = CoordinatorHarness()
-        var slots: [RotationSlot] = []
-
-        for _ in 0..<2 {
-            _ = harness.run(until: { $0.isFullBreak }, limit: 90 * minute)
-            slots.append(harness.coordinator.currentBreak?.routine.slot ?? .hip)
-            harness.completeBreak()
-        }
-
-        // Tomorrow morning, from the history the first day left behind.
-        harness.clock.advance(20 * 3600)
-        harness.coordinator.tick()
-        slots.append(harness.coordinator.nextRoutinePreview?.slot ?? .hip)
-
-        XCTAssertEqual(slots, [.hip, .tSpineChest, .neckShoulder])
     }
 }

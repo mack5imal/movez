@@ -34,7 +34,8 @@ final class MenuBarViewModelTests: XCTestCase {
 
     // MARK: - Sitting
 
-    func testSittingShowsTheCountdownAndTheRoutineItIsCountingTowards() {
+    /// Routines have no names, so there is nothing to advertise under the countdown.
+    func testSittingShowsTheCountdownAndNothingUnderIt() {
         let harness = harness()
         harness.run(seconds: 23 * 60)
         let menu = viewModel(harness)
@@ -42,21 +43,9 @@ final class MenuBarViewModelTests: XCTestCase {
         XCTAssertEqual(menu.state.mode, .sitting)
         XCTAssertEqual(menu.state.minutesRemaining, 32)
         XCTAssertEqual(menu.state.title, "Next break in 32 min")
-        XCTAssertEqual(menu.state.subtitle, harness.coordinator.nextRoutinePreview?.subtitle)
-        XCTAssertFalse(menu.state.subtitle.isEmpty)
+        XCTAssertEqual(menu.state.subtitle, "")
         XCTAssertEqual(menu.state.elapsedFraction, 23.0 / 55, accuracy: 0.01)
         XCTAssertEqual(menu.labelText, "32m")
-    }
-
-    /// The menu must advertise the routine the overlay will actually serve.
-    func testTheSubtitleIsTheRoutineTheBreakThenRuns() throws {
-        let harness = harness()
-        let menu = viewModel(harness)
-        let advertised = menu.state.subtitle
-
-        harness.coordinator.takeBreakNow()
-        let served = try XCTUnwrap(harness.coordinator.currentBreak?.routine)
-        XCTAssertEqual(advertised, served.subtitle)
     }
 
     func testTheDiscShowsWhatIsLeftAndTheIconWhatHasGone() {

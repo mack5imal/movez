@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		0029928374647F3135541973 /* SubstitutionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A9EBE441108D20D23E7CCC0 /* SubstitutionsTests.swift */; };
-		014CD8EA300813175B68DB40 /* RoutineNaming.swift in Sources */ = {isa = PBXBuildFile; fileRef = 081C0DC27F0E07B390673A5A /* RoutineNaming.swift */; };
 		05C2300393C6D87593D7781D /* ClockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86A1502B4366E217FC27D92F /* ClockTests.swift */; };
 		06E8F4E79312B75552CAED23 /* SignalAggregator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F960E406973B4091B524FF2A /* SignalAggregator.swift */; };
 		0866803C21557AB19497146D /* Scheduler+Hours.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27909D93B5772796C24BB3DA /* Scheduler+Hours.swift */; };
@@ -40,7 +39,6 @@
 		395009B7E0CA9406FD62971A /* MenuBarViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A646C36AA0B26476DDBB2CD /* MenuBarViewModelTests.swift */; };
 		3A1BB6EDE397350F51E3479E /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = E34A24AFC078FC0BFEFF7291 /* Fonts */; };
 		3B00E2CEB70B6C6936AE7F1C /* ReviewFixTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6C1EC7F64C93A00B211226 /* ReviewFixTests.swift */; };
-		442929D6E726EE59E03D8B07 /* RegionRotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F09EC25E84D897D4FA79FBB /* RegionRotation.swift */; };
 		44E77D618F64C6ED22E5A664 /* IdleMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D83FC30AC8126887FB2A394 /* IdleMonitor.swift */; };
 		4545DA6B9E5893B41295022E /* PanelViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D3466382DDA0245F7F6AEB8 /* PanelViewModelTests.swift */; };
 		461D03F65AB3A5E9CA0FBD0C /* AccessibilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B6527E077C9D30BD770D4FE /* AccessibilityTests.swift */; };
@@ -170,11 +168,9 @@
 		030F3F64672624066901F90A /* capture-signatures.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "capture-signatures.json"; sourceTree = "<group>"; };
 		054FB495976AF959CEC0DECB /* SignalOverrides.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalOverrides.swift; sourceTree = "<group>"; };
 		06CE8997B39FFB560CC27EC0 /* SchedulerEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerEffect.swift; sourceTree = "<group>"; };
-		081C0DC27F0E07B390673A5A /* RoutineNaming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineNaming.swift; sourceTree = "<group>"; };
 		0976D07A8738129E67842B9A /* CoordinatorSimulatedDayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoordinatorSimulatedDayTests.swift; sourceTree = "<group>"; };
 		0C58058242AB1A4A7DE35C95 /* HeadsUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadsUpView.swift; sourceTree = "<group>"; };
 		0CC20A4766BF3AC9C78A92C7 /* ScreenCaptureMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenCaptureMonitor.swift; sourceTree = "<group>"; };
-		0F09EC25E84D897D4FA79FBB /* RegionRotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegionRotation.swift; sourceTree = "<group>"; };
 		12186C3EB10709B6CBD27A71 /* TimerDisc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerDisc.swift; sourceTree = "<group>"; };
 		1357C14B78E301196BDC5185 /* Scheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scheduler.swift; sourceTree = "<group>"; };
 		139F174AFC2AD7EFB2B40268 /* Scheduler+Idle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Scheduler+Idle.swift"; sourceTree = "<group>"; };
@@ -455,11 +451,9 @@
 			children = (
 				E0358B4658CB12F9685A9098 /* MicroBreakBuilder.swift */,
 				A4954FDF028687ECBDC44740 /* Recency.swift */,
-				0F09EC25E84D897D4FA79FBB /* RegionRotation.swift */,
 				52237A737E2C1AFF6A78303C /* Routine.swift */,
 				64B812A24864DC7766D2B8E2 /* RoutineBuilder.swift */,
 				C8F16E197BB8CBCF7D345DCC /* RoutineContext.swift */,
-				081C0DC27F0E07B390673A5A /* RoutineNaming.swift */,
 				BED5BD6A2AA7A23D4AC1BABB /* RoutineValidator.swift */,
 				6E47EF436BDD3C23084D28F4 /* SeededRandom.swift */,
 			);
@@ -805,11 +799,9 @@
 				47D730F2B581C31604F130CC /* Preset.swift in Sources */,
 				56964AB17B0D050C2FD63B8D /* Recency.swift in Sources */,
 				71A239A7D8F88B6323D2EDD9 /* Region.swift in Sources */,
-				442929D6E726EE59E03D8B07 /* RegionRotation.swift in Sources */,
 				93E96C660961E469EC1C53D3 /* Routine.swift in Sources */,
 				0F074C7F41A3C8C7849C2F95 /* RoutineBuilder.swift in Sources */,
 				50D4E872D82B1BD926667F7A /* RoutineContext.swift in Sources */,
-				014CD8EA300813175B68DB40 /* RoutineNaming.swift in Sources */,
 				25E93322972C26948D469154 /* RoutineTemplate.swift in Sources */,
 				24A56B2FADD5631DAF0DFD13 /* RoutineValidator.swift in Sources */,
 				FFFA726A1E5C0A77083C6E51 /* Scheduler+Actions.swift in Sources */,

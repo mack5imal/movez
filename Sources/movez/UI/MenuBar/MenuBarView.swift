@@ -44,8 +44,10 @@ struct MenuBarView: View {
             )
             VStack(alignment: .leading, spacing: 2) {
                 MovezText(state.title, MovezType.menuTitle)
-                MovezText(state.subtitle, MovezType.menuSecondary, color: Tokens.text2)
-                    .fixedSize(horizontal: false, vertical: true)
+                if !state.subtitle.isEmpty {
+                    MovezText(state.subtitle, MovezType.menuSecondary, color: Tokens.text2)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
             Spacer(minLength: 0)
         }

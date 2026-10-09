@@ -10,18 +10,9 @@ final class OverlayViewModelTests: XCTestCase {
         let ids = ["CIR-02", "FLX-01", "STR-04", "BRE-01"]
         let blocks = ids.compactMap { id -> RoutineBlock? in
             guard let movement = library.movement(id: id) else { return nil }
-            return RoutineBlock(movement: movement, seconds: 60, trimmedFrom: nil)
+            return RoutineBlock(movement: movement, seconds: 60)
         }
-        return Routine(
-            id: UUID(),
-            name: "Hip reset",
-            focus: "hips and glutes",
-            completionTitle: "Hips reset",
-            slot: .hip,
-            shape: .standard,
-            timeOfDay: .normal,
-            blocks: blocks
-        )
+        return Routine(id: UUID(), blocks: blocks)
     }
 
     private func makeViewModel(
@@ -300,9 +291,9 @@ final class OverlayViewModelTests: XCTestCase {
         for _ in 0..<4 { viewModel.next() }
 
         XCTAssertEqual(viewModel.state.phase, .complete)
-        XCTAssertEqual(viewModel.state.eyebrow, "HIP RESET · COMPLETE")
+        XCTAssertEqual(viewModel.state.eyebrow, "MOVEMENT BREAK · COMPLETE")
         XCTAssertEqual(viewModel.state.headerTrailing, "NEXT BREAK 12:05")
-        XCTAssertEqual(viewModel.state.completionTitle, "Hips reset")
+        XCTAssertEqual(viewModel.state.completionTitle, "Break done")
         XCTAssertEqual(viewModel.state.endSummary, "Four movements done. Next break at 12:05.")
         XCTAssertEqual(viewModel.state.streak, 4)
     }

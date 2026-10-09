@@ -57,33 +57,4 @@ final class RecencyTests: XCTestCase {
         XCTAssertEqual(score, 1 + 2.0 / 3.0, accuracy: 0.001)
         XCTAssertLessThan(Recency.multiplier(score: score), Recency.multiplier(score: 1))
     }
-
-    /// The rotation cursor comes from the same record, and counts routines rather than movements.
-    func testRoutinesDoneBeforeTodayCountsRoutinesNotBlocks() {
-        let today = SchedulerHarness.mondayMorning
-        let history = HistoryStore()
-        let yesterday = UUID()
-        for id in ["CIR-01", "FLX-01", "BAL-01"] {
-            history.record(completion: MovementCompletion(
-                movementId: id,
-                at: today.addingTimeInterval(-day),
-                seconds: 60,
-                routineId: yesterday
-            ))
-        }
-        history.record(completion: MovementCompletion(
-            movementId: "EYE-01",
-            at: today.addingTimeInterval(-2 * day),
-            seconds: 30,
-            routineId: nil
-        ))
-        history.record(completion: MovementCompletion(
-            movementId: "HWF-01",
-            at: today,
-            seconds: 45,
-            routineId: UUID()
-        ))
-
-        XCTAssertEqual(history.routinesDoneBefore(today), 1, "one routine, a micro-break, and today's")
-    }
 }

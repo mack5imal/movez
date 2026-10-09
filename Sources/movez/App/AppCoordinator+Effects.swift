@@ -66,7 +66,7 @@ extension AppCoordinator {
 
     private func beginBreak(_ plan: BreakPlan) {
         // A break the lid closed on picks up where it left off, with the movements it had, and
-        // without counting twice against the day's rotation.
+        // without being counted twice among the day's routines.
         if let resumed = interruptedSession {
             interruptedSession = nil
             currentBreak = BreakSession(
@@ -94,7 +94,7 @@ extension AppCoordinator {
             history.record(
                 breakRecord: BreakRecord(
                     at: clock.now,
-                    routineName: current.routine.name,
+                    routineName: BreakRecord.movementBreakName,
                     outcome: .done,
                     completedBlocks: completed,
                     totalBlocks: total
@@ -105,7 +105,7 @@ extension AppCoordinator {
             // The scheduler does not track blocks, so the coordinator supplies the real count.
             history.record(breakRecord: BreakRecord(
                 at: clock.now,
-                routineName: current.routine.name,
+                routineName: BreakRecord.movementBreakName,
                 outcome: .skipped,
                 completedBlocks: max(completed, current.completedBlocks),
                 totalBlocks: current.totalBlocks
@@ -113,7 +113,7 @@ extension AppCoordinator {
         case .snoozed:
             history.record(breakRecord: BreakRecord(
                 at: clock.now,
-                routineName: current.routine.name,
+                routineName: BreakRecord.movementBreakName,
                 outcome: .snoozed,
                 completedBlocks: current.completedBlocks,
                 totalBlocks: current.totalBlocks
@@ -128,13 +128,13 @@ extension AppCoordinator {
 
     /// Writes down a break that was turned away at the heads-up, which never became a session.
     ///
-    /// The routine named is the one that was about to run, so the record reads the same as one
+    /// The block count is the routine that was about to run, so the record reads the same as one
     /// written for a break the user actually saw. Nothing was done, so no blocks are claimed.
     private func recordHeadsUpOutcome(_ outcome: HeadsUpOutcome) {
         let routine = previewNextRoutine(now: clock.now)
         history.record(breakRecord: BreakRecord(
             at: clock.now,
-            routineName: routine?.name ?? "",
+            routineName: BreakRecord.movementBreakName,
             outcome: outcome == .snoozed ? .snoozed : .skipped,
             completedBlocks: 0,
             totalBlocks: routine?.blocks.count ?? 0
@@ -155,7 +155,7 @@ extension AppCoordinator {
 
     private func beginMicro() {
         var context = MicroContext()
-        context.emphasisIndex = scheduler.snapshot.microEmphasisIndex
+        context.usedMovementIdsToday = usedMovementIdsToday(at: clock.now)
         context.lastMicroMovementIds = lastMicroIds
         context.nextFullRoutineIds = Set(previewNextRoutine(now: clock.now)?.movementIds ?? [])
         context.excluded = settings.excludedMovementIds
@@ -247,39 +247,23 @@ extension AppCoordinator {
         rollDayIfNeeded(at: now)
         var context = RoutineContext()
         context.date = now
-        context.timeOfDay = timeOfDay(at: now, breakIndex: breakIndex)
-        context.breakIndexToday = breakIndex
-        context.usedMovementIdsToday = history.usedMovementIds(on: now)
-            .union(routinesToday.flatMap(\.movementIds))
+        context.usedMovementIdsToday = usedMovementIdsToday(at: now)
         context.usedStrRegionsLastBreak = routinesToday.last?.strengthRegions ?? []
-        context.balanceServedToday = routinesToday.contains { $0.buckets.contains(.bal) }
         context.equipment = settings.equipment
         context.excluded = settings.excludedMovementIds
         context.focus = settings.focus
         context.difficultyCap = settings.difficultyCap
         context.unlockedDiff3 = history.unlockedDiff3(library: library)
-        // The rotation walks on from wherever it was, rather than restarting at hips every
-        // morning: a day with two breaks in it used to serve the first two slots and nothing else,
-        // for as long as the user kept that pattern up.
-        context.rotationIndex = history.routinesDoneBefore(now) + breakIndex
         context.recency = history.recencyScores(before: now)
         context.seed = SplitMix64.seed(day: scheduler.snapshot.dayKey, index: breakIndex)
         return context
     }
 
-    /// The last break before the working day closes, or an ordinary one.
-    ///
-    /// The window has to genuinely close for a break to be the last one. Working hours that run
-    /// the whole day still report an end at midnight, and treating that as a close gave anyone
-    /// working through the evening a wind-down routine every night at eleven.
-    func timeOfDay(at now: Date, breakIndex: Int) -> TimeOfDay {
-        let config = settings.schedulerConfig
-        guard let end = config.workingHours.nextEnd(after: now, calendar: config.calendar),
-              now.addingTimeInterval(TimeInterval(config.sitSeconds)) > end,
-              !config.workingHours.isWithin(end.addingTimeInterval(1), calendar: config.calendar) else {
-            return .normal
-        }
-        return .last
+    /// Everything served today, in either kind of break: what history has recorded, and the
+    /// routines already put on screen, which are remembered even when they were skipped.
+    func usedMovementIdsToday(at now: Date) -> Set<String> {
+        rollDayIfNeeded(at: now)
+        return history.usedMovementIds(on: now).union(routinesToday.flatMap(\.movementIds))
     }
 
     func breakIndexToday(at now: Date) -> Int {
@@ -325,9 +309,6 @@ extension AppCoordinator {
 
         state.secondsUntilBreak = scheduler.snapshot.secondsUntilFullBreak(at: now)
         state.nextBreakAt = scheduler.snapshot.nextFullDueAt
-        // The subtitle is read off the published preview rather than rebuilt: this runs on every
-        // tick, and the menu is the only thing that wants it.
-        state.nextRoutineSubtitle = nextRoutinePreview?.subtitle ?? ""
         return state
     }
 

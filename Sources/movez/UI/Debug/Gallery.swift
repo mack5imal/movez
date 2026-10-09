@@ -148,9 +148,9 @@ struct GalleryView: View {
                     HStack(alignment: .top, spacing: 14) {
                         TimerDisc(size: 64, progress: 0.7, numerals: "1:00", label: nil)
                         VStack(alignment: .leading, spacing: 5) {
-                            MovezText("MOVEMENT BREAK · HIPS AND GLUTES", MovezType.eyebrowPanel, color: Tokens.accent)
-                            MovezText("Hip reset in a minute", MovezType.panelTitle)
-                            MovezText("Five minutes, four movements.", MovezType.panelBody, color: Tokens.text2)
+                            MovezText("MOVEMENT BREAK", MovezType.eyebrowPanel, color: Tokens.accent)
+                            MovezText("Movement break in a minute", MovezType.panelTitle)
+                            MovezText("Five minutes, five movements.", MovezType.panelBody, color: Tokens.text2)
                         }
                     }
                     InfoBadge(text: "Sitting for 1 h 35 m · break waited for your call")
@@ -258,7 +258,7 @@ struct GalleryView: View {
 
     private func sample(for name: String) -> String {
         switch name {
-        case "eyebrowOverlay", "eyebrowPanel": return "Hip reset · hips and glutes"
+        case "eyebrowOverlay", "eyebrowPanel": return "Movement break · micro-break"
         case "discNumerals", "panelDisc", "menuDisc": return "0:42"
         case "discLabel": return "Next →"
         default: return "March in place"

@@ -1,16 +1,10 @@
 import Foundation
 
-/// Where a break falls in the working day. Each value selects a routine shape.
-enum TimeOfDay: String, Hashable, Codable, CaseIterable {
-    case mid
-    case last
-    case normal
-}
-
-/// The optional emphasis a user picks in settings.
+/// The optional emphasis a user picks in settings. Every focus is a set of body regions: what to
+/// work, not which kind of movement to do. Balance is already in every break, so "more balance"
+/// had nothing left to ask for.
 enum Focus: String, Hashable, Codable, CaseIterable {
     case none
-    case moreBalance
     case moreUpperBack
     case moreHips
     case moreNeckShoulders
@@ -19,7 +13,6 @@ enum Focus: String, Hashable, Codable, CaseIterable {
     var displayName: String {
         switch self {
         case .none: return "None"
-        case .moreBalance: return "More balance"
         case .moreUpperBack: return "More upper back"
         case .moreHips: return "More hips"
         case .moreNeckShoulders: return "More neck and shoulders"
@@ -31,7 +24,6 @@ enum Focus: String, Hashable, Codable, CaseIterable {
     var boostedRegions: Set<Region> {
         switch self {
         case .none: return []
-        case .moreBalance: return []
         case .moreUpperBack: return [.thoracic, .chest, .shoulder]
         case .moreHips: return [.hip, .glute]
         case .moreNeckShoulders: return [.neck, .shoulder]
@@ -44,42 +36,24 @@ enum Focus: String, Hashable, Codable, CaseIterable {
 /// produces the same routine.
 struct RoutineContext: Hashable {
     var date: Date = .init()
-    var timeOfDay: TimeOfDay = .normal
-    var breakIndexToday: Int = 0
+    /// Everything served today, in full breaks and micro-breaks alike. Nothing is served twice in
+    /// a day.
     var usedMovementIdsToday: Set<String> = []
     var usedStrRegionsLastBreak: Set<Region> = []
-    var balanceServedToday: Bool = false
     var equipment: Set<Equipment> = []
     var excluded: Set<String> = []
     var focus: Focus = .none
     var difficultyCap: Int = 2
     var unlockedDiff3: Set<String> = []
-    var rotationIndex: Int = 0
     /// How recently each movement was served, as `Recency` scores it.
     var recency: [String: Double] = [:]
     var seed: UInt64 = 0
-
-    /// Movements the chaining rules allow to recur inside one day.
-    static let alwaysRepeatable: Set<String> = ["CIR-01", "EYE-01", "BRE-01"]
-
-    var slot: RotationSlot { RotationSlot.slot(forRotationIndex: rotationIndex) }
 }
 
 /// Inputs for one micro-break.
 struct MicroContext: Hashable {
-    /// circulation → eyes and hands → posture → circulation …
-    enum Emphasis: String, CaseIterable, Hashable, Codable {
-        case circulation
-        case eyesHands
-        case posture
-
-        static func emphasis(forIndex index: Int) -> Emphasis {
-            let count = allCases.count
-            return allCases[((index % count) + count) % count]
-        }
-    }
-
-    var emphasisIndex: Int = 0
+    /// Everything served today, in full breaks and micro-breaks alike.
+    var usedMovementIdsToday: Set<String> = []
     var lastMicroMovementIds: Set<String> = []
     var nextFullRoutineIds: Set<String> = []
     var excluded: Set<String> = []
@@ -87,6 +61,4 @@ struct MicroContext: Hashable {
     /// How recently each movement was served, as `Recency` scores it.
     var recency: [String: Double] = [:]
     var seed: UInt64 = 0
-
-    var emphasis: Emphasis { Emphasis.emphasis(forIndex: emphasisIndex) }
 }

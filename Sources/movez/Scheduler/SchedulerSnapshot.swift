@@ -46,6 +46,9 @@ struct SchedulerSnapshot: Codable, Equatable {
     /// on the way to disk and cleared on the way back, so it is nil in memory by design — which
     /// also means two snapshots that differ only in `savedAt` are not `==`.
     var savedAt: Date?
+    /// How many micro-breaks have closed today, which seeds the next one's draw. The name is left
+    /// over from the emphasis rotation it used to drive; it stays because the synthesized decoder
+    /// requires every non-optional key, so renaming it would stop an existing `state.json` loading.
     var microEmphasisIndex: Int = 0
     var configHash: UInt64 = 0
     var transitions = TransitionLog()

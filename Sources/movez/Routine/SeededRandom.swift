@@ -40,6 +40,19 @@ struct SplitMix64: RandomNumberGenerator {
         return weights.indices.last
     }
 
+    /// `elements` in a random order. Fisher–Yates by hand rather than `shuffled(using:)`, whose
+    /// algorithm the standard library does not promise to keep, so the order is as stable across
+    /// releases as the generator itself.
+    mutating func shuffled<Element>(_ elements: [Element]) -> [Element] {
+        var result = elements
+        guard result.count > 1 else { return result }
+        for index in stride(from: result.count - 1, to: 0, by: -1) {
+            let other = Int(next() % UInt64(index + 1))
+            result.swapAt(index, other)
+        }
+        return result
+    }
+
     /// A stable seed for a given day and break index. `hashValue` is not stable across launches,
     /// so the bytes are folded by hand.
     static func seed(day: String, index: Int) -> UInt64 {

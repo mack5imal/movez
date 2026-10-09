@@ -214,9 +214,9 @@ final class OverlayViewModel: ObservableObject {
         state.skipsToday = skipsToday
 
         guard phase == .running else {
-            state.eyebrow = "\(routine.name) · complete".uppercased()
+            state.eyebrow = "\(OverlayState.movementBreakEyebrow) · COMPLETE"
             state.headerTrailing = nextBreakAt.map { "NEXT BREAK \(MovezClock.label($0))" } ?? ""
-            state.completionTitle = routine.completionTitle
+            state.completionTitle = "Break done"
             state.endSummary = OverlayState.summary(
                 movements: completedBlocks,
                 nextBreakAt: nextBreakAt.map(MovezClock.label) ?? "the usual time"
@@ -225,7 +225,7 @@ final class OverlayViewModel: ObservableObject {
             return
         }
 
-        state.eyebrow = routine.eyebrow
+        state.eyebrow = OverlayState.movementBreakEyebrow
         state.headerTrailing = "\(OverlayState.clock(breakRemaining)) LEFT"
         state.discNumerals = OverlayState.clock(blockRemaining)
         state.discProgress = discProgress

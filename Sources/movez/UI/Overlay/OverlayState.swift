@@ -15,6 +15,10 @@ enum BreakSide: String, Equatable {
 /// The view takes this rather than the view model, so a snapshot can render any state exactly
 /// without a clock, a scheduler or a history store anywhere near it.
 struct OverlayState: Equatable {
+    /// The heads-up's and the overlay's eyebrow. Routines have no names: they are drawn at random,
+    /// and a title could only describe whichever region the draw landed on.
+    static let movementBreakEyebrow = "MOVEMENT BREAK"
+
     enum Phase: Equatable {
         case running
         case complete

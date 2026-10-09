@@ -42,8 +42,6 @@ final class PanelEffectSink: EffectSink {
             startedAt: now,
             totalSeconds: config.headsUpSeconds
         )
-        model.routineName = routine.name
-        model.focus = routine.focus
         model.blockCount = routine.blocks.count
         model.breakMinutes = max(1, config.breakSeconds / 60)
         model.snoozesLeft = info.snoozesLeft

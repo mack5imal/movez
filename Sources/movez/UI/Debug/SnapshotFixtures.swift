@@ -1,12 +1,11 @@
 import Foundation
 
-/// The frozen data every snapshot renders from — the "Hip reset" break the design handoff shows,
-/// so a snapshot can be held next to `screenshots/2a-full-break-overlay.png` and compared.
+/// The frozen data every snapshot renders from — the break the design handoff shows, so a
+/// snapshot can be held next to `screenshots/2a-full-break-overlay.png` and compared. The
+/// handoff's routine name is gone: routines no longer have one.
 enum SnapshotFixtures {
-    static let routineName = "Hip reset"
-    static let routineFocus = "hips and glutes"
-    static let eyebrow = "HIP RESET · HIPS AND GLUTES"
-    static let completionTitle = "Hips reset"
+    static let eyebrow = OverlayState.movementBreakEyebrow
+    static let completionTitle = "Break done"
 
     static let movementName = "March in place"
     static let movementInstruction = """
@@ -94,7 +93,7 @@ extension SnapshotFixtures {
     static func overlayEnd() -> OverlayState {
         var state = OverlayState()
         state.phase = .complete
-        state.eyebrow = "HIP RESET · COMPLETE"
+        state.eyebrow = "\(OverlayState.movementBreakEyebrow) · COMPLETE"
         state.headerTrailing = "NEXT BREAK \(nextBreakAt)"
         state.completionTitle = completionTitle
         state.endSummary = endSummary
@@ -147,9 +146,7 @@ extension SnapshotFixtures {
     static func headsUp(deferred: Bool = false) -> PanelViewModel {
         let clock = ManualClock(now: panelInstant)
         let model = PanelViewModel(phase: .headsUp, clock: clock, startedAt: clock.now, totalSeconds: 60)
-        model.routineName = routineName
-        model.focus = routineFocus
-        model.blockCount = 4
+        model.blockCount = 5
         model.breakMinutes = 5
         model.skipsToday = skipsToday
         // The deferred variant has spent its one snooze, so the button is gone rather than dead.
@@ -209,8 +206,7 @@ extension SnapshotFixtures {
     static func microBreak() -> MicroBreak {
         MicroBreak(
             id: UUID(),
-            blocks: [RoutineBlock(movement: armCircles, seconds: 60, trimmedFrom: nil)],
-            emphasis: .circulation
+            blocks: [RoutineBlock(movement: armCircles, seconds: 60)]
         )
     }
 
@@ -245,7 +241,7 @@ extension SnapshotFixtures {
 }
 
 /// The menu-bar states the snapshots render, frozen at the moments the handoff draws:
-/// 32 minutes to a Hip reset, a 42-minute pause, and a Saturday.
+/// 32 minutes to the next break, a 42-minute pause, and a Saturday.
 extension SnapshotFixtures {
     static let menuStats = DailyStats(done: 3, snoozed: 1, skipped: 1, longestBoutSeconds: 72 * 60)
     static let menuOffHoursStats = DailyStats(done: 6, snoozed: 2, skipped: 1, longestBoutSeconds: 95 * 60)
@@ -257,7 +253,6 @@ extension SnapshotFixtures {
         // 32 of a 55-minute bout left.
         state.elapsedFraction = 1 - 32.0 / 55
         state.title = MenuBarState.title(mode: .sitting, minutesRemaining: 32)
-        state.subtitle = "\(routineName) · \(routineFocus)"
         state.stats = MenuBarState.statsLine(day: "Today", stats: menuStats)
         state.longestBout = MenuBarState.longestBoutLine(seconds: menuStats.longestBoutSeconds)
         return state

@@ -15,9 +15,7 @@ final class PanelViewModelTests: XCTestCase {
         deferred: PanelViewModel.DeferredInfo? = nil
     ) -> PanelViewModel {
         let model = PanelViewModel(phase: .headsUp, clock: clock, startedAt: clock.now, totalSeconds: 60)
-        model.routineName = "Hip reset"
-        model.focus = "hips and glutes"
-        model.blockCount = 4
+        model.blockCount = 5
         model.breakMinutes = 5
         model.skipsToday = 1
         model.snoozesLeft = snoozesLeft
@@ -31,8 +29,7 @@ final class PanelViewModelTests: XCTestCase {
         }
         return MicroBreak(
             id: UUID(),
-            blocks: [RoutineBlock(movement: movement, seconds: 60, trimmedFrom: nil)],
-            emphasis: .circulation
+            blocks: [RoutineBlock(movement: movement, seconds: 60)]
         )
     }
 
@@ -75,9 +72,9 @@ final class PanelViewModelTests: XCTestCase {
 
     func testHeadsUpCopyMatchesTheHandoff() {
         let model = headsUp(clock: ManualClock(now: start))
-        XCTAssertEqual(model.eyebrow, "MOVEMENT BREAK · HIPS AND GLUTES")
-        XCTAssertEqual(model.title, "Hip reset in a minute")
-        XCTAssertEqual(model.body, "Five minutes, four movements.")
+        XCTAssertEqual(model.eyebrow, "MOVEMENT BREAK")
+        XCTAssertEqual(model.title, "Movement break in a minute")
+        XCTAssertEqual(model.body, "Five minutes, five movements.")
         XCTAssertEqual(model.skipLabel, "Skip · 1 today")
     }
 
@@ -204,8 +201,7 @@ final class PanelViewModelTests: XCTestCase {
         let model = microCountIn(clock: clock)
         model.micro = MicroBreak(
             id: UUID(),
-            blocks: [RoutineBlock(movement: movement, seconds: 60, trimmedFrom: nil)],
-            emphasis: .circulation
+            blocks: [RoutineBlock(movement: movement, seconds: 60)]
         )
         XCTAssertTrue(model.body.contains("seated"), model.body)
     }

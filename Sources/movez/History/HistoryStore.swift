@@ -25,6 +25,10 @@ enum BreakResult: String, Codable, Equatable, CaseIterable {
 
 /// One break, as it happened.
 struct BreakRecord: Codable, Equatable, Identifiable {
+    /// What every full break is recorded as, now that routines have no names. The field keeps its
+    /// name and its type so that history written before still decodes.
+    static let movementBreakName = "Movement break"
+
     var at: Date
     var routineName: String
     var outcome: BreakResult
@@ -194,19 +198,6 @@ final class HistoryStore {
             scores[completion.movementId, default: 0] += weight
         }
         return scores
-    }
-
-    /// How many routines were done on the days before `date` — where the region rotation had got
-    /// to when today started.
-    ///
-    /// Counted from the completions rather than a stored number, because they already record which
-    /// routine each movement belonged to and they already survive a relaunch. Micro-breaks have no
-    /// routine id, so they do not move the rotation on. Today is excluded because the coordinator
-    /// adds today's breaks itself, from the routines it has in hand.
-    func routinesDoneBefore(_ date: Date) -> Int {
-        let today = calendar.startOfDay(for: date)
-        let ids = data.completions.filter { $0.at < today }.compactMap(\.routineId)
-        return Set(ids).count
     }
 
     func stats(on date: Date) -> DailyStats {

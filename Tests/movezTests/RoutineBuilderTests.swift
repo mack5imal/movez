@@ -18,7 +18,7 @@ final class RoutineBuilderTests: XCTestCase {
                 count += 1
                 let found = RoutineValidator.validate(routine, library: library)
                 if !found.isEmpty {
-                    problems.append("day \(day) · \(routine.name): \(found.joined(separator: "; "))")
+                    problems.append("day \(day) · \(routine.movementIds): \(found.joined(separator: "; "))")
                 }
             }
         }
@@ -26,6 +26,8 @@ final class RoutineBuilderTests: XCTestCase {
         XCTAssertEqual(problems.count, 0, problems.prefix(5).joined(separator: "\n"))
     }
 
+    /// No movement is exempt: walk lap, distance gaze and diaphragmatic breathing used to recur
+    /// freely, and were among the most-served movements because of it.
     func testNoMovementRepeatsWithinADay() {
         for day in 0..<40 {
             var options = RoutineTestSupport.DayOptions()
@@ -36,23 +38,48 @@ final class RoutineBuilderTests: XCTestCase {
                 seen[id, default: 0] += 1
             }
             let repeated = seen.filter { $0.value > 1 }.keys.sorted()
-            XCTAssertTrue(
-                repeated.allSatisfy(RoutineContext.alwaysRepeatable.contains),
-                "day \(day) repeated \(repeated)"
-            )
+            XCTAssertEqual(repeated, [], "day \(day) repeated \(repeated)")
         }
     }
 
-    // MARK: - Rotation
+    // MARK: - Shape
 
-    func testRotationVisitsEverySlotInOrder() {
-        var options = RoutineTestSupport.DayOptions()
-        options.breaks = 6
-        let routines = RoutineTestSupport.simulateDay(seed: 42, options: options)
-        XCTAssertEqual(
-            routines.map(\.slot),
-            [.hip, .tSpineChest, .neckShoulder, .posteriorChain, .core, .ankleFoot]
-        )
+    func testEveryRoutineHasTheSameShape() {
+        for seed in 0..<200 {
+            let routine = RoutineTestSupport.routine(seed: UInt64(seed &* 13 &+ 1))
+            let buckets = routine.buckets
+            XCTAssertEqual(buckets.count, 5)
+            XCTAssertEqual(buckets.first, .cir, "every routine opens on circulation")
+            XCTAssertEqual(Set(buckets[1...3]), [.bal, .flx, .str], "seed \(seed): \(buckets)")
+            XCTAssertTrue(Routine.closers.contains(buckets[4]), "seed \(seed) closes on \(buckets[4])")
+            XCTAssertTrue(routine.blocks.allSatisfy { $0.seconds == 60 })
+            XCTAssertEqual(routine.totalSeconds, 325, "five minutes of movement and five lead-ins")
+        }
+    }
+
+    func testTheWorkingBlocksComeInEveryOrder() {
+        var orders = Set<[Bucket]>()
+        for seed in 0..<200 {
+            orders.insert(Array(RoutineTestSupport.routine(seed: UInt64(seed &* 19 &+ 3)).buckets[1...3]))
+        }
+        XCTAssertEqual(orders.count, 6, "only \(orders.count) of the six orders appeared")
+    }
+
+    /// The closer is one pool, so each closer movement is about as likely as any other, rather
+    /// than each of the three buckets taking a third whatever its size.
+    func testTheCloserIsDrawnFromOnePool() {
+        var counts: [Bucket: Int] = [:]
+        let draws = 2_000
+        for seed in 0..<draws {
+            let closer = RoutineTestSupport.routine(seed: UInt64(seed &* 7 &+ 11)).buckets[4]
+            counts[closer, default: 0] += 1
+        }
+        let pool = RoutineTestSupport.builder.candidates(for: RoutineContext()).filter { Routine.closers.contains($0.bucket) }
+        for bucket in Routine.closers {
+            let expected = Double(pool.filter { $0.bucket == bucket }.count) / Double(pool.count)
+            let observed = Double(counts[bucket] ?? 0) / Double(draws)
+            XCTAssertEqual(observed, expected, accuracy: 0.05, "\(bucket.rawValue) closes \(Int(observed * 100))% of breaks")
+        }
     }
 
     func testStrengthRegionsNeverRepeatInConsecutiveBreaks() {
@@ -64,29 +91,16 @@ final class RoutineBuilderTests: XCTestCase {
                 let overlap = previous.strengthRegions.intersection(current.strengthRegions)
                 XCTAssertTrue(
                     overlap.isEmpty,
-                    "day \(day): \(previous.name) and \(current.name) share \(overlap.map(\.rawValue))"
+                    "day \(day): \(previous.movementIds) and \(current.movementIds) share \(overlap.map(\.rawValue))"
                 )
             }
         }
     }
 
-    // MARK: - Time of day
-
-    func testTimeOfDayShapes() {
-        for seed in 0..<50 {
-            let normal = RoutineTestSupport.routine(seed: UInt64(seed &* 13 &+ 1), timeOfDay: .normal)
-            XCTAssertEqual(normal.buckets.first, .cir, "every routine opens on circulation")
-
-            let last = RoutineTestSupport.routine(seed: UInt64(seed &* 17 &+ 2), timeOfDay: .last)
-            XCTAssertGreaterThanOrEqual(last.buckets.filter { $0 == .flx }.count, 2, "wind-down needs two FLX blocks")
-            XCTAssertEqual(last.buckets.last, .bre, "wind-down must close on breath")
-        }
-    }
-
     // MARK: - Variety across days
 
-    /// Thirty days of two breaks a day, with the history threaded forward the way the coordinator
-    /// threads it, and the rotation carrying on across days.
+    /// Thirty days of a few breaks a day, with the history threaded forward the way the
+    /// coordinator threads it.
     ///
     /// This is the shape of a real week for someone who takes one or two breaks a day, and it is
     /// where the old builder was at its worst: 39 of the 124 eligible movements ever appeared, and
@@ -94,21 +108,18 @@ final class RoutineBuilderTests: XCTestCase {
     /// was closest to an ideal length and broke ties by id.
     private func simulateMonth(breaksPerDay: Int) -> [Routine] {
         var served: [(id: String, day: Int)] = []
-        var cursor = 0
         var routines: [Routine] = []
 
         for day in 0..<30 {
             var options = RoutineTestSupport.DayOptions()
             options.breaks = breaksPerDay
             options.difficultyCap = 3
-            options.rotationCursor = cursor
             options.recency = served.reduce(into: [String: Double]()) { scores, entry in
                 scores[entry.id, default: 0] += Recency.weight(daysAgo: day - entry.day)
             }
 
             let today = RoutineTestSupport.simulateDay(seed: UInt64(day &* 104_729 &+ 17), options: options)
             routines += today
-            cursor += today.count
             served += today.flatMap(\.movementIds).map { (id: $0, day: day) }
         }
         return routines
@@ -124,7 +135,17 @@ final class RoutineBuilderTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(Set(ids).count, 80, "only \(Set(ids).count) distinct movements in a month")
 
         let topShare = Double(counts.values.max() ?? 0) / Double(routines.count)
-        XCTAssertLessThanOrEqual(topShare, 0.2, "one movement is in \(Int(topShare * 100))% of routines")
+        XCTAssertLessThanOrEqual(topShare, 0.15, "one movement is in \(Int(topShare * 100))% of routines")
+    }
+
+    /// Circulation, balance, flexibility and strength each take exactly a fifth of the blocks.
+    /// Under the old rules strength was 4% of them.
+    func testEachWorkingBucketIsAFifthOfAMonth() {
+        let buckets = simulateMonth(breaksPerDay: 3).flatMap(\.buckets)
+        for bucket in [Bucket.cir, .bal, .flx, .str] {
+            let share = Double(buckets.filter { $0 == bucket }.count) / Double(buckets.count)
+            XCTAssertEqual(share, 0.2, accuracy: 0.0001, "\(bucket.rawValue) is \(Int(share * 100))% of a month")
+        }
     }
 
     func testNoRoutineIsServedTwiceInAMonth() {
@@ -148,7 +169,6 @@ final class RoutineBuilderTests: XCTestCase {
             let served = Set(yesterday.flatMap(\.movementIds))
 
             options.recency = served.reduce(into: [String: Double]()) { $0[$1] = Recency.weight(daysAgo: 1) }
-            options.rotationCursor = yesterday.count
             let today = RoutineTestSupport.simulateDay(seed: UInt64(day &* 7_919 &+ 6), options: options)
 
             for id in today.flatMap(\.movementIds) {
@@ -159,16 +179,6 @@ final class RoutineBuilderTests: XCTestCase {
 
         let share = Double(yesterdayCount) / Double(total)
         XCTAssertLessThan(share, 0.1, "\(Int(share * 100))% of today came from yesterday")
-    }
-
-    func testBalanceIsServedEveryDay() {
-        for day in 0..<30 {
-            var options = RoutineTestSupport.DayOptions()
-            options.breaks = 6
-            let routines = RoutineTestSupport.simulateDay(seed: UInt64(day &* 977 &+ 7), options: options)
-            let balanceBlocks = routines.flatMap(\.buckets).filter { $0 == .bal }.count
-            XCTAssertGreaterThanOrEqual(balanceBlocks, 1, "day \(day) served no balance")
-        }
     }
 
     // MARK: - Equipment, excludes, focus
@@ -209,18 +219,18 @@ final class RoutineBuilderTests: XCTestCase {
             (0..<200).flatMap { seed in
                 RoutineTestSupport.routine(seed: UInt64(seed &* 11 &+ 6)) { context in
                     context.focus = focus
-                    context.balanceServedToday = true
                 }.blocks
             }
         }
 
         let baseline = blocks(focus: .none)
-        let balance = blocks(focus: .moreBalance)
+        let handsEyes = blocks(focus: .moreHandsEyes)
         let upperBack = blocks(focus: .moreUpperBack)
 
-        let baselineBalance = baseline.filter { $0.movement.bucket == .bal }.count
-        let focusedBalance = balance.filter { $0.movement.bucket == .bal }.count
-        XCTAssertGreaterThan(focusedBalance, baselineBalance, "more balance did not raise the BAL share")
+        let handsEyesRegions: Set<Region> = [.wristForearm, .eyes]
+        let baselineHandsEyes = baseline.filter { !Set($0.movement.regions).isDisjoint(with: handsEyesRegions) }.count
+        let focusedHandsEyes = handsEyes.filter { !Set($0.movement.regions).isDisjoint(with: handsEyesRegions) }.count
+        XCTAssertGreaterThan(focusedHandsEyes, baselineHandsEyes, "more hands and eyes did not raise their share")
 
         let upperRegions: Set<Region> = [.thoracic, .chest, .shoulder]
         let baselineUpper = baseline.filter { !Set($0.movement.regions).isDisjoint(with: upperRegions) }.count
@@ -233,10 +243,10 @@ final class RoutineBuilderTests: XCTestCase {
 
             focus        blocks   CIR   FLX   STR   BAL   HWF   EYE   BRE
             \(row("none", baseline))
-            \(row("moreBalance", balance))
+            \(row("moreHandsEyes", handsEyes))
             \(row("moreUpperBack", upperBack))
 
-            BAL blocks       none \(baselineBalance)   moreBalance \(focusedBalance)
+            Wrist/eye blocks   none \(baselineHandsEyes)   moreHandsEyes \(focusedHandsEyes)
             T-spine/Chest/Shoulder blocks   none \(baselineUpper)   moreUpperBack \(focusedUpper)
             """,
             to: "routine-distribution.txt"
@@ -266,9 +276,9 @@ final class RoutineBuilderTests: XCTestCase {
     }
 
     func testUnlockedDifficultyThreeCanAppear() {
-        // Narrow the strength slot to STR-29 so the unlock is the only variable under test.
+        // Narrow the strength block to STR-29 so the unlock is the only variable under test.
         let otherStrength = library.movements
-            .filter { ($0.bucket == .str && $0.id != "STR-29") || $0.bucket == .bal }
+            .filter { $0.bucket == .str && $0.id != "STR-29" }
             .map(\.id)
 
         let locked = RoutineTestSupport.routine(seed: 99) { context in
@@ -285,31 +295,7 @@ final class RoutineBuilderTests: XCTestCase {
         XCTAssertTrue(unlocked.movementIds.contains("STR-29"), "unlocked Diff 3 never appeared")
     }
 
-    // MARK: - Determinism and naming
-
-    /// The slot only weights selection, so naming by slot once put "Upper back opener" over leg
-    /// swings and squats. Every ordinary routine must now work the regions its name claims.
-    func testARoutineIsNamedForTheRegionsItActuallyWorks() {
-        var renamed = 0
-        for day in 0..<30 {
-            var options = RoutineTestSupport.DayOptions()
-            options.breaks = 8
-            for routine in RoutineTestSupport.simulateDay(seed: UInt64(day &* 613 &+ 17), options: options)
-            where RoutineNaming.timeOfDayName(routine.timeOfDay) == nil {
-                guard let named = RotationSlot.allCases.first(where: { RoutineNaming.slotName($0).name == routine.name }) else {
-                    XCTFail("day \(day): \(routine.name) is not a slot name")
-                    continue
-                }
-                if named != routine.slot { renamed += 1 }
-                let worked = Set(routine.blocks.flatMap(\.movement.regions))
-                XCTAssertFalse(
-                    worked.isDisjoint(with: named.regions),
-                    "day \(day): \(routine.name) works \(worked.map(\.rawValue).sorted())"
-                )
-            }
-        }
-        XCTAssertGreaterThan(renamed, 0, "the sweep should include routines the old naming got wrong")
-    }
+    // MARK: - Determinism
 
     func testSameSeedProducesTheSameRoutine() {
         let first = RoutineTestSupport.routine(seed: 4_242)
@@ -319,22 +305,6 @@ final class RoutineBuilderTests: XCTestCase {
 
         let different = RoutineTestSupport.routine(seed: 4_243)
         XCTAssertNotEqual(first.movementIds, different.movementIds)
-    }
-
-    func testNamingTable() {
-        let hip = RoutineNaming.name(slot: .hip, timeOfDay: .normal)
-        XCTAssertEqual(hip.name, "Hip reset")
-        XCTAssertEqual(hip.focus, "hips and glutes")
-        XCTAssertEqual(hip.completionTitle, "Hips reset")
-        XCTAssertEqual(hip.eyebrow, "HIP RESET · HIPS AND GLUTES")
-        XCTAssertEqual(hip.subtitle, "Hip reset · hips and glutes")
-
-        XCTAssertEqual(RoutineNaming.name(slot: .hip, timeOfDay: .last).completionTitle, "Wound down")
-        XCTAssertEqual(RoutineNaming.slotName(.ankleFoot).completionTitle, "Feet awake")
-
-        let routine = RoutineTestSupport.routine(seed: 7, rotationIndex: 0)
-        XCTAssertEqual(routine.subtitle, "Hip reset · hips and glutes")
-        XCTAssertEqual(routine.eyebrow, "HIP RESET · HIPS AND GLUTES")
     }
 
     func testWritesSampleRoutinesForEvidence() {

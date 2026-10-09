@@ -1,116 +1,79 @@
 import Foundation
 
-/// The block shapes a generated routine can take. The standard shape is the chaining-rule
-/// default; the wind-down is the documented variant for the last break of a working day (brief §6,
-/// library §13 sample R6).
-///
-/// There is no wake-up shape any more. It applied to the first break of every calendar day, which
-/// for anyone working odd hours is neither the start of their day nor a meaningful moment, and it
-/// spent two of four blocks on circulation, so the twenty circulation movements carried half of
-/// every such routine. Nor is there a post-lunch shape — see `Scheduler+Idle`.
-enum RoutineShape: String, Hashable, Codable, CaseIterable {
-    /// CIR → FLX → (STR | BAL) → closer
-    case standard
-    /// CIR → FLX → FLX → BRE — the last break unwinds and ends on breath.
-    case windDown
-
-    /// Buckets allowed at each position for a routine of `count` blocks.
-    ///
-    /// Four blocks is the chaining-rule default. The fifth block, when the four-block shape falls
-    /// short of the 270 s floor, is an extra FLX inserted before the closer — the shape the
-    /// library's own samples take (R2, R4, R7).
-    func plan(count: Int) -> [[Bucket]] {
-        var positions: [[Bucket]]
-        switch self {
-        case .standard: positions = [[.cir], [.flx], [.str, .bal]]
-        case .windDown: positions = [[.cir], [.flx], [.flx]]
-        }
-        if count <= 3 { positions.removeLast() }
-        if count >= 5 { positions.append([.flx]) }
-        positions.append(self == .windDown ? [.bre] : Self.closers)
-        return positions
-    }
-
-    /// The position of the strength-or-balance block, which carries the region the next break avoids.
-    var strengthPosition: Int { 2 }
-
-    static let closers: [Bucket] = [.hwf, .eye, .bre]
-
-    static func shape(for timeOfDay: TimeOfDay) -> RoutineShape {
-        switch timeOfDay {
-        case .last: return .windDown
-        case .mid, .normal: return .standard
-        }
-    }
-}
-
 /// One movement in a generated routine, with the seconds it is actually given.
 struct RoutineBlock: Hashable, Identifiable {
     let movement: Movement
     let seconds: Int
-    /// The movement's natural `block_seconds` when this block was shortened to fit the budget.
-    let trimmedFrom: Int?
 
     var id: String { movement.id }
     var perSide: Bool { movement.perSide }
-    var wasTrimmed: Bool { trimmedFrom != nil }
 
     /// Seconds given to each side of a per-side movement.
     var secondsPerSide: Int { perSide ? seconds / 2 : seconds }
 }
 
-/// A generated full break.
+/// A generated full break: a circulation warm-up, then balance, flexibility and strength in a
+/// random order, then a closer to come back to the desk on.
+///
+/// It has no name. The movements are drawn at random, so a title could only describe whichever
+/// region the draw happened to land on, and naming by region put "Hip reset" over about a third
+/// of all routines, because the hip region set is the broadest one in the library.
 struct Routine: Hashable, Identifiable {
     let id: UUID
-    let name: String
-    let focus: String
-    let completionTitle: String
-    let slot: RotationSlot
-    let shape: RoutineShape
-    let timeOfDay: TimeOfDay
     let blocks: [RoutineBlock]
 
-    /// Seconds between two blocks, used for the transition card and its chime.
-    static let transitionSeconds = 5
+    /// Every movement runs for a minute, a per-side one thirty seconds a side. The library's own
+    /// `block_seconds` varies from 20 to 90 s, and fitting a five-minute budget around it took a
+    /// repair pass that quietly favoured long movements over short ones.
+    static let blockSeconds = 60
 
-    /// Block time plus the transitions between blocks.
+    /// The lead-in before each movement, the first included: a moment to read what is coming
+    /// before the clock starts.
+    static let leadInSeconds = 5
+
+    /// The buckets the last block is drawn from, as one pool.
+    static let closers: Set<Bucket> = [.hwf, .eye, .bre]
+
+    /// Movement time plus a lead-in before every movement.
     var totalSeconds: Int {
-        blocks.reduce(0) { $0 + $1.seconds } + Self.transitionSeconds * max(0, blocks.count - 1)
+        movementSeconds + Self.leadInSeconds * blocks.count
     }
 
-    var blockSeconds: Int { blocks.reduce(0) { $0 + $1.seconds } }
+    var movementSeconds: Int { blocks.reduce(0) { $0 + $1.seconds } }
     var movementIds: [String] { blocks.map(\.movement.id) }
     var buckets: [Bucket] { blocks.map(\.movement.bucket) }
 
-    /// "HIP RESET · HIPS AND GLUTES"
-    var eyebrow: String { "\(name) · \(focus)".uppercased() }
-    /// "Hip reset · hips and glutes"
-    var subtitle: String { "\(name) · \(focus)" }
-
-    /// The regions worked by the strength or balance block, carried into the next break so the
-    /// same region is not loaded twice in a row.
+    /// The regions worked by the strength block, carried into the next break so the same region
+    /// is not loaded twice in a row.
     var strengthRegions: Set<Region> {
-        let strength = blocks.first { $0.movement.bucket == .str || $0.movement.bucket == .bal }
+        let strength = blocks.first { $0.movement.bucket == .str }
         return Set(strength?.movement.regions ?? [])
     }
 }
 
-/// A generated micro-break: one 60 s block or two 30 s blocks.
+/// A generated micro-break: one per-side movement for the whole minute, thirty seconds a side,
+/// or two one-sided movements of thirty seconds each with a lead-in before the second.
 struct MicroBreak: Hashable, Identifiable {
     let id: UUID
     let blocks: [RoutineBlock]
-    let emphasis: MicroContext.Emphasis
 
-    var totalSeconds: Int { blocks.reduce(0) { $0 + $1.seconds } }
+    /// 60 s for one movement, 65 s for two. The first movement needs no lead-in of its own: the
+    /// count-in has already said what it is.
+    var totalSeconds: Int {
+        blocks.reduce(0) { $0 + $1.seconds } + Routine.leadInSeconds * max(0, blocks.count - 1)
+    }
+
     var movementIds: [String] { blocks.map(\.movement.id) }
 
-    /// "MICRO-BREAK · SHOULDERS"
-    var eyebrow: String { "MICRO-BREAK · \(regionWord.uppercased())" }
+    /// "MICRO-BREAK · SHOULDERS", for the block on screen.
+    static func eyebrow(for block: RoutineBlock?) -> String {
+        "MICRO-BREAK · \(regionWord(for: block).uppercased())"
+    }
 
-    /// The plain-language region word taken from the first movement's primary region.
-    var regionWord: String {
-        guard let region = blocks.first?.movement.regions.first else { return "movement" }
-        return MicroBreak.regionWord(for: region)
+    /// The plain-language region word taken from a movement's primary region.
+    static func regionWord(for block: RoutineBlock?) -> String {
+        guard let region = block?.movement.regions.first else { return "movement" }
+        return regionWord(for: region)
     }
 
     static func regionWord(for region: Region) -> String {

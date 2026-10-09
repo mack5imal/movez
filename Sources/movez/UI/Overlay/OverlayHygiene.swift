@@ -113,7 +113,6 @@ enum OverlayHygiene {
     private static func fixtureContext() -> RoutineContext {
         var context = RoutineContext()
         context.seed = 2_026
-        context.balanceServedToday = true
         return context
     }
 }

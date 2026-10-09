@@ -34,7 +34,6 @@ struct MenuState: Equatable {
     var awaySeconds: Int?
     var nextBreakAt: Date?
     var pausedUntil: Date?
-    var nextRoutineSubtitle: String = ""
 }
 
 /// The one object that ties the pure scheduler to the world: it owns the clock, drives ticks,

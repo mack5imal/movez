@@ -12,78 +12,91 @@ final class MicroBreakBuilderTests: XCTestCase {
         return builder.build(context: context)
     }
 
-    func testAlwaysLastsOneMinute() {
-        for seed in 0..<200 {
-            let micro = micro(seed: UInt64(seed &* 13 &+ 1)) { $0.emphasisIndex = seed }
-            XCTAssertEqual(micro.totalSeconds, 60, "emphasis \(micro.emphasis)")
-            XCTAssertTrue((1...2).contains(micro.blocks.count))
-            if micro.blocks.count == 2 {
+    /// One per-side movement for the whole minute, or two one-sided movements of thirty seconds.
+    func testAPerSideMovementRunsAloneAndTheRestComeInPairs() {
+        var singles = 0
+        var pairs = 0
+        for seed in 0..<300 {
+            let micro = micro(seed: UInt64(seed &* 13 &+ 1))
+            switch micro.blocks.count {
+            case 1:
+                singles += 1
+                XCTAssertTrue(micro.blocks[0].perSide, "\(micro.blocks[0].movement.id) ran alone but is one-sided")
+                XCTAssertEqual(micro.blocks[0].seconds, 60)
+                XCTAssertEqual(micro.blocks[0].secondsPerSide, 30)
+                XCTAssertEqual(micro.totalSeconds, 60)
+            case 2:
+                pairs += 1
+                XCTAssertTrue(micro.blocks.allSatisfy { !$0.perSide }, "a pair held \(micro.movementIds)")
                 XCTAssertTrue(micro.blocks.allSatisfy { $0.seconds == 30 })
+                XCTAssertEqual(micro.totalSeconds, 65, "two halves and the lead-in between them")
+            default:
+                XCTFail("micro-break with \(micro.blocks.count) blocks")
             }
         }
+        XCTAssertGreaterThan(singles, 0)
+        XCTAssertGreaterThan(pairs, singles, "a third of the pool is per-side, so pairs should dominate")
     }
 
     func testOnlyServesMicroEligibleMovements() {
         for seed in 0..<200 {
-            let micro = micro(seed: UInt64(seed &* 17 &+ 2)) { $0.emphasisIndex = seed }
+            let micro = micro(seed: UInt64(seed &* 17 &+ 2))
             for block in micro.blocks {
                 XCTAssertTrue(block.movement.microEligible, "\(block.movement.id) is not micro-eligible")
                 XCTAssertFalse(block.movement.needsEquipment)
                 XCTAssertFalse(block.movement.isFloor)
-                XCTAssertLessThanOrEqual(block.seconds, block.movement.blockSeconds)
             }
         }
     }
 
-    func testEveryEmphasisLeadsWithItsOwnBuckets() {
-        for seed in 0..<100 {
-            let circulation = micro(seed: UInt64(seed &* 19 &+ 3)) { $0.emphasisIndex = 0 }
-            XCTAssertEqual(circulation.emphasis, .circulation)
-            XCTAssertTrue(
-                [.cir, .bal, .str].contains(circulation.blocks[0].movement.bucket),
-                "circulation led with \(circulation.blocks[0].movement.bucket)"
-            )
-
-            let eyesHands = micro(seed: UInt64(seed &* 23 &+ 4)) { $0.emphasisIndex = 1 }
-            XCTAssertEqual(eyesHands.emphasis, .eyesHands)
-            XCTAssertTrue([.eye, .hwf].contains(eyesHands.blocks[0].movement.bucket))
-
-            let posture = micro(seed: UInt64(seed &* 29 &+ 5)) { $0.emphasisIndex = 2 }
-            XCTAssertEqual(posture.emphasis, .posture)
-            XCTAssertTrue([.flx, .bre].contains(posture.blocks[0].movement.bucket))
+    /// The movement is drawn from the whole pool, so a bucket comes up in proportion to how many
+    /// movements it has. Drawing the bucket first gave the eight eye and breathing movements the
+    /// odds of the sixteen stretches.
+    func testBucketsComeUpInProportionToTheirSize() {
+        let pool = builder.candidates(for: MicroContext())
+        var served: [Bucket: Int] = [:]
+        var total = 0
+        for seed in 0..<3_000 {
+            for block in micro(seed: UInt64(seed &* 31 &+ 6)).blocks {
+                served[block.movement.bucket, default: 0] += 1
+                total += 1
+            }
         }
+        let eyeBreath = Double((served[.eye] ?? 0) + (served[.bre] ?? 0)) / Double(total)
+        let eyeBreathPool = Double(pool.filter { $0.bucket == .eye || $0.bucket == .bre }.count) / Double(pool.count)
+        // Pairs are one-sided, and every eye and breathing movement is one-sided, so they run a
+        // little above their share of the pool. They used to run at more than twice it.
+        XCTAssertEqual(eyeBreath, eyeBreathPool, accuracy: 0.05, "eye and breathing are \(Int(eyeBreath * 100))% of micro movements")
+        XCTAssertEqual(Set(served.keys), Set(Bucket.allCases), "missing \(Set(Bucket.allCases).subtracting(served.keys))")
     }
 
-    /// The whole micro-eligible library is reachable, which it was not while every micro-break
-    /// had to contain a circulation movement.
-    func testEveryBucketIsReachableAcrossManyMicroBreaks() {
-        var served: Set<Bucket> = []
-        for seed in 0..<300 {
-            let micro = micro(seed: UInt64(seed &* 31 &+ 6)) { $0.emphasisIndex = seed % 3 }
-            served.formUnion(micro.blocks.map(\.movement.bucket))
-        }
-        XCTAssertEqual(served, Set(Bucket.allCases), "missing \(Set(Bucket.allCases).subtracting(served))")
-    }
-
-    func testNeverRepeatsTheLastMicroOrTheNextFullBreak() {
+    func testNeverRepeatsTheLastMicroTheNextFullBreakOrAnythingFromToday() {
         let forbidden: Set<String> = ["CIR-04", "CIR-02", "EYE-01", "EYE-02"]
         let upcoming: Set<String> = ["CIR-01", "FLX-01", "HWF-06"]
+        let today: Set<String> = ["BRE-01", "BAL-01", "STR-11", "CIR-12"]
         for seed in 0..<200 {
             let micro = micro(seed: UInt64(seed &* 31 &+ 6)) { context in
-                context.emphasisIndex = seed
                 context.lastMicroMovementIds = forbidden
                 context.nextFullRoutineIds = upcoming
+                context.usedMovementIdsToday = today
             }
             XCTAssertTrue(Set(micro.movementIds).isDisjoint(with: forbidden))
             XCTAssertTrue(Set(micro.movementIds).isDisjoint(with: upcoming))
+            XCTAssertTrue(Set(micro.movementIds).isDisjoint(with: today))
         }
+    }
+
+    /// A day long enough to use up the pool still gets a micro-break, rather than an empty panel.
+    func testAnExhaustedDayStillServesSomething() {
+        let everything = Set(library.microEligible.map(\.id))
+        let micro = micro(seed: 3) { $0.usedMovementIdsToday = everything }
+        XCTAssertFalse(micro.blocks.isEmpty)
     }
 
     func testConsecutiveMicrosDoNotRepeat() {
         var previous: Set<String> = []
         for index in 0..<24 {
             let micro = micro(seed: UInt64(index &* 37 &+ 7)) { context in
-                context.emphasisIndex = index
                 context.lastMicroMovementIds = previous
             }
             XCTAssertTrue(Set(micro.movementIds).isDisjoint(with: previous), "micro \(index) repeated a movement")
@@ -94,18 +107,15 @@ final class MicroBreakBuilderTests: XCTestCase {
     func testExcludedMovementsNeverAppear() {
         let excluded = Set(library.microEligible.filter { $0.bucket == .cir }.map(\.id))
         for seed in 0..<100 {
-            let micro = micro(seed: UInt64(seed &* 43 &+ 9)) { context in
-                context.excluded = excluded
-                context.emphasisIndex = 0
-            }
+            let micro = micro(seed: UInt64(seed &* 43 &+ 9)) { $0.excluded = excluded }
             XCTAssertTrue(Set(micro.movementIds).isDisjoint(with: excluded))
-            XCTAssertEqual(micro.totalSeconds, 60)
         }
     }
 
-    func testEyebrowUsesThePlainRegionWord() {
-        let micro = micro(seed: 11) { $0.emphasisIndex = 0 }
-        XCTAssertTrue(micro.eyebrow.hasPrefix("MICRO-BREAK · "))
+    func testEyebrowUsesThePlainRegionWordOfTheBlockOnScreen() {
+        let micro = micro(seed: 11)
+        XCTAssertTrue(MicroBreak.eyebrow(for: micro.blocks.first).hasPrefix("MICRO-BREAK · "))
+        XCTAssertEqual(MicroBreak.eyebrow(for: nil), "MICRO-BREAK · MOVEMENT")
         XCTAssertEqual(MicroBreak.regionWord(for: .shoulder), "shoulders")
         XCTAssertEqual(MicroBreak.regionWord(for: .calfAnkle), "calves")
         XCTAssertEqual(MicroBreak.regionWord(for: .wristForearm), "hands")
@@ -119,8 +129,8 @@ final class MicroBreakBuilderTests: XCTestCase {
     }
 
     func testDeterministicForTheSameSeed() {
-        let first = micro(seed: 5_150) { $0.emphasisIndex = 1 }
-        let second = micro(seed: 5_150) { $0.emphasisIndex = 1 }
+        let first = micro(seed: 5_150)
+        let second = micro(seed: 5_150)
         XCTAssertEqual(first.movementIds, second.movementIds)
     }
 }

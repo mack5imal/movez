@@ -114,14 +114,15 @@ final class SettingsWindowTests: XCTestCase {
         XCTAssertEqual(SettingsViewModel.difficultyOptions.map(\.label), ["Beginner", "Moderate", "Advanced"])
     }
 
-    func testFocusOptionsAreExactlyTheSix() {
+    /// Every focus is a body region. "More balance" went when balance joined every break.
+    func testFocusOptionsAreExactlyTheFive() {
         XCTAssertEqual(
             SettingsViewModel.focusOptions.map(\.label),
-            ["None", "More balance", "More upper back", "More hips", "More neck and shoulders", "More hands and eyes"]
+            ["None", "More upper back", "More hips", "More neck and shoulders", "More hands and eyes"]
         )
         XCTAssertEqual(
             SettingsViewModel.focusOptions.map(\.value),
-            [.none, .moreBalance, .moreUpperBack, .moreHips, .moreNeckShoulders, .moreHandsEyes]
+            [.none, .moreUpperBack, .moreHips, .moreNeckShoulders, .moreHandsEyes]
         )
     }
 

@@ -46,8 +46,6 @@ final class PanelViewModel: ObservableObject {
     private(set) var totalSeconds: Int
 
     // What the words are made of.
-    var routineName = ""
-    var focus = ""
     var blockCount = 0
     var breakMinutes = 5
     var snoozesLeft = 2
@@ -115,15 +113,15 @@ final class PanelViewModel: ObservableObject {
 
     var eyebrow: String {
         switch phase {
-        case .headsUp: return "MOVEMENT BREAK · \(focus)".uppercased()
-        case .microCountIn, .microRunning: return micro?.eyebrow ?? ""
+        case .headsUp: return OverlayState.movementBreakEyebrow
+        case .microCountIn, .microRunning: return MicroBreak.eyebrow(for: micro?.blocks.first)
         case .toast: return ""
         }
     }
 
     var title: String {
         switch phase {
-        case .headsUp: return "\(routineName) in a minute"
+        case .headsUp: return "Movement break in a minute"
         case .microCountIn: return "\(movementName) in a moment"
         case .microRunning: return movementName
         case .toast: return toastTitle

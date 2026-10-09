@@ -136,7 +136,8 @@ final class MenuBarViewModel: ObservableObject {
         next.minutesRemaining = Self.minutes(remaining)
         next.elapsedFraction = sitSeconds > 0 ? 1 - Double(remaining) / Double(sitSeconds) : 0
         next.title = MenuBarState.title(mode: .sitting, minutesRemaining: next.minutesRemaining)
-        next.subtitle = coordinator.nextRoutinePreview?.subtitle ?? ""
+        // Routines have no names to preview, and the title already says when the break is.
+        next.subtitle = ""
         applyStats(to: &next, day: "Today", stats: coordinator.history.stats(on: now))
     }
 
