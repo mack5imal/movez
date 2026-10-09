@@ -28,7 +28,7 @@ Sources of truth, in order: `product-brief-v1.md`, `scheduler-research-v1.md`,
 5. **The overlay has Next and no Back.** → and Return advance; Escape deliberately does nothing,
    because snoozing should be easier than skipping and neither should happen by reflex.
 6. **The sequence strip has as many columns as the routine has blocks** (three to five), not a
-   fixed four.
+   fixed four. Every routine now has five (28).
 7. **Other displays show the dim and a small label**, not a second copy of the card.
 8. **A deferred break is never shortened.** It waits, at full length. What it loses is patience:
    a break that has waited more than half an hour gets one snooze instead of two.
@@ -37,12 +37,12 @@ Sources of truth, in order: `product-brief-v1.md`, `scheduler-research-v1.md`,
    swings and squats. The name comes from the slot whose regions the stretch and
    strength-or-balance blocks work for the most seconds, ties going to the planned slot. The
    rotation itself and the chaining rules are unchanged, and the last break of a working day
-   keeps its time-of-day name.
+   keeps its time-of-day name. *Superseded by 33: routines have no names.*
 
 ## The micro-break
 
 9. **The thirty-second count-in stays**, with Start now · Snooze 5 min · Skip, then a sixty-second
-   countdown with Snooze 5 min · Skip.
+   countdown with Snooze 5 min · Skip. The countdown is now sixty or sixty-five seconds (30).
 10. **One snooze total.** A second snooze request is a skip — the intent is the same and the
     pretence helps nobody.
 11. **The handoff's "Shoulder rolls" is placeholder copy.** There is no such movement in the
@@ -148,7 +148,8 @@ Sources of truth, in order: `product-brief-v1.md`, `scheduler-research-v1.md`,
     by the repair and trim steps that already enforce the 270–330 s window. A movement served
     yesterday is worth a third of its weight, and is back to full weight on the fourth day. Over a
     simulated month the same two-breaks-a-day pattern now reaches 100 movements, with no movement
-    in more than 11% of routines.
+    in more than 11% of routines. *The repair and trim steps are gone too: every block is a minute
+    (29). The three-day memory stays.*
 23f. **The region rotation carries on across days, and there is no wake-up routine.** The
     rotation index was the day's break count, so a user who takes two breaks a day saw the first
     two slots — hips, then upper back — and no others, for ever. It is now a cursor over the
@@ -157,13 +158,14 @@ Sources of truth, in order: `product-brief-v1.md`, `scheduler-research-v1.md`,
     odd hours is not the start of anything, and it spent half of its blocks on circulation. The
     wind-down shape stays, but only when the working day genuinely closes — always-on working
     hours report an end at midnight, which used to give anyone working late a wind-down routine
-    every night.
+    every night. *Superseded by 28: the rotation and the wind-down are both gone.*
 23g. **The post-lunch rule is gone, and micro-breaks draw from more buckets.** A return from
     twenty minutes away between 11:00 and 14:00 used to mark the next micro-break as post-lunch,
     however many hours later it came, and that micro-break was a single minute drawn from four
     movements. Every micro-break also contained a circulation movement, so twelve movements
     carried all of them, and the balance and strength movements marked micro-eligible were never
     served at all. Each emphasis now leads with its own buckets and follows with a wider set.
+    *Superseded by 30: there is no emphasis, and no bucket is drawn first.*
 23h. **The microphone means a call only after a minute, and a micro-break on screen is left
     alone.** `kAudioDevicePropertyDeviceIsRunningSomewhere` cannot say which process is listening,
     and a dictation tool holds the mic for a few seconds at a time. Every one of those bursts used
@@ -206,3 +208,57 @@ Sources of truth, in order: `product-brief-v1.md`, `scheduler-research-v1.md`,
     team identifier registers, with and without the `get-task-allow` a Debug build carries, and
     the login item survives a rebuild that changes the code hash. The refusal is still shown under
     the toggle rather than letting it spring back silently, for the systems where macOS says no.
+
+## The October 2026 rules
+
+Several weeks of real history showed the rules above interacting in ways nobody chose: strength was
+26% of the library and 4% of what full breaks served, eye and breathing movements were 7% of the
+library and about 20% of what was served, "four blocks by default" came out as five 75% of the
+time, and "Hip reset" was the name about twice as often as a fair share. The entries below replace
+those rules with a much smaller set. The working list, the reasoning and the simulation behind them
+are in `docs/rule-changes-2026-10.md` and `scripts/simulate_selection.py`.
+
+28. **Every full break has the same shape: circulation, then balance, flexibility and strength in
+    a random order, then a closer.** This departs from the library's chaining rules (one each of
+    FLX, CIR and STR plus one of BAL/HWF/EYE/BRE, a region rotation, time-of-day shapes) and from
+    the brief's "STR or BAL, balance served daily". Sharing one slot between strength and balance,
+    with balance claiming it first every day, is what kept strength to 4%; now each takes a fifth
+    of every break. Circulation stays first as the warm-up after sitting. The region rotation and
+    the wind-down shape are gone: the rotation only weighted the draw, about half of routines
+    ended up working its slot, and keeping it in a simulation moved each region's share by about
+    two points. The closer is one draw over every hand, eye and breathing movement together, so
+    each is as likely as any other rather than each bucket taking a third whatever its size.
+29. **Every movement runs a minute, thirty seconds a side, after a five-second lead-in.** Length
+    is no longer a selection rule. The library's `block_seconds` runs from 20 to 90 s, and fitting
+    it into five minutes took a repair pass that swapped short movements for longer ones and so
+    quietly drew against the eye and hand movements. Each movement, the first included, now
+    appears on a hollow disc counting down from −0:05 so it can be read before its minute starts;
+    Next still goes to the next movement. A break is 5:25, and `breakSeconds` follows it, so the
+    half-time rule (22) is now 162 s. The transition chime still plays as a movement appears.
+30. **A micro-break is drawn straight from the micro-eligible pool, and runs its own length.** A
+    per-side movement fills the minute alone, thirty seconds a side; otherwise two one-sided
+    movements run thirty seconds each, with a five-second lead-in before the second, for 65 s. No
+    bucket is drawn first and there is no emphasis rotation: giving the eight eye and breathing
+    movements the odds of sixteen stretches is what made them the most-served movements in the
+    app. The panel shows each movement in turn — it used to show only the first, for the whole
+    minute, while history recorded both — and ends the micro-break itself, as the overlay ends a
+    full break. The scheduler's `microSeconds` is 65, the longest a micro-break runs: its backstop,
+    and what the half rule (23i) measures. Only the movements the user got halfway through are
+    written to history.
+31. **A micro-break chimes at its transitions and closes on the completion chime.** The transition
+    chime plays as the second movement appears and at a per-side movement's halfway point, as in
+    a full break. A micro-break that runs to its end closes on the chime a full break ends on;
+    skipping, snoozing and a count-in that never started stay quiet.
+32. **Nothing is served twice in a day, in either kind of break.** The library lets walk lap
+    (CIR-01), distance gaze (EYE-01) and diaphragmatic breathing (BRE-01) recur freely; they were
+    among the most-served movements because of it, and at any realistic number of breaks a day the
+    pools never run short without them. Micro-breaks used to avoid only the last micro-break and
+    the next full break, so a movement from the morning's break could come back in the afternoon.
+33. **Routines have no names.** They are drawn at random, so a name could only describe whichever
+    region the draw landed on. The heads-up reads "Movement break in a minute", the overlay's
+    eyebrow "MOVEMENT BREAK", the completion screen "Break done", and history records "Movement
+    break" (the field keeps its name so older history still decodes). The menu no longer has a
+    line under the countdown.
+34. **Focus is a body region, not a kind of movement.** "More balance" is gone: balance is in every
+    break. "More hands and eyes" stays, as the wrist/forearm and eye regions. A stored
+    `moreBalance` reads as no focus.

@@ -71,7 +71,7 @@ by the next poll.
 
 **Routines** (`Library/` → `Routine/`): `LibraryLoader` decodes and validates the JSON into
 `MovementLibrary`; `RoutineBuilder` and `MicroBreakBuilder` generate from it with `SeededRandom`,
-using `RoutineContext` (history, region rotation, equipment, settings); `RoutineValidator` checks
+using `RoutineContext` (what was served today, recency, equipment, settings); `RoutineValidator` checks
 the shape of the result.
 
 **UI** (`UI/`): `DesignSystem/` (tokens, Manrope text styles, controls) plus the surfaces
