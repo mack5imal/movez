@@ -93,6 +93,7 @@ struct Scheduler {
         case .userMakeDueIn(let seconds): return makeDue(in: seconds, now: now)
         case .userStartNow: return startBreakNow(now: now)
         case .userSnooze: return snooze(now: now)
+        case .overlayPauseExpired: return snooze(now: now, beyondAllowance: true)
         case .userSkip: return skip(now: now)
         case .userNextBlock: return nextBlock()
         case .userDone(let completed, let total, let elapsed):

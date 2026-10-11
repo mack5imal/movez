@@ -62,6 +62,16 @@ extension SnapshotFixtures {
         return state
     }
 
+    /// Paused a few seconds into a movement: the countdowns stand still and the header says how
+    /// long the pause may last.
+    static func overlayPaused() -> OverlayState {
+        var state = overlayRunning()
+        state.headerTrailing = "PAUSED · ENDS IN 4:48"
+        state.discLabel = "PAUSED"
+        state.isPaused = true
+        return state
+    }
+
     /// The first movement's lead-in: on screen to read, its minute not yet started.
     static func overlayLeadIn() -> OverlayState {
         var state = overlayRunning()

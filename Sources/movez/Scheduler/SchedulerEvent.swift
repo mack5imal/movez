@@ -22,6 +22,8 @@ enum SchedulerEvent: Equatable {
     case userNextBlock
     case userDone(completedBlocks: Int, totalBlocks: Int, elapsed: Int)
     case breakEnded(completedBlocks: Int, totalBlocks: Int, elapsed: Int)
+    /// The overlay was left paused for its limit. A snooze, even with none left.
+    case overlayPauseExpired
 
     // User actions — micro
     case userMicroStartNow

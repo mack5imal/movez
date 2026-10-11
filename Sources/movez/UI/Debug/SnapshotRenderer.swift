@@ -9,6 +9,7 @@ enum SnapshotSurface: String, CaseIterable {
     case gallery
     case overlayFull = "overlay-full"
     case overlayLeadIn = "overlay-leadin"
+    case overlayPaused = "overlay-paused"
     case overlaySide = "overlay-side"
     case overlayEnd = "overlay-end"
     case overlayOtherDisplay = "overlay-other-display"
@@ -54,7 +55,7 @@ enum SnapshotSurface: String, CaseIterable {
             return SettingsScreen.size
         case .debug:
             return CGSize(width: SettingsScreen.size.width, height: 1_500)
-        case .overlayFull, .overlayLeadIn, .overlaySide, .overlayEnd, .overlayOtherDisplay,
+        case .overlayFull, .overlayLeadIn, .overlayPaused, .overlaySide, .overlayEnd, .overlayOtherDisplay,
              .overlayLongName:
             return Self.screen
         }
@@ -165,6 +166,8 @@ enum SnapshotRenderer {
         switch surface {
         case .overlayLeadIn:
             return AnyView(OverlaySnapshot(state: SnapshotFixtures.overlayLeadIn()))
+        case .overlayPaused:
+            return AnyView(OverlaySnapshot(state: SnapshotFixtures.overlayPaused()))
         case .overlaySide:
             return AnyView(OverlaySnapshot(state: SnapshotFixtures.overlaySide()))
         case .overlayEnd:

@@ -111,6 +111,8 @@ struct OverlayView: View {
 
     private var actionRow: some View {
         HStack(spacing: 12) {
+            Button(state.pauseLabel, action: actions.pause)
+                .buttonStyle(SecondaryButtonStyle(size: .panel))
             if state.doneAvailable {
                 Button("Done", action: actions.done)
                     .buttonStyle(AccentOutlineButtonStyle(size: .panel))

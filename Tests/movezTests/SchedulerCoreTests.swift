@@ -65,6 +65,38 @@ final class SchedulerCoreTests: XCTestCase {
 
     // MARK: - Snooze
 
+    /// A break left paused past its limit is snoozed even with no snoozes left: it is coming back,
+    /// not being skipped.
+    func testAPauseThatRunsOutSnoozesEvenWithNoneLeft() {
+        let harness = SchedulerHarness()
+        for _ in 0..<2 {
+            harness.run(until: { $0.isHeadsUp }, limit: 120 * minute)
+            harness.clock.advance(4)
+            harness.send(.userSnooze)
+        }
+        harness.run(until: { $0.isHeadsUp })
+        harness.send(.userStartNow)
+        XCTAssertTrue(harness.state.isFullBreak)
+        XCTAssertEqual(harness.scheduler.snoozesLeft, 0)
+
+        harness.send(.userSnooze)
+        XCTAssertTrue(harness.state.isFullBreak, "an ordinary snooze is refused")
+
+        harness.clock.advance(300)
+        let effects = harness.send(.overlayPauseExpired)
+        XCTAssertTrue(harness.state.isSnoozed)
+        XCTAssertTrue(effects.contains(.endFullBreak(.snoozed)))
+        XCTAssertEqual(harness.snapshot.snoozedToday, 3)
+    }
+
+    func testAPauseExpiryOutsideABreakDoesNothing() {
+        let harness = SchedulerHarness()
+        harness.run(until: { $0.isHeadsUp }, limit: 120 * minute)
+        let effects = harness.send(.overlayPauseExpired)
+        XCTAssertTrue(effects.isEmpty)
+        XCTAssertTrue(harness.state.isHeadsUp)
+    }
+
     func testSnoozeReturnsThroughHeadsUpAndIsCapped() {
         let harness = SchedulerHarness()
         harness.run(until: { $0.isHeadsUp }, limit: 60 * minute)

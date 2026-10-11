@@ -47,6 +47,7 @@ struct OverlayState: Equatable {
     var snoozeAvailable = true
     var doneAvailable = false
     var skipEnabled = false
+    var isPaused = false
     var skipsToday = 0
 
     // End state
@@ -55,6 +56,7 @@ struct OverlayState: Equatable {
     var streak = 0
 
     var skipLabel: String { "Skip · \(skipsToday) today" }
+    var pauseLabel: String { isPaused ? "Resume" : "Pause" }
 
     /// "Four movements done. Next break at 12:05." — the counts small enough to spell out are.
     static func summary(movements: Int, nextBreakAt: String) -> String {
@@ -92,6 +94,7 @@ struct OverlayActions {
     var snooze: () -> Void = {}
     var done: () -> Void = {}
     var skip: () -> Void = {}
+    var pause: () -> Void = {}
     var chooseSide: (BreakSide) -> Void = { _ in }
     var backToWork: () -> Void = {}
 }

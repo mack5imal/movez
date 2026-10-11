@@ -117,8 +117,8 @@ final class OverlayWindowController {
 
     // MARK: - Keyboard
 
-    /// → and Return advance. Everything else is swallowed, so a break never types into whatever
-    /// was underneath it. Escape deliberately does nothing: snoozing should be easier than
+    /// → and Return advance, and Space pauses or resumes. Everything else is swallowed, so a break
+    /// never types into whatever was underneath it. Escape deliberately does nothing: snoozing should be easier than
     /// skipping, and neither should happen by reflex.
     private func installKeyMonitor() {
         keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
@@ -126,6 +126,8 @@ final class OverlayWindowController {
             switch event.keyCode {
             case 124, 36, 76:
                 self.viewModel?.next()
+            case 49:
+                self.viewModel?.togglePause()
             default:
                 break
             }
@@ -260,6 +262,7 @@ struct OverlayScreen: View {
             snooze: viewModel.snooze,
             done: viewModel.done,
             skip: viewModel.skip,
+            pause: viewModel.togglePause,
             chooseSide: viewModel.choose(side:),
             backToWork: viewModel.done
         )

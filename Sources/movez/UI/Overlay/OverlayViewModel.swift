@@ -13,6 +13,9 @@ import Foundation
 final class OverlayViewModel: ObservableObject {
     /// How long Skip stays inert at the start of a break, so nobody dismisses it by reflex.
     static let skipDelaySeconds: TimeInterval = 3
+    /// How long one pause may last before the break ends on its own. A pause is for reading a
+    /// movement, not for parking the break; after five minutes it has been abandoned.
+    static let pauseLimitSeconds: TimeInterval = 300
 
     @Published private(set) var state = OverlayState()
 
@@ -31,6 +34,11 @@ final class OverlayViewModel: ObservableObject {
     /// When the current block appeared, which is when its lead-in began.
     private var blockStartedAt: Date
     private var halfwayChimed = false
+    /// When the current pause began, if the break is paused.
+    private var pausedAt: Date?
+    /// Every finished pause added together. The break's own time is the wall clock less this.
+    private var pausedTotal: TimeInterval = 0
+    private var pauseExpiredHandled = false
     /// The strip only changes when the block or the side does, not on every tick.
     private var cachedStrip: [StripItem] = []
 
@@ -44,6 +52,8 @@ final class OverlayViewModel: ObservableObject {
     var onBlockCompleted: ((RoutineBlock, Int) -> Void)?
     var onSnooze: (() -> Void)?
     var onSkip: (() -> Void)?
+    /// A pause ran its five minutes and the break did not yet count.
+    var onPauseExpired: (() -> Void)?
     /// Blocks completed, blocks planned, and seconds the break ran.
     var onFinished: ((Int, Int, Int) -> Void)?
 
@@ -84,8 +94,18 @@ final class OverlayViewModel: ObservableObject {
     /// Animations are the first thing to go when the user has asked the system for less motion.
     var animationsEnabled: Bool { !reduceMotion }
 
-    /// The break's own time. Every countdown on screen reads this one value.
-    private var now: Date { clock.now }
+    /// The break's own time. Every countdown on screen reads this one value, so a pause stops
+    /// them all at once: while paused it stands still, and afterwards it runs behind the wall
+    /// clock by however long the pauses lasted.
+    private var now: Date { (pausedAt ?? clock.now).addingTimeInterval(-pausedTotal) }
+
+    var isPaused: Bool { pausedAt != nil }
+
+    /// Whole seconds before the current pause ends the break, rounded up.
+    var pauseRemaining: Int {
+        guard let pausedAt else { return 0 }
+        return max(0, Int((Self.pauseLimitSeconds - clock.now.timeIntervalSince(pausedAt)).rounded(.up)))
+    }
 
     /// When the movement itself starts, after its lead-in.
     var movementStartsAt: Date { blockStartedAt.addingTimeInterval(TimeInterval(Routine.leadInSeconds)) }
@@ -145,6 +165,15 @@ final class OverlayViewModel: ObservableObject {
     /// debug time scale) walks through each of them.
     func tick() {
         guard phase == .running else { return }
+        // Paused, nothing moves and nothing chimes; the only thing that can happen is the limit.
+        if let pausedAt {
+            if clock.now.timeIntervalSince(pausedAt) >= Self.pauseLimitSeconds {
+                pauseExpired()
+            } else {
+                refresh()
+            }
+            return
+        }
         while block != nil, now >= blockEndsAt {
             advance(recordCompletion: true, nextStartsAt: blockEndsAt)
             guard phase == .running else { return }
@@ -167,8 +196,11 @@ final class OverlayViewModel: ObservableObject {
 
     /// The disc, → and Return all land here, in a lead-in as much as in a movement. There is
     /// deliberately no way back.
+    ///
+    /// Paused, it does nothing: the pause is there so the movement can be read, and a stray
+    /// Return should not move on from it.
     func next() {
-        guard phase == .running else { return }
+        guard phase == .running, !isPaused else { return }
         advance(recordCompletion: true, nextStartsAt: now)
     }
 
@@ -185,6 +217,32 @@ final class OverlayViewModel: ObservableObject {
     func done() {
         guard phase == .running, doneAvailable else { return }
         finish()
+    }
+
+    /// The Pause button and Space. Snooze, Skip and Done still work while paused.
+    func togglePause() {
+        guard phase == .running else { return }
+        if let pausedAt {
+            pausedTotal += clock.now.timeIntervalSince(pausedAt)
+            self.pausedAt = nil
+        } else {
+            pausedAt = clock.now
+        }
+        refresh()
+    }
+
+    /// Five minutes paused. A break that already counts ends as done, as Done would have ended
+    /// it; any other ends as snoozed, whether or not a snooze is left, because it is coming back
+    /// rather than being skipped.
+    private func pauseExpired() {
+        guard !pauseExpiredHandled else { return }
+        pauseExpiredHandled = true
+        togglePause()
+        if doneAvailable {
+            finish()
+        } else {
+            onPauseExpired?()
+        }
     }
 
     func choose(side newSide: BreakSide) {
@@ -247,7 +305,9 @@ final class OverlayViewModel: ObservableObject {
         }
 
         state.eyebrow = OverlayState.movementBreakEyebrow
-        state.headerTrailing = "\(OverlayState.clock(breakRemaining)) LEFT"
+        state.headerTrailing = isPaused
+            ? "PAUSED · ENDS IN \(OverlayState.clock(pauseRemaining))"
+            : "\(OverlayState.clock(breakRemaining)) LEFT"
         if isLeadIn {
             state.discNumerals = OverlayState.untilStart(leadInRemaining)
             state.discProgress = movementStartsAt.timeIntervalSince(now) / Double(Routine.leadInSeconds)
@@ -259,6 +319,8 @@ final class OverlayViewModel: ObservableObject {
             state.discMode = block?.perSide == true ? .halfShare(sideIndex: side.index) : .full
             state.discLabel = block?.perSide == true && side == .left ? "THEN RIGHT" : "NEXT →"
         }
+        if isPaused { state.discLabel = "PAUSED" }
+        state.isPaused = isPaused
         state.movementName = block?.movement.name ?? ""
         state.instruction = block?.movement.instructions ?? ""
         state.isSideBlock = block?.perSide == true

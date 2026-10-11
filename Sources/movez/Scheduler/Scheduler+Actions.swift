@@ -92,11 +92,14 @@ extension Scheduler {
 
     /// A snooze is a deferral, never a skip: it costs one of the two allowances and comes back
     /// through the heads-up rather than straight to the overlay.
-    mutating func snooze(now: Date) -> [SchedulerEffect] {
-        guard snoozesLeft > 0 else { return [] }
+    ///
+    /// A break left paused past its limit is snoozed `beyondAllowance`: it is coming back, not
+    /// being skipped, and running out of snoozes does not change that.
+    mutating func snooze(now: Date, beyondAllowance: Bool = false) -> [SchedulerEffect] {
+        guard snoozesLeft > 0 || beyondAllowance else { return [] }
         var dismissal: [SchedulerEffect]
         switch snapshot.state {
-        case .headsUp: dismissal = [.hideHeadsUp, .recordHeadsUpOutcome(.snoozed)]
+        case .headsUp where !beyondAllowance: dismissal = [.hideHeadsUp, .recordHeadsUpOutcome(.snoozed)]
         case .fullBreak: dismissal = [.endFullBreak(.snoozed)]
         default: return []
         }

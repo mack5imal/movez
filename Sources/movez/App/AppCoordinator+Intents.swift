@@ -20,6 +20,9 @@ extension AppCoordinator {
 
     func skip() { inject(.userSkip) }
 
+    /// The overlay sat paused for five minutes without the break counting: it ends as snoozed.
+    func pauseExpired() { inject(.overlayPauseExpired) }
+
     /// Advances to the next block, recording the one that just finished.
     func nextBlock() {
         guard var current = currentBreak, let block = current.block else { return }
