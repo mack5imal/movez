@@ -11,10 +11,18 @@ BIN := $(APP)/Contents/MacOS/movez
 XCB := xcodebuild -project $(PROJECT) -scheme $(SCHEME) -configuration Debug \
 	-destination 'platform=macOS' -derivedDataPath $(DERIVED)
 
-.PHONY: gen build test lint app run snapshots hygiene panel-hygiene assets clean
+.PHONY: version gen build test lint app run snapshots hygiene panel-hygiene assets clean
 
 gen:
 	xcodegen generate --spec project.yml
+
+# `make version V=0.6.0` — the one place the app version changes. The build number needs no bump:
+# every build stamps it with the commit count.
+version:
+	@[[ "$(V)" =~ ^[0-9]+\.[0-9]+\.[0-9]+$$ ]] || { echo "usage: make version V=x.y.z" >&2; exit 1; }
+	@sed -i '' -E 's/^( *MARKETING_VERSION: ).*/\1$(V)/' project.yml
+	@$(MAKE) --no-print-directory gen
+	@grep -m1 'MARKETING_VERSION' project.yml
 
 build: gen
 	$(XCB) -quiet build

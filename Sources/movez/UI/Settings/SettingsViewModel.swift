@@ -72,10 +72,19 @@ final class SettingsViewModel: ObservableObject {
 
     // MARK: - Derived text
 
-    /// "movez 0.1 · library v4 · 147 movements"
+    /// "movez 0.5.0 (38) · library v4.1 · 159 movements"
+    ///
+    /// Every part is read from what is installed rather than written down here: the app version and
+    /// build number from the bundle (set in `project.yml` and stamped with the commit count at build
+    /// time), the library version and size from the JSON. A bump of either shows up on its own.
     var versionLine: String {
-        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.1"
-        return "movez \(version) · library v\(library.version) · \(library.movements.count) movements"
+        Self.versionLine(info: Bundle.main.infoDictionary ?? [:], library: library)
+    }
+
+    static func versionLine(info: [String: Any], library: MovementLibrary) -> String {
+        let version = info["CFBundleShortVersionString"] as? String ?? "?"
+        let build = (info["CFBundleVersion"] as? String).map { " (\($0))" } ?? ""
+        return "movez \(version)\(build) · library v\(library.version) · \(library.movements.count) movements"
     }
 
     var excludedLine: String { "\(settings.excludedMovementIds.count) excluded" }

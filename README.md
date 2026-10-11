@@ -25,6 +25,21 @@ make assets     # re-fetch Manrope and regenerate the chimes
 `make gen` alone regenerates `movez.xcodeproj` from `project.yml`. The generated project is
 committed so the repo opens in Xcode without XcodeGen, but `project.yml` is the source of truth.
 
+## Versions
+
+Settings ends with a line like `movez 0.5.0 (38) · library v4.1 · 159 movements`. Each part is read
+from what is installed, so nothing else needs editing when one of them moves:
+
+- **App version** (`0.5.0`): `MARKETING_VERSION` in `project.yml`, changed with
+  `make version V=0.6.0`. A minor bump for a release with features, a patch bump for one with only
+  fixes; 1.0 is reserved for when the app is called done.
+- **Build number** (`38`): stamped on every build with the commit count (`git rev-list --count
+  HEAD`), so it never needs bumping.
+- **Library version** (`v4.1`): the `version` field of `movement-library-v4.json`, with the same
+  number in the title of `movement-library-v4.md` (a test holds them together). The filename keeps
+  only the major version, so a minor library revision touches the two library files and nothing
+  else.
+
 ## Install
 
 `make run` launches the app out of the build directory, which is right for development and wrong

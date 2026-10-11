@@ -238,7 +238,32 @@ final class SettingsWindowTests: XCTestCase {
 
     func testTheFooterSaysWhatIsInstalled() {
         let viewModel = makeViewModel()
-        XCTAssertEqual(viewModel.versionLine, "movez 0.1 · library v4 · 147 movements")
+        let info = Bundle.main.infoDictionary ?? [:]
+        let version = info["CFBundleShortVersionString"] as? String ?? ""
+        let build = info["CFBundleVersion"] as? String ?? ""
+        XCTAssertEqual(
+            viewModel.versionLine,
+            "movez \(version) (\(build)) · library v\(viewModel.library.version) · \(viewModel.library.movements.count) movements"
+        )
+    }
+
+    func testTheFooterIsBuiltFromWhatItIsGiven() throws {
+        let library = try LibraryLoader.loadBundled()
+        let line = SettingsViewModel.versionLine(
+            info: ["CFBundleShortVersionString": "0.7.2", "CFBundleVersion": "51"],
+            library: library
+        )
+        XCTAssertEqual(line, "movez 0.7.2 (51) · library v\(library.version) · \(library.movements.count) movements")
+    }
+
+    /// The version is set once in `project.yml` and the build number is stamped from the commit
+    /// count; neither should ever reach the app as an unexpanded build setting or a placeholder.
+    func testTheAppVersionIsPreReleaseSemverAndTheBuildNumberIsStamped() {
+        let info = Bundle.main.infoDictionary ?? [:]
+        let version = info["CFBundleShortVersionString"] as? String ?? ""
+        XCTAssertNotNil(version.range(of: #"^0\.\d+\.\d+$"#, options: .regularExpression), version)
+        let build = Int(info["CFBundleVersion"] as? String ?? "") ?? 0
+        XCTAssertGreaterThan(build, 1, "the build number should be the commit count")
     }
 
     // MARK: - Every write reaches the scheduler
