@@ -45,15 +45,11 @@ final class OverlayEffectSink: EffectSink {
             clock: coordinator.clock,
             config: coordinator.settings.schedulerConfig,
             chimes: chimes,
-            collapsed: coordinator.history.data.collapsedInstructions,
             snoozesLeft: coordinator.scheduler.snoozesLeft,
             skipsToday: coordinator.scheduler.snapshot.skipsToday,
             streak: coordinator.streak,
             nextBreakAt: coordinator.scheduler.snapshot.nextFullDueAt,
-            reduceMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion,
-            persistCollapsed: { [weak coordinator] id, collapsed in
-                coordinator?.setCollapsed(id, collapsed)
-            }
+            reduceMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
         )
         viewModel.onBlockCompleted = { [weak coordinator] block, _ in
             coordinator?.recordOverlayBlock(block)

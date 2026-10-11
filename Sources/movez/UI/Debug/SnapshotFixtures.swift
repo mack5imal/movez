@@ -17,7 +17,6 @@ enum SnapshotFixtures {
         Right foot forward into a half-lunge, back knee soft. Tuck the tailbone and squeeze the \
         back glute until the front of the left hip opens.
         """
-    static let collapsedMovementName = "Wall sit"
 
     /// Circulation first, then balance, flexibility and strength in whatever order the break drew,
     /// then the closer.
@@ -72,20 +71,6 @@ extension SnapshotFixtures {
         state.discProgress = 0.6
         state.discMode = .leadIn
         state.skipEnabled = true
-        return state
-    }
-
-    static func overlayCollapsed() -> OverlayState {
-        var state = overlayRunning()
-        state.headerTrailing = "1:52 LEFT"
-        state.discNumerals = "0:27"
-        state.discProgress = 0.55
-        state.movementName = collapsedMovementName
-        state.instruction = "Back flat against the wall, knees at ninety degrees, weight through the heels."
-        state.instructionCollapsed = true
-        state.strip = strip(currentIndex: 3)
-        state.snoozeAvailable = false
-        state.doneAvailable = true
         return state
     }
 

@@ -22,8 +22,6 @@ final class OverlayViewModel: ObservableObject {
     private let chimes: ChimePlayer?
     /// The scheduler's own rules, so the overlay and the state machine agree about what counts.
     private let config: SchedulerConfig
-    private var collapsed: Set<String>
-    private let persistCollapsed: (String, Bool) -> Void
     private let reduceMotion: Bool
 
     private(set) var blockIndex = 0
@@ -54,26 +52,22 @@ final class OverlayViewModel: ObservableObject {
         clock: Clock,
         config: SchedulerConfig = SchedulerConfig(),
         chimes: ChimePlayer? = nil,
-        collapsed: Set<String> = [],
         snoozesLeft: Int = 2,
         skipsToday: Int = 0,
         streak: Int = 0,
         nextBreakAt: Date? = nil,
-        reduceMotion: Bool = false,
-        persistCollapsed: @escaping (String, Bool) -> Void = { _, _ in }
+        reduceMotion: Bool = false
     ) {
         self.routine = routine
         self.startedAt = startedAt
         self.clock = clock
         self.config = config
         self.chimes = chimes
-        self.collapsed = collapsed
         self.snoozesLeft = snoozesLeft
         self.skipsToday = skipsToday
         self.streak = streak
         self.nextBreakAt = nextBreakAt
         self.reduceMotion = reduceMotion
-        self.persistCollapsed = persistCollapsed
         blockStartedAt = startedAt
         side = routine.blocks.first?.perSide == true ? .left : .none
         rebuildStrip()
@@ -123,10 +117,6 @@ final class OverlayViewModel: ObservableObject {
         clock.now.timeIntervalSince(startedAt) >= Self.skipDelaySeconds
     }
 
-    var instructionCollapsed: Bool {
-        block.map { collapsed.contains($0.movement.id) } ?? false
-    }
-
     // MARK: - The tick
 
     /// One second of the break. The overlay's whole clock is this method.
@@ -173,15 +163,6 @@ final class OverlayViewModel: ObservableObject {
     func done() {
         guard phase == .running, doneAvailable else { return }
         finish()
-    }
-
-    func toggleCollapsed() {
-        guard let block else { return }
-        let id = block.movement.id
-        let nowCollapsed = !collapsed.contains(id)
-        if nowCollapsed { collapsed.insert(id) } else { collapsed.remove(id) }
-        persistCollapsed(id, nowCollapsed)
-        refresh()
     }
 
     func choose(side newSide: BreakSide) {
@@ -258,7 +239,6 @@ final class OverlayViewModel: ObservableObject {
         }
         state.movementName = block?.movement.name ?? ""
         state.instruction = block?.movement.instructions ?? ""
-        state.instructionCollapsed = instructionCollapsed
         state.isSideBlock = block?.perSide == true
         state.side = side
         state.snoozeAvailable = snoozesLeft > 0 && !doneAvailable

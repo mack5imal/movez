@@ -55,7 +55,7 @@ struct AccentOutlineButtonStyle: ButtonStyle {
     }
 }
 
-/// Skip, "I know this one", "Show instruction". Never a button — plain underlined text, because
+/// Skip and the like. Never a button — plain underlined text, because
 /// the whole point is that skipping should be quieter than snoozing.
 struct LinkActionStyle: ButtonStyle {
     var color: MovezColor = Tokens.text3

@@ -68,6 +68,8 @@ struct DailyStats: Codable, Equatable {
 struct HistoryData: Codable, Equatable {
     var completions: [MovementCompletion] = []
     var breakRecords: [BreakRecord] = []
+    /// No longer read. The break screen once let an instruction be collapsed for good; the field
+    /// stays so a history file still decodes in a build that expects it.
     var collapsedInstructions: Set<String> = []
     var days: [String: DailyStats] = [:]
 }
@@ -152,19 +154,6 @@ final class HistoryStore {
         }
         save()
         return true
-    }
-
-    func setCollapsed(_ movementId: String, _ collapsed: Bool) {
-        if collapsed {
-            data.collapsedInstructions.insert(movementId)
-        } else {
-            data.collapsedInstructions.remove(movementId)
-        }
-        save()
-    }
-
-    func isCollapsed(_ movementId: String) -> Bool {
-        data.collapsedInstructions.contains(movementId)
     }
 
     // MARK: - Reading

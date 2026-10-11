@@ -86,14 +86,6 @@ extension AppCoordinator {
         inject(.breakEnded(completedBlocks: completed, totalBlocks: total, elapsed: elapsedInBreak))
     }
 
-    func setCollapsed(_ movementId: String, _ collapsed: Bool) {
-        history.setCollapsed(movementId, collapsed)
-    }
-
-    func isCollapsed(_ movementId: String) -> Bool {
-        history.isCollapsed(movementId)
-    }
-
     // MARK: - Micro-break
 
     func microStartNow() { inject(.userMicroStartNow) }

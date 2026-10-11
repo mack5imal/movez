@@ -102,7 +102,7 @@ final class HistoryStoreTests: XCTestCase {
         XCTAssertEqual(store.completionCount(movementId: "FLX-01"), 1)
     }
 
-    func testCollapsedInstructionsSurviveARelaunch() throws {
+    func testTheHistoryFileSurvivesARelaunchAndIsPrivate() throws {
         let directory = URL(fileURLWithPath: NSTemporaryDirectory())
             .appendingPathComponent("movez-history-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
@@ -110,18 +110,32 @@ final class HistoryStoreTests: XCTestCase {
 
         let file = FileHistoryStore(url: directory.appendingPathComponent("history.json"))
         let store = HistoryStore(store: file)
-        store.setCollapsed("STR-11", true)
-        XCTAssertTrue(store.isCollapsed("STR-11"))
+        store.record(completion: MovementCompletion(movementId: "STR-11", at: day, seconds: 60, routineId: nil))
 
         let reloaded = HistoryStore(store: FileHistoryStore(url: file.url))
-        XCTAssertTrue(reloaded.isCollapsed("STR-11"))
-        XCTAssertFalse(reloaded.isCollapsed("STR-12"))
+        XCTAssertEqual(reloaded.completionCount(movementId: "STR-11"), 1)
+        XCTAssertEqual(reloaded.completionCount(movementId: "STR-12"), 0)
 
         let permissions = try FileManager.default.attributesOfItem(atPath: file.url.path)[.posixPermissions]
         XCTAssertEqual((permissions as? NSNumber)?.intValue, 0o600)
+    }
 
-        reloaded.setCollapsed("STR-11", false)
-        XCTAssertFalse(HistoryStore(store: FileHistoryStore(url: file.url)).isCollapsed("STR-11"))
+    /// Files written while the break screen could collapse an instruction still load.
+    func testAFileWithCollapsedInstructionsStillLoads() throws {
+        let directory = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent("movez-history-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+
+        let url = directory.appendingPathComponent("history.json")
+        let legacy = """
+            {"completions":[],"breakRecords":[],"collapsedInstructions":["STR-11"],
+             "days":{"2026-09-07":{"done":3,"skipped":0,"snoozed":1,"longestBoutSeconds":600}}}
+            """
+        try Data(legacy.utf8).write(to: url)
+
+        let store = HistoryStore(store: FileHistoryStore(url: url))
+        XCTAssertEqual(store.data.days["2026-09-07"]?.done, 3, "the file loaded rather than starting fresh")
     }
 
     func testEveryMutationWritesToDisk() throws {
@@ -129,9 +143,8 @@ final class HistoryStoreTests: XCTestCase {
         let store = HistoryStore(store: file)
         store.record(completion: MovementCompletion(movementId: "FLX-01", at: day, seconds: 60, routineId: nil))
         record(store, .done, offset: 60)
-        store.setCollapsed("FLX-01", true)
         store.recordLongestBout(600, on: day)
-        XCTAssertEqual(file.saveCount, 4)
+        XCTAssertEqual(file.saveCount, 3)
     }
 
     func testReversingACreditedBreakUndoesTheCount() {

@@ -80,8 +80,6 @@ struct GalleryView: View {
                     Button("Snooze 5 min") {}.buttonStyle(SecondaryButtonStyle())
                     Button("Done") {}.buttonStyle(AccentOutlineButtonStyle(size: .panel))
                     Button("Skip · 1 today") {}.buttonStyle(LinkActionStyle())
-                    Button("I know this one") {}
-                        .buttonStyle(LinkActionStyle(color: Tokens.accent, style: MovezType.helperLink))
                     Button("Skip · disabled 3 s") {}.buttonStyle(LinkActionStyle(disabled: true))
                 }
             }

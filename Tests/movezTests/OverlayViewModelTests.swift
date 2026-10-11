@@ -18,22 +18,18 @@ final class OverlayViewModelTests: XCTestCase {
     private func makeViewModel(
         clock: ManualClock = ManualClock(now: SchedulerHarness.mondayMorning),
         chimes: RecordingChimePlayer? = nil,
-        collapsed: Set<String> = [],
-        reduceMotion: Bool = false,
-        persist: @escaping (String, Bool) -> Void = { _, _ in }
+        reduceMotion: Bool = false
     ) -> OverlayViewModel {
         OverlayViewModel(
             routine: fixtureRoutine(),
             startedAt: clock.now,
             clock: clock,
             chimes: chimes ?? RecordingChimePlayer(),
-            collapsed: collapsed,
             snoozesLeft: 2,
             skipsToday: 1,
             streak: 4,
             nextBreakAt: clock.now.addingTimeInterval(3600),
-            reduceMotion: reduceMotion,
-            persistCollapsed: persist
+            reduceMotion: reduceMotion
         )
     }
 
@@ -205,39 +201,16 @@ final class OverlayViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.state.discProgress, 0.5, accuracy: 0.05, "half of the right half")
     }
 
-    // MARK: - Collapsing the instruction
+    // MARK: - The instruction
 
-    func testCollapsingPersistsAndIsRememberedNextTime() {
-        var persisted: [String: Bool] = [:]
-        let viewModel = makeViewModel(persist: { persisted[$0] = $1 })
-        XCTAssertFalse(viewModel.state.instructionCollapsed)
-        XCTAssertEqual(viewModel.state.helperLabel, "I know this one")
-
-        viewModel.toggleCollapsed()
-        XCTAssertTrue(viewModel.state.instructionCollapsed)
-        XCTAssertEqual(viewModel.state.helperLabel, "Show instruction")
-        XCTAssertEqual(persisted["CIR-02"], true)
-
-        let reopened = makeViewModel(collapsed: ["CIR-02"])
-        XCTAssertTrue(reopened.state.instructionCollapsed, "a movement stays collapsed next time")
-
-        viewModel.toggleCollapsed()
-        XCTAssertEqual(persisted["CIR-02"], false)
-    }
-
-    func testCollapsingThroughTheHistoryStore() {
-        let store = HistoryStore(store: InMemoryHistoryStore())
-        let viewModel = makeViewModel(persist: { store.setCollapsed($0, $1) })
-        viewModel.toggleCollapsed()
-        XCTAssertTrue(store.isCollapsed("CIR-02"))
-
-        let next = OverlayViewModel(
-            routine: fixtureRoutine(),
-            startedAt: SchedulerHarness.mondayMorning,
-            clock: ManualClock(now: SchedulerHarness.mondayMorning),
-            collapsed: store.data.collapsedInstructions
-        )
-        XCTAssertTrue(next.state.instructionCollapsed)
+    func testTheInstructionIsAlwaysOnScreen() {
+        let clock = ManualClock(now: SchedulerHarness.mondayMorning)
+        let viewModel = makeViewModel(clock: clock)
+        for _ in 0..<viewModel.totalBlocks {
+            XCTAssertEqual(viewModel.state.instruction, viewModel.block?.movement.instructions)
+            XCTAssertFalse(viewModel.state.instruction.isEmpty)
+            viewModel.next()
+        }
     }
 
     // MARK: - Snooze, done and skip

@@ -260,7 +260,6 @@ struct OverlayScreen: View {
             snooze: viewModel.snooze,
             done: viewModel.done,
             skip: viewModel.skip,
-            toggleCollapsed: viewModel.toggleCollapsed,
             chooseSide: viewModel.choose(side:),
             backToWork: viewModel.done
         )

@@ -39,7 +39,6 @@ struct OverlayState: Equatable {
     // Body
     var movementName = ""
     var instruction = ""
-    var instructionCollapsed = false
     var isSideBlock = false
     var side: BreakSide = .none
 
@@ -56,7 +55,6 @@ struct OverlayState: Equatable {
     var streak = 0
 
     var skipLabel: String { "Skip · \(skipsToday) today" }
-    var helperLabel: String { instructionCollapsed ? "Show instruction" : "I know this one" }
 
     /// "Four movements done. Next break at 12:05." — the counts small enough to spell out are.
     static func summary(movements: Int, nextBreakAt: String) -> String {
@@ -94,7 +92,6 @@ struct OverlayActions {
     var snooze: () -> Void = {}
     var done: () -> Void = {}
     var skip: () -> Void = {}
-    var toggleCollapsed: () -> Void = {}
     var chooseSide: (BreakSide) -> Void = { _ in }
     var backToWork: () -> Void = {}
 }

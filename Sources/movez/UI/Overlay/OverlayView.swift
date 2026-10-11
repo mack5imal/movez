@@ -96,28 +96,17 @@ struct OverlayView: View {
                 SideToggle(side: state.side, choose: actions.chooseSide)
             }
 
-            if state.instructionCollapsed {
-                helperLink
-            } else {
-                MovezText(
-                    state.instruction,
-                    state.isSideBlock ? MovezType.instructionSide : MovezType.instruction,
-                    color: Tokens.text2,
-                    alignment: .center
-                )
-                .fixedSize(horizontal: false, vertical: true)
-                helperLink
-            }
+            // Always shown. It used to collapse behind "I know this one", which nobody needs: the
+            // instruction is the reason the break has a screen at all.
+            MovezText(
+                state.instruction,
+                state.isSideBlock ? MovezType.instructionSide : MovezType.instruction,
+                color: Tokens.text2,
+                alignment: .center
+            )
+            .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity)
-    }
-
-    private var helperLink: some View {
-        Button(state.helperLabel, action: actions.toggleCollapsed)
-            .buttonStyle(LinkActionStyle(
-                color: state.instructionCollapsed ? Tokens.text3 : Tokens.accent,
-                style: MovezType.helperLink
-            ))
     }
 
     private var actionRow: some View {
