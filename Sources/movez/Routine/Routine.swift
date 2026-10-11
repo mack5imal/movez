@@ -52,29 +52,28 @@ struct Routine: Hashable, Identifiable {
 }
 
 /// A generated micro-break: one per-side movement for the whole minute, thirty seconds a side,
-/// or two one-sided movements of thirty seconds each with a lead-in before the second.
+/// or two one-sided movements of thirty seconds each, each with a lead-in before it.
 struct MicroBreak: Hashable, Identifiable {
     let id: UUID
     let blocks: [RoutineBlock]
 
-    /// 60 s for one movement, 65 s for two. The first movement needs no lead-in of its own: the
-    /// count-in has already said what it is.
+    /// 65 s for one movement, 70 s for two. The first movement gets a lead-in too: the count-in
+    /// names it, but only the lead-in shows its instructions before its clock starts.
     var totalSeconds: Int {
-        blocks.reduce(0) { $0 + $1.seconds } + Routine.leadInSeconds * max(0, blocks.count - 1)
+        blocks.reduce(0) { $0 + $1.seconds } + Routine.leadInSeconds * blocks.count
     }
 
     var movementIds: [String] { blocks.map(\.movement.id) }
 
-    /// Seconds into the running micro-break at which each block appears; the second one's
-    /// lead-in starts there.
+    /// Seconds into the running micro-break at which each block appears; its lead-in starts
+    /// there.
     func appearsAt(block index: Int) -> Int {
-        let earlier = blocks.prefix(index).reduce(0) { $0 + $1.seconds }
-        return earlier + Routine.leadInSeconds * max(0, index - 1)
+        blocks.prefix(index).reduce(0) { $0 + Routine.leadInSeconds + $1.seconds }
     }
 
     /// Seconds into the running micro-break at which each block's movement starts.
     func startsAt(block index: Int) -> Int {
-        appearsAt(block: index) + (index > 0 ? Routine.leadInSeconds : 0)
+        appearsAt(block: index) + Routine.leadInSeconds
     }
 
     /// The blocks the user got at least halfway through in `seconds` of running time — the rule a

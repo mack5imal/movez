@@ -24,12 +24,12 @@ final class MicroBreakBuilderTests: XCTestCase {
                 XCTAssertTrue(micro.blocks[0].perSide, "\(micro.blocks[0].movement.id) ran alone but is one-sided")
                 XCTAssertEqual(micro.blocks[0].seconds, 60)
                 XCTAssertEqual(micro.blocks[0].secondsPerSide, 30)
-                XCTAssertEqual(micro.totalSeconds, 60)
+                XCTAssertEqual(micro.totalSeconds, 65, "the minute and its lead-in")
             case 2:
                 pairs += 1
                 XCTAssertTrue(micro.blocks.allSatisfy { !$0.perSide }, "a pair held \(micro.movementIds)")
                 XCTAssertTrue(micro.blocks.allSatisfy { $0.seconds == 30 })
-                XCTAssertEqual(micro.totalSeconds, 65, "two halves and the lead-in between them")
+                XCTAssertEqual(micro.totalSeconds, 70, "two halves, each after its lead-in")
             default:
                 XCTFail("micro-break with \(micro.blocks.count) blocks")
             }

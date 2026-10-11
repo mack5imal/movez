@@ -59,6 +59,7 @@
 		56964AB17B0D050C2FD63B8D /* Recency.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4954FDF028687ECBDC44740 /* Recency.swift */; };
 		58809FEBA39684F0D89A6FC7 /* Gallery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C72D952CD33F4E122997B90 /* Gallery.swift */; };
 		5987DDB5C15A06E93AD17AE8 /* SchedulerEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD7E4757BE6870716B20B25A /* SchedulerEvent.swift */; };
+		5A2FEA6C50A83464C64EEFAC /* MicroPanelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 743F13B911D68FC7B72458C7 /* MicroPanelTests.swift */; };
 		5DB3F9562B633581A83E2DAF /* Clock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B38057FE27BFBA4B888F5B0 /* Clock.swift */; };
 		6144F8A35500D2DA0410DD2B /* StatePersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = A49E80929BB51EEDA20B470F /* StatePersistence.swift */; };
 		61F812800D92C69E54FD7CDE /* LibraryMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54B929FFC124423F85034C3A /* LibraryMetadata.swift */; };
@@ -218,6 +219,7 @@
 		6E13952F4D1F735C7AE7CD53 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
 		6E47EF436BDD3C23084D28F4 /* SeededRandom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeededRandom.swift; sourceTree = "<group>"; };
 		6E7DD03A596EDE389F7C25FB /* HistoryPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryPersistence.swift; sourceTree = "<group>"; };
+		743F13B911D68FC7B72458C7 /* MicroPanelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroPanelTests.swift; sourceTree = "<group>"; };
 		77913B41BA43A68FBCD32134 /* DebugState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugState.swift; sourceTree = "<group>"; };
 		78E3FDC0CDAA721777AC550A /* AwayToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AwayToastView.swift; sourceTree = "<group>"; };
 		7B6527E077C9D30BD770D4FE /* AccessibilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityTests.swift; sourceTree = "<group>"; };
@@ -360,6 +362,7 @@
 				1637897564C21375102AE856 /* LibraryTests.swift */,
 				5A646C36AA0B26476DDBB2CD /* MenuBarViewModelTests.swift */,
 				E6FDDD314F5FCB09D7D7D496 /* MicroBreakBuilderTests.swift */,
+				743F13B911D68FC7B72458C7 /* MicroPanelTests.swift */,
 				DDE9A9945AC290A685C90405 /* OverlayTimingTests.swift */,
 				9F047B6DAC3BCCEF246181DC /* OverlayViewModelTests.swift */,
 				7D3466382DDA0245F7F6AEB8 /* PanelViewModelTests.swift */,
@@ -889,6 +892,7 @@
 				C0CE23AE79FE5163DF44F90C /* LibraryTests.swift in Sources */,
 				395009B7E0CA9406FD62971A /* MenuBarViewModelTests.swift in Sources */,
 				B9D41EEFC7605CAFEDBB00CC /* MicroBreakBuilderTests.swift in Sources */,
+				5A2FEA6C50A83464C64EEFAC /* MicroPanelTests.swift in Sources */,
 				8B347FCD733537555F2F5B6F /* OverlayTimingTests.swift in Sources */,
 				0D8C3D387D6F2D4B80DEF4AF /* OverlayViewModelTests.swift in Sources */,
 				4545DA6B9E5893B41295022E /* PanelViewModelTests.swift in Sources */,

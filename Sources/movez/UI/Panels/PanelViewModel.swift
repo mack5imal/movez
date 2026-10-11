@@ -54,7 +54,7 @@ final class PanelViewModel: ObservableObject {
     var micro: MicroBreak?
     /// The longest a micro-break runs, from the scheduler. The panel runs the micro-break's own
     /// length, which is shorter when it is a single movement.
-    var microSeconds = 65
+    var microSeconds = 70
     /// The micro-break's one snooze. A second request is a skip.
     var microSnoozeUsed = false
     var toast: ToastInfo?
@@ -136,7 +136,7 @@ final class PanelViewModel: ObservableObject {
         Double(micro?.startsAt(block: microBlockIndex) ?? 0)
     }
 
-    /// The five seconds before the second movement starts.
+    /// The five seconds before each movement starts, the first included.
     var isMicroLeadIn: Bool { phase == .microRunning && elapsed < microBlockStart }
 
     /// Which side a per-side movement is on.
@@ -151,11 +151,11 @@ final class PanelViewModel: ObservableObject {
         return max(0, microBlockStart + Double(block.seconds) - elapsed)
     }
 
-    /// The transition chime as the second movement appears and at a per-side movement's halfway
-    /// point, as in a full break.
+    /// The transition chime as each movement appears and at a per-side movement's halfway point,
+    /// as in a full break. The first one sounds as the count-in hands over to its lead-in.
     private func chimeMicroTransitions() {
         let index = microBlockIndex
-        if index > 0, chimedAppearances.insert(index).inserted {
+        if chimedAppearances.insert(index).inserted {
             chimes?.play(.transition)
         }
         if microSide == .right, chimedHalfways.insert(index).inserted {
@@ -236,15 +236,15 @@ final class PanelViewModel: ObservableObject {
         }
     }
 
-    /// The disc's ring. A running micro-break drains it per movement — per side for a per-side
-    /// one, as the overlay does — and the lead-in drains it over its five seconds.
+    /// The disc's ring, which runs the way the full break's does: a movement fills it as it goes,
+    /// per side for a per-side one, and a lead-in or count-in drains it towards the start.
     var discProgress: Double {
         guard phase == .microRunning, let block = microBlock else { return progress }
         if isMicroLeadIn { return microBlockRemainingExact / Double(Routine.leadInSeconds) }
-        guard block.perSide else { return microBlockRemainingExact / Double(max(1, block.seconds)) }
+        guard block.perSide else { return max(0, min(1, 1 - microBlockRemainingExact / Double(max(1, block.seconds)))) }
         let half = Double(max(1, block.secondsPerSide))
         let sideRemaining = microSide == .left ? microBlockRemainingExact - half : microBlockRemainingExact
-        return max(0, min(1, sideRemaining / half))
+        return max(0, min(1, 1 - sideRemaining / half))
     }
 
     var discMode: TimerDiscMode {

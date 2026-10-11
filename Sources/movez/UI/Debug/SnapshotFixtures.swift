@@ -148,13 +148,15 @@ extension SnapshotFixtures {
 
     static let deferredSittingSeconds: TimeInterval = 5_700
     static let microCountInRemaining: TimeInterval = 21
-    /// Seconds into the running micro-break each micro snapshot is taken at: the first movement
+    /// Seconds into the running micro-break each micro snapshot is taken at: the first movement's
+    /// lead-in at −0:03, the first movement
     /// with 0:14 left, the second movement's lead-in at −0:03, the second movement with 0:18 left,
     /// and a per-side movement on its right side with 0:22 left.
-    static let microFirstElapsed: TimeInterval = 16
-    static let microLeadInElapsed: TimeInterval = 32
-    static let microSecondElapsed: TimeInterval = 47
-    static let microSideElapsed: TimeInterval = 38
+    static let microFirstLeadInElapsed: TimeInterval = 2
+    static let microFirstElapsed: TimeInterval = 21
+    static let microLeadInElapsed: TimeInterval = 37
+    static let microSecondElapsed: TimeInterval = 52
+    static let microSideElapsed: TimeInterval = 43
     /// Sixty percent of the toast's time left, which is where the handoff draws its hairline.
     static let toastRemaining: TimeInterval = 9
 

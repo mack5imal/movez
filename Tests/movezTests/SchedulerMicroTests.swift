@@ -134,8 +134,8 @@ final class SchedulerMicroTests: XCTestCase {
         harness.clearEffects()
 
         harness.run(until: { $0.isSitting })
-        // The backstop is the longest micro-break, 65 s, reached on the first two-second tick past it.
-        XCTAssertEqual(ranSeconds(harness), [66])
+        // The backstop is the longest micro-break, 70 s, which a two-second tick lands on exactly.
+        XCTAssertEqual(ranSeconds(harness), [70])
     }
 
     /// A micro-break that runs its course ends on the completion chime a full break ends on.

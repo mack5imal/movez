@@ -17,6 +17,7 @@ enum SnapshotSurface: String, CaseIterable {
     case headsUp = "headsup"
     case headsUpDeferred = "headsup-deferred"
     case microCountIn = "micro-countin"
+    case microFirstLeadIn = "micro-first-leadin"
     case microRunning = "micro-running"
     case microLeadIn = "micro-leadin"
     case microSecond = "micro-second"
@@ -46,7 +47,7 @@ enum SnapshotSurface: String, CaseIterable {
     var size: CGSize {
         switch self {
         case .gallery: return CGSize(width: 1400, height: 2900)
-        case .headsUp, .headsUpDeferred, .microCountIn, .microRunning, .microLeadIn, .microSecond, .microSide:
+        case .headsUp, .headsUpDeferred, .microCountIn, .microFirstLeadIn, .microRunning, .microLeadIn, .microSecond, .microSide:
             return Self.panelCanvas
         case .toast: return Self.toastCanvas
         case .menuSitting, .menuPaused, .menuOffHours, .menuAway: return Self.menuCanvas
@@ -124,8 +125,20 @@ enum SnapshotRenderer {
             return AnyView(PanelSnapshot(viewModel: SnapshotFixtures.headsUp()))
         case .headsUpDeferred:
             return AnyView(PanelSnapshot(viewModel: SnapshotFixtures.headsUp(deferred: true)))
+        case .toast:
+            return AnyView(PanelSnapshot(viewModel: SnapshotFixtures.awayToast(), placement: .bottomRight))
+        default:
+            return microView(for: surface)
+        }
+    }
+
+    /// The micro-break panel at each of its moments.
+    private static func microView(for surface: SnapshotSurface) -> AnyView? {
+        switch surface {
         case .microCountIn:
             return AnyView(PanelSnapshot(viewModel: SnapshotFixtures.microCountIn()))
+        case .microFirstLeadIn:
+            return AnyView(PanelSnapshot(viewModel: SnapshotFixtures.microRunning(elapsed: SnapshotFixtures.microFirstLeadInElapsed)))
         case .microRunning:
             return AnyView(PanelSnapshot(viewModel: SnapshotFixtures.microRunning()))
         case .microLeadIn:
@@ -137,8 +150,6 @@ enum SnapshotRenderer {
                 elapsed: SnapshotFixtures.microSideElapsed,
                 micro: SnapshotFixtures.microSideBreak()
             )))
-        case .toast:
-            return AnyView(PanelSnapshot(viewModel: SnapshotFixtures.awayToast(), placement: .bottomRight))
         default:
             return nil
         }
