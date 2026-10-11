@@ -1,0 +1,4495 @@
+{
+  "library": "movez strength library",
+  "mode": "strength",
+  "version": "1",
+  "source": "strength-library-v1.md",
+  "generated": "2026-10-09",
+  "schema": {
+    "movement": {
+      "id": "bucket prefix + 2-digit number",
+      "bucket": "SQT|HNG|PSH|PUL|COR|ACC|END",
+      "regions": "list of body regions (v4 regions plus Arm)",
+      "dose": "rep target or hold sized to the block; '/side' = both sides, 30 s each; 'alternating' = sides alternate inside the block",
+      "per_side": "true when the block splits into two 30 s halves with a side switch at the halfway chime",
+      "block_seconds": "60 for full-routine buckets; END is 60 per-side or 30 two-sided",
+      "difficulty": "1 easy, 2 moderate, 3 harder / more control",
+      "settings": "every surface used: Stand, Chair, Desk, Wall, Floor, Any",
+      "on_floor": "true when Floor is among the settings (routine rule 5)",
+      "equipment": "REQUIRED, any one of: dumbbells (a pair), kettlebell (one). Empty = bodyweight. Differs from v4's equipment_optional.",
+      "load": "light|moderate|heavy relative to what the user owns; null for bodyweight",
+      "grip_demand": "true when it counts against the grip budget (routine rule 6)",
+      "micro_eligible": "true for every END movement and nothing else",
+      "counteracts": "desk-work effect targeted",
+      "instructions": "in-app instruction text",
+      "v4_overlap": "{id, kind} when the movement matches a v4 movement; 'same' counts as one for no-repeat when modes mix"
+    },
+    "regions": [
+      "Adductor",
+      "Arm",
+      "Calf/Ankle",
+      "Chest",
+      "Foot/Shin",
+      "Full",
+      "Glute",
+      "Ham",
+      "Hip",
+      "L-spine/Core",
+      "Neck",
+      "Quad",
+      "Shoulder",
+      "T-spine",
+      "Wrist/Forearm"
+    ],
+    "settings": [
+      "Chair",
+      "Desk",
+      "Floor",
+      "Stand",
+      "Wall"
+    ],
+    "equipment": [
+      "dumbbells",
+      "kettlebell"
+    ],
+    "load_tiers": {
+      "light": "typically 2-6 kg",
+      "moderate": "typically 6-12 kg",
+      "heavy": "the heaviest the user owns, typically 12-24 kg"
+    }
+  },
+  "design_rules": {
+    "full_routine": {
+      "movements": 5,
+      "seconds_per_movement": 60,
+      "per_side_split": 30,
+      "lead_in_seconds": 5,
+      "slot_order": [
+        "SQT",
+        "PSH",
+        "HNG",
+        "PUL",
+        "COR|ACC"
+      ]
+    },
+    "micro_routine": {
+      "seconds": 60,
+      "structure": "one per-side END movement (30 s a side) or two two-sided END movements (30 s each)",
+      "pool": "END",
+      "equipment": "none",
+      "floor_allowed": true,
+      "chair_allowed": true
+    },
+    "rep_targets": {
+      "two_sided": [
+        12,
+        20
+      ],
+      "per_side": [
+        8,
+        12
+      ],
+      "tempo_seconds_per_rep": 3,
+      "swing_seconds_per_rep": 2,
+      "rule": "the timer wins: rest if reps finish early, stop if the window ends first"
+    },
+    "intensity": "RPE <= 7, about three reps in reserve; no grinding, breath-holding or grunting",
+    "environment": "quiet, small office or cubicle; no jumping, no dropping weights; kettlebell swings allowed and parked gently",
+    "equipment_allowed": [
+      "bodyweight",
+      "dumbbells",
+      "kettlebell",
+      "chair",
+      "floor",
+      "desk",
+      "wall"
+    ],
+    "goal": "maintain or slowly build strength; not hypertrophy"
+  },
+  "desk_effects": [
+    {
+      "effect": "Quad and sit-to-stand strength decline, faster with age",
+      "primary": "SQT",
+      "secondary": "ACC (wall-free calf and shin work)"
+    },
+    {
+      "effect": "Mid/lower traps and rear shoulders weaken while pecs and upper traps dominate",
+      "primary": "PUL",
+      "secondary": "END (shoulder lift-offs)"
+    },
+    {
+      "effect": "Pushing capacity fades with nothing to push against",
+      "primary": "PSH",
+      "secondary": "COR"
+    },
+    {
+      "effect": "Trunk stabilizers switch off in a supported seat",
+      "primary": "COR",
+      "secondary": "HNG (back extensions)"
+    },
+    {
+      "effect": "Calf, soleus, and shin strength lost to little walking",
+      "primary": "ACC",
+      "secondary": "END (ankle)"
+    },
+    {
+      "effect": "Frontal-plane weakness (adductors, abductors) from forward-only movement",
+      "primary": "SQT (lateral lunges)",
+      "secondary": "ACC"
+    },
+    {
+      "effect": "End ranges never visited: deep hip flexion, hip rotation, overhead and behind-the-back shoulder range, spinal extension and rotation",
+      "primary": "END",
+      "secondary": "—"
+    },
+    {
+      "effect": "Weak deep neck flexors, forward head",
+      "primary": "ACC (head lift)",
+      "secondary": "END (neck)"
+    }
+  ],
+  "buckets": [
+    {
+      "id": "SQT",
+      "name": "Squat & lunge",
+      "count": 16
+    },
+    {
+      "id": "HNG",
+      "name": "Hinge & bridge",
+      "count": 18
+    },
+    {
+      "id": "PSH",
+      "name": "Push",
+      "count": 18
+    },
+    {
+      "id": "PUL",
+      "name": "Pull & upper back",
+      "count": 18
+    },
+    {
+      "id": "COR",
+      "name": "Core",
+      "count": 18
+    },
+    {
+      "id": "ACC",
+      "name": "Accessory & joint resilience",
+      "count": 11
+    },
+    {
+      "id": "END",
+      "name": "End-range strength & active flexibility",
+      "count": 41
+    }
+  ],
+  "full_routine_rules": [
+    "Five movements, fixed slot order: SQT → PSH → HNG → PUL → COR or ACC. Alternating lower and upper body lets each region rest while the next works, so moderate loads stay at RPE 7 without breaks between movements.",
+    "Slot 5 draws from COR and ACC together, with COR weighted about 2:1.",
+    "Equipment filter. A movement is eligible when it is bodyweight, or when its equipment list includes something the user selected. If the user selected any equipment, at least two of slots 1–4 should be loaded, so owning weights actually changes the routine. With nothing selected, everything is bodyweight. Two more switches belong with the equipment choice: solid wall available (when off, skip movements with Wall in their setting), and the kettlebell's weight (when it's heavier than about 12 kg, skip the kettlebell version of Load L and M movements).",
+    "Slot 1 is the warm-up. It is Diff 1–2, never Load H, and never a swing. Swings (HNG-10, HNG-11) appear only in slot 3, after the body is warm.",
+    "Floor limit. At most two movements with Floor in their setting per routine, so the user isn't up and down five times.",
+    "Grip budget. At most two Grip movements per routine, never in slot 5, so the forearms are fresh for typing.",
+    "No repeats in a day (DECISIONS 32). If the user mixes modes in a day, treat the \"same\" overlaps in section 15 as the same movement.",
+    "Difficulty ramp. Default cap Diff 2, plus the user's manual cap. Both swings are Diff 3, so a new user meets them only after unlocking the hinge bucket; samples that use a Diff 3 movement say \"Diff 3 unlocked\". A Diff 3 movement unlocks per bucket after the user has completed Diff 2 movements in that bucket several times (tracked per movement, as in v4 rule 7).",
+    "Region focus steers by region exactly as in movement mode.",
+    "Timer wins. Reps are a target, not a contract. The UI shows the rep target, runs the 60 s timer (or 30 s per side), and moves on when it ends."
+  ],
+  "micro_routine_rules": [
+    "Pool: the END bucket only. Bodyweight only; floor and chair allowed.",
+    "Shape: the movement-mode micro rule (DECISIONS 30). One draw over the pool. If it's per-side, it fills the minute alone, 30 s a side. Otherwise a second two-sided END movement is drawn, and each runs 30 s with a 5 s lead-in before the second.",
+    "Stay at one level. If the first movement is on the floor, prefer a floor movement for the second, and likewise for standing and seated, so a 1-minute break doesn't include getting down and up again.",
+    "No region twice in consecutive micro-routines, and no movement twice in a day.",
+    "Avoid the next full routine's regions where possible, so a micro-routine doesn't pre-tire what the next strength routine is about to load."
+  ],
+  "coverage": {
+    "none": {
+      "SQT": {
+        "eligible": 9,
+        "loaded": 0,
+        "diff_1_2": 8
+      },
+      "PSH": {
+        "eligible": 10,
+        "loaded": 0,
+        "diff_1_2": 7
+      },
+      "HNG": {
+        "eligible": 9,
+        "loaded": 0,
+        "diff_1_2": 8
+      },
+      "PUL": {
+        "eligible": 8,
+        "loaded": 0,
+        "diff_1_2": 8
+      },
+      "COR": {
+        "eligible": 11,
+        "loaded": 0,
+        "diff_1_2": 10
+      },
+      "ACC": {
+        "eligible": 9,
+        "loaded": 0,
+        "diff_1_2": 8
+      },
+      "COR+ACC": {
+        "eligible": 20
+      }
+    },
+    "dumbbells": {
+      "SQT": {
+        "eligible": 16,
+        "loaded": 7,
+        "diff_1_2": 14
+      },
+      "PSH": {
+        "eligible": 18,
+        "loaded": 8,
+        "diff_1_2": 15
+      },
+      "HNG": {
+        "eligible": 16,
+        "loaded": 7,
+        "diff_1_2": 14
+      },
+      "PUL": {
+        "eligible": 17,
+        "loaded": 9,
+        "diff_1_2": 16
+      },
+      "COR": {
+        "eligible": 18,
+        "loaded": 7,
+        "diff_1_2": 14
+      },
+      "ACC": {
+        "eligible": 11,
+        "loaded": 2,
+        "diff_1_2": 10
+      },
+      "COR+ACC": {
+        "eligible": 29
+      }
+    },
+    "kettlebell": {
+      "SQT": {
+        "eligible": 15,
+        "loaded": 6,
+        "diff_1_2": 13
+      },
+      "PSH": {
+        "eligible": 12,
+        "loaded": 2,
+        "diff_1_2": 9
+      },
+      "HNG": {
+        "eligible": 18,
+        "loaded": 9,
+        "diff_1_2": 14
+      },
+      "PUL": {
+        "eligible": 11,
+        "loaded": 3,
+        "diff_1_2": 11
+      },
+      "COR": {
+        "eligible": 17,
+        "loaded": 6,
+        "diff_1_2": 13
+      },
+      "ACC": {
+        "eligible": 11,
+        "loaded": 2,
+        "diff_1_2": 10
+      },
+      "COR+ACC": {
+        "eligible": 28
+      }
+    },
+    "both": {
+      "SQT": {
+        "eligible": 16,
+        "loaded": 7,
+        "diff_1_2": 14
+      },
+      "PSH": {
+        "eligible": 18,
+        "loaded": 8,
+        "diff_1_2": 15
+      },
+      "HNG": {
+        "eligible": 18,
+        "loaded": 9,
+        "diff_1_2": 14
+      },
+      "PUL": {
+        "eligible": 18,
+        "loaded": 10,
+        "diff_1_2": 17
+      },
+      "COR": {
+        "eligible": 18,
+        "loaded": 7,
+        "diff_1_2": 14
+      },
+      "ACC": {
+        "eligible": 11,
+        "loaded": 2,
+        "diff_1_2": 10
+      },
+      "COR+ACC": {
+        "eligible": 29
+      }
+    }
+  },
+  "movements": [
+    {
+      "id": "SQT-01",
+      "name": "Bodyweight squat",
+      "bucket": "SQT",
+      "bucket_name": "Squat & lunge",
+      "regions": [
+        "Quad",
+        "Glute"
+      ],
+      "dose": "20 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "quad and glute deconditioning from sitting",
+      "instructions": "Stand with feet shoulder width, toes turned out slightly, arms reaching forward for balance. Sit the hips back and down as low as you can with the heels flat and the chest up, then stand and squeeze the glutes at the top. Keep a steady rhythm of about 3 s a rep, with the knees tracking over the toes.",
+      "v4_overlap": {
+        "id": "CIR-16",
+        "kind": "similar"
+      }
+    },
+    {
+      "id": "SQT-02",
+      "name": "Tempo squat",
+      "bucket": "SQT",
+      "bucket_name": "Squat & lunge",
+      "regions": [
+        "Quad",
+        "Glute"
+      ],
+      "dose": "10 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "quad and glute deconditioning",
+      "instructions": "Same stance as the bodyweight squat. Take 3 s to lower, pause for 1 s at the bottom without bouncing, then stand up in 1 s. The slow lowering is the point: it builds strength without any load.",
+      "v4_overlap": {
+        "id": "STR-04",
+        "kind": "same"
+      }
+    },
+    {
+      "id": "SQT-03",
+      "name": "Chair sit-to-stand",
+      "bucket": "SQT",
+      "bucket_name": "Squat & lunge",
+      "regions": [
+        "Quad",
+        "Glute"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Chair"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "loss of sit-to-stand strength",
+      "instructions": "Sit on the front half of the chair, feet hip width and slightly behind the knees; if it's an office chair, lock the swivel and push it back against the desk or a wall first. Lean the chest forward and stand up without using your hands. Sit back down slowly, taking 2–3 s, and only brush the seat before standing again.",
+      "v4_overlap": null
+    },
+    {
+      "id": "SQT-04",
+      "name": "Goblet squat",
+      "bucket": "SQT",
+      "bucket_name": "Squat & lunge",
+      "regions": [
+        "Quad",
+        "Glute",
+        "Hip"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "load": "moderate",
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "lower-body strength loss, stiff hips",
+      "instructions": "Hold one dumbbell upright by its top end, or the kettlebell by the horns, against your chest with the elbows pointing down. With feet shoulder width, squat as low as is comfortable, elbows tracking inside the knees and chest tall, then stand and squeeze the glutes. Keep the weight touching your chest the whole time.",
+      "v4_overlap": {
+        "id": "STR-09",
+        "kind": "same"
+      }
+    },
+    {
+      "id": "SQT-05",
+      "name": "Dumbbell front squat",
+      "bucket": "SQT",
+      "bucket_name": "Squat & lunge",
+      "regions": [
+        "Quad",
+        "Glute",
+        "L-spine/Core"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "dumbbells"
+      ],
+      "load": "moderate",
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "quad weakness, slumped trunk",
+      "instructions": "Rest one end of each dumbbell on the front of your shoulders, elbows high and pointing forward. Squat down with the chest tall and the elbows staying up, then drive up through the whole foot. If the elbows drop the weights tip forward, so think \"elbows up\" on every rep.",
+      "v4_overlap": null
+    },
+    {
+      "id": "SQT-06",
+      "name": "Suitcase squat",
+      "bucket": "SQT",
+      "bucket_name": "Squat & lunge",
+      "regions": [
+        "Quad",
+        "Glute",
+        "L-spine/Core"
+      ],
+      "dose": "10/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "load": "moderate",
+      "grip_demand": true,
+      "micro_eligible": false,
+      "counteracts": "quad weakness, lateral core weakness",
+      "instructions": "Hold one dumbbell or the kettlebell at your side like a suitcase, arm long. Squat until the weight nearly touches the floor, staying level, without letting the shoulders tilt toward the weight. Switch hands at the halfway chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "SQT-07",
+      "name": "Split squat",
+      "bucket": "SQT",
+      "bucket_name": "Squat & lunge",
+      "regions": [
+        "Quad",
+        "Glute",
+        "Hip"
+      ],
+      "dose": "10/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "hip flexor shortening, single-leg weakness",
+      "instructions": "Stand in a long stride with the rear heel up and the feet hip width apart side to side, as if on train tracks. Lower straight down until the rear knee hovers just above the floor, torso upright, then push through the front foot to rise. Do all the reps on one side, then switch at the chime. A fingertip on the desk for balance is fine.",
+      "v4_overlap": {
+        "id": "STR-05",
+        "kind": "same"
+      }
+    },
+    {
+      "id": "SQT-08",
+      "name": "Loaded split squat",
+      "bucket": "SQT",
+      "bucket_name": "Squat & lunge",
+      "regions": [
+        "Quad",
+        "Glute",
+        "Hip"
+      ],
+      "dose": "10/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "load": "moderate",
+      "grip_demand": true,
+      "micro_eligible": false,
+      "counteracts": "single-leg weakness, hip flexor shortening",
+      "instructions": "Set up as for the split squat, holding a dumbbell in each hand at your sides or the kettlebell at your chest. Lower until the rear knee hovers above the floor, keep the torso tall, and drive up through the front heel. Switch legs at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "SQT-09",
+      "name": "Reverse lunge",
+      "bucket": "SQT",
+      "bucket_name": "Squat & lunge",
+      "regions": [
+        "Glute",
+        "Quad"
+      ],
+      "dose": "10/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "glute inhibition",
+      "instructions": "From standing, step one foot back and lower until both knees are at about 90°, torso tall. Push through the front heel to bring the back foot forward to standing. Do all the reps on one leg, then switch. Set the back foot down softly; no stomping.",
+      "v4_overlap": {
+        "id": "STR-06",
+        "kind": "same"
+      }
+    },
+    {
+      "id": "SQT-10",
+      "name": "Loaded reverse lunge",
+      "bucket": "SQT",
+      "bucket_name": "Squat & lunge",
+      "regions": [
+        "Glute",
+        "Quad"
+      ],
+      "dose": "8/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "load": "moderate",
+      "grip_demand": true,
+      "micro_eligible": false,
+      "counteracts": "glute inhibition, single-leg weakness",
+      "instructions": "Hold a dumbbell in each hand at your sides, or the kettlebell at your chest. Step back into the lunge and lower until the back knee hovers, then drive through the front heel to return to standing. Finish one side, then switch.",
+      "v4_overlap": null
+    },
+    {
+      "id": "SQT-11",
+      "name": "Lateral lunge",
+      "bucket": "SQT",
+      "bucket_name": "Squat & lunge",
+      "regions": [
+        "Adductor",
+        "Quad",
+        "Glute"
+      ],
+      "dose": "8/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "no side-to-side loading, stiff adductors",
+      "instructions": "From a wide stance with toes forward, sit back into one hip, bending that knee while the other leg stays straight. Keep the bent-side heel down and the chest up, then push back to centre. Do all the reps to one side, then switch.",
+      "v4_overlap": null
+    },
+    {
+      "id": "SQT-12",
+      "name": "Goblet lateral lunge",
+      "bucket": "SQT",
+      "bucket_name": "Squat & lunge",
+      "regions": [
+        "Adductor",
+        "Quad",
+        "Glute"
+      ],
+      "dose": "8/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "load": "moderate",
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "no side-to-side loading, adductor weakness",
+      "instructions": "Hold a dumbbell or the kettlebell at your chest as for a goblet squat. From a wide stance, sit into one hip with the other leg straight, then push back to centre. Finish one side, then switch. Go only as deep as you can with the bent-side heel flat.",
+      "v4_overlap": null
+    },
+    {
+      "id": "SQT-13",
+      "name": "Curtsy lunge",
+      "bucket": "SQT",
+      "bucket_name": "Squat & lunge",
+      "regions": [
+        "Glute",
+        "Quad",
+        "Adductor"
+      ],
+      "dose": "10/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak side glutes, hip stiffness",
+      "instructions": "Stand tall, then step one foot diagonally behind and across the other, as if curtsying, and bend both knees. Keep the front knee over the front foot and the hips facing forward, then push through the front heel to return. Finish one side, then switch.",
+      "v4_overlap": null
+    },
+    {
+      "id": "SQT-14",
+      "name": "Rear-foot-elevated split squat",
+      "bucket": "SQT",
+      "bucket_name": "Squat & lunge",
+      "regions": [
+        "Quad",
+        "Glute",
+        "Hip"
+      ],
+      "dose": "8/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 3,
+      "settings": [
+        "Stand",
+        "Chair"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "single-leg weakness, hip flexor shortening",
+      "instructions": "Use a fixed chair, or lock an office chair's swivel and push it against a wall or desk so it can't move, then stand about a stride in front of it, facing away. Rest the top of your rear foot on the seat, lower straight down until the front thigh is near parallel with the torso tall, and drive up through the front heel. Switch legs at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "SQT-15",
+      "name": "Loaded rear-foot-elevated split squat",
+      "bucket": "SQT",
+      "bucket_name": "Squat & lunge",
+      "regions": [
+        "Quad",
+        "Glute",
+        "Hip"
+      ],
+      "dose": "8/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 3,
+      "settings": [
+        "Stand",
+        "Chair"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "load": "moderate",
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "single-leg weakness",
+      "instructions": "Same setup as the rear-foot-elevated split squat, holding a dumbbell in each hand at your sides or the kettlebell at your chest. Lower until the front thigh is near parallel, keeping the weight over the front foot, then drive up through the heel. Switch legs at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "SQT-16",
+      "name": "Wall sit",
+      "bucket": "SQT",
+      "bucket_name": "Squat & lunge",
+      "regions": [
+        "Quad"
+      ],
+      "dose": "45–60 s",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Wall"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "quad deconditioning",
+      "instructions": "Lean your back against a wall and walk the feet forward, sliding down until the thighs are roughly parallel to the floor and the knees are over the ankles. Keep the whole back and head against the wall and breathe normally. If it burns too much before the minute is up, slide a little higher rather than stopping.",
+      "v4_overlap": {
+        "id": "STR-11",
+        "kind": "same"
+      }
+    },
+    {
+      "id": "HNG-01",
+      "name": "Glute bridge",
+      "bucket": "HNG",
+      "bucket_name": "Hinge & bridge",
+      "regions": [
+        "Glute",
+        "Ham"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "glute inhibition",
+      "instructions": "Lie on your back with knees bent, feet flat and hip width, arms at your sides. Drive through the heels to lift the hips until the body is straight from shoulders to knees, squeeze the glutes for 1 s, then lower slowly. Don't arch the low back to get higher.",
+      "v4_overlap": {
+        "id": "STR-01",
+        "kind": "same"
+      }
+    },
+    {
+      "id": "HNG-02",
+      "name": "Single-leg glute bridge",
+      "bucket": "HNG",
+      "bucket_name": "Hinge & bridge",
+      "regions": [
+        "Glute",
+        "Ham"
+      ],
+      "dose": "10/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "glute inhibition, side-to-side imbalance",
+      "instructions": "Set up as for the glute bridge, then lift one foot off the floor with the knee bent. Push through the planted heel to raise the hips, keeping both hip bones level, then lower. Switch legs at the chime.",
+      "v4_overlap": {
+        "id": "STR-02",
+        "kind": "same"
+      }
+    },
+    {
+      "id": "HNG-03",
+      "name": "Loaded glute bridge",
+      "bucket": "HNG",
+      "bucket_name": "Hinge & bridge",
+      "regions": [
+        "Glute",
+        "Ham"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "load": "heavy",
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "glute inhibition",
+      "instructions": "Lie on your back, knees bent, and rest one dumbbell across your hip bones, or the kettlebell on its side with the bell on your lower belly, steadied with both hands. Drive through the heels to lift the hips until the body is straight from shoulders to knees, squeeze for 1 s, and lower under control. Keep the weight still; the hips do the moving.",
+      "v4_overlap": null
+    },
+    {
+      "id": "HNG-04",
+      "name": "Chair-edge hip thrust",
+      "bucket": "HNG",
+      "bucket_name": "Hinge & bridge",
+      "regions": [
+        "Glute"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor",
+        "Chair"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "glute inhibition",
+      "instructions": "Use a fixed chair, or lock an office chair's swivel and tilt and push it against a wall or desk, then sit on the floor with your upper back against the front edge of the seat, knees bent and feet flat. Tuck the chin and drive through the heels until the thighs are level with the torso, squeeze the glutes, then lower under control.",
+      "v4_overlap": {
+        "id": "STR-03",
+        "kind": "same"
+      }
+    },
+    {
+      "id": "HNG-05",
+      "name": "Loaded chair-edge hip thrust",
+      "bucket": "HNG",
+      "bucket_name": "Hinge & bridge",
+      "regions": [
+        "Glute"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor",
+        "Chair"
+      ],
+      "on_floor": true,
+      "equipment": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "load": "heavy",
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "glute inhibition, posterior chain weakness",
+      "instructions": "Same setup as the chair-edge hip thrust, with a dumbbell across your hip bones or the kettlebell resting on your lower belly, held steady with both hands. Drive through the heels until the thighs are level with the torso, squeeze for 1 s, and lower slowly.",
+      "v4_overlap": null
+    },
+    {
+      "id": "HNG-06",
+      "name": "Single-leg chair-edge hip thrust",
+      "bucket": "HNG",
+      "bucket_name": "Hinge & bridge",
+      "regions": [
+        "Glute",
+        "Ham"
+      ],
+      "dose": "8/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 3,
+      "settings": [
+        "Floor",
+        "Chair"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "glute inhibition, side-to-side imbalance",
+      "instructions": "Set up as for the chair-edge hip thrust, then lift one foot with the knee bent. Drive through the planted heel until the thigh is level with the torso, keeping the hips square, then lower. Switch legs at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "HNG-07",
+      "name": "Bodyweight good morning",
+      "bucket": "HNG",
+      "bucket_name": "Hinge & bridge",
+      "regions": [
+        "Ham",
+        "Glute",
+        "L-spine/Core"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "posterior chain weakness, lost hip hinge",
+      "instructions": "Stand with feet hip width, knees soft, fingertips lightly behind your head. Push the hips straight back, letting the torso tip forward with a flat back until you feel the hamstrings load, then drive the hips forward to stand tall and squeeze the glutes. The hips move back and forth; the back never rounds.",
+      "v4_overlap": {
+        "id": "CIR-12",
+        "kind": "similar"
+      }
+    },
+    {
+      "id": "HNG-08",
+      "name": "Romanian deadlift",
+      "bucket": "HNG",
+      "bucket_name": "Hinge & bridge",
+      "regions": [
+        "Ham",
+        "Glute"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "load": "heavy",
+      "grip_demand": true,
+      "micro_eligible": false,
+      "counteracts": "posterior chain weakness",
+      "instructions": "Stand holding a dumbbell in each hand in front of your thighs, or the kettlebell with both hands. With soft knees, push the hips back and slide the weight down the front of your legs with a flat back until you feel a strong hamstring stretch, around mid-shin. Drive the hips forward to stand and squeeze the glutes. Keep the weight close to the legs the whole way.",
+      "v4_overlap": null
+    },
+    {
+      "id": "HNG-09",
+      "name": "Sumo deadlift",
+      "bucket": "HNG",
+      "bucket_name": "Hinge & bridge",
+      "regions": [
+        "Ham",
+        "Glute",
+        "Adductor"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "load": "heavy",
+      "grip_demand": true,
+      "micro_eligible": false,
+      "counteracts": "posterior chain weakness, adductor weakness",
+      "instructions": "Stand wide with toes turned out and the kettlebell, or one dumbbell standing on its end, on the floor between your feet. Push the hips back and bend the knees until you can grip it with a flat back, then stand tall by driving the hips forward. Lower it under control and just tap the floor, or stop a few centimetres above it to stay quiet.",
+      "v4_overlap": {
+        "id": "STR-10",
+        "kind": "similar"
+      }
+    },
+    {
+      "id": "HNG-10",
+      "name": "Kettlebell swing",
+      "bucket": "HNG",
+      "bucket_name": "Hinge & bridge",
+      "regions": [
+        "Glute",
+        "Ham",
+        "Full"
+      ],
+      "dose": "20 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 3,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "kettlebell"
+      ],
+      "load": "heavy",
+      "grip_demand": true,
+      "micro_eligible": false,
+      "counteracts": "posterior chain weakness, low power",
+      "instructions": "Set the bell about 30 cm in front of you, hinge, and grip the handle with both hands, tilting it toward you. Hike it back high between the thighs, then snap the hips forward to float the bell to chest height; the arms are ropes and the hips do the work. Let it fall back into the hinge and repeat. To finish, hike it back once more and park it gently on the floor in front of you.",
+      "v4_overlap": {
+        "id": "CIR-18",
+        "kind": "similar"
+      }
+    },
+    {
+      "id": "HNG-11",
+      "name": "One-arm kettlebell swing",
+      "bucket": "HNG",
+      "bucket_name": "Hinge & bridge",
+      "regions": [
+        "Glute",
+        "Ham",
+        "L-spine/Core"
+      ],
+      "dose": "10/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 3,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "kettlebell"
+      ],
+      "load": "heavy",
+      "grip_demand": true,
+      "micro_eligible": false,
+      "counteracts": "posterior chain weakness, trunk rotation control",
+      "instructions": "Swing as in the two-hand swing, with one hand on the handle and the free arm loose at your side. Keep the shoulders square and don't let the bell pull you into a twist. At the halfway chime, park the bell gently, switch hands, and continue.",
+      "v4_overlap": null
+    },
+    {
+      "id": "HNG-12",
+      "name": "Single-leg RDL",
+      "bucket": "HNG",
+      "bucket_name": "Hinge & bridge",
+      "regions": [
+        "Ham",
+        "Glute"
+      ],
+      "dose": "8/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "posterior chain weakness, balance loss",
+      "instructions": "Stand on one leg with a soft knee. Hinge at the hip, sending the free leg straight back and the torso forward together like a see-saw, with a flat back and the hips square. Reach toward the floor, then squeeze the standing-side glute to return. A fingertip on the desk is fine; switch legs at the chime.",
+      "v4_overlap": {
+        "id": "STR-08",
+        "kind": "same"
+      }
+    },
+    {
+      "id": "HNG-13",
+      "name": "Loaded single-leg RDL",
+      "bucket": "HNG",
+      "bucket_name": "Hinge & bridge",
+      "regions": [
+        "Ham",
+        "Glute"
+      ],
+      "dose": "8/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 3,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "load": "moderate",
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "posterior chain weakness, balance loss",
+      "instructions": "Hold a dumbbell or the kettlebell in the hand opposite the standing leg. Hinge as in the single-leg RDL, letting the weight hang straight below the shoulder until the torso is nearly parallel to the floor, then squeeze the glute to stand. Keep the hips square to the floor. Switch legs and hands at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "HNG-14",
+      "name": "Kickstand RDL",
+      "bucket": "HNG",
+      "bucket_name": "Hinge & bridge",
+      "regions": [
+        "Ham",
+        "Glute"
+      ],
+      "dose": "10/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "load": "moderate",
+      "grip_demand": true,
+      "micro_eligible": false,
+      "counteracts": "posterior chain weakness, side-to-side imbalance",
+      "instructions": "Stand with one foot slightly behind the other, rear heel up and only the ball of that foot touching for balance; most of your weight stays on the front leg. Holding a dumbbell in each hand or the kettlebell in both, hinge over the front leg with a flat back until you feel the hamstring stretch, then drive the hips forward to stand. Switch legs at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "HNG-15",
+      "name": "Prone back extension",
+      "bucket": "HNG",
+      "bucket_name": "Hinge & bridge",
+      "regions": [
+        "L-spine/Core",
+        "Glute"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak back extensors from a supported seat",
+      "instructions": "Lie face down with your hands lightly at your temples and legs straight. Squeeze the glutes and lift the chest a few centimetres off the floor using the back muscles, hold 1 s, and lower slowly. Keep the chin tucked and the eyes looking at the floor.",
+      "v4_overlap": {
+        "id": "STR-27",
+        "kind": "same"
+      }
+    },
+    {
+      "id": "HNG-16",
+      "name": "Frog pump",
+      "bucket": "HNG",
+      "bucket_name": "Hinge & bridge",
+      "regions": [
+        "Glute"
+      ],
+      "dose": "20 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "glute inhibition",
+      "instructions": "Lie on your back, bring the soles of the feet together, and let the knees fall out wide with the heels close to your hips. Press the outer edges of the feet down and lift the hips in short, quick bridges, squeezing the glutes hard at the top of each. The range is small; the squeeze is everything.",
+      "v4_overlap": null
+    },
+    {
+      "id": "HNG-17",
+      "name": "Hamstring walkout",
+      "bucket": "HNG",
+      "bucket_name": "Hinge & bridge",
+      "regions": [
+        "Ham",
+        "Glute"
+      ],
+      "dose": "6 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak hamstrings, posterior chain weakness",
+      "instructions": "Lie on your back with knees bent and lift into a glute bridge. Keeping the hips up, walk the heels away from you in small steps until the legs are nearly straight, then walk them back and lower the hips. That's one rep. Let the hips drop a little as the feet go out if you need to.",
+      "v4_overlap": null
+    },
+    {
+      "id": "HNG-18",
+      "name": "Suitcase deadlift",
+      "bucket": "HNG",
+      "bucket_name": "Hinge & bridge",
+      "regions": [
+        "Ham",
+        "Glute",
+        "L-spine/Core"
+      ],
+      "dose": "8/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "load": "moderate",
+      "grip_demand": true,
+      "micro_eligible": false,
+      "counteracts": "posterior chain weakness, lateral core weakness",
+      "instructions": "Stand with one dumbbell or the kettlebell on the floor beside one foot. Hinge and bend the knees to grip it with a flat back, then stand tall without leaning toward the weight, and lower it slowly back to a quiet tap on the floor. Switch sides at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "PSH-01",
+      "name": "Wall push-up",
+      "bucket": "PSH",
+      "bucket_name": "Push",
+      "regions": [
+        "Chest",
+        "Shoulder"
+      ],
+      "dose": "20 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand",
+        "Wall"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "upper-body deconditioning",
+      "instructions": "Stand an arm's length from a wall with your hands on it at shoulder height, slightly wider than the shoulders. Keeping the body straight from head to heels, bend the elbows to bring the chest toward the wall, elbows angled about 45° from the body, then push back. Step the feet further back to make it harder.",
+      "v4_overlap": null
+    },
+    {
+      "id": "PSH-02",
+      "name": "Desk incline push-up",
+      "bucket": "PSH",
+      "bucket_name": "Push",
+      "regions": [
+        "Chest",
+        "Shoulder"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand",
+        "Desk"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "upper-body deconditioning",
+      "instructions": "Put your hands on the edge of a sturdy desk, slightly wider than the shoulders, and walk the feet back until the body is straight from head to heels. Lower the chest to the desk edge with the elbows about 45° from the body, then press back up. Squeeze the glutes so the hips don't sag.",
+      "v4_overlap": {
+        "id": "STR-20",
+        "kind": "same"
+      }
+    },
+    {
+      "id": "PSH-03",
+      "name": "Knee push-up",
+      "bucket": "PSH",
+      "bucket_name": "Push",
+      "regions": [
+        "Chest",
+        "Shoulder"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "upper-body deconditioning",
+      "instructions": "Start on hands and knees, then walk the hands forward until the body is straight from head to knees, hands slightly wider than the shoulders. Lower the chest toward the floor with the elbows about 45° from the body, then press back up. Keep the hips in line with the shoulders rather than piked up.",
+      "v4_overlap": null
+    },
+    {
+      "id": "PSH-04",
+      "name": "Push-up",
+      "bucket": "PSH",
+      "bucket_name": "Push",
+      "regions": [
+        "Chest",
+        "Shoulder",
+        "L-spine/Core"
+      ],
+      "dose": "12 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "upper-body deconditioning",
+      "instructions": "Hands on the floor slightly wider than the shoulders, body straight from head to heels. Lower the chest until it's a fist's height from the floor, elbows about 45° from the body, then press back up, taking 2 s to lower. If the hips start to sag, finish the reps on your knees.",
+      "v4_overlap": {
+        "id": "STR-21",
+        "kind": "same"
+      }
+    },
+    {
+      "id": "PSH-05",
+      "name": "Tempo push-up",
+      "bucket": "PSH",
+      "bucket_name": "Push",
+      "regions": [
+        "Chest",
+        "Shoulder",
+        "L-spine/Core"
+      ],
+      "dose": "10 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 3,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "upper-body deconditioning",
+      "instructions": "Set up as for a push-up. Take 3 s to lower, pause 1 s with the chest just above the floor, then press up in 1 s. Drop to the knees for the remaining reps rather than letting the form slip.",
+      "v4_overlap": null
+    },
+    {
+      "id": "PSH-06",
+      "name": "Close-grip desk push-up",
+      "bucket": "PSH",
+      "bucket_name": "Push",
+      "regions": [
+        "Chest",
+        "Arm",
+        "Shoulder"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand",
+        "Desk"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak triceps and pushing strength",
+      "instructions": "Hands on the edge of a sturdy desk, shoulder width apart, body straight from head to heels. Lower the chest to the desk edge with the elbows brushing your ribs, pointing back rather than out, then press back up. Walk the feet further back to make it harder.",
+      "v4_overlap": null
+    },
+    {
+      "id": "PSH-07",
+      "name": "Decline push-up",
+      "bucket": "PSH",
+      "bucket_name": "Push",
+      "regions": [
+        "Chest",
+        "Shoulder"
+      ],
+      "dose": "10 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 3,
+      "settings": [
+        "Floor",
+        "Chair"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "upper-body and overhead weakness",
+      "instructions": "Brace a fixed chair (or a locked office chair) against a wall, put your feet on the seat, and walk the hands out into a push-up position on the floor, slightly wider than the shoulders. Lower the chest toward the floor with the elbows about 45° from the body, then press up. Keep the body straight; don't let the hips pike.",
+      "v4_overlap": null
+    },
+    {
+      "id": "PSH-08",
+      "name": "Pike push-up",
+      "bucket": "PSH",
+      "bucket_name": "Push",
+      "regions": [
+        "Shoulder",
+        "Arm"
+      ],
+      "dose": "10 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 3,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "overhead pressing weakness",
+      "instructions": "From a push-up position, walk the feet toward the hands until the hips are high and the body makes an upside-down V. Bend the elbows to lower the top of your head toward the floor just in front of the hands, then press back up. Shorten the range rather than letting the hips drop.",
+      "v4_overlap": null
+    },
+    {
+      "id": "PSH-09",
+      "name": "Chair dip",
+      "bucket": "PSH",
+      "bucket_name": "Push",
+      "regions": [
+        "Arm",
+        "Chest",
+        "Shoulder"
+      ],
+      "dose": "12 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Chair"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak triceps and pushing strength",
+      "instructions": "Use a fixed chair that can't roll or swivel, or the edge of a sturdy desk. Sit on the edge with your hands beside your hips, fingers forward, then slide forward off the seat with the knees bent and feet flat. Bend the elbows straight back to lower until the upper arms are about parallel to the floor, or less, then press up. Keep the shoulders down away from the ears.",
+      "v4_overlap": null
+    },
+    {
+      "id": "PSH-10",
+      "name": "Push-up plus",
+      "bucket": "PSH",
+      "bucket_name": "Push",
+      "regions": [
+        "Shoulder"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak serratus, rounded shoulders",
+      "instructions": "Start in a push-up position, or on your knees, arms straight. Without bending the elbows, let the chest sink between the shoulders so the shoulder blades pinch together, then push the floor away so they spread apart and the upper back rounds slightly. Move slowly; the arms stay locked the whole time.",
+      "v4_overlap": {
+        "id": "STR-22",
+        "kind": "similar"
+      }
+    },
+    {
+      "id": "PSH-11",
+      "name": "Dumbbell floor press",
+      "bucket": "PSH",
+      "bucket_name": "Push",
+      "regions": [
+        "Chest",
+        "Arm"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [
+        "dumbbells"
+      ],
+      "load": "moderate",
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "upper-body deconditioning",
+      "instructions": "Lie on your back with knees bent and a dumbbell in each hand, upper arms resting on the floor at about 45° from the body, forearms vertical. Press both dumbbells straight up over the chest, then lower slowly until the upper arms touch the floor lightly. Pause there for a moment before pressing again.",
+      "v4_overlap": null
+    },
+    {
+      "id": "PSH-12",
+      "name": "Single-arm floor press",
+      "bucket": "PSH",
+      "bucket_name": "Push",
+      "regions": [
+        "Chest",
+        "Arm",
+        "L-spine/Core"
+      ],
+      "dose": "10/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "load": "moderate",
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "upper-body deconditioning, trunk rotation control",
+      "instructions": "Lie on your back with knees bent, holding one dumbbell, or the kettlebell with the bell resting on the back of your forearm, upper arm on the floor. Press straight up over the shoulder without letting the body roll toward the weight, then lower until the upper arm touches the floor. Switch arms at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "PSH-13",
+      "name": "Squeeze press",
+      "bucket": "PSH",
+      "bucket_name": "Push",
+      "regions": [
+        "Chest",
+        "Arm"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [
+        "dumbbells"
+      ],
+      "load": "light",
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "upper-body deconditioning",
+      "instructions": "Lie on your back with knees bent, holding the dumbbells together over your chest, palms facing each other. Squeeze them hard against each other and keep squeezing as you lower them to the chest and press back up. The inward squeeze is what loads the chest.",
+      "v4_overlap": null
+    },
+    {
+      "id": "PSH-14",
+      "name": "Standing dumbbell overhead press",
+      "bucket": "PSH",
+      "bucket_name": "Push",
+      "regions": [
+        "Shoulder",
+        "Arm"
+      ],
+      "dose": "12 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "dumbbells"
+      ],
+      "load": "light",
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "overhead weakness, rounded upper back",
+      "instructions": "Stand with a dumbbell in each hand at shoulder height, palms facing forward or toward each other. Brace the belly and squeeze the glutes so the ribs stay down, then press straight up until the arms are beside the ears, and lower slowly. Don't lean back to finish the press.",
+      "v4_overlap": null
+    },
+    {
+      "id": "PSH-15",
+      "name": "Single-arm overhead press",
+      "bucket": "PSH",
+      "bucket_name": "Push",
+      "regions": [
+        "Shoulder",
+        "Arm",
+        "L-spine/Core"
+      ],
+      "dose": "8/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "load": "moderate",
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "overhead weakness, rounded upper back",
+      "instructions": "Hold one dumbbell at shoulder height, or the kettlebell in the rack position with the bell resting on the outside of the forearm, elbow tucked. Brace, then press straight up until the arm is locked out beside the ear, without leaning away from the weight. Lower slowly and switch arms at the chime.",
+      "v4_overlap": {
+        "id": "STR-32",
+        "kind": "same"
+      }
+    },
+    {
+      "id": "PSH-16",
+      "name": "Half-kneeling single-arm press",
+      "bucket": "PSH",
+      "bucket_name": "Push",
+      "regions": [
+        "Shoulder",
+        "Arm",
+        "L-spine/Core"
+      ],
+      "dose": "8/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [
+        "dumbbells"
+      ],
+      "load": "light",
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "overhead weakness, hip flexor shortening",
+      "instructions": "Kneel on one knee with the other foot flat in front, and hold one dumbbell at the shoulder on the kneeling side. Squeeze the glute of the down leg so the hip opens, then press straight up and lower slowly. Switch the knee and the arm at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "PSH-17",
+      "name": "Lateral raise",
+      "bucket": "PSH",
+      "bucket_name": "Push",
+      "regions": [
+        "Shoulder"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "dumbbells"
+      ],
+      "load": "light",
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak shoulder abductors",
+      "instructions": "Stand holding the light dumbbells at your sides, elbows slightly bent. Raise the arms out to the sides until they reach shoulder height, leading with the elbows and keeping the shoulders down, then lower over 2 s. If you have to swing or shrug, the weights are too heavy.",
+      "v4_overlap": null
+    },
+    {
+      "id": "PSH-18",
+      "name": "Overhead triceps extension",
+      "bucket": "PSH",
+      "bucket_name": "Push",
+      "regions": [
+        "Arm"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "dumbbells"
+      ],
+      "load": "light",
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak triceps",
+      "instructions": "Hold one dumbbell upright by its top end with both hands, overhead with the arms straight. Keeping the elbows pointing up and close to your head, bend them to lower the weight behind your head, then straighten the arms. Keep the ribs down so the back doesn't arch.",
+      "v4_overlap": null
+    },
+    {
+      "id": "PUL-01",
+      "name": "Prone Y-T-W",
+      "bucket": "PUL",
+      "bucket_name": "Pull & upper back",
+      "regions": [
+        "Shoulder",
+        "T-spine"
+      ],
+      "dose": "5 of each",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak lower and middle traps",
+      "instructions": "Lie face down with your forehead resting on the floor and chin tucked. With thumbs up, lift straight arms off the floor in a Y (overhead, wide), lower, then in a T (straight out to the sides), lower, then in a W (elbows bent and pulled toward the hips). Squeeze the shoulder blades together and down on each lift.",
+      "v4_overlap": {
+        "id": "STR-16",
+        "kind": "same"
+      }
+    },
+    {
+      "id": "PUL-02",
+      "name": "Reverse snow angel",
+      "bucket": "PUL",
+      "bucket_name": "Pull & upper back",
+      "regions": [
+        "Shoulder",
+        "T-spine"
+      ],
+      "dose": "10 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak posterior shoulder",
+      "instructions": "Lie face down with arms at your sides, palms down, forehead on the floor. Lift both arms a few centimetres and sweep them slowly out and up overhead like a snow angel, then back to the hips, without letting them touch the floor. Keep the shoulder blades pulled down.",
+      "v4_overlap": {
+        "id": "STR-28",
+        "kind": "same"
+      }
+    },
+    {
+      "id": "PUL-03",
+      "name": "Prone lat pull-down",
+      "bucket": "PUL",
+      "bucket_name": "Pull & upper back",
+      "regions": [
+        "Shoulder",
+        "T-spine"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak lats and lower traps",
+      "instructions": "Lie face down with arms reaching overhead, thumbs up, and lift them a few centimetres off the floor. Pull the elbows down toward your ribs as if pulling a bar to your chest, squeeze the shoulder blades together for 1 s, then reach back overhead. The arms stay off the floor for the whole set.",
+      "v4_overlap": null
+    },
+    {
+      "id": "PUL-04",
+      "name": "Prone cobra hold",
+      "bucket": "PUL",
+      "bucket_name": "Pull & upper back",
+      "regions": [
+        "T-spine",
+        "Shoulder"
+      ],
+      "dose": "6 × 5 s",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "rounded upper back, weak mid-back",
+      "instructions": "Lie face down with your arms by your sides, palms down. Lift the chest slightly, draw the shoulder blades back and down, and rotate the arms so the thumbs point to the ceiling as the hands lift off the floor. Hold for 5 s, rest for 3 s, and repeat. Keep the neck long and the eyes on the floor.",
+      "v4_overlap": null
+    },
+    {
+      "id": "PUL-05",
+      "name": "Supine elbow press",
+      "bucket": "PUL",
+      "bucket_name": "Pull & upper back",
+      "regions": [
+        "T-spine",
+        "Shoulder"
+      ],
+      "dose": "10 × 3 s",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak mid-back, rounded shoulders",
+      "instructions": "Lie on your back with knees bent and elbows bent to 90° beside the ribs, hands pointing up. Press the elbows down into the floor, pinching the shoulder blades together until the upper back lifts slightly, hold for 3 s, then relax. It's a small movement driven entirely by the muscles between the shoulder blades.",
+      "v4_overlap": null
+    },
+    {
+      "id": "PUL-06",
+      "name": "Reverse tabletop",
+      "bucket": "PUL",
+      "bucket_name": "Pull & upper back",
+      "regions": [
+        "Shoulder",
+        "Glute",
+        "T-spine"
+      ],
+      "dose": "12 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "rounded shoulders, weak posterior chain",
+      "instructions": "Sit on the floor with knees bent, feet flat, and hands on the floor behind the hips, fingers pointing toward your feet. Press through the hands and heels to lift the hips until the body is flat like a table from shoulders to knees, pulling the shoulders back and down, then lower. Keep the chest open; don't let the shoulders creep up to the ears.",
+      "v4_overlap": null
+    },
+    {
+      "id": "PUL-07",
+      "name": "Prone T-raise",
+      "bucket": "PUL",
+      "bucket_name": "Pull & upper back",
+      "regions": [
+        "Shoulder",
+        "T-spine"
+      ],
+      "dose": "12 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak middle traps, rounded shoulders",
+      "instructions": "Lie face down with arms straight out to the sides in a T, thumbs pointing up, forehead on the floor. Pinch the shoulder blades together to lift both arms as high as you can, hold for 2 s, then lower slowly. Lead with the shoulder blades, not the hands.",
+      "v4_overlap": null
+    },
+    {
+      "id": "PUL-08",
+      "name": "Bodyweight bent-over T and Y raise",
+      "bucket": "PUL",
+      "bucket_name": "Pull & upper back",
+      "regions": [
+        "Shoulder",
+        "T-spine",
+        "Ham"
+      ],
+      "dose": "12 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak mid-back, rounded shoulders",
+      "instructions": "Hinge forward with soft knees and a flat back until the torso is nearly parallel to the floor, arms hanging. Raise the arms out to the sides in a T with thumbs up, squeezing the shoulder blades, then lower; on the next rep raise them forward and wide in a Y. Alternate T and Y, holding the hinge the whole set.",
+      "v4_overlap": null
+    },
+    {
+      "id": "PUL-09",
+      "name": "Bent-over dumbbell row",
+      "bucket": "PUL",
+      "bucket_name": "Pull & upper back",
+      "regions": [
+        "Shoulder",
+        "T-spine"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "dumbbells"
+      ],
+      "load": "moderate",
+      "grip_demand": true,
+      "micro_eligible": false,
+      "counteracts": "weak upper back, rounded shoulders",
+      "instructions": "Hold a dumbbell in each hand and hinge forward with a flat back until the torso is about 45° to the floor, arms hanging. Pull both dumbbells toward the lower ribs, driving the elbows back past the body and squeezing the shoulder blades, then lower under control. Keep the neck long and the back flat.",
+      "v4_overlap": null
+    },
+    {
+      "id": "PUL-10",
+      "name": "Single-arm supported row",
+      "bucket": "PUL",
+      "bucket_name": "Pull & upper back",
+      "regions": [
+        "Shoulder",
+        "T-spine"
+      ],
+      "dose": "10/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand",
+        "Desk"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "load": "moderate",
+      "grip_demand": true,
+      "micro_eligible": false,
+      "counteracts": "weak upper back, rounded shoulders",
+      "instructions": "Put one hand on the desk and step back into a staggered stance, hinging until the back is flat. Holding one dumbbell or the kettlebell in the free hand, pull it toward your hip, elbow close to the body, then lower until the arm is straight. Don't twist the torso to lift it higher. Switch sides at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "PUL-11",
+      "name": "Gorilla row",
+      "bucket": "PUL",
+      "bucket_name": "Pull & upper back",
+      "regions": [
+        "Shoulder",
+        "T-spine",
+        "Ham"
+      ],
+      "dose": "20 reps, alternating",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "dumbbells"
+      ],
+      "load": "moderate",
+      "grip_demand": true,
+      "micro_eligible": false,
+      "counteracts": "weak upper back, posterior chain weakness",
+      "instructions": "Stand wide with a dumbbell on the floor inside each foot. Hinge down with a flat back and grip both, then row one dumbbell to the hip while pushing the other lightly into the floor, lower it, and row the other. Stay in the hinge the whole minute and set the weights down quietly at the end.",
+      "v4_overlap": null
+    },
+    {
+      "id": "PUL-12",
+      "name": "Bent-over reverse fly",
+      "bucket": "PUL",
+      "bucket_name": "Pull & upper back",
+      "regions": [
+        "Shoulder",
+        "T-spine"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "dumbbells"
+      ],
+      "load": "light",
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "rounded shoulders, weak rear shoulders",
+      "instructions": "Hinge forward with a flat back until the torso is near parallel to the floor, light dumbbells hanging below the shoulders. With slightly bent elbows, raise the arms out to the sides until they form a T, squeezing the shoulder blades together, then lower slowly. Use the lightest weights you have.",
+      "v4_overlap": {
+        "id": "STR-33",
+        "kind": "same"
+      }
+    },
+    {
+      "id": "PUL-13",
+      "name": "Bent-over Y raise",
+      "bucket": "PUL",
+      "bucket_name": "Pull & upper back",
+      "regions": [
+        "Shoulder",
+        "T-spine"
+      ],
+      "dose": "12 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "dumbbells"
+      ],
+      "load": "light",
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak lower traps",
+      "instructions": "Hinge forward with a flat back until the torso is near parallel to the floor, light dumbbells hanging, thumbs pointing forward. Raise straight arms forward and out in a Y until they're in line with your ears, then lower slowly. If the weights pull the shoulders up toward the ears, they're too heavy.",
+      "v4_overlap": null
+    },
+    {
+      "id": "PUL-14",
+      "name": "Dumbbell pullover",
+      "bucket": "PUL",
+      "bucket_name": "Pull & upper back",
+      "regions": [
+        "Shoulder",
+        "Chest",
+        "L-spine/Core"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [
+        "dumbbells"
+      ],
+      "load": "light",
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak lats, stiff overhead range",
+      "instructions": "Lie on your back with knees bent, holding one dumbbell by its end over your chest with both hands and slightly bent arms. Keeping the ribs and low back pressed down, lower the weight in an arc behind your head until it nearly touches the floor, then pull it back over the chest. Stop the arc where the ribs start to flare.",
+      "v4_overlap": null
+    },
+    {
+      "id": "PUL-15",
+      "name": "Side-lying external rotation",
+      "bucket": "PUL",
+      "bucket_name": "Pull & upper back",
+      "regions": [
+        "Shoulder"
+      ],
+      "dose": "10/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [
+        "dumbbells"
+      ],
+      "load": "light",
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak rotator cuff, rounded shoulders",
+      "instructions": "Lie on your side and hold a very light dumbbell in the top hand, elbow bent to 90° and pinned to your side, forearm across the belly. Rotate the forearm up toward the ceiling, keeping the elbow glued to the ribs, then lower over 2 s. Switch sides at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "PUL-16",
+      "name": "Renegade row",
+      "bucket": "PUL",
+      "bucket_name": "Pull & upper back",
+      "regions": [
+        "Shoulder",
+        "L-spine/Core"
+      ],
+      "dose": "16 reps, alternating",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 3,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [
+        "dumbbells"
+      ],
+      "load": "light",
+      "grip_demand": true,
+      "micro_eligible": false,
+      "counteracts": "weak upper back, trunk rotation control",
+      "instructions": "Start in a push-up position with your hands on two dumbbells, feet wide; flat-sided (hex) dumbbells won't roll, but with round ones put the hands on the floor and row one dumbbell from beside the hand instead. Row one dumbbell toward the hip without letting the hips twist, set it down quietly, and row the other. Drop to the knees if the hips rock side to side.",
+      "v4_overlap": null
+    },
+    {
+      "id": "PUL-17",
+      "name": "Two-hand kettlebell row",
+      "bucket": "PUL",
+      "bucket_name": "Pull & upper back",
+      "regions": [
+        "Shoulder",
+        "T-spine"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "kettlebell"
+      ],
+      "load": "heavy",
+      "grip_demand": true,
+      "micro_eligible": false,
+      "counteracts": "weak upper back, rounded shoulders",
+      "instructions": "Grip the kettlebell handle with both hands and hinge forward with a flat back until the torso is about 45° to the floor, arms hanging. Pull the bell to your lower ribs, elbows driving back and close to the body, squeeze the shoulder blades, then lower under control.",
+      "v4_overlap": null
+    },
+    {
+      "id": "PUL-18",
+      "name": "Kickstand single-arm row",
+      "bucket": "PUL",
+      "bucket_name": "Pull & upper back",
+      "regions": [
+        "Shoulder",
+        "T-spine",
+        "Ham"
+      ],
+      "dose": "10/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "load": "moderate",
+      "grip_demand": true,
+      "micro_eligible": false,
+      "counteracts": "weak upper back, posterior chain weakness",
+      "instructions": "Take a staggered stance with the rear heel up, hinge over the front leg with a flat back, and hold one dumbbell or the kettlebell in the hand on the rear-leg side. Row it to your hip without twisting, then lower slowly; there's no hand on the desk, so the hinge muscles work too. Switch sides and stance at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "COR-01",
+      "name": "Dead bug",
+      "bucket": "COR",
+      "bucket_name": "Core",
+      "regions": [
+        "L-spine/Core"
+      ],
+      "dose": "16 reps, alternating",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "trunk stabilizers switched off by sitting",
+      "instructions": "Lie on your back with arms pointing at the ceiling and knees bent at 90° over the hips. Press the low back into the floor, then slowly lower one arm overhead and the opposite leg toward the floor without letting the back arch, and return. Alternate sides, breathing out as you reach.",
+      "v4_overlap": {
+        "id": "STR-13",
+        "kind": "same"
+      }
+    },
+    {
+      "id": "COR-02",
+      "name": "Weighted dead bug",
+      "bucket": "COR",
+      "bucket_name": "Core",
+      "regions": [
+        "L-spine/Core",
+        "Shoulder"
+      ],
+      "dose": "16 reps, alternating",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "load": "light",
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "trunk stabilizers switched off by sitting",
+      "instructions": "Set up as for the dead bug, holding one dumbbell or the kettlebell over your chest with both arms straight. Keep the weight still and the low back pressed down while you slowly lower one leg toward the floor and back, then the other.",
+      "v4_overlap": null
+    },
+    {
+      "id": "COR-03",
+      "name": "Front plank",
+      "bucket": "COR",
+      "bucket_name": "Core",
+      "regions": [
+        "L-spine/Core"
+      ],
+      "dose": "45–60 s",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak anterior core",
+      "instructions": "Forearms on the floor under the shoulders, legs straight back, body in a straight line from head to heels. Squeeze the glutes, brace the belly as if about to be poked, and breathe normally. Drop to the knees for the last part rather than letting the hips sag.",
+      "v4_overlap": {
+        "id": "STR-15",
+        "kind": "same"
+      }
+    },
+    {
+      "id": "COR-04",
+      "name": "Side plank",
+      "bucket": "COR",
+      "bucket_name": "Core",
+      "regions": [
+        "L-spine/Core",
+        "Glute"
+      ],
+      "dose": "25 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak lateral core",
+      "instructions": "Lie on your side propped on one forearm, elbow under the shoulder, legs straight and stacked. Lift the hips until the body is straight from head to feet, and hold. Switch sides at the chime.",
+      "v4_overlap": {
+        "id": "STR-14",
+        "kind": "same"
+      }
+    },
+    {
+      "id": "COR-05",
+      "name": "Bird dog",
+      "bucket": "COR",
+      "bucket_name": "Core",
+      "regions": [
+        "L-spine/Core",
+        "Glute"
+      ],
+      "dose": "12 reps, alternating, 2 s hold",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak spinal stabilizers",
+      "instructions": "On hands and knees, wrists under shoulders and knees under hips, back flat. Reach one arm forward and the opposite leg back until both are level with the torso, hold for 2 s without the hips tipping, then return and switch. Move slowly, as if balancing a cup on your low back.",
+      "v4_overlap": {
+        "id": "STR-12",
+        "kind": "same"
+      }
+    },
+    {
+      "id": "COR-06",
+      "name": "Plank shoulder taps",
+      "bucket": "COR",
+      "bucket_name": "Core",
+      "regions": [
+        "L-spine/Core",
+        "Shoulder"
+      ],
+      "dose": "20 reps, alternating",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak anti-rotation core",
+      "instructions": "Start in a push-up position with feet wide. Lift one hand to tap the opposite shoulder, put it back, then switch, keeping the hips as still as possible. Go slowly; the wider the feet, the easier it is.",
+      "v4_overlap": null
+    },
+    {
+      "id": "COR-07",
+      "name": "Bear hold",
+      "bucket": "COR",
+      "bucket_name": "Core",
+      "regions": [
+        "L-spine/Core",
+        "Quad",
+        "Shoulder"
+      ],
+      "dose": "4 × 10 s",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak anterior core",
+      "instructions": "Start on hands and knees with toes tucked under. Brace the belly and lift the knees about 3 cm off the floor, back flat, and hold for 10 s while breathing. Lower the knees for a few seconds, then repeat.",
+      "v4_overlap": null
+    },
+    {
+      "id": "COR-08",
+      "name": "Hollow body hold",
+      "bucket": "COR",
+      "bucket_name": "Core",
+      "regions": [
+        "L-spine/Core"
+      ],
+      "dose": "4 × 10 s",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 3,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak anterior core",
+      "instructions": "Lie on your back, press the low back firmly into the floor, and lift the head, shoulders, and legs a few centimetres, arms reaching toward the feet. Hold for 10 s, keeping the low back down and breathing steadily, then rest briefly and repeat. Bend the knees to make it easier.",
+      "v4_overlap": null
+    },
+    {
+      "id": "COR-09",
+      "name": "Reverse crunch",
+      "bucket": "COR",
+      "bucket_name": "Core",
+      "regions": [
+        "L-spine/Core"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak lower abs",
+      "instructions": "Lie on your back with knees bent at 90° over the hips and arms on the floor beside you. Curl the hips off the floor, bringing the knees toward the chest, then lower the hips slowly without letting the feet drop. Use the belly, not momentum.",
+      "v4_overlap": null
+    },
+    {
+      "id": "COR-10",
+      "name": "Seated knee tuck",
+      "bucket": "COR",
+      "bucket_name": "Core",
+      "regions": [
+        "L-spine/Core",
+        "Hip"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Chair"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak anterior core and hip flexors",
+      "instructions": "Sit near the front edge of a chair that can't roll or swivel, hands gripping the sides of the seat, and lean back slightly. Extend the legs out in front with the feet just off the floor, then pull the knees in toward the chest and extend again. Keep the chest lifted rather than collapsing forward.",
+      "v4_overlap": null
+    },
+    {
+      "id": "COR-11",
+      "name": "Halo",
+      "bucket": "COR",
+      "bucket_name": "Core",
+      "regions": [
+        "Shoulder",
+        "L-spine/Core"
+      ],
+      "dose": "8 each direction",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "load": "light",
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "stiff shoulders, weak trunk control",
+      "instructions": "Hold the kettlebell upside down by the horns, or one dumbbell upright by both ends, at chest height. Circle it slowly around your head, close to the skull, keeping the ribs down and the hips still. Do half the circles one way and half the other.",
+      "v4_overlap": null
+    },
+    {
+      "id": "COR-12",
+      "name": "Suitcase march",
+      "bucket": "COR",
+      "bucket_name": "Core",
+      "regions": [
+        "L-spine/Core",
+        "Hip"
+      ],
+      "dose": "25 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "load": "heavy",
+      "grip_demand": true,
+      "micro_eligible": false,
+      "counteracts": "weak lateral core",
+      "instructions": "Hold one dumbbell or the kettlebell at your side like a suitcase. March slowly in place, lifting each knee to hip height, standing perfectly tall without leaning toward or away from the weight. Switch hands at the chime.",
+      "v4_overlap": {
+        "id": "STR-25",
+        "kind": "similar"
+      }
+    },
+    {
+      "id": "COR-13",
+      "name": "Half-kneeling chop",
+      "bucket": "COR",
+      "bucket_name": "Core",
+      "regions": [
+        "L-spine/Core",
+        "Shoulder"
+      ],
+      "dose": "10/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [
+        "dumbbells"
+      ],
+      "load": "light",
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak rotational core",
+      "instructions": "Kneel on one knee and hold one dumbbell by both ends beside the shoulder opposite the down knee. Move it diagonally across and down toward the outside of the down-knee hip, rotating through the upper back, then return. Keep the hips facing forward. Switch the knee and the direction at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "COR-14",
+      "name": "Windmill",
+      "bucket": "COR",
+      "bucket_name": "Core",
+      "regions": [
+        "L-spine/Core",
+        "Hip",
+        "Shoulder"
+      ],
+      "dose": "5/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 3,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "load": "light",
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak lateral core, stiff hips",
+      "instructions": "Press a light dumbbell or the kettlebell overhead and turn both feet about 45° away from that arm. Watching the weight, push the hips toward the weighted side and slide the free hand down the inside of the front leg toward the floor, keeping the top arm vertical. Stand back up by driving the hips. Switch sides at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "COR-15",
+      "name": "Bodyweight windmill",
+      "bucket": "COR",
+      "bucket_name": "Core",
+      "regions": [
+        "L-spine/Core",
+        "Hip",
+        "Shoulder"
+      ],
+      "dose": "6/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak lateral core, stiff hips",
+      "instructions": "Raise one arm straight overhead and turn both feet about 45° away from it. Watching the raised hand, push the hips toward that side and slide the other hand down the inside of the front leg as far as you can, keeping the top arm vertical, then stand back up. Switch sides at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "COR-16",
+      "name": "Half Turkish get-up",
+      "bucket": "COR",
+      "bucket_name": "Core",
+      "regions": [
+        "Full",
+        "Shoulder",
+        "L-spine/Core"
+      ],
+      "dose": "3/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 3,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "load": "light",
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak trunk and shoulder stability",
+      "instructions": "Lie on your back with one arm pressing a light dumbbell or the kettlebell straight up, that knee bent and foot flat, the other arm and leg out at 45°. Watching the weight, roll up onto the opposite elbow, then the hand, then lift the hips into a bridge. Reverse each step slowly back to the floor. Switch sides at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "COR-17",
+      "name": "Plank pull-through",
+      "bucket": "COR",
+      "bucket_name": "Core",
+      "regions": [
+        "L-spine/Core",
+        "Shoulder"
+      ],
+      "dose": "12 reps, alternating",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 3,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "load": "light",
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak anti-rotation core",
+      "instructions": "Start in a push-up position, feet wide, with a dumbbell or the kettlebell on the floor just outside one hand. Reach under your body with the opposite hand and pull it across to the other side, lifting it low rather than dragging it, without the hips twisting. Alternate hands.",
+      "v4_overlap": null
+    },
+    {
+      "id": "COR-18",
+      "name": "Short side plank",
+      "bucket": "COR",
+      "bucket_name": "Core",
+      "regions": [
+        "L-spine/Core",
+        "Glute"
+      ],
+      "dose": "25 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak lateral core",
+      "instructions": "Lie on your side propped on one forearm, knees bent at 90° behind you. Lift the hips until the body is straight from head to knees, and hold. Switch sides at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "ACC-01",
+      "name": "Slow calf raise",
+      "bucket": "ACC",
+      "bucket_name": "Accessory & joint resilience",
+      "regions": [
+        "Calf/Ankle"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "calf deconditioning, venous pooling",
+      "instructions": "Stand with feet hip width, a hand on the desk for balance. Rise as high as you can onto the balls of the feet, pause for 1 s at the top, then lower over 2 s. Keep the weight over the big and second toes rather than rolling out.",
+      "v4_overlap": {
+        "id": "CIR-04",
+        "kind": "similar"
+      }
+    },
+    {
+      "id": "ACC-02",
+      "name": "Single-leg calf raise",
+      "bucket": "ACC",
+      "bucket_name": "Accessory & joint resilience",
+      "regions": [
+        "Calf/Ankle"
+      ],
+      "dose": "8/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "calf deconditioning, ankle weakness",
+      "instructions": "Stand on one foot with a fingertip on the desk or wall for balance. Rise as high as you can, pause at the top, and lower slowly through the full range. Switch feet at the chime.",
+      "v4_overlap": {
+        "id": "STR-26",
+        "kind": "same"
+      }
+    },
+    {
+      "id": "ACC-03",
+      "name": "Loaded calf raise",
+      "bucket": "ACC",
+      "bucket_name": "Accessory & joint resilience",
+      "regions": [
+        "Calf/Ankle"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "load": "heavy",
+      "grip_demand": true,
+      "micro_eligible": false,
+      "counteracts": "calf deconditioning",
+      "instructions": "Hold the kettlebell at your chest, or a dumbbell in each hand at your sides. Rise as high as you can onto the balls of the feet, pause for 1 s, and lower over 2 s. Stand near the desk in case you need a fingertip for balance.",
+      "v4_overlap": null
+    },
+    {
+      "id": "ACC-04",
+      "name": "Seated soleus raise",
+      "bucket": "ACC",
+      "bucket_name": "Accessory & joint resilience",
+      "regions": [
+        "Calf/Ankle"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Chair"
+      ],
+      "on_floor": false,
+      "equipment": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "load": "heavy",
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "soleus deconditioning, venous pooling",
+      "instructions": "Sit on the chair with feet flat and knees at 90°, and rest the kettlebell or the dumbbells across the tops of your thighs near the knees. Lift the heels as high as you can, pause, and lower slowly. The bent knee shifts the work to the soleus, the deep calf muscle that pumps blood back up from the legs.",
+      "v4_overlap": null
+    },
+    {
+      "id": "ACC-05",
+      "name": "Tibialis raise",
+      "bucket": "ACC",
+      "bucket_name": "Accessory & joint resilience",
+      "regions": [
+        "Foot/Shin"
+      ],
+      "dose": "20 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand",
+        "Wall"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak shins",
+      "instructions": "Lean your back against a wall with the feet about 30 cm in front of it. Keeping the legs straight, pull the toes up toward the shins as high as you can, then lower slowly without letting them slap the floor. Walk the feet further out to make it harder.",
+      "v4_overlap": {
+        "id": "STR-31",
+        "kind": "same"
+      }
+    },
+    {
+      "id": "ACC-06",
+      "name": "Side-lying hip abduction",
+      "bucket": "ACC",
+      "bucket_name": "Accessory & joint resilience",
+      "regions": [
+        "Glute"
+      ],
+      "dose": "12/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak side glutes",
+      "instructions": "Lie on your side with the bottom knee bent and the top leg straight, in line with the body. Turn the toes of the top leg slightly down and lift the leg toward the ceiling, leading with the heel, then lower slowly. Keep the top hip stacked over the bottom one; don't roll back. Switch sides at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "ACC-07",
+      "name": "Side-lying adductor raise",
+      "bucket": "ACC",
+      "bucket_name": "Accessory & joint resilience",
+      "regions": [
+        "Adductor"
+      ],
+      "dose": "10/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak adductors",
+      "instructions": "Lie on your side, propped on the forearm, and cross the top leg over so its foot is flat on the floor in front of the bottom knee. Keeping the bottom leg straight, lift it a few centimetres off the floor using the inner thigh, hold for 1 s, then lower. Switch sides at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "ACC-08",
+      "name": "Copenhagen plank (short lever)",
+      "bucket": "ACC",
+      "bucket_name": "Accessory & joint resilience",
+      "regions": [
+        "Adductor",
+        "L-spine/Core"
+      ],
+      "dose": "20 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 3,
+      "settings": [
+        "Floor",
+        "Chair"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak adductors",
+      "instructions": "Lie on your side beside a fixed or braced chair, propped on the forearm. Rest the inside of the top knee and shin on the chair seat, with the bottom leg bent behind you. Press the top knee into the seat to lift the hips until the body is straight from head to knee, and hold. Switch sides at the chime.",
+      "v4_overlap": {
+        "id": "STR-29",
+        "kind": "same"
+      }
+    },
+    {
+      "id": "ACC-09",
+      "name": "Standing hip hike",
+      "bucket": "ACC",
+      "bucket_name": "Accessory & joint resilience",
+      "regions": [
+        "Glute"
+      ],
+      "dose": "12/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak side glutes, hip drop when walking",
+      "instructions": "Stand on one leg, a fingertip on the desk if you need it, standing knee straight and the other foot just off the floor. Let the free-side hip drop a few centimetres, then lift it back up level and a little higher using the outer hip of the standing leg. Keep the torso upright. Switch sides at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "ACC-10",
+      "name": "Deep neck flexor head lift",
+      "bucket": "ACC",
+      "bucket_name": "Accessory & joint resilience",
+      "regions": [
+        "Neck"
+      ],
+      "dose": "6 × 5 s",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak deep neck flexors, forward head",
+      "instructions": "Lie on your back with knees bent and no pillow. Tuck the chin gently as if nodding \"yes\", then lift the head about a centimetre off the floor, keeping the chin tucked. Hold for 5 s without letting the chin poke forward, then rest for a few seconds.",
+      "v4_overlap": {
+        "id": "STR-36",
+        "kind": "same"
+      }
+    },
+    {
+      "id": "ACC-11",
+      "name": "Wall-press knee hold",
+      "bucket": "ACC",
+      "bucket_name": "Accessory & joint resilience",
+      "regions": [
+        "Glute",
+        "Hip"
+      ],
+      "dose": "25 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand",
+        "Wall"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": false,
+      "counteracts": "weak side glutes",
+      "instructions": "Stand side-on to a wall, close enough that when you lift the knee nearest the wall to hip height, the outside of that knee touches it. Press that knee firmly into the wall while standing tall on the outside leg, and hold. You'll feel the work in the standing-side outer hip. Switch sides at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "END-01",
+      "name": "Standing knee-lift hold",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Hip",
+        "L-spine/Core"
+      ],
+      "dose": "25 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "deep hip flexion range never used in a chair",
+      "instructions": "Stand tall with a fingertip on the desk. Lift one knee as high above hip height as you can without rounding the back or leaning back, and hold it there with the leg muscles alone; every few seconds, try to lift it a centimetre higher. Switch legs at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "END-02",
+      "name": "Seated knee lift-off",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Hip"
+      ],
+      "dose": "6/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Chair"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "weak hip flexors at full flexion",
+      "instructions": "Sit tall on the front of the chair with your hands holding the sides of the seat. Lift one knee as high toward the chest as you can without leaning back, hold for 2 s at the top, and lower slowly. Switch legs at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "END-03",
+      "name": "Seated straight-leg lift-off",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Hip",
+        "Quad",
+        "L-spine/Core"
+      ],
+      "dose": "6/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 3,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "weak hip flexors in a compressed position",
+      "instructions": "Sit on the floor with legs straight and hands on the floor beside the knees, sitting as tall as you can. Keeping the knee locked, lift one heel a few centimetres off the floor, hold for 2 s, and lower slowly. If the heel won't lift, put the hands on the floor behind the hips and lean back slightly. Switch legs at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "END-04",
+      "name": "90/90 back-leg lift-off",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Hip"
+      ],
+      "dose": "6/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "lost hip internal rotation",
+      "instructions": "Sit in a 90/90: front leg bent 90° in front of you, back leg bent 90° out to the side, hands on the floor behind you. Lift the back foot and knee off the floor together, rotating from the hip, hold for 2 s, and lower. A small lift is normal. Switch the legs at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "END-05",
+      "name": "Half-kneeling hip flexor contract-relax",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Hip",
+        "Quad"
+      ],
+      "dose": "30 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "hip flexor shortening",
+      "instructions": "Kneel on one knee, other foot flat in front, tuck the pelvis, and squeeze the rear glute to feel the stretch at the front of the rear hip. Hold for 10 s, then press the rear knee into the floor as if dragging it forward at about 30% effort for 10 s. Relax a little deeper, then for the last 10 s squeeze the rear glute harder and hold the new range with no help from the floor push. Switch sides at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "END-06",
+      "name": "Cossack squat with end-range pause",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Adductor",
+        "Hip"
+      ],
+      "dose": "4/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "stiff adductors, no side-to-side range",
+      "instructions": "Take a wide stance with toes slightly out. Shift to one side and bend that knee deeply while the other leg stays straight with its toes pointing up. Pause for 2 s at your lowest point, trying to sink a little further, then push back to centre. Do all reps on one side, then switch.",
+      "v4_overlap": {
+        "id": "FLX-09",
+        "kind": "similar"
+      }
+    },
+    {
+      "id": "END-07",
+      "name": "Deep squat hold with reach",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Hip",
+        "Calf/Ankle",
+        "T-spine"
+      ],
+      "dose": "30 s",
+      "per_side": false,
+      "block_seconds": 30,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "compressed hips, stiff ankles",
+      "instructions": "Sink into the deepest squat you can with heels down, feet slightly wider than the hips. Hold the bottom and, every few seconds, reach one arm up to the ceiling, rotating the chest to follow it, then switch arms. Hold the desk with one hand if the heels lift.",
+      "v4_overlap": {
+        "id": "FLX-08",
+        "kind": "similar"
+      }
+    },
+    {
+      "id": "END-08",
+      "name": "Standing hip CARs",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Hip"
+      ],
+      "dose": "2 each direction/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "lost hip rotation",
+      "instructions": "Stand with a hand on the desk. Lift one knee to hip height, open it out to the side as far as it goes, rotate it behind you so the foot points up, then sweep the knee back down beside the standing leg. Make the biggest, slowest circle you can without the pelvis moving, then reverse. Switch legs at the chime.",
+      "v4_overlap": {
+        "id": "FLX-26",
+        "kind": "same"
+      }
+    },
+    {
+      "id": "END-09",
+      "name": "Side-lying hip internal rotation lift-off",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Hip"
+      ],
+      "dose": "6/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "lost hip internal rotation",
+      "instructions": "Lie on your side with hips and knees bent at 90°, knees stacked. Keeping the knees touching, lift the top foot toward the ceiling as high as it will go, hold for 2 s, and lower slowly. The knee stays down; only the foot rises. Switch sides at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "END-10",
+      "name": "Adductor rock-back",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Adductor",
+        "Hip"
+      ],
+      "dose": "6/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "stiff adductors",
+      "instructions": "Kneel on all fours, then extend one leg straight out to the side with the foot flat on the floor. Rock the hips back toward the heel of the bent leg until you feel the inner thigh of the straight leg; hold 2 s, pressing that foot into the floor, then rock forward. Keep the back flat. Switch sides at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "END-11",
+      "name": "Prone straight-leg hip extension",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Glute",
+        "Hip"
+      ],
+      "dose": "8/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "glutes never working at full hip extension",
+      "instructions": "Lie face down with your forehead on your stacked hands. Squeeze one glute to lift that straight leg a few centimetres off the floor, hold for 2 s, and lower; the hip bones stay pressed down. Switch legs at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "END-12",
+      "name": "Standing hip airplane",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Hip",
+        "Glute"
+      ],
+      "dose": "4/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 3,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "weak hip rotators, balance loss",
+      "instructions": "Stand on one leg, fingertips on the desk if you need them, and hinge forward until the torso is nearly parallel to the floor, free leg straight behind you. Slowly rotate the pelvis open toward the ceiling as far as you can, then roll it closed toward the floor, all on the standing hip. Switch legs at the chime.",
+      "v4_overlap": {
+        "id": "BAL-07",
+        "kind": "similar"
+      }
+    },
+    {
+      "id": "END-13",
+      "name": "Shin box get-up",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Hip",
+        "Glute"
+      ],
+      "dose": "4 reps",
+      "per_side": false,
+      "block_seconds": 30,
+      "difficulty": 3,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "lost hip rotation, weak glutes",
+      "instructions": "Sit in a 90/90 with hands free if you can. Squeeze the front-leg glute to rise up onto the knees into tall kneeling, then lower back to the 90/90 with control. Swap the legs to the other side, rise again, and keep alternating. Use a hand on the floor if needed.",
+      "v4_overlap": null
+    },
+    {
+      "id": "END-14",
+      "name": "Standing straight-leg front raise",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Ham",
+        "Hip"
+      ],
+      "dose": "6/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "hamstring tightness, weak hip flexors at length",
+      "instructions": "Stand tall with a hand on the desk. Keeping the knee straight and the torso upright, lift one leg in front of you as high as you can, hold for 2 s at the top, and lower slowly. Don't lean back to get the leg higher. Switch legs at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "END-15",
+      "name": "Supine active straight-leg raise",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Ham",
+        "Hip"
+      ],
+      "dose": "6/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "hamstring tightness",
+      "instructions": "Lie on your back with both legs straight. Pull the toes of one foot toward you and raise that leg as high as you can with no help from the hands, keeping both knees straight; hold for 2 s at the top and lower slowly. The other leg stays pressed to the floor. Switch legs at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "END-16",
+      "name": "Elephant walk",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Ham",
+        "Calf/Ankle"
+      ],
+      "dose": "30 s",
+      "per_side": false,
+      "block_seconds": 30,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "hamstring and calf tightness",
+      "instructions": "Fold forward and put your hands on the floor, bending the knees as much as needed. Straighten one knee and press that heel down while the other knee bends, then switch, walking in place slowly. Pause for a moment each time a leg is straight.",
+      "v4_overlap": null
+    },
+    {
+      "id": "END-17",
+      "name": "Bodyweight Jefferson curl",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "T-spine",
+        "L-spine/Core",
+        "Ham"
+      ],
+      "dose": "3 slow reps",
+      "per_side": false,
+      "block_seconds": 30,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "spine held still all day",
+      "instructions": "Stand with feet together, knees straight but not locked. Tuck the chin and slowly roll down one vertebra at a time, letting the arms hang, until you reach your lowest point; there, pull yourself a little deeper using the front of the trunk rather than just hanging, then roll up one vertebra at a time. Each rep takes about 10 s.",
+      "v4_overlap": {
+        "id": "FLX-37",
+        "kind": "similar"
+      }
+    },
+    {
+      "id": "END-18",
+      "name": "Quadruped thoracic rotation with hold",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "T-spine"
+      ],
+      "dose": "6/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "thoracic rotation loss",
+      "instructions": "On hands and knees, sit the hips back halfway toward the heels and put one hand behind your head. Rotate that elbow up toward the ceiling as far as it goes, eyes following, hold for 2 s while trying to turn a little further, then rotate down toward the opposite wrist. Switch sides at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "END-19",
+      "name": "Seated rotation lift-off",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "T-spine"
+      ],
+      "dose": "5/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Chair"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "thoracic rotation loss",
+      "instructions": "Sit sideways on the chair with the backrest beside you, feet flat and knees together. Rotate toward the backrest as far as you can, using both hands on it to pull into the end of the turn, then let go and hold the position with your trunk muscles alone for 3 s while trying to turn further. Return to centre. At the chime, sit facing the other way and repeat.",
+      "v4_overlap": null
+    },
+    {
+      "id": "END-20",
+      "name": "Sphinx lift-off",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "T-spine",
+        "L-spine/Core",
+        "Shoulder"
+      ],
+      "dose": "6 reps",
+      "per_side": false,
+      "block_seconds": 30,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "spinal extension range lost to slouching",
+      "instructions": "Lie face down propped on your forearms, elbows under the shoulders, chest up. Keeping the chest where it is, lift both forearms a centimetre off the floor and hold for 2 s using the back muscles, then set them down. Keep the neck long.",
+      "v4_overlap": null
+    },
+    {
+      "id": "END-21",
+      "name": "Standing side-bend lift-off",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "L-spine/Core",
+        "T-spine"
+      ],
+      "dose": "5/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "side-bending range never used",
+      "instructions": "Stand with feet hip width and reach one arm overhead. Bend sideways away from the raised arm as far as you can without twisting, then use the waist muscles on the side you're bending toward to pull a little further and hold for 3 s, and return to upright by lifting from the other side. Switch sides at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "END-22",
+      "name": "Open book with lift-off",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "T-spine",
+        "Chest"
+      ],
+      "dose": "5/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "thoracic rotation loss, tight chest",
+      "instructions": "Lie on your side with knees bent to 90° and stacked, both arms straight out in front. Keeping the knees together, arc the top arm over to the other side, letting the chest follow. At the end of the turn, lift that hand a centimetre off the floor and hold for 2 s, then return. Switch sides at the chime.",
+      "v4_overlap": {
+        "id": "FLX-12",
+        "kind": "similar"
+      }
+    },
+    {
+      "id": "END-23",
+      "name": "Segmental cat-cow",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "T-spine",
+        "L-spine/Core"
+      ],
+      "dose": "30 s",
+      "per_side": false,
+      "block_seconds": 30,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "spinal stiffness",
+      "instructions": "On hands and knees, start rounding from the tailbone and let it travel up the spine one segment at a time until the head tucks last. Then reverse, starting the arch from the tailbone. At each end, pause for 2 s and actively push a little further.",
+      "v4_overlap": {
+        "id": "FLX-11",
+        "kind": "similar"
+      }
+    },
+    {
+      "id": "END-24",
+      "name": "Shoulder CARs",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Shoulder"
+      ],
+      "dose": "2 each direction/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "stiff shoulders, lost overhead range",
+      "instructions": "Stand tall, make a loose fist, and brace the trunk so nothing moves but the arm. Raise the straight arm forward and up past the ear, rotate the thumb out as it goes behind you, and sweep it down and back to the hip in the biggest circle you can, then reverse. Go slowly enough to feel every part of the circle. Switch arms at the chime.",
+      "v4_overlap": {
+        "id": "FLX-25",
+        "kind": "same"
+      }
+    },
+    {
+      "id": "END-25",
+      "name": "Wall-facing overhead lift-off",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Shoulder",
+        "T-spine"
+      ],
+      "dose": "8 reps",
+      "per_side": false,
+      "block_seconds": 30,
+      "difficulty": 2,
+      "settings": [
+        "Stand",
+        "Wall"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "lost overhead range, weak lower traps",
+      "instructions": "Stand facing a wall with toes about 30 cm from it, arms overhead in a Y, thumbs pointing back, palms on the wall. Without arching the low back, lift both hands a centimetre or two off the wall, hold for 2 s, and touch back. Step closer to the wall to make it harder.",
+      "v4_overlap": null
+    },
+    {
+      "id": "END-26",
+      "name": "Behind-the-back arm lift",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Shoulder",
+        "Chest"
+      ],
+      "dose": "8 reps",
+      "per_side": false,
+      "block_seconds": 30,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "tight chest, weak shoulder extension",
+      "instructions": "Stand tall with straight arms by your sides, palms facing behind you. Squeeze the shoulder blades together and lift both arms backward and up as high as you can without leaning forward, hold for 2 s, and lower. Keep the chin tucked.",
+      "v4_overlap": null
+    },
+    {
+      "id": "END-27",
+      "name": "Prone overhead lift-off",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Shoulder",
+        "T-spine"
+      ],
+      "dose": "8 reps",
+      "per_side": false,
+      "block_seconds": 30,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "lost overhead range",
+      "instructions": "Lie face down with arms overhead in a Y, thumbs up, forehead on the floor. Lift both arms a few centimetres off the floor, hold for 2 s, and lower. Keep the low back relaxed; the lift comes from between the shoulder blades.",
+      "v4_overlap": null
+    },
+    {
+      "id": "END-28",
+      "name": "Prone 90/90 external rotation lift-off",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Shoulder"
+      ],
+      "dose": "6/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "weak rotator cuff at end range",
+      "instructions": "Lie face down with one upper arm out to the side at shoulder height and the elbow bent 90°, hand pointing toward your head, palm down. Keeping the elbow on the floor, lift the hand and forearm as high as you can by rotating the shoulder, hold for 2 s, and lower. Switch arms at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "END-29",
+      "name": "Wall slide with lift-off",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Shoulder",
+        "T-spine"
+      ],
+      "dose": "6 reps",
+      "per_side": false,
+      "block_seconds": 30,
+      "difficulty": 2,
+      "settings": [
+        "Stand",
+        "Wall"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "weak lower traps",
+      "instructions": "Face a wall with forearms flat on it, elbows at shoulder height. Slide the arms up until they're nearly straight, then lift the forearms a centimetre off the wall and hold for 2 s. Return to the wall and slide back down, keeping the ribs down.",
+      "v4_overlap": {
+        "id": "STR-37",
+        "kind": "same"
+      }
+    },
+    {
+      "id": "END-30",
+      "name": "Hand-behind-back lift-off",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Shoulder"
+      ],
+      "dose": "6/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "lost shoulder internal rotation",
+      "instructions": "Stand tall and place the back of one hand against your low back, palm facing out, elbow bent. Without arching the back or tipping the shoulder forward, lift the hand a few centimetres away from the body and hold for 2 s, then touch back. Slide the hand higher up the back as this gets easier. Switch arms at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "END-31",
+      "name": "Chin tuck hold",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Neck"
+      ],
+      "dose": "6 × 4 s",
+      "per_side": false,
+      "block_seconds": 30,
+      "difficulty": 1,
+      "settings": [
+        "Chair"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "forward head posture",
+      "instructions": "Sit or stand tall, eyes level. Glide the head straight back, making a double chin, as far as it goes without tilting the head down; hold for 4 s and release halfway. Imagine a string pulling the back of your head up and back.",
+      "v4_overlap": {
+        "id": "FLX-21",
+        "kind": "similar"
+      }
+    },
+    {
+      "id": "END-32",
+      "name": "Neck side-bend isometric",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Neck"
+      ],
+      "dose": "30 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Chair"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "tight upper traps, stiff neck",
+      "instructions": "Sit tall and tilt one ear toward the shoulder as far as is comfortable. Reach the hand on the side you're tilting toward over the top of your head to the opposite ear, and press the head back toward centre into the hand at about 20% effort for 5 s, then relax and let the hand ease the head a little further. Repeat once more, then take the hand away and hold the tilt on your own for the last few seconds. Switch sides at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "END-33",
+      "name": "Neck rotation end-range hold",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Neck"
+      ],
+      "dose": "4/side, 3 s hold",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Chair"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "lost neck rotation",
+      "instructions": "Sit tall with the shoulders still. Turn the head as far as you can to one side, leading with the eyes, hold for 3 s while gently trying to turn a little further, then return to centre. Switch sides at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "END-34",
+      "name": "Half-kneeling ankle rock",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Calf/Ankle"
+      ],
+      "dose": "8/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "stiff ankles",
+      "instructions": "Kneel on one knee with the other foot flat in front. Keeping that heel down, drive the front knee forward over the toes as far as it will go, hold for 2 s, then rock back. Let the knee track over the second toe. Switch legs at the chime.",
+      "v4_overlap": {
+        "id": "FLX-30",
+        "kind": "similar"
+      }
+    },
+    {
+      "id": "END-35",
+      "name": "Top-range calf raise hold",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Calf/Ankle",
+        "Foot/Shin"
+      ],
+      "dose": "20 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "weak calves and feet at full tiptoe",
+      "instructions": "Stand on one foot with a fingertip on the desk. Rise onto the ball of the foot as high as you possibly can and hold the very top, pressing the big toe down. If the heel sinks, push back up to the top. Switch feet at the chime.",
+      "v4_overlap": {
+        "id": "BAL-13",
+        "kind": "similar"
+      }
+    },
+    {
+      "id": "END-36",
+      "name": "Seated ankle CARs",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Calf/Ankle"
+      ],
+      "dose": "3 each direction/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Chair"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "stiff ankles",
+      "instructions": "Sit tall and lift one foot just off the floor. Holding the shin still with your hand if needed, draw the biggest, slowest circle you can with the foot, reaching each edge of the range, then reverse. Switch feet at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "END-37",
+      "name": "Toe yoga and short foot",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Foot/Shin"
+      ],
+      "dose": "30 s",
+      "per_side": false,
+      "block_seconds": 30,
+      "difficulty": 1,
+      "settings": [
+        "Chair"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "weak feet from shoes and sitting",
+      "instructions": "Sit with both feet flat and bare or in thin socks if possible. Lift only the big toes while the other toes stay down, then press the big toes down and lift the other four; alternate for about 20 s. Finish by gently pulling the ball of the foot toward the heel to raise the arch, without curling the toes, and hold.",
+      "v4_overlap": null
+    },
+    {
+      "id": "END-38",
+      "name": "Reverse Nordic (short range)",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Quad",
+        "Hip"
+      ],
+      "dose": "6 reps",
+      "per_side": false,
+      "block_seconds": 30,
+      "difficulty": 3,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "quads never loaded at length",
+      "instructions": "Kneel tall with knees hip width and the tops of the feet flat, on carpet if you have it. Squeeze the glutes and lean the whole body back as one straight line from knees to head, only as far as you can control, then return to tall kneeling. Start with a very small lean.",
+      "v4_overlap": null
+    },
+    {
+      "id": "END-39",
+      "name": "Knee-over-toe split squat hold",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Quad",
+        "Hip",
+        "Calf/Ankle"
+      ],
+      "dose": "25 s/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Stand"
+      ],
+      "on_floor": false,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "knees and ankles never loaded at full bend",
+      "instructions": "Take a short stride, a hand on the desk if you need it, and sink down so the front knee travels well past the toes while that heel stays flat, rear knee hovering near the floor. Hold the lowest position you can control and breathe. Switch legs at the chime.",
+      "v4_overlap": null
+    },
+    {
+      "id": "END-40",
+      "name": "Kneeling wrist rocks with lift-off",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Wrist/Forearm"
+      ],
+      "dose": "30 s",
+      "per_side": false,
+      "block_seconds": 30,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "wrists stuck in one keyboard position",
+      "instructions": "On hands and knees, palms flat and fingers forward, rock gently forward over the hands to the end of the wrist range, then back, for about 15 s. At the end of each forward rock, try to lift the fingertips off the floor for a moment. Then turn the hands over so the backs of the hands are on the floor, fingers pointing toward the knees, and rock gently back to work the opposite direction.",
+      "v4_overlap": null
+    },
+    {
+      "id": "END-41",
+      "name": "Spiderman lunge with reach",
+      "bucket": "END",
+      "bucket_name": "End-range strength & active flexibility",
+      "regions": [
+        "Hip",
+        "T-spine"
+      ],
+      "dose": "3/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "on_floor": true,
+      "equipment": [],
+      "load": null,
+      "grip_demand": false,
+      "micro_eligible": true,
+      "counteracts": "hip flexor shortening, thoracic rotation loss",
+      "instructions": "From a push-up position, step one foot outside the same-side hand and sink the hips low; hold for 3 s while pressing the hips down. Rotate and reach the inside arm to the ceiling, hold for 3 s, then return the hand and step back. Do all reps on one side, then switch.",
+      "v4_overlap": {
+        "id": "FLX-04",
+        "kind": "similar"
+      }
+    }
+  ],
+  "routines": [
+    {
+      "id": "SR1",
+      "name": "Bodyweight basics",
+      "focus": "no equipment, beginner",
+      "target_seconds": 300,
+      "sum_of_blocks": 300,
+      "equipment_used": [],
+      "blocks": [
+        {
+          "movement_id": "SQT-01",
+          "seconds": 60
+        },
+        {
+          "movement_id": "PSH-02",
+          "seconds": 60
+        },
+        {
+          "movement_id": "HNG-01",
+          "seconds": 60
+        },
+        {
+          "movement_id": "PUL-03",
+          "seconds": 60
+        },
+        {
+          "movement_id": "COR-10",
+          "seconds": 60
+        }
+      ]
+    },
+    {
+      "id": "SR2",
+      "name": "Bodyweight builder",
+      "focus": "no equipment, harder",
+      "target_seconds": 300,
+      "sum_of_blocks": 300,
+      "equipment_used": [],
+      "blocks": [
+        {
+          "movement_id": "SQT-13",
+          "seconds": 60
+        },
+        {
+          "movement_id": "PSH-04",
+          "seconds": 60
+        },
+        {
+          "movement_id": "HNG-12",
+          "seconds": 60
+        },
+        {
+          "movement_id": "PUL-02",
+          "seconds": 60
+        },
+        {
+          "movement_id": "ACC-02",
+          "seconds": 60
+        }
+      ]
+    },
+    {
+      "id": "SR3",
+      "name": "Dumbbells",
+      "focus": "pair of dumbbells",
+      "target_seconds": 300,
+      "sum_of_blocks": 300,
+      "equipment_used": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "blocks": [
+        {
+          "movement_id": "SQT-04",
+          "seconds": 60
+        },
+        {
+          "movement_id": "PSH-14",
+          "seconds": 60
+        },
+        {
+          "movement_id": "HNG-08",
+          "seconds": 60
+        },
+        {
+          "movement_id": "PUL-09",
+          "seconds": 60
+        },
+        {
+          "movement_id": "COR-03",
+          "seconds": 60
+        }
+      ]
+    },
+    {
+      "id": "SR4",
+      "name": "Kettlebell",
+      "focus": "one kettlebell, Diff 3 unlocked",
+      "target_seconds": 300,
+      "sum_of_blocks": 300,
+      "equipment_used": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "blocks": [
+        {
+          "movement_id": "SQT-04",
+          "seconds": 60
+        },
+        {
+          "movement_id": "PSH-15",
+          "seconds": 60
+        },
+        {
+          "movement_id": "HNG-10",
+          "seconds": 60
+        },
+        {
+          "movement_id": "PUL-10",
+          "seconds": 60
+        },
+        {
+          "movement_id": "COR-11",
+          "seconds": 60
+        }
+      ]
+    },
+    {
+      "id": "SR5",
+      "name": "Kettlebell and chair",
+      "focus": "one kettlebell",
+      "target_seconds": 300,
+      "sum_of_blocks": 300,
+      "equipment_used": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "blocks": [
+        {
+          "movement_id": "SQT-12",
+          "seconds": 60
+        },
+        {
+          "movement_id": "PSH-09",
+          "seconds": 60
+        },
+        {
+          "movement_id": "HNG-05",
+          "seconds": 60
+        },
+        {
+          "movement_id": "PUL-17",
+          "seconds": 60
+        },
+        {
+          "movement_id": "COR-02",
+          "seconds": 60
+        }
+      ]
+    },
+    {
+      "id": "SR6",
+      "name": "Full kit",
+      "focus": "dumbbells and kettlebell",
+      "target_seconds": 300,
+      "sum_of_blocks": 300,
+      "equipment_used": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "blocks": [
+        {
+          "movement_id": "SQT-05",
+          "seconds": 60
+        },
+        {
+          "movement_id": "PSH-11",
+          "seconds": 60
+        },
+        {
+          "movement_id": "HNG-14",
+          "seconds": 60
+        },
+        {
+          "movement_id": "PUL-12",
+          "seconds": 60
+        },
+        {
+          "movement_id": "COR-11",
+          "seconds": 60
+        }
+      ]
+    },
+    {
+      "id": "SR7",
+      "name": "Standing only",
+      "focus": "no equipment, no floor",
+      "target_seconds": 300,
+      "sum_of_blocks": 300,
+      "equipment_used": [],
+      "blocks": [
+        {
+          "movement_id": "SQT-03",
+          "seconds": 60
+        },
+        {
+          "movement_id": "PSH-02",
+          "seconds": 60
+        },
+        {
+          "movement_id": "HNG-07",
+          "seconds": 60
+        },
+        {
+          "movement_id": "PUL-08",
+          "seconds": 60
+        },
+        {
+          "movement_id": "ACC-01",
+          "seconds": 60
+        }
+      ]
+    },
+    {
+      "id": "SR8",
+      "name": "Swing day",
+      "focus": "dumbbells and kettlebell, Diff 3 unlocked",
+      "target_seconds": 300,
+      "sum_of_blocks": 300,
+      "equipment_used": [
+        "dumbbells",
+        "kettlebell"
+      ],
+      "blocks": [
+        {
+          "movement_id": "SQT-06",
+          "seconds": 60
+        },
+        {
+          "movement_id": "PSH-12",
+          "seconds": 60
+        },
+        {
+          "movement_id": "HNG-11",
+          "seconds": 60
+        },
+        {
+          "movement_id": "PUL-15",
+          "seconds": 60
+        },
+        {
+          "movement_id": "COR-15",
+          "seconds": 60
+        }
+      ]
+    }
+  ],
+  "micro_routines": [
+    {
+      "id": "SM1",
+      "name": "Hip flexors",
+      "target_seconds": 60,
+      "sum_of_blocks": 60,
+      "blocks": [
+        {
+          "movement_id": "END-05",
+          "seconds": 60
+        }
+      ]
+    },
+    {
+      "id": "SM2",
+      "name": "Overhead reach",
+      "target_seconds": 60,
+      "sum_of_blocks": 60,
+      "blocks": [
+        {
+          "movement_id": "END-25",
+          "seconds": 30
+        },
+        {
+          "movement_id": "END-26",
+          "seconds": 30
+        }
+      ]
+    },
+    {
+      "id": "SM3",
+      "name": "Hip rotation",
+      "target_seconds": 60,
+      "sum_of_blocks": 60,
+      "blocks": [
+        {
+          "movement_id": "END-09",
+          "seconds": 60
+        }
+      ]
+    },
+    {
+      "id": "SM4",
+      "name": "Spine on the floor",
+      "target_seconds": 60,
+      "sum_of_blocks": 60,
+      "blocks": [
+        {
+          "movement_id": "END-23",
+          "seconds": 30
+        },
+        {
+          "movement_id": "END-20",
+          "seconds": 30
+        }
+      ]
+    },
+    {
+      "id": "SM5",
+      "name": "Knees and ankles",
+      "target_seconds": 60,
+      "sum_of_blocks": 60,
+      "blocks": [
+        {
+          "movement_id": "END-39",
+          "seconds": 60
+        }
+      ]
+    },
+    {
+      "id": "SM6",
+      "name": "At the desk",
+      "target_seconds": 60,
+      "sum_of_blocks": 60,
+      "blocks": [
+        {
+          "movement_id": "END-31",
+          "seconds": 30
+        },
+        {
+          "movement_id": "END-37",
+          "seconds": 30
+        }
+      ]
+    },
+    {
+      "id": "SM7",
+      "name": "Hamstrings",
+      "target_seconds": 60,
+      "sum_of_blocks": 60,
+      "blocks": [
+        {
+          "movement_id": "END-14",
+          "seconds": 60
+        }
+      ]
+    },
+    {
+      "id": "SM8",
+      "name": "Neck",
+      "target_seconds": 60,
+      "sum_of_blocks": 60,
+      "blocks": [
+        {
+          "movement_id": "END-32",
+          "seconds": 60
+        }
+      ]
+    },
+    {
+      "id": "SM9",
+      "name": "Bottom of the squat",
+      "target_seconds": 60,
+      "sum_of_blocks": 60,
+      "blocks": [
+        {
+          "movement_id": "END-07",
+          "seconds": 30
+        },
+        {
+          "movement_id": "END-16",
+          "seconds": 30
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Separate from movement-library-v4.json; IDs use new prefixes so both can load together.",
+    "block_seconds is the scheduling unit; dose is display text (a rep target).",
+    "equipment is required (any one of), unlike v4's equipment_optional; bodyweight movements have an empty list."
+  ]
+}
