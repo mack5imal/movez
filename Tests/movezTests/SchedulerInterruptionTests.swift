@@ -15,11 +15,30 @@ final class SchedulerInterruptionTests: XCTestCase {
         XCTAssertEqual(harness.snapshot.nextFullDueAt, due)
     }
 
-    func testKitchenTripIsCreditedAsAMicroBreak() {
+    private func toast(_ harness: SchedulerHarness) -> ToastInfo? {
+        harness.effects.compactMap { effect -> ToastInfo? in
+            if case .showToast(let info) = effect { return info } else { return nil }
+        }.first
+    }
+
+    private func absences(_ harness: SchedulerHarness) -> [AbsenceRecord] {
+        harness.effects.compactMap { effect -> AbsenceRecord? in
+            if case .recordAbsence(let record) = effect { return record } else { return nil }
+        }
+    }
+
+    private func pausing() -> SchedulerConfig {
+        var config = SchedulerConfig()
+        config.awayBehaviour = .pause
+        return config
+    }
+
+    /// Reset, the default: any absence past the threshold starts both countdowns again, and is
+    /// logged, but it is not a break.
+    func testAKitchenTripResetsBothCountdownsAndIsNotABreak() {
         let harness = SchedulerHarness()
         harness.run(seconds: 10 * minute)
-        let dueBefore = harness.snapshot.nextFullDueAt
-        let remaining = dueBefore.map { Int($0.timeIntervalSince(harness.now)) } ?? 0
+        let lastBreak = harness.snapshot.lastCompletedBreakAt
 
         harness.clock.advance(4 * minute)
         harness.send(.idle(seconds: 240))
@@ -29,19 +48,20 @@ final class SchedulerInterruptionTests: XCTestCase {
         harness.clearEffects()
         harness.send(.input(lastEventAgeSeconds: 0))
         XCTAssertTrue(harness.state.isSitting)
-        XCTAssertDate(harness.snapshot.nextFullDueAt, harness.now.addingTimeInterval(TimeInterval(remaining)))
+        XCTAssertEqual(harness.snapshot.boutStartedAt, harness.now)
+        XCTAssertEqual(harness.snapshot.nextFullDueAt, harness.now.addingTimeInterval(55 * minute))
         XCTAssertEqual(harness.snapshot.nextMicroDueAt, harness.now.addingTimeInterval(30 * minute))
-        XCTAssertEqual(harness.snapshot.doneToday, 0)
+        XCTAssertEqual(harness.snapshot.doneToday, 0, "an absence is not a break")
+        XCTAssertEqual(harness.snapshot.lastCompletedBreakAt, lastBreak)
 
-        let toast = harness.effects.compactMap { effect -> ToastInfo? in
-            if case .showToast(let info) = effect { return info } else { return nil }
-        }.first
-        XCTAssertEqual(toast?.kind, .creditedMicroBreak)
-        XCTAssertEqual(toast?.awaySeconds, 240)
-        XCTAssertEqual(toast?.reversal, .wasSittingAfterMicroCredit)
+        XCTAssertEqual(toast(harness)?.behaviour, .reset)
+        XCTAssertEqual(toast(harness)?.awaySeconds, 240)
+        XCTAssertEqual(toast(harness)?.reversal, .wasSitting)
+        XCTAssertEqual(absences(harness), [AbsenceRecord(behaviour: .reset, awaySeconds: 240)])
+        XCTAssertEqual(harness.effectNames.prefix(3), ["recordAbsence(reset)", "showToast", "chime(toast)"])
     }
 
-    func testLongAbsenceIsCreditedAsAFullBreak() {
+    func testALongerAbsenceIsTheSameResetAndStillNotABreak() {
         let harness = SchedulerHarness()
         harness.run(seconds: 10 * minute)
         harness.clock.advance(7 * minute)
@@ -50,18 +70,54 @@ final class SchedulerInterruptionTests: XCTestCase {
         harness.send(.input(lastEventAgeSeconds: 0))
 
         XCTAssertTrue(harness.state.isSitting)
-        XCTAssertEqual(harness.snapshot.doneToday, 1)
+        XCTAssertEqual(harness.snapshot.doneToday, 0)
         XCTAssertEqual(harness.snapshot.boutStartedAt, harness.now)
         XCTAssertEqual(harness.snapshot.nextFullDueAt, harness.now.addingTimeInterval(55 * minute))
-
-        let toast = harness.effects.compactMap { effect -> ToastInfo? in
-            if case .showToast(let info) = effect { return info } else { return nil }
-        }.first
-        XCTAssertEqual(toast?.kind, .creditedFullBreak)
-        XCTAssertEqual(toast?.reversal, .wasSittingAfterFullCredit)
+        XCTAssertEqual(toast(harness)?.behaviour, .reset)
+        XCTAssertEqual(absences(harness).count, 1)
     }
 
-    func testIWasSittingReversesTheCreditExactly() {
+    /// Pause: both countdowns stand still while the user is gone and carry on with exactly what
+    /// they had.
+    func testPauseHandsBothCountdownsBackWithTheTimeTheyHad() {
+        let harness = SchedulerHarness(config: pausing())
+        harness.run(seconds: 10 * minute)
+        let fullLeft = harness.snapshot.nextFullDueAt!.timeIntervalSince(harness.now)
+        let microLeft = harness.snapshot.nextMicroDueAt!.timeIntervalSince(harness.now)
+
+        harness.clock.advance(7 * minute)
+        harness.send(.idle(seconds: 7 * 60))
+        harness.clearEffects()
+        harness.send(.input(lastEventAgeSeconds: 0))
+
+        XCTAssertTrue(harness.state.isSitting)
+        XCTAssertDate(harness.snapshot.nextFullDueAt, harness.now.addingTimeInterval(fullLeft))
+        XCTAssertDate(harness.snapshot.nextMicroDueAt, harness.now.addingTimeInterval(microLeft))
+        XCTAssertEqual(harness.snapshot.doneToday, 0)
+        XCTAssertEqual(toast(harness)?.behaviour, .pause)
+        XCTAssertEqual(absences(harness), [AbsenceRecord(behaviour: .pause, awaySeconds: 420)])
+    }
+
+    /// The bout moves forward with the due times, so re-planning on a settings change keeps the
+    /// countdown the pause handed back.
+    func testASettingsChangeAfterAPauseDoesNotMoveTheCountdown() {
+        let harness = SchedulerHarness(config: pausing())
+        harness.run(seconds: 10 * minute)
+        harness.clock.advance(7 * minute)
+        harness.send(.idle(seconds: 7 * 60))
+        harness.send(.input(lastEventAgeSeconds: 0))
+        let full = harness.snapshot.nextFullDueAt
+        let micro = harness.snapshot.nextMicroDueAt
+
+        var config = pausing()
+        config.workingHours = .alwaysOn
+        config.awayThresholdSeconds = 240
+        harness.send(.settingsChanged(config))
+        XCTAssertEqual(harness.snapshot.nextFullDueAt, full)
+        XCTAssertEqual(harness.snapshot.nextMicroDueAt, micro)
+    }
+
+    func testIWasSittingUndoesAResetExactly() {
         let harness = SchedulerHarness()
         harness.run(seconds: 10 * minute)
         let before = harness.snapshot
@@ -69,15 +125,34 @@ final class SchedulerInterruptionTests: XCTestCase {
         harness.clock.advance(7 * minute)
         harness.send(.idle(seconds: 7 * 60))
         harness.send(.input(lastEventAgeSeconds: 0))
-        XCTAssertEqual(harness.snapshot.doneToday, 1)
 
         harness.clock.advance(3)
-        harness.send(.toastReverse(.wasSittingAfterFullCredit))
+        harness.send(.toastReverse(.wasSitting))
         XCTAssertEqual(harness.snapshot.doneToday, before.doneToday)
         XCTAssertEqual(harness.snapshot.boutStartedAt, before.boutStartedAt)
         XCTAssertEqual(harness.snapshot.nextFullDueAt, before.nextFullDueAt)
+        XCTAssertEqual(harness.snapshot.nextMicroDueAt, before.nextMicroDueAt)
         XCTAssertEqual(harness.snapshot.lastCompletedBreakAt, before.lastCompletedBreakAt)
         XCTAssertTrue(harness.state.isSitting)
+    }
+
+    func testIWasSittingUndoesAPauseExactly() {
+        let harness = SchedulerHarness(config: pausing())
+        harness.run(seconds: 10 * minute)
+        let before = harness.snapshot
+
+        harness.clock.advance(7 * minute)
+        harness.send(.idle(seconds: 7 * 60))
+        harness.send(.input(lastEventAgeSeconds: 0))
+        XCTAssertNotEqual(harness.snapshot.nextFullDueAt, before.nextFullDueAt)
+
+        harness.clock.advance(3)
+        let effects = harness.send(.toastReverse(.wasSitting))
+        XCTAssertTrue(effects.contains(.hideToast))
+        XCTAssertEqual(harness.snapshot.boutStartedAt, before.boutStartedAt)
+        XCTAssertEqual(harness.snapshot.nextFullDueAt, before.nextFullDueAt, "the minutes away count as sitting")
+        XCTAssertEqual(harness.snapshot.nextMicroDueAt, before.nextMicroDueAt)
+        XCTAssertEqual(harness.snapshot.microAnchorAt, before.microAnchorAt)
     }
 
     func testReversalExpiresWithTheToast() {
@@ -86,10 +161,47 @@ final class SchedulerInterruptionTests: XCTestCase {
         harness.clock.advance(7 * minute)
         harness.send(.idle(seconds: 7 * 60))
         harness.send(.input(lastEventAgeSeconds: 0))
+        let due = harness.snapshot.nextFullDueAt
 
         harness.clock.advance(30)
-        XCTAssertEqual(harness.send(.toastReverse(.wasSittingAfterFullCredit)), [], "the toast is long gone")
-        XCTAssertEqual(harness.snapshot.doneToday, 1)
+        XCTAssertEqual(harness.send(.toastReverse(.wasSitting)), [], "the toast is long gone")
+        XCTAssertEqual(harness.snapshot.nextFullDueAt, due)
+    }
+
+    /// A closed lid pauses the countdowns too, from when the lid closed to when the machine woke;
+    /// the quiet minute after the wake is the user back at the desk.
+    func testALidClosedForTenMinutesPausesTheCountdowns() {
+        let harness = SchedulerHarness(config: pausing())
+        harness.run(seconds: 10 * minute)
+        let fullLeft = harness.snapshot.nextFullDueAt!.timeIntervalSince(harness.now)
+        harness.send(.sleep)
+        harness.clock.advance(10 * minute)
+        let wokeAt = harness.now
+        harness.send(.wake(gapSeconds: 600))
+        harness.clearEffects()
+        harness.run(seconds: 70)
+
+        XCTAssertTrue(harness.state.isSitting, "got \(harness.state)")
+        XCTAssertDate(harness.snapshot.nextFullDueAt, wokeAt.addingTimeInterval(fullLeft))
+        XCTAssertEqual(absences(harness), [AbsenceRecord(behaviour: .pause, awaySeconds: 600)])
+        XCTAssertEqual(toast(harness)?.behaviour, .pause)
+    }
+
+    /// Standby is the same whichever behaviour is chosen: silent, and logged as a reset.
+    func testStandbyIsSilentInBothBehavioursAndLoggedAsAReset() {
+        for config in [SchedulerConfig(), pausing()] {
+            let harness = SchedulerHarness(config: config)
+            harness.run(seconds: 10 * minute)
+            harness.clock.advance(70 * minute)
+            harness.send(.idle(seconds: 70 * 60))
+            harness.clearEffects()
+            harness.send(.input(lastEventAgeSeconds: 0))
+
+            XCTAssertNil(toast(harness), "\(config.awayBehaviour)")
+            XCTAssertEqual(absences(harness), [AbsenceRecord(behaviour: .reset, awaySeconds: 70 * 60)])
+            XCTAssertEqual(harness.snapshot.nextFullDueAt, harness.now.addingTimeInterval(55 * minute))
+            XCTAssertEqual(harness.snapshot.doneToday, 0)
+        }
     }
 
     // MARK: - Sleep, lock and wake

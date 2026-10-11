@@ -23,6 +23,7 @@ final class SettingsStore: ObservableObject {
         static let suppressFullscreen = "suppressFullscreen"
         static let fullscreenExceptions = "fullscreenExceptions"
         static let awayThresholdMinutes = "awayThresholdMinutes"
+        static let awayBehaviour = "awayBehaviour"
         static let soundsEnabled = "soundsEnabled"
         static let launchAtLogin = "launchAtLogin"
         static let debugTimeScale = "debugTimeScale"
@@ -55,6 +56,7 @@ final class SettingsStore: ObservableObject {
     @Published var suppressFullscreen: Bool { didSet { write(suppressFullscreen, Key.suppressFullscreen) } }
     @Published var fullscreenExceptions: [String] { didSet { write(fullscreenExceptions, Key.fullscreenExceptions) } }
     @Published var awayThresholdMinutes: Int { didSet { write(awayThresholdMinutes, Key.awayThresholdMinutes) } }
+    @Published var awayBehaviour: AwayBehaviour { didSet { write(awayBehaviour.rawValue, Key.awayBehaviour) } }
     @Published var soundsEnabled: Bool { didSet { write(soundsEnabled, Key.soundsEnabled) } }
     @Published var launchAtLogin: Bool { didSet { write(launchAtLogin, Key.launchAtLogin) } }
     @Published var debugTimeScale: Double { didSet { write(debugTimeScale, Key.debugTimeScale) } }
@@ -80,6 +82,7 @@ final class SettingsStore: ObservableObject {
         suppressFullscreen = defaults.object(forKey: Key.suppressFullscreen) as? Bool ?? true
         fullscreenExceptions = defaults.stringArray(forKey: Key.fullscreenExceptions) ?? []
         awayThresholdMinutes = defaults.object(forKey: Key.awayThresholdMinutes) as? Int ?? 3
+        awayBehaviour = AwayBehaviour(rawValue: defaults.string(forKey: Key.awayBehaviour) ?? "") ?? .reset
         soundsEnabled = defaults.object(forKey: Key.soundsEnabled) as? Bool ?? true
         launchAtLogin = defaults.object(forKey: Key.launchAtLogin) as? Bool ?? false
         debugTimeScale = defaults.object(forKey: Key.debugTimeScale) as? Double ?? 1
@@ -104,6 +107,7 @@ final class SettingsStore: ObservableObject {
         )
         config.workingHours = workingHours
         config.awayThresholdSeconds = awayThresholdMinutes * 60
+        config.awayBehaviour = awayBehaviour
         return config
     }
 

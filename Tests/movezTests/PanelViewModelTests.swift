@@ -45,7 +45,7 @@ final class PanelViewModelTests: XCTestCase {
         return model
     }
 
-    private func toast(clock: ManualClock, kind: ToastInfo.Kind, awaySeconds: Int) -> PanelViewModel {
+    private func toast(clock: ManualClock, behaviour: AwayBehaviour = .reset, awaySeconds: Int) -> PanelViewModel {
         let model = PanelViewModel(
             phase: .toast,
             clock: clock,
@@ -53,10 +53,10 @@ final class PanelViewModelTests: XCTestCase {
             totalSeconds: ToastInfo.defaultSecondsOnScreen
         )
         model.toast = ToastInfo(
-            kind: kind,
+            behaviour: behaviour,
             awaySeconds: awaySeconds,
             nextBreakAt: nextBreakAtTwoPastTwo,
-            reversal: kind == .creditedFullBreak ? .wasSittingAfterFullCredit : .wasSittingAfterMicroCredit
+            reversal: .wasSitting
         )
         return model
     }
@@ -251,25 +251,26 @@ final class PanelViewModelTests: XCTestCase {
 
     // MARK: - The away toast
 
-    func testToastCopyForBothCredits() {
+    /// The toast says what the absence did to the timer. It never calls the absence a break.
+    func testToastCopyForBothBehaviours() {
         let clock = ManualClock(now: start)
         XCTAssertEqual(
-            toast(clock: clock, kind: .creditedFullBreak, awaySeconds: 420).toastTitle,
-            "Away 7 min · counted as your break"
+            toast(clock: clock, behaviour: .reset, awaySeconds: 420).toastTitle,
+            "Away 7 min · break timer reset"
         )
         XCTAssertEqual(
-            toast(clock: clock, kind: .creditedMicroBreak, awaySeconds: 240).toastTitle,
-            "Away 4 min · counted as a micro-break"
+            toast(clock: clock, behaviour: .pause, awaySeconds: 240).toastTitle,
+            "Away 4 min · break timer paused"
         )
         XCTAssertEqual(
-            toast(clock: clock, kind: .creditedFullBreak, awaySeconds: 420).toastSubtitle,
+            toast(clock: clock, awaySeconds: 420).toastSubtitle,
             "Next break at 14:02"
         )
     }
 
     func testTheHairlineShrinksOverFifteenSeconds() {
         let clock = ManualClock(now: start)
-        let model = toast(clock: clock, kind: .creditedFullBreak, awaySeconds: 420)
+        let model = toast(clock: clock, awaySeconds: 420)
         XCTAssertEqual(ToastInfo.defaultSecondsOnScreen, 15)
 
         XCTAssertEqual(model.progress, 1, accuracy: 0.001)
@@ -283,7 +284,7 @@ final class PanelViewModelTests: XCTestCase {
 
     func testTheToastDismissesItselfWhenItRunsOut() {
         let clock = ManualClock(now: start)
-        let model = toast(clock: clock, kind: .creditedFullBreak, awaySeconds: 420)
+        let model = toast(clock: clock, awaySeconds: 420)
         var dismissed = 0
         model.actions.dismiss = { dismissed += 1 }
 
@@ -295,9 +296,9 @@ final class PanelViewModelTests: XCTestCase {
         XCTAssertEqual(dismissed, 1)
     }
 
-    func testDismissTakesTheToastAwayAndKeepsTheCredit() {
+    func testDismissTakesTheToastAwayAndLetsTheResetStand() {
         let clock = ManualClock(now: start)
-        let model = toast(clock: clock, kind: .creditedFullBreak, awaySeconds: 420)
+        let model = toast(clock: clock, awaySeconds: 420)
         var reversed = 0
         var dismissed = 0
         model.actions.reverseToast = { reversed += 1 }
@@ -308,9 +309,9 @@ final class PanelViewModelTests: XCTestCase {
         XCTAssertEqual(reversed, 0, "dismissing is not reversing")
     }
 
-    func testIWasSittingReversesTheCreditAndTakesTheToastAway() {
+    func testIWasSittingUndoesTheAbsenceAndTakesTheToastAway() {
         let clock = ManualClock(now: start)
-        let model = toast(clock: clock, kind: .creditedFullBreak, awaySeconds: 420)
+        let model = toast(clock: clock, awaySeconds: 420)
         var reversed = 0
         var dismissed = 0
         model.actions.reverseToast = { reversed += 1 }
@@ -334,10 +335,11 @@ final class PanelViewModelTests: XCTestCase {
         XCTAssertEqual(PanelWindowController.topInset, 12)
     }
 
-    func testTheToastSitsTwentyPointsOffTheBottomRightCorner() {
+    /// Top-right, level with the panels under the menu bar and twenty points in from the edge.
+    func testTheToastSitsInTheTopRightCorner() {
         let frame = PanelWindowController.toastFrame(shell: CGSize(width: 380, height: 64), visible: visible)
         XCTAssertEqual(visible.maxX - frame.maxX, 20, accuracy: 1)
-        XCTAssertEqual(frame.minY - visible.minY, 20, accuracy: 1)
+        XCTAssertEqual(visible.maxY - frame.maxY, PanelWindowController.topInset, accuracy: 1)
     }
 
     func testTheShellFrameIsTheWindowFrameWithoutItsShadowMargin() {

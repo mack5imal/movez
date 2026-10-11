@@ -225,20 +225,29 @@ final class CoordinatorSimulatedDayTests: XCTestCase {
         XCTAssertEqual(harness.coordinator.currentBreak?.routine.movementIds, preview?.movementIds)
     }
 
-    func testACreditedAbsenceIsRecordedAndReversible() {
-        let harness = CoordinatorHarness()
-        harness.run(seconds: 10 * minute)
+    /// An absence is written down, moves none of the day's numbers or the streak, and "I was
+    /// sitting" takes the entry back out.
+    func testAnAbsenceIsLoggedButIsNotABreakAndIsReversible() {
+        for behaviour in AwayBehaviour.allCases {
+            let harness = CoordinatorHarness { $0.awayBehaviour = behaviour }
+            harness.run(seconds: 10 * minute)
+            let streak = harness.history.streak(on: harness.now)
 
-        harness.clock.advance(7 * minute)
-        harness.coordinator.inject(.idle(seconds: 7 * 60))
-        harness.coordinator.inject(.input(lastEventAgeSeconds: 0))
-        XCTAssertEqual(harness.history.stats(on: harness.now).done, 1)
-        XCTAssertEqual(harness.coordinator.toastInfo?.kind, .creditedFullBreak)
+            harness.clock.advance(7 * minute)
+            harness.coordinator.inject(.idle(seconds: 7 * 60))
+            harness.coordinator.inject(.input(lastEventAgeSeconds: 0))
+            XCTAssertEqual(harness.history.data.breakRecords.map(\.outcome), [BreakResult(behaviour)])
+            XCTAssertEqual(harness.history.data.breakRecords.first?.routineName, "Away 7 min")
+            let stats = harness.history.stats(on: harness.now)
+            XCTAssertEqual([stats.done, stats.skipped, stats.snoozed], [0, 0, 0], "not done, skipped or snoozed")
+            XCTAssertEqual(harness.history.streak(on: harness.now), streak)
+            XCTAssertEqual(harness.coordinator.toastInfo?.behaviour, behaviour)
 
-        harness.clock.advance(3)
-        harness.coordinator.reverseToast()
-        XCTAssertEqual(harness.history.stats(on: harness.now).done, 0)
-        XCTAssertNil(harness.coordinator.toastInfo)
+            harness.clock.advance(3)
+            harness.coordinator.reverseToast()
+            XCTAssertTrue(harness.history.data.breakRecords.isEmpty)
+            XCTAssertNil(harness.coordinator.toastInfo)
+        }
     }
 
     /// A break turned away at the heads-up never becomes a session, so the coordinator used to

@@ -126,7 +126,7 @@ enum SnapshotRenderer {
         case .headsUpDeferred:
             return AnyView(PanelSnapshot(viewModel: SnapshotFixtures.headsUp(deferred: true)))
         case .toast:
-            return AnyView(PanelSnapshot(viewModel: SnapshotFixtures.awayToast(), placement: .bottomRight))
+            return AnyView(PanelSnapshot(viewModel: SnapshotFixtures.awayToast(), placement: .topRight))
         default:
             return microView(for: surface)
         }

@@ -1,5 +1,16 @@
 import Foundation
 
+/// What a stretch away from the desk does to the countdowns, which the user chooses.
+///
+/// Either way it is not a break: nobody is moving on movez's say-so, and counting it as one let a
+/// day spent in meetings run up the record without a single movement done.
+enum AwayBehaviour: String, Codable, CaseIterable, Hashable {
+    /// Both countdowns start again from the return.
+    case reset
+    /// Both countdowns stand still while the user is gone and carry on from where they were.
+    case pause
+}
+
 /// Every tunable the scheduler reads, with the defaults from research §6.
 struct SchedulerConfig: Codable, Equatable, Hashable {
     var sitSeconds: Int = 55 * 60
@@ -23,7 +34,7 @@ struct SchedulerConfig: Codable, Equatable, Hashable {
     var skipDelaySeconds: Int = 3
     var completionFraction: Double = 0.5
     var awayThresholdSeconds: Int = 180
-    var fullCreditSeconds: Int = 300
+    var awayBehaviour: AwayBehaviour = .reset
     var wakeQuietSeconds: Int = 60
     var postSuppressionGraceSeconds: Int = 120
     var deferredBadgeSeconds: Int = 1800
@@ -88,7 +99,7 @@ struct SchedulerConfig: Codable, Equatable, Hashable {
         mix(snoozeSeconds)
         mix(maxSnoozesPerBreak)
         mix(awayThresholdSeconds)
-        mix(fullCreditSeconds)
+        mix(awayBehaviour == .reset ? 0 : 1)
         mix(postSuppressionGraceSeconds)
         for day in workingHours.days {
             mix(day.enabled ? 1 : 0)

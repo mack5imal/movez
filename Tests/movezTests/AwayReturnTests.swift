@@ -35,27 +35,32 @@ final class AwayReturnTests: XCTestCase {
         effects.filter { if case .showToast = $0 { return true } else { return false } }.count
     }
 
+    private func absenceCount(_ effects: [SchedulerEffect]) -> Int {
+        effects.filter { if case .recordAbsence = $0 { return true } else { return false } }.count
+    }
+
     private func isAway(_ state: SchedulerState) -> Bool {
         if case .away = state { return true } else { return false }
     }
 
     // MARK: - The credit loop
 
-    func testPollingThroughAnAbsenceCreditsItOnceOnReturn() {
+    func testPollingThroughAnAbsenceHandlesItOnceOnReturn() {
         let harness = SchedulerHarness()
         harness.run(seconds: 10 * minute)
         harness.clearEffects()
 
         _ = stayAway(harness, for: 30 * minute)
         XCTAssertTrue(isAway(harness.state), "got \(harness.state)")
-        XCTAssertEqual(harness.snapshot.doneToday, 0, "nothing is credited while the user is still gone")
+        XCTAssertEqual(absenceCount(harness.effects), 0, "nothing is logged while the user is still gone")
         XCTAssertEqual(toastCount(harness.effects), 0)
 
         harness.clock.advance(2)
         poll(harness, idle: 0)
 
         XCTAssertTrue(harness.state.isSitting)
-        XCTAssertEqual(harness.snapshot.doneToday, 1)
+        XCTAssertEqual(harness.snapshot.doneToday, 0, "an absence is never a break")
+        XCTAssertEqual(absenceCount(harness.effects), 1)
         XCTAssertEqual(toastCount(harness.effects), 1)
         XCTAssertTrue(harness.effects.contains(.chime(.toast)), "the toast announces itself")
         let toast = harness.effects.compactMap { effect -> ToastInfo? in
@@ -80,19 +85,22 @@ final class AwayReturnTests: XCTestCase {
         XCTAssertEqual(harness.snapshot.doneToday, 0)
     }
 
-    func testAnAbsenceCannotBeginBeforeTheLastBreakEnded() {
+    func testAnAbsenceCannotBeginBeforeTheLastAbsenceEnded() {
         let harness = SchedulerHarness()
         harness.run(seconds: 10 * minute)
+        harness.clearEffects()
         let idle = stayAway(harness, for: 8 * minute)
         harness.clock.advance(60)
         harness.send(.wake(gapSeconds: 60))
         harness.run(seconds: 70)
-        XCTAssertEqual(harness.snapshot.doneToday, 1, "the machine woke with nobody at it")
+        XCTAssertEqual(absenceCount(harness.effects), 1, "the machine woke with nobody at it")
 
-        // Still nobody there: the idle clock has not reset, but those minutes were just credited.
+        // Still nobody there: the idle clock has not reset, but those minutes were just handled.
         harness.clock.advance(2)
         poll(harness, idle: idle + 132)
         XCTAssertTrue(harness.state.isSitting, "got \(harness.state)")
+        XCTAssertEqual(absenceCount(harness.effects), 1)
+        XCTAssertEqual(harness.snapshot.doneToday, 0)
     }
 
     // MARK: - A break the display slept on
@@ -136,18 +144,19 @@ final class AwayReturnTests: XCTestCase {
 
     // MARK: - Standby
 
-    /// The line between a credited break and standby is the sitting interval itself, whatever
-    /// that interval has been set to.
-    func testJustUnderTheSittingIntervalIsCreditedAndJustOverIsStandby() {
-        let credited = SchedulerHarness()
-        credited.run(seconds: 10 * minute)
-        credited.clearEffects()
-        _ = stayAway(credited, for: 54 * minute)
-        credited.clock.advance(2)
-        poll(credited, idle: 0)
+    /// The line between a toasted reset and standby is the sitting interval itself, whatever that
+    /// interval has been set to. Both are logged; only the shorter one says so.
+    func testJustUnderTheSittingIntervalIsToastedAndJustOverIsStandby() {
+        let toasted = SchedulerHarness()
+        toasted.run(seconds: 10 * minute)
+        toasted.clearEffects()
+        _ = stayAway(toasted, for: 54 * minute)
+        toasted.clock.advance(2)
+        poll(toasted, idle: 0)
 
-        XCTAssertEqual(credited.snapshot.doneToday, 1, "54 minutes is still a break")
-        XCTAssertEqual(toastCount(credited.effects), 1)
+        XCTAssertEqual(toasted.snapshot.doneToday, 0, "54 minutes away is not a break")
+        XCTAssertEqual(toastCount(toasted.effects), 1)
+        XCTAssertEqual(absenceCount(toasted.effects), 1)
 
         let standby = SchedulerHarness()
         standby.run(seconds: 10 * minute)
@@ -159,6 +168,7 @@ final class AwayReturnTests: XCTestCase {
 
         XCTAssertEqual(standby.snapshot.doneToday, 0, "56 minutes is standby")
         XCTAssertEqual(toastCount(standby.effects), 0, "standby says nothing")
+        XCTAssertEqual(absenceCount(standby.effects), 1, "but is logged")
         XCTAssertFalse(standby.effects.contains(.chime(.toast)))
         XCTAssertTrue(standby.state.isSitting)
         XCTAssertDate(standby.snapshot.boutStartedAt, back, accuracy: 6, "the countdown starts again")
@@ -466,8 +476,8 @@ final class AwayReturnCoordinatorTests: XCTestCase {
         harness.clock.advance(2)
         harness.coordinator.inject(.input(lastEventAgeSeconds: 0))
 
-        XCTAssertEqual(harness.history.data.breakRecords.map(\.outcome), [.credited])
-        XCTAssertEqual(harness.history.stats(on: harness.now).done, 1)
+        XCTAssertEqual(harness.history.data.breakRecords.map(\.outcome), [.awayReset])
+        XCTAssertEqual(harness.history.stats(on: harness.now).done, 0)
         XCTAssertEqual(harness.sink.names.filter { $0 == "showToast" }.count, 1)
         XCTAssertEqual(harness.sink.names.filter { $0 == "chime(toast)" }.count, 1)
     }

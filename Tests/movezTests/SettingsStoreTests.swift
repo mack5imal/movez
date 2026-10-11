@@ -27,6 +27,8 @@ final class SettingsStoreTests: XCTestCase {
         XCTAssertTrue(settings.suppressFullscreen)
         XCTAssertTrue(settings.fullscreenExceptions.isEmpty)
         XCTAssertEqual(settings.awayThresholdMinutes, 3)
+        XCTAssertEqual(settings.awayBehaviour, .reset)
+        XCTAssertEqual(settings.schedulerConfig.awayBehaviour, .reset)
         XCTAssertTrue(settings.soundsEnabled)
         XCTAssertFalse(settings.launchAtLogin)
         XCTAssertEqual(settings.debugTimeScale, 1)
@@ -48,6 +50,7 @@ final class SettingsStoreTests: XCTestCase {
         settings.suppressMic = false
         settings.fullscreenExceptions = ["us.zoom.xos"]
         settings.awayThresholdMinutes = 6
+        settings.awayBehaviour = .pause
         settings.soundsEnabled = false
         settings.launchAtLogin = true
         settings.debugTimeScale = 60
@@ -68,6 +71,7 @@ final class SettingsStoreTests: XCTestCase {
         XCTAssertFalse(reloaded.suppressMic)
         XCTAssertEqual(reloaded.fullscreenExceptions, ["us.zoom.xos"])
         XCTAssertEqual(reloaded.awayThresholdMinutes, 6)
+        XCTAssertEqual(reloaded.awayBehaviour, .pause)
         XCTAssertFalse(reloaded.soundsEnabled)
         XCTAssertTrue(reloaded.launchAtLogin)
         XCTAssertEqual(reloaded.debugTimeScale, 60)

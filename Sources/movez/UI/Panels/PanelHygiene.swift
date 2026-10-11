@@ -118,13 +118,16 @@ enum PanelHygiene {
             before: before
         )
         let rightInset = observation.visible.maxX - observation.frame.maxX
-        let bottomInset = observation.frame.minY - observation.visible.minY
-        emit("\(observation.line) rightInset=\(number(rightInset)) bottomInset=\(number(bottomInset))")
+        let topInset = observation.visible.maxY - observation.frame.maxY
+        emit("\(observation.line) rightInset=\(number(rightInset)) topInset=\(number(topInset))")
 
         var failures = observation.focusFailures
-        let inset = PanelWindowController.toastInset
-        if abs(rightInset - inset) > tolerance { failures.append("toast: right inset \(number(rightInset))") }
-        if abs(bottomInset - inset) > tolerance { failures.append("toast: bottom inset \(number(bottomInset))") }
+        if abs(rightInset - PanelWindowController.toastInset) > tolerance {
+            failures.append("toast: right inset \(number(rightInset))")
+        }
+        if abs(topInset - PanelWindowController.topInset) > tolerance {
+            failures.append("toast: top inset \(number(topInset))")
+        }
 
         controller.hideToast(animated: false)
         SnapshotRenderer.pumpRunLoop(seconds: 0.2)

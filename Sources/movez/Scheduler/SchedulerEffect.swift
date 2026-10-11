@@ -64,20 +64,22 @@ struct MicroInfo: Equatable {
     var seconds: Int
 }
 
+/// An absence long enough to have moved the countdowns, for the history.
+struct AbsenceRecord: Equatable {
+    var behaviour: AwayBehaviour
+    var awaySeconds: Int
+}
+
 /// The away toast.
 struct ToastInfo: Equatable {
-    enum Kind: String, Equatable {
-        case creditedFullBreak
-        case creditedMicroBreak
-    }
-
-    /// How long the credit stays reversible, which is how long the toast stays on screen.
+    /// How long "I was sitting" stays available, which is how long the toast stays on screen.
     ///
     /// Fifteen, not the handoff's six: the toast usually lands the moment a display wakes, and six
     /// seconds had gone before a hand reached the trackpad (`docs/DECISIONS.md` 23a).
     static let defaultSecondsOnScreen = 15
 
-    var kind: Kind
+    /// What the absence did: reset the countdowns, or paused them.
+    var behaviour: AwayBehaviour
     var awaySeconds: Int
     var nextBreakAt: Date?
     var reversal: ToastReversal
@@ -105,6 +107,8 @@ enum SchedulerEffect: Equatable {
     case showMicroRunning
     /// The micro-break ran long enough to count, and its movements belong in history.
     case recordMicroDone(seconds: Int)
+    /// An absence reset or paused the countdowns. Logged, but not a break: it counts for nothing.
+    case recordAbsence(AbsenceRecord)
     case hideMicro
     case chime(Chime)
     case showToast(ToastInfo)
@@ -129,6 +133,7 @@ extension SchedulerEffect {
         case .showMicroCountIn: return "showMicroCountIn"
         case .showMicroRunning: return "showMicroRunning"
         case .recordMicroDone(let seconds): return "recordMicroDone(\(seconds))"
+        case .recordAbsence(let record): return "recordAbsence(\(record.behaviour.rawValue))"
         case .hideMicro: return "hideMicro"
         case .chime(let chime): return "chime(\(chime.rawValue))"
         case .showToast: return "showToast"

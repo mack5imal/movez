@@ -1,11 +1,11 @@
 import SwiftUI
 
-/// "Away 7 min · counted as your break", bottom-right, for fifteen seconds.
+/// "Away 7 min · break timer reset" (or "paused"), top-right, for fifteen seconds.
 ///
-/// The credit is taken as soon as the user comes back, and the toast is the only way to give it
-/// back. That is why it is a toast and not a dialog: crediting the break is nearly always right,
-/// and the rare wrong case should cost one click, not an interruption. Dismiss is the other click:
-/// the credit stands and the toast goes, without waiting out its fifteen seconds.
+/// The countdowns are reset or paused as soon as the user comes back, and the toast is the only way
+/// to undo it. That is why it is a toast and not a dialog: it is nearly always right, and the rare
+/// wrong case should cost one click, not an interruption. Dismiss is the other click: what happened
+/// stands and the toast goes, without waiting out its fifteen seconds.
 struct AwayToastView: View {
     @ObservedObject var viewModel: PanelViewModel
 

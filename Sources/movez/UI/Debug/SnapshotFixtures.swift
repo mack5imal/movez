@@ -209,10 +209,10 @@ extension SnapshotFixtures {
             totalSeconds: ToastInfo.defaultSecondsOnScreen
         )
         model.toast = ToastInfo(
-            kind: .creditedFullBreak,
+            behaviour: .reset,
             awaySeconds: 7 * 60,
             nextBreakAt: toastNextBreak,
-            reversal: .wasSittingAfterFullCredit
+            reversal: .wasSitting
         )
         return model
     }

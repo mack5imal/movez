@@ -14,7 +14,7 @@ extension Scheduler {
             return []
         case .paused, .offHours:
             // A pause outlasts a closed lid, and off hours there is nothing to interrupt. Going
-            // away here would cancel the pause and credit a break the user never took.
+            // away here would cancel the pause and reset a countdown that was not running.
             return []
         case .postBreakGrace(_, .returnFromAbsence(let since, _)):
             // Woke and went straight back to sleep inside the quiet minute. The absence being
@@ -42,8 +42,7 @@ extension Scheduler {
         for dismissal in [SchedulerEffect.hideHeadsUp, .hideMicro] where !effects.contains(dismissal) {
             effects.append(dismissal)
         }
-        snapshot.dueAtAway = snapshot.nextFullDueAt
-        snapshot.remainingAtAwaySeconds = snapshot.nextFullDueAt.map { max(0, Int($0.timeIntervalSince(now))) }
+        captureCountdowns(at: now)
         // The idle age at the moment of locking is unknown here; the next poll sets the baseline.
         snapshot.awayInputAge = nil
         transition(to: .away(since: now), reason: reason, at: now)
@@ -263,7 +262,7 @@ extension Scheduler {
     /// A new sitting session: the interval starts from now and nothing is owed from the last one.
     ///
     /// The three transients cleared here are kept across midnight on purpose — a break interrupted
-    /// at 23:58 must still resume, a credit taken at 23:59:58 must still be reversible while its
+    /// at 23:58 must still resume, an absence handled at 23:59:58 must still be reversible while its
     /// toast is up, and a break deferred by a call still in progress is still owed. They are only
     /// moot once the session they belong to has genuinely ended.
     mutating func startFreshSession(now: Date, reason: String) -> [SchedulerEffect] {

@@ -66,6 +66,11 @@ final class SettingsViewModel: ObservableObject {
         Focus.allCases.map { ($0, $0.displayName) }
     }
 
+    static let awayBehaviourOptions: [(value: AwayBehaviour, label: String)] = [
+        (.reset, "Reset timer"),
+        (.pause, "Pause timer")
+    ]
+
     static var awayOptions: [(value: Int, label: String)] {
         SettingsStore.awayThresholdRange.map { ($0, "\($0) min") }
     }
@@ -230,6 +235,11 @@ final class SettingsViewModel: ObservableObject {
 
     func setSuppressFullscreen(_ on: Bool) {
         settings.suppressFullscreen = on
+        changed()
+    }
+
+    func setAwayBehaviour(_ behaviour: AwayBehaviour) {
+        settings.awayBehaviour = behaviour
         changed()
     }
 

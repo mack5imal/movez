@@ -197,6 +197,12 @@ struct SettingsView: View {
                     accessibilityName: "Count me away after"
                 )
             }
+            SettingsRow(label: "When I'm away") {
+                SegmentedControl(
+                    options: SettingsViewModel.awayBehaviourOptions,
+                    selection: Binding(get: { settings.awayBehaviour }, set: viewModel.setAwayBehaviour)
+                )
+            }
         }
     }
 

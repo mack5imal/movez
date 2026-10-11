@@ -13,7 +13,8 @@ final class PanelWindowController {
     static let fade: TimeInterval = 0.16
     /// The gap between the menu bar and the top of a panel.
     static let topInset: CGFloat = 12
-    /// The toast's inset from the bottom-right corner of the working area.
+    /// The toast's inset from the right edge of the working area. It sits `topInset` below the
+    /// menu bar, level with the panels, in the top-right corner.
     static let toastInset: CGFloat = 20
     /// Room around the shell for its drop shadow, which would otherwise clip at the window edge.
     static let shadowMargin: CGFloat = 44
@@ -112,7 +113,7 @@ final class PanelWindowController {
     static func toastFrame(shell: CGSize, visible: NSRect) -> NSRect {
         NSRect(
             x: (visible.maxX - toastInset - shell.width).rounded(),
-            y: (visible.minY + toastInset).rounded(),
+            y: (visible.maxY - topInset - shell.height).rounded(),
             width: shell.width,
             height: shell.height
         )

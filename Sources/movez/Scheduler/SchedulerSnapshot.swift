@@ -24,6 +24,12 @@ struct SchedulerSnapshot: Codable, Equatable {
     /// untouched rather than restarted.
     var remainingAtAwaySeconds: Int?
     var dueAtAway: Date?
+    /// The micro-break countdown as it stood when the user walked away, for the pause behaviour.
+    /// Nil when no micro-break was scheduled.
+    var remainingMicroAtAwaySeconds: Int?
+    /// When the last absence ended, however it ended. An absence cannot begin before it, or the
+    /// same idle minutes are counted again by the next poll after a wake nobody was there for.
+    var lastAbsenceEndedAt: Date?
     /// The largest input age seen since the user went away. Idle time only grows until something
     /// is touched, so a reading below it is the evidence of a return. Optional so older state
     /// files still decode.
@@ -73,11 +79,15 @@ struct InterruptedBreak: Codable, Equatable {
     var totalBlocks: Int
 }
 
-/// Enough of the snapshot to undo an away credit when the user taps "I was sitting".
+/// Enough of the snapshot to undo what an absence did to the countdowns when the user taps "I was
+/// sitting". The name is from when an absence was credited as a break; it stays so a persisted
+/// one still decodes.
 struct CreditRestore: Codable, Equatable {
     var boutStartedAt: Date
     var nextFullDueAt: Date?
     var nextMicroDueAt: Date?
+    /// Optional so a restore written before the pause behaviour existed still decodes.
+    var microAnchorAt: Date?
     var lastCompletedBreakAt: Date?
     var doneToday: Int
     var longestBoutSeconds: Int

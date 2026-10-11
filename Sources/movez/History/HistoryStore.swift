@@ -15,12 +15,23 @@ enum BreakResult: String, Codable, Equatable, CaseIterable {
     case done
     case skipped
     case snoozed
-    /// A five-minute absence the scheduler credited as a break.
+    /// A five-minute absence an earlier build credited as a break. No longer written, but it still
+    /// counts as done, so the days it was recorded on keep their numbers.
     case credited
+    /// An absence that reset the countdowns. Logged, and worth nothing: not done, not skipped.
+    case awayReset
+    /// An absence that paused the countdowns. Logged the same way.
+    case awayPaused
 
-    /// Snoozing is a deferral, so it neither counts for nor against the streak.
-    var affectsStreak: Bool { self != .snoozed }
+    /// Snoozing is a deferral and an absence is not a break, so neither counts for or against the
+    /// streak.
+    var affectsStreak: Bool { self != .snoozed && !isAbsence }
     var countsAsCompleted: Bool { self == .done || self == .credited }
+    var isAbsence: Bool { self == .awayReset || self == .awayPaused }
+
+    init(_ behaviour: AwayBehaviour) {
+        self = behaviour == .reset ? .awayReset : .awayPaused
+    }
 }
 
 /// One break, as it happened.
@@ -56,9 +67,9 @@ struct DailyStats: Codable, Equatable {
 
     /// "1 snoozed · 1 skipped".
     ///
-    /// `done` is deliberately not shown. It counts credited absences as well as routines, and a
-    /// day spent away from the desk can run the figure up without the user having done a single
-    /// movement, which made it the least trustworthy number in the menu.
+    /// `done` is deliberately not shown. On days before October 2026 it counts credited absences
+    /// as well as routines, and a day spent away from the desk ran the figure up without the user
+    /// having done a single movement, which made it the least trustworthy number in the menu.
     var summary: String {
         "\(snoozed) snoozed · \(skipped) skipped"
     }
@@ -123,6 +134,7 @@ final class HistoryStore {
         case .done, .credited: stats.done += 1
         case .skipped: stats.skipped += 1
         case .snoozed: stats.snoozed += 1
+        case .awayReset, .awayPaused: break
         }
         if let longestBoutSeconds { stats.longestBoutSeconds = max(stats.longestBoutSeconds, longestBoutSeconds) }
         data.days[key] = stats
@@ -149,6 +161,7 @@ final class HistoryStore {
             case .done, .credited: stats.done = max(0, stats.done - 1)
             case .skipped: stats.skipped = max(0, stats.skipped - 1)
             case .snoozed: stats.snoozed = max(0, stats.snoozed - 1)
+            case .awayReset, .awayPaused: break
             }
             data.days[key] = stats
         }
@@ -217,9 +230,10 @@ final class HistoryStore {
         return streak
     }
 
-    /// The most recent day with any break recorded — what the off-hours menu shows.
+    /// The most recent day with any break recorded — what the off-hours menu shows. A day with
+    /// nothing but absences on it had no breaks to show.
     func lastRecordedDay() -> RecordedDay? {
-        guard let record = data.breakRecords.last else { return nil }
+        guard let record = data.breakRecords.last(where: { !$0.outcome.isAbsence }) else { return nil }
         let key = DayKey.key(for: record.at, calendar: calendar)
         return RecordedDay(key: key, date: record.at, stats: data.days[key] ?? .empty)
     }

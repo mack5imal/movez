@@ -46,10 +46,9 @@ enum SchedulerEvent: Equatable {
     case toastReverse(ToastReversal)
 }
 
-/// The two reversible credits the away toast offers.
+/// What the away toast can undo.
 enum ToastReversal: String, Codable, Equatable {
-    /// "I was sitting" after a credited full break — restore the interval that was running.
-    case wasSittingAfterFullCredit
-    /// "I was sitting" after a micro credit — restore the paused countdown.
-    case wasSittingAfterMicroCredit
+    /// "I was sitting": the time away was sitting after all, so the countdowns go back to running
+    /// through it as if the user never left.
+    case wasSitting
 }

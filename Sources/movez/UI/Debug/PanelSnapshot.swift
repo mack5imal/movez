@@ -2,8 +2,8 @@ import SwiftUI
 
 /// A floating panel as a snapshot: the panel where it actually sits, over a placeholder desktop.
 ///
-/// The panels are placed rather than centred — top-centre under the menu bar, or bottom-right
-/// with its 20 pt inset — so the PNG carries the placement as well as the contents, and can be
+/// The panels are placed rather than centred — top-centre under the menu bar, or the toast in the
+/// top-right corner — so the PNG carries the placement as well as the contents, and can be
 /// held next to `screenshots/3a-panels-and-toast.png`.
 struct PanelSnapshot: View {
     var viewModel: PanelViewModel
@@ -11,7 +11,7 @@ struct PanelSnapshot: View {
 
     enum Placement {
         case topCentre
-        case bottomRight
+        case topRight
     }
 
     /// The light desktop the handoff draws its panels over.
@@ -19,7 +19,7 @@ struct PanelSnapshot: View {
     private static let desktopCard = MovezColor(hex: 0xF7F5_F0)
 
     var body: some View {
-        ZStack(alignment: placement == .topCentre ? .top : .bottomTrailing) {
+        ZStack(alignment: placement == .topCentre ? .top : .topTrailing) {
             desktop
             panel
         }
@@ -31,9 +31,10 @@ struct PanelSnapshot: View {
         case .topCentre:
             PanelHost(viewModel: viewModel)
                 .padding(.top, PanelWindowController.topInset)
-        case .bottomRight:
+        case .topRight:
             AwayToastView(viewModel: viewModel)
-                .padding(PanelWindowController.toastInset)
+                .padding(.top, PanelWindowController.topInset)
+                .padding(.trailing, PanelWindowController.toastInset)
         }
     }
 

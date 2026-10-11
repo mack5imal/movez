@@ -81,7 +81,7 @@ final class DebugViewModelTests: XCTestCase {
 
     // MARK: - Injectors
 
-    func testSevenMinutesIdleGoesAwayAndIsCreditedOnTheNextKeystroke() {
+    func testSevenMinutesIdleGoesAwayAndResetsOnTheNextKeystroke() {
         let harness = harness()
         debug(harness).fire(.idleSeven)
         XCTAssertEqual(harness.state.name, "away")
@@ -89,17 +89,19 @@ final class DebugViewModelTests: XCTestCase {
         harness.coordinator.report(inputAgeSeconds: 0)
         XCTAssertEqual(harness.state.name, "sitting")
         XCTAssertTrue(
-            reasons(harness).contains { $0.contains("credited as a break") },
+            reasons(harness).contains { $0.contains("countdowns reset") },
             reasons(harness).joined(separator: " | ")
         )
-        XCTAssertEqual(harness.coordinator.toastInfo?.kind, .creditedFullBreak)
+        XCTAssertEqual(harness.coordinator.toastInfo?.behaviour, .reset)
     }
 
-    func testFourMinutesIdleIsOnlyWorthAMicroBreak() {
+    /// Four minutes and seven are the same kind of absence now: past the threshold is past it.
+    func testFourMinutesIdleIsTheSameAsSeven() {
         let harness = harness()
         debug(harness).fire(.idleFour)
         harness.coordinator.report(inputAgeSeconds: 0)
-        XCTAssertEqual(harness.coordinator.toastInfo?.kind, .creditedMicroBreak)
+        XCTAssertEqual(harness.coordinator.toastInfo?.behaviour, .reset)
+        XCTAssertEqual(harness.coordinator.toastInfo?.awaySeconds, 240)
     }
 
     func testMicOnSuppressesAndMicOffOpensTheGrace() {

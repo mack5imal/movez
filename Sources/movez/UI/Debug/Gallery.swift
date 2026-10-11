@@ -162,7 +162,7 @@ struct GalleryView: View {
                     HStack(alignment: .top, spacing: 10) {
                         Circle().fill(Tokens.accent.color).frame(width: 10, height: 10).padding(.top, 4)
                         VStack(alignment: .leading, spacing: 2) {
-                            MovezText("Away 7 min · counted as your break", MovezType.toastTitle)
+                            MovezText("Away 7 min · break timer reset", MovezType.toastTitle)
                             MovezText("Next break at 14:02", MovezType.toastBody, color: Tokens.text2)
                         }
                         Spacer(minLength: 8)

@@ -32,11 +32,12 @@ extension AppCoordinator {
     /// Toasts, persistence and polling.
     private func applySideEffect(_ effect: SchedulerEffect) {
         switch effect {
+        case .recordAbsence(let record):
+            recordAbsence(record)
         case .showToast(let info):
-            recordCredit(info)
             toastInfo = info
         case .hideToast:
-            reverseCreditRecord()
+            reverseAbsenceRecord()
             toastInfo = nil
         case .recordHeadsUpOutcome(let outcome):
             recordHeadsUpOutcome(outcome)
@@ -192,15 +193,16 @@ extension AppCoordinator {
         }
     }
 
-    // MARK: - Credited absences
+    // MARK: - Absences
 
-    private func recordCredit(_ info: ToastInfo) {
-        guard info.kind == .creditedFullBreak else { return }
+    /// Writes down that an absence reset or paused the countdowns. It goes in the same list as the
+    /// breaks, so the record says what happened, but it moves none of the day's numbers.
+    private func recordAbsence(_ record: AbsenceRecord) {
         history.record(
             breakRecord: BreakRecord(
                 at: clock.now,
-                routineName: "Away \(info.awaySeconds / 60) min",
-                outcome: .credited,
+                routineName: "Away \(record.awaySeconds / 60) min",
+                outcome: BreakResult(record.behaviour),
                 completedBlocks: 0,
                 totalBlocks: 0
             ),
@@ -208,11 +210,10 @@ extension AppCoordinator {
         )
     }
 
-    /// "I was sitting" takes the credited break back out of the record as well as out of the
-    /// scheduler.
-    private func reverseCreditRecord() {
-        guard toastInfo?.kind == .creditedFullBreak else { return }
-        history.removeLastBreakRecord(matching: .credited)
+    /// "I was sitting" takes the absence back out of the record as well as out of the scheduler.
+    private func reverseAbsenceRecord() {
+        guard let toast = toastInfo else { return }
+        history.removeLastBreakRecord(matching: BreakResult(toast.behaviour))
     }
 
     // MARK: - Routine selection

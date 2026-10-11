@@ -52,6 +52,22 @@ final class SettingsLiveUpdateTests: XCTestCase {
         XCTAssertEqual(harness.scheduler.snapshot.boutStartedAt, boutStart)
     }
 
+    func testTheAwayBehaviourReachesTheScheduler() {
+        let harness = harness()
+        let settings = viewModel(harness)
+        XCTAssertEqual(SettingsViewModel.awayBehaviourOptions.map(\.label), ["Reset timer", "Pause timer"])
+        settings.setAwayBehaviour(.pause)
+        XCTAssertEqual(harness.scheduler.config.awayBehaviour, .pause)
+
+        harness.run(seconds: 10 * 60)
+        let due = harness.scheduler.snapshot.nextFullDueAt
+        harness.clock.advance(4 * 60)
+        harness.coordinator.inject(.idle(seconds: 4 * 60))
+        harness.coordinator.inject(.input(lastEventAgeSeconds: 0))
+        XCTAssertEqual(harness.coordinator.toastInfo?.behaviour, .pause)
+        XCTAssertEqual(harness.scheduler.snapshot.nextFullDueAt, due?.addingTimeInterval(4 * 60))
+    }
+
     func testTheAwayThresholdReachesTheScheduler() {
         let harness = harness()
         let settings = viewModel(harness)
@@ -61,7 +77,7 @@ final class SettingsLiveUpdateTests: XCTestCase {
         harness.sink.clear()
         harness.run(seconds: 4)
 
-        // Five minutes away is under the new six-minute threshold, so nothing is credited.
+        // Five minutes away is under the new six-minute threshold, so nothing happens.
         harness.coordinator.inject(.idle(seconds: 5 * 60))
         XCTAssertEqual(harness.state.name, "sitting", "not away yet at the new threshold")
 

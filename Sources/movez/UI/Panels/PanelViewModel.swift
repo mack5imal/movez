@@ -283,8 +283,8 @@ final class PanelViewModel: ObservableObject {
 
     var toastTitle: String {
         guard let toast else { return "" }
-        let credited = toast.kind == .creditedFullBreak ? "counted as your break" : "counted as a micro-break"
-        return "Away \(toast.awaySeconds / 60) min · \(credited)"
+        let what = toast.behaviour == .reset ? "break timer reset" : "break timer paused"
+        return "Away \(toast.awaySeconds / 60) min · \(what)"
     }
 
     var toastSubtitle: String {
@@ -330,14 +330,15 @@ final class PanelViewModel: ObservableObject {
         }
     }
 
-    /// "I was sitting" — hand the credit back and take the toast away.
+    /// "I was sitting" — undo what the absence did and take the toast away.
     func reverse() {
         guard phase == .toast else { return }
         actions.reverseToast()
         actions.dismiss()
     }
 
-    /// "Dismiss" — take the toast away and keep the credit, exactly as running out of time does.
+    /// "Dismiss" — take the toast away and let the reset or pause stand, exactly as running out of
+    /// time does.
     func dismissToast() {
         guard phase == .toast else { return }
         actions.dismiss()
