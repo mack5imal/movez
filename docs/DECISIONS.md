@@ -107,7 +107,7 @@ Sources of truth, in order: `product-brief-v1.md`, `scheduler-research-v1.md`,
 21. **Nothing is polled while paused or off hours.** The signal monitors stop outright rather than
     sampling into a void; a thirty-second wake-check notices when the pause runs out.
 22. **A break counts as done at half the movements or half the time** (research §4.11).
-23. **Idle is credited in two tiers**: three to five minutes hands the countdown back with the
+23. *(Superseded by 43.)* **Idle is credited in two tiers**: three to five minutes hands the countdown back with the
     time it had left; five minutes up to a whole sitting interval is a full break. Both are
     reversible while the away toast is up, because movez cannot tell a walk to the kitchen from a
     long read on paper. Longer than that is standby (23c), and is not credited at all.
@@ -235,7 +235,7 @@ are in `docs/rule-changes-2026-10.md` and `scripts/simulate_selection.py`.
     appears on a hollow disc counting down from −0:05 so it can be read before its minute starts;
     Next still goes to the next movement. A break is 5:25, and `breakSeconds` follows it, so the
     half-time rule (22) is now 162 s. The transition chime still plays as a movement appears.
-30. **A micro-break is drawn straight from the micro-eligible pool, and runs its own length.** A
+30. *(Lengths amended by 39.)* **A micro-break is drawn straight from the micro-eligible pool, and runs its own length.** A
     per-side movement fills the minute alone, thirty seconds a side; otherwise two one-sided
     movements run thirty seconds each, with a five-second lead-in before the second, for 65 s. No
     bucket is drawn first and there is no emphasis rotation: giving the eight eye and breathing
@@ -262,3 +262,79 @@ are in `docs/rule-changes-2026-10.md` and `scripts/simulate_selection.py`.
 34. **Focus is a body region, not a kind of movement.** "More balance" is gone: balance is in every
     break. "More hands and eyes" stays, as the wrist/forearm and eye regions. A stored
     `moreBalance` reads as no focus.
+
+## October 2026 changes
+
+35. **The app version is set once and the build number counts itself.** `MARKETING_VERSION` in
+    `project.yml` feeds `Info.plist`, and `make version V=x.y.z` is the one way to change it. A
+    build phase stamps `CFBundleVersion` with the commit count before signing, so every commit has a
+    higher build number without anyone remembering to bump it. Versions stay below 1.0 — a minor
+    bump for a release with features, a patch bump for one with only fixes — and this build is
+    0.5.0: in daily use and roughly whole for its first scope. The library carries its own version
+    (41), and the Settings footer reads all three from what is installed.
+36. **The break screen always shows the instructions.** "I know this one" collapsed a movement's
+    instruction for good, and nobody needs it: the instruction is the reason the break has a
+    screen. The per-movement memory of collapsed instructions went with it — removing only the link
+    would have hidden those instructions permanently — and the stored field stays in the history
+    file, unread, so the file still decodes.
+37. **The break's time left is worked out from the plan.** It used to be the wall clock since the
+    break began, while each movement started on whichever one-second tick noticed the last one
+    end, so the two counters drifted apart by up to a second a movement and the break could run
+    out with the movement still on four seconds. Now each movement starts at the previous one's
+    planned end, and the header is the current movement's remainder plus the planned movements
+    after it, rounded the same way. Pressing Next takes the skipped time off the header.
+38. **A full break can be paused so a movement can be read.** Pause, or Space, stops both
+    countdowns and every chime; the disc says PAUSED and the header says how long the pause may
+    last, and nothing covers the movement or its instruction. Snooze, Skip and Done still work and
+    Next does not, so a stray Return cannot move on from a movement being read. Five minutes in one
+    pause ends the break — as done if it already counts, otherwise as snoozed even with no snoozes
+    left, because a break left paused is coming back, not being skipped. Paused time does not count
+    toward the completion rule (22). A lid closed during a pause still ends the break as an
+    interrupted one (20), judged by the wall clock; that is not worth the scheduler knowing about
+    pauses it otherwise never sees. The micro-break panel has no pause.
+39. **A micro-break's first movement gets a lead-in too.** The count-in names the movement but
+    never showed its instructions, and the movement started the moment the count-in ended. Every
+    movement in a micro-break now opens with the five-second lead-in a full break has, with the
+    transition chime as it appears, so a micro-break runs 65 s with one movement and 70 s with two.
+    `microSeconds` is 70, amending 30.
+40. **Rings fill as a movement runs and drain as a start approaches, everywhere.** The full break's
+    ring always filled; the micro-break panel's drained, which looked like it was running
+    backwards next to it. A movement's ring now fills in both, per side for a per-side movement,
+    and only count-ins and lead-ins drain.
+41. **The library says what a movement cannot be done without, and settings say what the user
+    lacks.** Movement library 4.1 adds `requires` — floor, wall, stairs — to every movement, set
+    by hand from the instructions and only where there is no alternative: the couch stretch needs
+    the floor but a wall *or* a chair will do, and a fingertip on the wall for balance is not a
+    wall requirement. The existing `settings` field could not be used, because it mixes "can be
+    done at" with "needs" (`["Stand","Wall"]` is optional support, `["Floor","Wall"]` needs both).
+    Three switches under Movements — a wall, floor space, stairs nearby — default on, and a
+    movement needing something switched off is never served in either kind of break. The builder
+    never relaxes that rule, since no shortage of options makes stairs appear; with all three off,
+    no equipment and the default difficulty cap, the strength slot still has ten movements to draw
+    from, three of them new. The loader now checks the
+    counts the JSON declares for itself, so a library revision needs no code change.
+42. **Twelve core movements, and a More core focus.** The library had five core movements, all on
+    the floor and all competing with thirty-three others for the one strength slot, so they almost
+    never came up. Nine floor movements (crunch, sit-up, lying leg raise, scissor kicks, bicycle
+    crunch, reverse crunch, hollow body hold, alternating heel taps, V-up) and three that need no
+    floor (standing oblique crunch, desk plank, seated knee tucks) join the strength bucket as
+    STR-39 to STR-50, so core work reaches someone who will not get down on the floor at the
+    office. They share the strength slot rather than getting one of their own; "More core" weights
+    the core region up for anyone who wants more of it.
+43. **An absence resets or pauses the countdowns, and is never a break.** This replaces the two
+    credit tiers (23). Any absence past "Count me away after" either starts both countdowns again
+    or pauses them — the user's choice under "When I'm away", reset by default — so the hidden
+    five-minute line between a micro-break credit and a full one is gone. It adds nothing to the
+    day's count and neither builds nor breaks the streak; it is written to history as an away entry
+    (`awayReset` or `awayPaused`) that counts for nothing, and "I was sitting" takes the entry back
+    out with the rest. Records written as `credited` before keep counting, so days already recorded
+    keep their numbers. The toast says what happened — "Away 7 min · break timer reset", or
+    "paused" — and Dismiss lets it stand (amending 23a). Standby (23c) is unchanged in either
+    behaviour, silent and restarting, but it is now logged as a reset too; a launch gap is still not
+    (20b), because nothing was observed. Pausing moves the bout forward with the due times, as the
+    launch shift does, so a later settings change cannot make the countdown jump. An older build
+    that reads a history file with an away entry in it cannot decode it and starts fresh; that only
+    matters on a downgrade.
+44. **The away toast sits in the top-right corner**, twelve points under the menu bar like the
+    panels and twenty in from the edge, rather than bottom-right as the handoff draws it. The
+    panels sit top-centre, so the two never meet.
