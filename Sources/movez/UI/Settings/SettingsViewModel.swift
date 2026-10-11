@@ -168,6 +168,21 @@ final class SettingsViewModel: ObservableObject {
         changed()
     }
 
+    func setWallAvailable(_ available: Bool) {
+        settings.wallAvailable = available
+        changed()
+    }
+
+    func setFloorAvailable(_ available: Bool) {
+        settings.floorAvailable = available
+        changed()
+    }
+
+    func setStairsAvailable(_ available: Bool) {
+        settings.stairsAvailable = available
+        changed()
+    }
+
     func setDifficultyCap(_ cap: Int) {
         settings.difficultyCap = cap
         changed()

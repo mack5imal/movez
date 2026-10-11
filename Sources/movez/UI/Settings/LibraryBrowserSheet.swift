@@ -69,6 +69,7 @@ struct LibraryBrowserSheet: View {
                     LibraryRow(
                         movement: movement,
                         excluded: viewModel.isExcluded(movement.id),
+                        unavailable: viewModel.settings.unavailableRequirements,
                         setExcluded: { viewModel.setExcluded(movement.id, $0) }
                     )
                     MovezDivider(color: Tokens.ruleSettings)
@@ -84,26 +85,34 @@ struct LibraryBrowserSheet: View {
 struct LibraryRow: View {
     var movement: Movement
     var excluded: Bool
+    /// What the user has said they do not have. A movement that needs it is shown dimmed: it is
+    /// out of rotation whatever its switch says.
+    var unavailable: Set<Requirement> = []
     var setExcluded: (Bool) -> Void
+
+    private var outOfReach: Bool { movement.needsAny(of: unavailable) }
 
     var body: some View {
         HStack(spacing: 12) {
             MovezText(movement.id, MovezType.version, color: Tokens.text3)
                 .frame(width: 56, alignment: .leading)
             VStack(alignment: .leading, spacing: 2) {
-                MovezText(movement.name, MovezType.settingsRow, color: excluded ? Tokens.text3 : Tokens.text)
+                MovezText(movement.name, MovezType.settingsRow, color: excluded || outOfReach ? Tokens.text3 : Tokens.text)
                 MovezText(subtitle, MovezType.version, color: Tokens.text3)
             }
             Spacer(minLength: 12)
             MovezToggle(isOn: Binding(get: { !excluded }, set: { setExcluded(!$0) }))
         }
         .padding(.vertical, 9)
-        .opacity(excluded ? 0.75 : 1)
+        .opacity(excluded || outOfReach ? 0.75 : 1)
     }
 
-    /// "Circulation & metabolic · Diff 1 · micro"
-    private var subtitle: String {
+    /// "Strength · Diff 1 · needs floor", or "Circulation & metabolic · Diff 1 · micro"
+    var subtitle: String {
         var parts = [movement.bucket.displayName, "Diff \(movement.difficulty)"]
+        if !movement.requires.isEmpty {
+            parts.append("needs " + movement.requires.map(\.displayName).joined(separator: " and "))
+        }
         if movement.microEligible { parts.append("micro") }
         return parts.joined(separator: " · ")
     }

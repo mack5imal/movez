@@ -18,6 +18,10 @@ final class SettingsStoreTests: XCTestCase {
         XCTAssertEqual(settings.difficultyCap, 2)
         XCTAssertTrue(settings.excludedMovementIds.isEmpty)
         XCTAssertEqual(settings.focus, .none)
+        XCTAssertTrue(settings.wallAvailable)
+        XCTAssertTrue(settings.floorAvailable)
+        XCTAssertTrue(settings.stairsAvailable)
+        XCTAssertEqual(settings.unavailableRequirements, [])
         XCTAssertTrue(settings.suppressMic)
         XCTAssertTrue(settings.suppressCapture)
         XCTAssertTrue(settings.suppressFullscreen)
@@ -38,6 +42,9 @@ final class SettingsStoreTests: XCTestCase {
         settings.difficultyCap = 3
         settings.excludedMovementIds = ["FLX-01", "STR-09"]
         settings.focus = .moreHandsEyes
+        settings.wallAvailable = false
+        settings.floorAvailable = false
+        settings.stairsAvailable = false
         settings.suppressMic = false
         settings.fullscreenExceptions = ["us.zoom.xos"]
         settings.awayThresholdMinutes = 6
@@ -57,6 +64,7 @@ final class SettingsStoreTests: XCTestCase {
         XCTAssertEqual(reloaded.difficultyCap, 3)
         XCTAssertEqual(reloaded.excludedMovementIds, ["FLX-01", "STR-09"])
         XCTAssertEqual(reloaded.focus, .moreHandsEyes)
+        XCTAssertEqual(reloaded.unavailableRequirements, [.wall, .floor, .stairs])
         XCTAssertFalse(reloaded.suppressMic)
         XCTAssertEqual(reloaded.fullscreenExceptions, ["us.zoom.xos"])
         XCTAssertEqual(reloaded.awayThresholdMinutes, 6)

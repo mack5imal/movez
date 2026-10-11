@@ -85,6 +85,7 @@ struct RoutineBuilder {
 
     private func usable(_ movement: Movement, context: RoutineContext) -> Bool {
         if movement.needsEquipment, context.equipment.isDisjoint(with: movement.equipmentOptional) { return false }
+        if movement.needsAny(of: context.unavailable) { return false }
         if context.excluded.contains(movement.id) { return false }
         if context.usedMovementIdsToday.contains(movement.id) { return false }
         if movement.difficulty > context.difficultyCap { return false }

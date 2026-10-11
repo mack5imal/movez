@@ -160,6 +160,7 @@ extension AppCoordinator {
         context.nextFullRoutineIds = Set(previewNextRoutine(now: clock.now)?.movementIds ?? [])
         context.excluded = settings.excludedMovementIds
         context.equipment = settings.equipment
+        context.unavailable = settings.unavailableRequirements
         context.recency = history.recencyScores(before: clock.now)
         context.seed = SplitMix64.seed(day: scheduler.snapshot.dayKey, index: 1_000 + scheduler.snapshot.microEmphasisIndex)
         currentMicro = microBuilder.build(context: context)
@@ -242,7 +243,8 @@ extension AppCoordinator {
             String(settings.excludedMovementIds.count),
             settings.focus.rawValue,
             String(settings.difficultyCap),
-            settings.equipment.map(\.rawValue).sorted().joined(separator: "+")
+            settings.equipment.map(\.rawValue).sorted().joined(separator: "+"),
+            settings.unavailableRequirements.map(\.rawValue).sorted().joined(separator: "+")
         ].joined(separator: "|")
     }
 
@@ -253,6 +255,7 @@ extension AppCoordinator {
         context.usedMovementIdsToday = usedMovementIdsToday(at: now)
         context.usedStrRegionsLastBreak = routinesToday.last?.strengthRegions ?? []
         context.equipment = settings.equipment
+        context.unavailable = settings.unavailableRequirements
         context.excluded = settings.excludedMovementIds
         context.focus = settings.focus
         context.difficultyCap = settings.difficultyCap

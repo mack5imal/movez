@@ -3,7 +3,8 @@ import Foundation
 /// Assembles the micro-break: one per-side movement for the whole minute, thirty seconds a side,
 /// or two one-sided movements of thirty seconds each.
 ///
-/// Micro-break rules (library §11): micro-eligible movements only, no floor, no equipment. Never a
+/// Micro-break rules (library §11): micro-eligible movements only, no floor, no equipment, nothing
+/// that needs what the user has said they do not have. Never a
 /// repeat of the last micro-break, never a movement the next full break is about to use, and
 /// never anything already served today.
 ///
@@ -50,6 +51,7 @@ struct MicroBreakBuilder {
         library.microEligible.filter { movement in
             !movement.needsEquipment
                 && !movement.requiresFloor
+                && !movement.needsAny(of: context.unavailable)
                 && !context.excluded.contains(movement.id)
                 && !context.lastMicroMovementIds.contains(movement.id)
                 && !context.nextFullRoutineIds.contains(movement.id)

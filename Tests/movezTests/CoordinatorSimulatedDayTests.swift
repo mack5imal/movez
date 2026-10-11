@@ -204,6 +204,17 @@ final class CoordinatorSimulatedDayTests: XCTestCase {
         XCTAssertEqual(AppCoordinator.duration(1_920), "32 m")
     }
 
+    /// Saying there is no floor rebuilds the menu's preview without any floor movement in it.
+    func testTurningTheFloorOffChangesThePreview() {
+        let harness = CoordinatorHarness()
+        let library = RoutineTestSupport.library
+        harness.settings.floorAvailable = false
+        harness.coordinator.settingsChanged()
+        let preview = harness.coordinator.previewNextRoutine(now: harness.now)
+        XCTAssertNotNil(preview)
+        XCTAssertFalse(preview?.movementIds.contains { library.movement(id: $0)?.requiresFloor == true } ?? true)
+    }
+
     func testThePreviewMatchesTheRoutineTheOverlayServes() {
         let harness = CoordinatorHarness()
         _ = harness.run(until: { $0.isPendingFull }, limit: 90 * minute)

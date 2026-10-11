@@ -104,6 +104,16 @@ final class MicroBreakBuilderTests: XCTestCase {
         }
     }
 
+    func testNothingIsServedThatNeedsWhatTheUserLacks() {
+        for seed in 0..<300 {
+            let micro = micro(seed: UInt64(seed &* 7 &+ 2)) { $0.unavailable = [.wall, .stairs] }
+            XCTAssertFalse(micro.blocks.isEmpty)
+            for block in micro.blocks {
+                XCTAssertFalse(block.movement.needsAny(of: [.wall, .stairs]), block.movement.id)
+            }
+        }
+    }
+
     func testExcludedMovementsNeverAppear() {
         let excluded = Set(library.microEligible.filter { $0.bucket == .cir }.map(\.id))
         for seed in 0..<100 {

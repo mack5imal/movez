@@ -203,6 +203,37 @@ final class RoutineBuilderTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(used, 1, "equipment movements never appeared across 200 routines")
     }
 
+    /// With no wall, no floor and no stairs, a month of breaks never serves a movement that needs
+    /// one, and every break still has its five movements.
+    func testNothingIsServedThatNeedsWhatTheUserLacks() {
+        let none: Set<Requirement> = [.wall, .floor, .stairs]
+        for day in 0..<22 {
+            var options = RoutineTestSupport.DayOptions()
+            options.unavailable = none
+            options.difficultyCap = 3
+            for routine in RoutineTestSupport.simulateDay(seed: UInt64(day &* 31 &+ 5), options: options) {
+                XCTAssertEqual(routine.blocks.count, 5, "the pools stay deep enough to fill every slot")
+                for block in routine.blocks {
+                    XCTAssertTrue(block.movement.requires.isEmpty, "\(block.movement.id) needs \(block.movement.requires)")
+                }
+            }
+        }
+    }
+
+    func testOnlyTheMissingThingIsFilteredOut() {
+        var served: Set<String> = []
+        for day in 0..<22 {
+            var options = RoutineTestSupport.DayOptions()
+            options.unavailable = [.stairs]
+            for routine in RoutineTestSupport.simulateDay(seed: UInt64(day &* 17 &+ 3), options: options) {
+                served.formUnion(routine.movementIds)
+            }
+        }
+        let byId = Dictionary(uniqueKeysWithValues: library.movements.map { ($0.id, $0) })
+        XCTAssertFalse(served.contains { byId[$0]?.requires.contains(.stairs) == true })
+        XCTAssertTrue(served.contains { byId[$0]?.requires.contains(.floor) == true }, "the floor is still on offer")
+    }
+
     func testExcludedMovementsNeverAppear() {
         let excluded: Set<String> = ["CIR-01", "FLX-01", "STR-01", "BAL-01", "EYE-01", "BRE-01", "HWF-01"]
         for seed in 0..<200 {

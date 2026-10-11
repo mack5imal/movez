@@ -44,6 +44,9 @@ struct RoutineContext: Hashable {
     var usedMovementIdsToday: Set<String> = []
     var usedStrRegionsLastBreak: Set<Region> = []
     var equipment: Set<Equipment> = []
+    /// What the user has said they do not have. Never relaxed: a movement that needs stairs
+    /// cannot be done without them, however short of options the builder is.
+    var unavailable: Set<Requirement> = []
     var excluded: Set<String> = []
     var focus: Focus = .none
     var difficultyCap: Int = 2
@@ -61,6 +64,8 @@ struct MicroContext: Hashable {
     var nextFullRoutineIds: Set<String> = []
     var excluded: Set<String> = []
     var equipment: Set<Equipment> = []
+    /// What the user has said they do not have.
+    var unavailable: Set<Requirement> = []
     /// How recently each movement was served, as `Recency` scores it.
     var recency: [String: Double] = [:]
     var seed: UInt64 = 0

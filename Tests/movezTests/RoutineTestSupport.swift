@@ -19,6 +19,7 @@ enum RoutineTestSupport {
         var breaks = 8
         var focus: Focus = .none
         var equipment: Set<Equipment> = []
+        var unavailable: Set<Requirement> = []
         var excluded: Set<String> = []
         var difficultyCap = 2
         var unlockedDiff3: Set<String> = []
@@ -37,6 +38,7 @@ enum RoutineTestSupport {
             context.usedMovementIdsToday = used
             context.usedStrRegionsLastBreak = lastStrengthRegions
             context.equipment = options.equipment
+            context.unavailable = options.unavailable
             context.excluded = options.excluded
             context.focus = options.focus
             context.difficultyCap = options.difficultyCap

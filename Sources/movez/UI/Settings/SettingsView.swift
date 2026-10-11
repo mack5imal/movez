@@ -139,6 +139,16 @@ struct SettingsView: View {
                 }
             }
 
+            SettingsRow(label: "A wall I can lean on") {
+                MovezToggle(isOn: Binding(get: { settings.wallAvailable }, set: viewModel.setWallAvailable))
+            }
+            SettingsRow(label: "Floor space I'm willing to use") {
+                MovezToggle(isOn: Binding(get: { settings.floorAvailable }, set: viewModel.setFloorAvailable))
+            }
+            SettingsRow(label: "Stairs nearby") {
+                MovezToggle(isOn: Binding(get: { settings.stairsAvailable }, set: viewModel.setStairsAvailable))
+            }
+
             SettingsRow(label: "Difficulty cap") {
                 SegmentedControl(
                     options: SettingsViewModel.difficultyOptions,

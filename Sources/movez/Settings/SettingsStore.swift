@@ -15,6 +15,9 @@ final class SettingsStore: ObservableObject {
         static let difficultyCap = "difficultyCap"
         static let excludedMovementIds = "excludedMovementIds"
         static let focus = "focus"
+        static let wallAvailable = "wallAvailable"
+        static let floorAvailable = "floorAvailable"
+        static let stairsAvailable = "stairsAvailable"
         static let suppressMic = "suppressMic"
         static let suppressCapture = "suppressCapture"
         static let suppressFullscreen = "suppressFullscreen"
@@ -42,6 +45,11 @@ final class SettingsStore: ObservableObject {
         didSet { write(excludedMovementIds.sorted(), Key.excludedMovementIds) }
     }
     @Published var focus: Focus { didSet { write(focus.rawValue, Key.focus) } }
+    /// Whether there is a wall to lean on, floor the user is willing to get down on, and stairs
+    /// nearby. All three default to yes, which serves the whole library.
+    @Published var wallAvailable: Bool { didSet { write(wallAvailable, Key.wallAvailable) } }
+    @Published var floorAvailable: Bool { didSet { write(floorAvailable, Key.floorAvailable) } }
+    @Published var stairsAvailable: Bool { didSet { write(stairsAvailable, Key.stairsAvailable) } }
     @Published var suppressMic: Bool { didSet { write(suppressMic, Key.suppressMic) } }
     @Published var suppressCapture: Bool { didSet { write(suppressCapture, Key.suppressCapture) } }
     @Published var suppressFullscreen: Bool { didSet { write(suppressFullscreen, Key.suppressFullscreen) } }
@@ -64,6 +72,9 @@ final class SettingsStore: ObservableObject {
         difficultyCap = defaults.object(forKey: Key.difficultyCap) as? Int ?? 2
         excludedMovementIds = Set(defaults.stringArray(forKey: Key.excludedMovementIds) ?? [])
         focus = Focus(rawValue: defaults.string(forKey: Key.focus) ?? "") ?? .none
+        wallAvailable = defaults.object(forKey: Key.wallAvailable) as? Bool ?? true
+        floorAvailable = defaults.object(forKey: Key.floorAvailable) as? Bool ?? true
+        stairsAvailable = defaults.object(forKey: Key.stairsAvailable) as? Bool ?? true
         suppressMic = defaults.object(forKey: Key.suppressMic) as? Bool ?? true
         suppressCapture = defaults.object(forKey: Key.suppressCapture) as? Bool ?? true
         suppressFullscreen = defaults.object(forKey: Key.suppressFullscreen) as? Bool ?? true
@@ -73,6 +84,15 @@ final class SettingsStore: ObservableObject {
         launchAtLogin = defaults.object(forKey: Key.launchAtLogin) as? Bool ?? false
         debugTimeScale = defaults.object(forKey: Key.debugTimeScale) as? Double ?? 1
         debugExpanded = defaults.object(forKey: Key.debugExpanded) as? Bool ?? false
+    }
+
+    /// What the user has said they do not have, so no movement that needs it is served.
+    var unavailableRequirements: Set<Requirement> {
+        var unavailable: Set<Requirement> = []
+        if !wallAvailable { unavailable.insert(.wall) }
+        if !floorAvailable { unavailable.insert(.floor) }
+        if !stairsAvailable { unavailable.insert(.stairs) }
+        return unavailable
     }
 
     /// The scheduler config these settings imply.
