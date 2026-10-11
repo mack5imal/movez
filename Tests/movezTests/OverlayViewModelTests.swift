@@ -81,7 +81,7 @@ final class OverlayViewModelTests: XCTestCase {
         let chimes = RecordingChimePlayer()
         let viewModel = makeViewModel(clock: clock, chimes: chimes)
         var finished: (completed: Int, total: Int)?
-        viewModel.onFinished = { completed, total in finished = (completed, total) }
+        viewModel.onFinished = { completed, total, _ in finished = (completed, total) }
 
         for _ in 0..<4 {
             clock.advance(60)
@@ -154,6 +154,48 @@ final class OverlayViewModelTests: XCTestCase {
         let clock = ManualClock(now: SchedulerHarness.mondayMorning)
         let viewModel = OverlayViewModel(routine: routine, startedAt: clock.now, clock: clock)
         XCTAssertEqual(viewModel.state.headerTrailing, "5:25 LEFT")
+    }
+
+    // MARK: - The two countdowns
+
+    /// The header's time left and the disc never disagree: the header is always the disc's time
+    /// plus the blocks still to come, however late the ticks arrive, and both reach zero together.
+    func testTheTwoCountdownsAlwaysAgree() {
+        let clock = ManualClock(now: SchedulerHarness.mondayMorning)
+        let viewModel = makeViewModel(clock: clock)
+        let routine = viewModel.routine
+        let steps: [TimeInterval] = [1.0, 1.3, 1.1, 1.4, 0.9, 1.2]
+        var index = 0
+
+        while viewModel.phase == .running {
+            let block = viewModel.block!
+            let later = routine.blocks.dropFirst(viewModel.blockIndex + 1).reduce(0) { $0 + 5 + $1.seconds }
+            let disc = viewModel.isLeadIn ? viewModel.leadInRemaining + block.seconds : viewModel.blockRemaining
+            XCTAssertEqual(viewModel.breakRemaining - later, disc, "block \(viewModel.blockIndex)")
+
+            clock.advance(steps[index % steps.count])
+            index += 1
+            viewModel.tick()
+        }
+
+        let ran = clock.now.timeIntervalSince(viewModel.startedAt)
+        XCTAssertEqual(viewModel.breakRemaining, 0)
+        XCTAssertLessThan(ran, Double(routine.totalSeconds) + 1.5, "late ticks no longer stretch the break")
+        XCTAssertGreaterThanOrEqual(ran, Double(routine.totalSeconds))
+    }
+
+    func testNextTakesTheRestOfTheBlockOffTheTimeLeft() {
+        let clock = ManualClock(now: SchedulerHarness.mondayMorning)
+        let viewModel = makeViewModel(clock: clock)
+        XCTAssertEqual(viewModel.breakRemaining, 4 * 65)
+
+        clock.advance(10)
+        viewModel.tick()
+        XCTAssertEqual(viewModel.breakRemaining, 4 * 65 - 10)
+
+        viewModel.next()
+        XCTAssertEqual(viewModel.breakRemaining, 3 * 65, "the skipped fifty-five seconds are gone")
+        XCTAssertEqual(viewModel.state.headerTrailing, "3:15 LEFT")
     }
 
     // MARK: - Per-side blocks
@@ -259,7 +301,7 @@ final class OverlayViewModelTests: XCTestCase {
         let clock = ManualClock(now: SchedulerHarness.mondayMorning)
         let viewModel = makeViewModel(clock: clock)
         var finished = 0
-        viewModel.onFinished = { _, _ in finished += 1 }
+        viewModel.onFinished = { _, _, _ in finished += 1 }
 
         viewModel.done()
         XCTAssertEqual(finished, 0)

@@ -44,7 +44,8 @@ final class OverlayViewModel: ObservableObject {
     var onBlockCompleted: ((RoutineBlock, Int) -> Void)?
     var onSnooze: (() -> Void)?
     var onSkip: (() -> Void)?
-    var onFinished: ((Int, Int) -> Void)?
+    /// Blocks completed, blocks planned, and seconds the break ran.
+    var onFinished: ((Int, Int, Int) -> Void)?
 
     init(
         routine: Routine,
@@ -83,19 +84,34 @@ final class OverlayViewModel: ObservableObject {
     /// Animations are the first thing to go when the user has asked the system for less motion.
     var animationsEnabled: Bool { !reduceMotion }
 
+    /// The break's own time. Every countdown on screen reads this one value.
+    private var now: Date { clock.now }
+
     /// When the movement itself starts, after its lead-in.
     var movementStartsAt: Date { blockStartedAt.addingTimeInterval(TimeInterval(Routine.leadInSeconds)) }
-    var isLeadIn: Bool { clock.now < movementStartsAt }
+    /// When the block on screen is planned to end.
+    var blockEndsAt: Date { movementStartsAt.addingTimeInterval(TimeInterval(block?.seconds ?? 0)) }
+    var isLeadIn: Bool { now < movementStartsAt }
     /// Whole seconds of lead-in left, rounded up like the panels' count-ins, so it reads 0:05 the
     /// moment the movement appears.
-    var leadInRemaining: Int { max(0, Int(movementStartsAt.timeIntervalSince(clock.now).rounded(.up))) }
+    var leadInRemaining: Int { max(0, Int(movementStartsAt.timeIntervalSince(now).rounded(.up))) }
 
     /// Seconds of the movement itself that have run; zero throughout the lead-in.
-    var blockElapsed: Int { max(0, Int(clock.now.timeIntervalSince(movementStartsAt))) }
+    var blockElapsed: Int { max(0, Int(now.timeIntervalSince(movementStartsAt))) }
     var blockRemaining: Int { max(0, (block?.seconds ?? 0) - blockElapsed) }
+
+    /// What is left of the break: the rest of the block on screen, then every block after it as
+    /// planned, lead-ins included.
+    ///
+    /// It is worked out from the plan rather than from when the break started. Measured from the
+    /// start, it drifted from the movement's own countdown by up to a second a block — each block
+    /// began on whichever tick noticed the last one end — and pressing Next never moved it at all.
+    /// Rounded up the way the disc is, so the two always differ by exactly the blocks still to come.
     var breakRemaining: Int {
-        let planned = routine.totalSeconds
-        return max(0, planned - Int(clock.now.timeIntervalSince(startedAt)))
+        guard phase == .running, block != nil else { return 0 }
+        let current = max(0, blockEndsAt.timeIntervalSince(now)).rounded(.up)
+        let later = routine.blocks.dropFirst(blockIndex + 1).reduce(0) { $0 + Routine.leadInSeconds + $1.seconds }
+        return Int(current) + later
     }
 
     /// Done replaces Snooze once the break has actually been done: half the blocks, or half the
@@ -108,21 +124,32 @@ final class OverlayViewModel: ObservableObject {
         Scheduler.meetsCompletionRule(
             completed: completedBlocks,
             total: totalBlocks,
-            elapsed: Int(clock.now.timeIntervalSince(startedAt)),
+            elapsed: elapsedSeconds,
             config: config
         )
     }
 
+    /// Whole seconds the break has been running.
+    var elapsedSeconds: Int { max(0, Int(now.timeIntervalSince(startedAt))) }
+
     var skipEnabled: Bool {
-        clock.now.timeIntervalSince(startedAt) >= Self.skipDelaySeconds
+        now.timeIntervalSince(startedAt) >= Self.skipDelaySeconds
     }
 
     // MARK: - The tick
 
     /// One second of the break. The overlay's whole clock is this method.
+    ///
+    /// A block that has run out hands over at its planned end, not at the tick that noticed: the
+    /// next one is already that much under way. A tick late enough to cover several blocks (the
+    /// debug time scale) walks through each of them.
     func tick() {
-        guard phase == .running, let block else { return }
-        guard !isLeadIn else {
+        guard phase == .running else { return }
+        while block != nil, now >= blockEndsAt {
+            advance(recordCompletion: true, nextStartsAt: blockEndsAt)
+            guard phase == .running else { return }
+        }
+        guard let block, !isLeadIn else {
             refresh()
             return
         }
@@ -133,11 +160,6 @@ final class OverlayViewModel: ObservableObject {
             rebuildStrip()
             chimes?.play(.transition)
         }
-
-        if blockElapsed >= block.seconds {
-            advance(recordCompletion: true)
-            return
-        }
         refresh()
     }
 
@@ -147,7 +169,7 @@ final class OverlayViewModel: ObservableObject {
     /// deliberately no way back.
     func next() {
         guard phase == .running else { return }
-        advance(recordCompletion: true)
+        advance(recordCompletion: true, nextStartsAt: now)
     }
 
     func snooze() {
@@ -174,7 +196,7 @@ final class OverlayViewModel: ObservableObject {
 
     // MARK: - Progression
 
-    private func advance(recordCompletion: Bool) {
+    private func advance(recordCompletion: Bool, nextStartsAt: Date) {
         if recordCompletion, let block {
             completedBlocks += 1
             onBlockCompleted?(block, blockIndex)
@@ -186,7 +208,7 @@ final class OverlayViewModel: ObservableObject {
         }
 
         blockIndex += 1
-        blockStartedAt = clock.now
+        blockStartedAt = nextStartsAt
         halfwayChimed = false
         side = block?.perSide == true ? .left : .none
         rebuildStrip()
@@ -198,7 +220,7 @@ final class OverlayViewModel: ObservableObject {
         phase = .complete
         rebuildStrip()
         chimes?.play(.completion)
-        onFinished?(completedBlocks, totalBlocks)
+        onFinished?(completedBlocks, totalBlocks, elapsedSeconds)
         refresh()
     }
 
@@ -228,7 +250,7 @@ final class OverlayViewModel: ObservableObject {
         state.headerTrailing = "\(OverlayState.clock(breakRemaining)) LEFT"
         if isLeadIn {
             state.discNumerals = OverlayState.untilStart(leadInRemaining)
-            state.discProgress = movementStartsAt.timeIntervalSince(clock.now) / Double(Routine.leadInSeconds)
+            state.discProgress = movementStartsAt.timeIntervalSince(now) / Double(Routine.leadInSeconds)
             state.discMode = .leadIn
             state.discLabel = "GET READY"
         } else {

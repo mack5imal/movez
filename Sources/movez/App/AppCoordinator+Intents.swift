@@ -81,9 +81,10 @@ extension AppCoordinator {
         currentBreak = current
     }
 
-    /// Ends a break the overlay finished. The scheduler decides whether that counts.
-    func finishOverlayBreak(completed: Int, total: Int) {
-        inject(.breakEnded(completedBlocks: completed, totalBlocks: total, elapsed: elapsedInBreak))
+    /// Ends a break the overlay finished. The scheduler decides whether that counts, from the time
+    /// the overlay says the break ran: it knows about time spent paused, and the wall clock doesn't.
+    func finishOverlayBreak(completed: Int, total: Int, elapsed: Int) {
+        inject(.breakEnded(completedBlocks: completed, totalBlocks: total, elapsed: elapsed))
     }
 
     // MARK: - Micro-break

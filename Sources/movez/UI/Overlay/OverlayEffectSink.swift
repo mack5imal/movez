@@ -56,8 +56,8 @@ final class OverlayEffectSink: EffectSink {
         }
         viewModel.onSnooze = { [weak coordinator] in coordinator?.snooze() }
         viewModel.onSkip = { [weak coordinator] in coordinator?.skip() }
-        viewModel.onFinished = { [weak coordinator] completed, total in
-            coordinator?.finishOverlayBreak(completed: completed, total: total)
+        viewModel.onFinished = { [weak coordinator] completed, total, elapsed in
+            coordinator?.finishOverlayBreak(completed: completed, total: total, elapsed: elapsed)
         }
         controller.present(viewModel)
     }
