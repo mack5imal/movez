@@ -1,6 +1,6 @@
-# movez — Movement Library v4
+# movez — Movement Library v4.1
 
-Library of movements the app can prescribe at each movement break. v2 expanded every description into brief in-app instructions (enough for someone unfamiliar with the movement to do it imperfectly). v3 added the interval presets and the 1-minute micro-break (section 11) and flagged the movements suitable for it with a **Micro** tag. v4 expands the balance bucket (13 → 29) with yoga-derived balance-and-strength postures, adds a balance-focused sample routine, and separates each header line from its instructions.
+Library of movements the app can prescribe at each movement break. v2 expanded every description into brief in-app instructions (enough for someone unfamiliar with the movement to do it imperfectly). v3 added the interval presets and the 1-minute micro-break (section 11) and flagged the movements suitable for it with a **Micro** tag. v4 expands the balance bucket (13 → 29) with yoga-derived balance-and-strength postures, adds a balance-focused sample routine, and separates each header line from its instructions. v4.1 marks what each movement cannot be done without (floor, wall, stairs), so a user without one is never served it, and adds twelve core movements to the strength bucket (STR-39–STR-50).
 
 ## 1. Design rules
 
@@ -30,7 +30,7 @@ Library of movements the app can prescribe at each movement break. v2 expanded e
 
 Each entry is formatted as:
 
-**ID · Movement name** — Region · Dose · Block seconds · Diff · Setting (optional equipment) · [**Micro**] · Counteracts: ….
+**ID · Movement name** — Region · Dose · Block seconds · Diff · Setting (optional equipment) · [Requires …] · [**Micro**] · Counteracts: ….
 
 Instructions (2–4 sentences: setup, the movement, the one cue that matters most), always separated from the header line by a blank line. The header ends with a period after the Counteracts text.
 
@@ -39,6 +39,7 @@ Instructions (2–4 sentences: setup, the movement, the one cue that matters mos
 - **Block** — approximate total block time in seconds.
 - **Diff** — 1 easy, 2 moderate, 3 harder or needs more control.
 - **Setting** — Stand, Chair, Wall, Desk, Floor, Any. Equipment in parentheses when optional: (Band), (KB) kettlebell or dumbbell, (Roller), (Ball).
+- **Requires** — present when the movement cannot be done without a floor to lie or kneel on, a wall, or stairs. Absent when it needs none of them, including when a wall or step only helps with balance or another surface (a chair, the desk) will do.
 - **Micro** — present when the movement is eligible for the 1-minute micro-break. Criteria: block ≤ 60 s, done standing or seated (no floor), no equipment required, no warm-up needed, no sweat, and the user can return to typing immediately.
 
 Buckets: **FLX** flexibility & mobility, **CIR** blood flow & circulation, **STR** strength, **BAL** balance & proprioception, **HWF** hands / wrists / forearms, **EYE** eyes, **BRE** breathing.
@@ -51,15 +52,15 @@ Buckets: **FLX** flexibility & mobility, **CIR** blood flow & circulation, **STR
 
 Step one foot back about a metre, both feet pointing forward, rear heel up. Tuck your tailbone under (as if zipping tight jeans), squeeze the rear glute, and reach the same-side arm overhead. You should feel the front of the rear hip, not the low back. Keep the front knee over the ankle.
 
-**FLX-02 · Half-kneeling hip flexor stretch** — Hip · 30 s/side · 60 · Diff 1 · Floor · Counteracts: hip flexor shortening.
+**FLX-02 · Half-kneeling hip flexor stretch** — Hip · 30 s/side · 60 · Diff 1 · Floor · Requires floor · Counteracts: hip flexor shortening.
 
 Kneel on one knee with the other foot flat in front, both knees at 90°. Tuck the pelvis under and squeeze the glute on the kneeling side, then shift forward an inch or two without arching the back. Stay tall; the stretch is in the front of the kneeling-side hip.
 
-**FLX-03 · Couch stretch** — Hip, Quad · 30 s/side · 60 · Diff 2 · Floor/Wall · Counteracts: hip flexor + rectus femoris tightness.
+**FLX-03 · Couch stretch** — Hip, Quad · 30 s/side · 60 · Diff 2 · Floor/Wall · Requires floor · Counteracts: hip flexor + rectus femoris tightness.
 
 Kneel facing away from a wall or chair and put one shin up against it, knee on the floor, foot pointing up. Step the other foot forward flat. Squeeze the rear glute, tuck the pelvis, and slowly raise your torso toward upright. Stop where you feel a strong stretch in the front of the thigh and hip.
 
-**FLX-04 · World's greatest stretch** — Full · 3 reps/side · 90 · Diff 2 · Floor · Counteracts: hips, T-spine, hamstrings at once.
+**FLX-04 · World's greatest stretch** — Full · 3 reps/side · 90 · Diff 2 · Floor · Requires floor · Counteracts: hips, T-spine, hamstrings at once.
 
 From a push-up position, step the right foot outside the right hand. Drop the right elbow toward the instep, then rotate and reach the right arm to the ceiling, eyes following the hand. Bring the hand down, push the hips back and straighten the front leg to feel the hamstring, then return to the lunge. That's one rep.
 
@@ -71,7 +72,7 @@ Stand on one leg and cross the other ankle over the standing knee. Push the hips
 
 Sit tall and place one ankle on the opposite knee, letting the raised knee drop out. Keeping the back straight, hinge forward from the hips until you feel the stretch in the raised-leg glute. Gently press the raised knee down for more.
 
-**FLX-07 · 90/90 hip switches** — Hip · 8 switches · 60 · Diff 2 · Floor · Counteracts: lost hip rotation.
+**FLX-07 · 90/90 hip switches** — Hip · 8 switches · 60 · Diff 2 · Floor · Requires floor · Counteracts: lost hip rotation.
 
 Sit on the floor with the front leg bent 90° in front of you and the back leg bent 90° out to the side, torso tall. Without using your hands, lift both knees and rotate them together to the other side so the leg positions swap. Move slowly; going all the way over is not required.
 
@@ -87,15 +88,15 @@ Take a wide stance, toes pointed slightly out. Shift your weight to one side and
 
 Place one heel on the floor a step in front of you, toes up, that leg straight. Hinge at the hips with a flat back and sweep both hands down past the toes and forward, as if scooping the floor, then stand tall. It's a rhythmic movement, not a long hold.
 
-**FLX-11 · Cat-cow** — T-spine, L-spine/Core · 10 reps · 60 · Diff 1 · Floor · Counteracts: spinal stiffness.
+**FLX-11 · Cat-cow** — T-spine, L-spine/Core · 10 reps · 60 · Diff 1 · Floor · Requires floor · Counteracts: spinal stiffness.
 
 On hands and knees, wrists under shoulders and knees under hips. Exhale and round the whole back toward the ceiling, tucking chin and tailbone. Inhale and let the belly drop, lifting the chest and tailbone. Move slowly so every part of the spine takes part.
 
-**FLX-12 · Open book** — T-spine · 6 reps/side · 75 · Diff 1 · Floor · Counteracts: thoracic rotation loss.
+**FLX-12 · Open book** — T-spine · 6 reps/side · 75 · Diff 1 · Floor · Requires floor · Counteracts: thoracic rotation loss.
 
 Lie on your side with knees bent to 90° and stacked, both arms straight out in front, palms together. Keeping the knees glued together, lift the top arm and arc it over to the other side like opening a book, letting the eyes and chest follow. Pause, then return.
 
-**FLX-13 · Thread the needle** — T-spine, Shoulder · 6 reps/side · 75 · Diff 1 · Floor · Counteracts: thoracic rotation loss.
+**FLX-13 · Thread the needle** — T-spine, Shoulder · 6 reps/side · 75 · Diff 1 · Floor · Requires floor · Counteracts: thoracic rotation loss.
 
 On hands and knees, slide one arm palm-up under the body until the shoulder and ear come toward the floor. Then unthread and reach the same arm up to the ceiling, opening the chest. Keep the hips still over the knees the whole time.
 
@@ -103,15 +104,15 @@ On hands and knees, slide one arm palm-up under the body until the shoulder and 
 
 Sit so the top edge of the chair back is at mid-back level, just below the shoulder blades. Interlace fingers behind the head, keep the ribs and belly relaxed, and lean back over the edge of the chair, looking up. Return to upright and repeat. If your chair is too tall, roll a towel and place it behind the mid-back.
 
-**FLX-15 · Foam roller thoracic extension** — T-spine · 8 reps · 75 · Diff 1 · Floor (Roller) · Counteracts: kyphosis.
+**FLX-15 · Foam roller thoracic extension** — T-spine · 8 reps · 75 · Diff 1 · Floor (Roller) · Requires floor · Counteracts: kyphosis.
 
 Lie back with the roller across your mid-back, knees bent, hands supporting the head. Keeping the hips on the floor, extend the upper back over the roller and return. Do a few reps, move the roller up a couple of inches, and repeat at two or three spots between the shoulder blades and the base of the neck.
 
-**FLX-16 · Wall angels** — Shoulder, T-spine · 10 reps · 60 · Diff 2 · Wall · Counteracts: rounded shoulders, weak lower traps.
+**FLX-16 · Wall angels** — Shoulder, T-spine · 10 reps · 60 · Diff 2 · Wall · Requires wall · Counteracts: rounded shoulders, weak lower traps.
 
 Stand with heels a few inches from the wall, back and head touching it. Put the backs of the hands and forearms against the wall with elbows at shoulder height. Slide the arms slowly up the wall and back down, keeping wrists, elbows, and low back in contact as much as you can. Reduce range rather than let the ribs flare.
 
-**FLX-17 · Doorway pec stretch** — Chest · 20 s × 3 heights · 60 · Diff 1 · Wall · Counteracts: tight pecs.
+**FLX-17 · Doorway pec stretch** — Chest · 20 s × 3 heights · 60 · Diff 1 · Wall · Requires wall · Counteracts: tight pecs.
 
 Stand in a doorway with forearms on each side of the frame, elbows at shoulder height. Step one foot through and lean gently until the chest stretches. Then repeat with elbows below shoulder height, then above. Keep the ribs down and chin tucked; don't push the head forward.
 
@@ -155,11 +156,11 @@ Hold a wall or desk with one hand. Lift the opposite knee to hip height in front
 
 Stand with feet hip width, knees soft, hands crossed on the chest. Rotate the ribcage as far as you can to one side without moving the hips, pause, and return. Keep the head moving with the chest. Alternate sides.
 
-**FLX-28 · Downward dog with pedals** — Ham, Calf/Ankle, Shoulder · 45 s · 60 · Diff 2 · Floor · Counteracts: posterior chain tightness.
+**FLX-28 · Downward dog with pedals** — Ham, Calf/Ankle, Shoulder · 45 s · 60 · Diff 2 · Floor · Requires floor · Counteracts: posterior chain tightness.
 
 From hands and knees, tuck the toes and lift the hips up and back so the body makes an inverted V, arms straight, heels reaching toward the floor. Alternately bend one knee while pressing the other heel down, pedalling slowly. Keep the spine long; a bent knee is fine.
 
-**FLX-29 · Wall calf stretch** — Calf/Ankle · 20 s × 2/side · 80 · Diff 1 · Wall · Counteracts: gastroc/soleus stiffness.
+**FLX-29 · Wall calf stretch** — Calf/Ankle · 20 s × 2/side · 80 · Diff 1 · Wall · Requires wall · Counteracts: gastroc/soleus stiffness.
 
 Hands on a wall, step one foot back with the heel down and knee straight, and lean in until the upper calf stretches. Then bend the rear knee while keeping the heel down to stretch the lower calf. Both feet point straight at the wall.
 
@@ -171,11 +172,11 @@ Half-kneel with one foot flat in front, or stand with one foot on a low step. Dr
 
 Stand on one leg, holding a wall if needed, and grab the other ankle behind you. Tuck the pelvis under and squeeze that glute, keeping the knees close together. Don't pull the heel to the glute; the pelvic tuck is what makes the stretch.
 
-**FLX-32 · Prone press-up** — L-spine/Core · 10 reps · 60 · Diff 1 · Floor · Counteracts: lumbar flexion posture.
+**FLX-32 · Prone press-up** — L-spine/Core · 10 reps · 60 · Diff 1 · Floor · Requires floor · Counteracts: lumbar flexion posture.
 
 Lie face down with hands under the shoulders. Press through the hands to lift the chest while the hips and legs stay relaxed on the floor, letting the low back arch. Go only as high as is comfortable, hold 2 s, and lower.
 
-**FLX-33 · Child's pose with side reach** — L-spine/Core, Shoulder · 20 s centre + 20 s/side · 60 · Diff 1 · Floor · Counteracts: lumbar and lat stiffness.
+**FLX-33 · Child's pose with side reach** — L-spine/Core, Shoulder · 20 s centre + 20 s/side · 60 · Diff 1 · Floor · Requires floor · Counteracts: lumbar and lat stiffness.
 
 Kneel and sit back toward the heels, arms stretched forward on the floor, forehead down. Breathe into the low back. Then walk both hands to one side, keeping the hips centred, to stretch the side of the torso. Repeat on the other side.
 
@@ -209,7 +210,7 @@ Get up and walk briskly around the room, down a hallway, or outside. Swing the a
 
 March on the spot lifting each knee to about hip height, swinging the opposite arm as the knee rises. Land softly on the ball of the foot and keep a steady, slightly quicker-than-walking rhythm.
 
-**CIR-03 · Stair climb** — Full · 60–90 s · 90 · Diff 2 · Stand · Counteracts: sluggish circulation.
+**CIR-03 · Stair climb** — Full · 60–90 s · 90 · Diff 2 · Stand · Requires stairs · Counteracts: sluggish circulation.
 
 Climb one or two flights of stairs at a steady pace, pushing through the whole foot and standing tall at the top of each step. Walk down at an easy pace. Repeat if time allows.
 
@@ -229,7 +230,7 @@ Arms straight out to the sides, make small circles forward and gradually enlarge
 
 Like a jumping jack without the jump: step one foot out to the side as both arms swing overhead, step it back in as arms come down, then the other foot. Keep a brisk, even rhythm.
 
-**CIR-08 · Inchworm** — Full, Ham · 5 reps · 60 · Diff 2 · Floor · Counteracts: posterior chain stiffness, low HR.
+**CIR-08 · Inchworm** — Full, Ham · 5 reps · 60 · Diff 2 · Floor · Requires floor · Counteracts: posterior chain stiffness, low HR.
 
 From standing, fold forward and place hands on the floor, bending the knees as needed. Walk the hands forward until you're in a straight-arm plank. Then walk the feet toward the hands in small steps, keeping the legs as straight as you can, and stand up.
 
@@ -265,7 +266,7 @@ Stand loosely and shake the hands, then the arms from the shoulders, then bounce
 
 Feet shoulder width, sit the hips back and down to about a quarter or half squat, arms reaching forward for balance, then stand and squeeze the glutes. Keep the heels down and move at about one rep per 2 s.
 
-**CIR-17 · Step-ups** — Glute, Quad · 45 s · 45 · Diff 1 · Stand · Counteracts: low HR, glute inhibition.
+**CIR-17 · Step-ups** — Glute, Quad · 45 s · 45 · Diff 1 · Stand · Requires stairs · Counteracts: low HR, glute inhibition.
 
 Use the bottom stair or a sturdy step. Step fully onto it with one foot, bring the other up, then step down leading with the same foot. Alternate the leading leg every few reps. Keep the torso upright and the pace moderate.
 
@@ -283,15 +284,15 @@ Take a wide step to one side, bending that knee and letting the other leg trail 
 
 ## 6. STR — Strength (bodyweight-first, low-sweat)
 
-**STR-01 · Glute bridge** — Glute · 12 reps, 2 s hold · 60 · Diff 1 · Floor · Counteracts: glute inhibition.
+**STR-01 · Glute bridge** — Glute · 12 reps, 2 s hold · 60 · Diff 1 · Floor · Requires floor · Counteracts: glute inhibition.
 
 Lie on your back, knees bent, feet flat and hip width, arms at the sides. Drive through the heels to lift the hips until the body is straight from shoulders to knees. Squeeze the glutes hard at the top for 2 s, then lower slowly. Don't arch the low back to get higher.
 
-**STR-02 · Single-leg glute bridge** — Glute · 8/side · 75 · Diff 2 · Floor · Counteracts: glute inhibition, asymmetry.
+**STR-02 · Single-leg glute bridge** — Glute · 8/side · 75 · Diff 2 · Floor · Requires floor · Counteracts: glute inhibition, asymmetry.
 
 Same setup as the glute bridge, but lift one foot off the floor with the knee bent. Push through the planted heel to lift the hips, keeping both hip bones level, hold, and lower. Swap sides after the set.
 
-**STR-03 · Chair-edge hip thrust** — Glute · 12 reps · 60 · Diff 2 · Chair · Counteracts: glute inhibition.
+**STR-03 · Chair-edge hip thrust** — Glute · 12 reps · 60 · Diff 2 · Chair · Requires floor · Counteracts: glute inhibition.
 
 Sit on the floor with your upper back against the front edge of a chair seat, knees bent, feet flat. Tuck the chin and drive through the heels to lift the hips until the thighs are level with the torso, then squeeze the glutes. Lower under control. Brace the chair against a wall so it can't slide.
 
@@ -307,7 +308,7 @@ Stand in a long stride stance, rear heel up. Lower straight down until the rear 
 
 From standing, step one foot back and lower until both knees are around 90°, torso tall. Push through the front heel to return to standing. Alternate legs or finish one side first. Hold a wall or desk if balance is an issue.
 
-**STR-07 · Step-up (slow)** — Glute, Quad · 8/side · 75 · Diff 1 · Stand · Counteracts: glute inhibition.
+**STR-07 · Step-up (slow)** — Glute, Quad · 8/side · 75 · Diff 1 · Stand · Requires stairs · Counteracts: glute inhibition.
 
 Stand facing a stair or sturdy step. Place one whole foot on it and, without pushing off the back foot, drive through the front heel to stand fully on the step. Lower the back foot to the floor slowly, taking about 3 s. Do all reps on one leg, then switch.
 
@@ -323,27 +324,27 @@ Hold a kettlebell or dumbbell against the chest with both hands, elbows pointing
 
 Stand with the bell between the feet. Push the hips back and bend the knees a little until you can grip the handle with a flat back and the chest up. Stand by driving the hips forward, then hinge back down under control, keeping the bell close to the legs.
 
-**STR-11 · Wall sit** — Quad · 30–45 s · 45 · Diff 1 · Wall · **Micro** · Counteracts: quad deconditioning.
+**STR-11 · Wall sit** — Quad · 30–45 s · 45 · Diff 1 · Wall · Requires wall · **Micro** · Counteracts: quad deconditioning.
 
 Lean your back against a wall and walk the feet forward, sliding down until the thighs are roughly parallel to the floor and the knees are over the ankles. Keep the whole back and head against the wall and breathe normally.
 
-**STR-12 · Bird dog** — L-spine/Core, Glute · 6/side, 3 s hold · 75 · Diff 1 · Floor · Counteracts: weak spinal stabilizers.
+**STR-12 · Bird dog** — L-spine/Core, Glute · 6/side, 3 s hold · 75 · Diff 1 · Floor · Requires floor · Counteracts: weak spinal stabilizers.
 
 On hands and knees, brace the belly as if about to be poked. Extend the right arm forward and the left leg back until both are level with the torso, without letting the hips or shoulders tilt. Hold 3 s, return, and switch. Keep the neck neutral, eyes on the floor.
 
-**STR-13 · Dead bug** — L-spine/Core · 8/side · 75 · Diff 1 · Floor · Counteracts: weak anterior core, rib flare.
+**STR-13 · Dead bug** — L-spine/Core · 8/side · 75 · Diff 1 · Floor · Requires floor · Counteracts: weak anterior core, rib flare.
 
 Lie on your back, arms pointing at the ceiling, hips and knees bent to 90°. Press the low back gently into the floor and keep it there. Slowly lower the right arm overhead and the left leg toward the floor together, exhale, then return and switch. Stop the range wherever the low back starts to lift.
 
-**STR-14 · Side plank** — L-spine/Core · 20–30 s/side · 60 · Diff 2 · Floor · Counteracts: lateral core weakness.
+**STR-14 · Side plank** — L-spine/Core · 20–30 s/side · 60 · Diff 2 · Floor · Requires floor · Counteracts: lateral core weakness.
 
 Lie on one side propped on the forearm, elbow under the shoulder. Lift the hips so the body forms a straight line from head to feet (or head to knees, with knees bent, for an easier version). Squeeze the glutes and don't let the hips sag or roll. Switch sides.
 
-**STR-15 · Front plank** — L-spine/Core · 30–45 s · 45 · Diff 1 · Floor · Counteracts: core deconditioning.
+**STR-15 · Front plank** — L-spine/Core · 30–45 s · 45 · Diff 1 · Floor · Requires floor · Counteracts: core deconditioning.
 
 Forearms on the floor, elbows under shoulders, toes tucked. Lift the body into a straight line from head to heels. Squeeze the glutes and quads, push the floor away with the forearms, and keep the neck long with eyes on the floor. Breathe.
 
-**STR-16 · Prone Y-T-W** — Shoulder, T-spine · 8 each · 75 · Diff 2 · Floor · Counteracts: weak lower/mid traps.
+**STR-16 · Prone Y-T-W** — Shoulder, T-spine · 8 each · 75 · Diff 2 · Floor · Requires floor · Counteracts: weak lower/mid traps.
 
 Lie face down, forehead resting on a folded towel. With thumbs up, lift straight arms off the floor in a Y shape (overhead, wide), lower, then in a T (straight out to the sides), lower, then in a W (elbows bent and pulled toward the hips). Squeeze the shoulder blades on each lift; the head stays down.
 
@@ -363,11 +364,11 @@ Anchor a band at waist height, or loop it around your feet while seated on the f
 
 Hands on the desk edge slightly wider than shoulders, body in a straight line from head to heels, feet back. Bend the elbows to lower the chest to the desk, elbows angled about 45° from the body, then push back up. Squeeze the glutes so the hips don't sag.
 
-**STR-21 · Push-up** — Chest, Shoulder, Core · 8–12 reps · 60 · Diff 2 · Floor · Counteracts: upper-body deconditioning.
+**STR-21 · Push-up** — Chest, Shoulder, Core · 8–12 reps · 60 · Diff 2 · Floor · Requires floor · Counteracts: upper-body deconditioning.
 
 Hands on the floor slightly wider than shoulders, body straight from head to heels. Lower the chest until it's a fist's height from the floor, elbows about 45° from the body, then press back up. Take 2 s to lower. Drop to the knees if the hips sag.
 
-**STR-22 · Scapular push-up** — Shoulder · 12 reps · 45 · Diff 1 · Floor · Counteracts: weak serratus, winged scapula.
+**STR-22 · Scapular push-up** — Shoulder · 12 reps · 45 · Diff 1 · Floor · Requires floor · Counteracts: weak serratus, winged scapula.
 
 Hold a straight-arm plank. Without bending the elbows, let the chest sink between the shoulders so the shoulder blades pinch together, then push the floor away so the upper back rounds slightly and the blades spread apart. Small, slow movement.
 
@@ -375,7 +376,7 @@ Hold a straight-arm plank. Without bending the elbows, let the chest sink betwee
 
 Loop a mini-band just above the knees. Sink into a quarter squat with feet hip width and toes forward. Step sideways, leading with the outside foot and keeping tension on the band, then follow with the other foot without letting the feet touch. Go one way, then back.
 
-**STR-24 · Clamshell** — Glute · 15/side · 75 · Diff 1 · Floor (Band) · Counteracts: weak glute medius / hip external rotators.
+**STR-24 · Clamshell** — Glute · 15/side · 75 · Diff 1 · Floor (Band) · Requires floor · Counteracts: weak glute medius / hip external rotators.
 
 Lie on one side with hips and knees bent about 45°, feet together, head on the lower arm. Keeping the feet touching and the pelvis still, lift the top knee as high as it goes, pause, and lower slowly. Add a mini-band above the knees to make it harder. Switch sides.
 
@@ -387,15 +388,15 @@ Hold a light kettlebell or dumbbell in one hand at your side like a suitcase. Wa
 
 Stand on one foot with a fingertip on the wall for balance. Rise as high as you can onto the ball of the foot, pause, then lower over 3 s until the heel touches. Keep the ankle from rolling outward. Switch legs.
 
-**STR-27 · Prone back extension** — L-spine/Core, Glute · 10 reps · 45 · Diff 1 · Floor · Counteracts: weak spinal extensors.
+**STR-27 · Prone back extension** — L-spine/Core, Glute · 10 reps · 45 · Diff 1 · Floor · Requires floor · Counteracts: weak spinal extensors.
 
 Lie face down with hands at the temples, elbows out, legs straight. Squeeze the glutes and lift the chest a few inches off the floor, keeping the neck in line with the spine and eyes down. Hold 2 s and lower slowly. Height is not the goal.
 
-**STR-28 · Reverse snow angel** — Shoulder, T-spine · 10 reps · 60 · Diff 2 · Floor · Counteracts: weak posterior shoulder.
+**STR-28 · Reverse snow angel** — Shoulder, T-spine · 10 reps · 60 · Diff 2 · Floor · Requires floor · Counteracts: weak posterior shoulder.
 
 Lie face down with arms at your sides, palms down, forehead on a towel. Lift both arms an inch off the floor and sweep them slowly out and up overhead like a snow angel, then back to the hips, without letting them touch the floor. Keep the shoulder blades pulled down.
 
-**STR-29 · Copenhagen plank (short lever)** — Adductor, Core · 15–20 s/side · 60 · Diff 3 · Floor/Chair · Counteracts: adductor weakness.
+**STR-29 · Copenhagen plank (short lever)** — Adductor, Core · 15–20 s/side · 60 · Diff 3 · Floor/Chair · Requires floor · Counteracts: adductor weakness.
 
 Lie on one side beside a chair, propped on the forearm. Bend the top leg and rest the inside of that knee and shin on the chair seat; the bottom leg is bent behind you, foot off the floor. Lift the hips so the body is straight from head to top knee, pressing the top knee into the chair. Hold, then switch.
 
@@ -403,7 +404,7 @@ Lie on one side beside a chair, propped on the forearm. Bend the top leg and res
 
 Stand on the middle of a band and loop the top behind the neck across the upper traps. With soft knees, push the hips back and hinge forward with a flat back until you feel the hamstrings, then squeeze the glutes to stand against the band. Keep the chin tucked.
 
-**STR-31 · Tibialis raise** — Foot/Shin · 15 reps · 45 · Diff 1 · Wall · **Micro** · Counteracts: weak shins, ankle stiffness.
+**STR-31 · Tibialis raise** — Foot/Shin · 15 reps · 45 · Diff 1 · Wall · Requires wall · **Micro** · Counteracts: weak shins, ankle stiffness.
 
 Lean your back against a wall with feet about a foot in front of it, legs straight. Keeping the heels down, lift the toes and the front of both feet as high as possible, pause, and lower slowly. The further the feet are from the wall, the harder it gets.
 
@@ -423,17 +424,65 @@ Squat as deep as you can with heels down, feet slightly turned out, and hold the
 
 Stand tall with feet hip width. Squeeze both glutes as hard as you can, as if pinching a coin between them, without tucking the pelvis much or leaning back. Hold 5 s, relax fully, and repeat.
 
-**STR-36 · Deep neck flexor hold** — Neck · 5 × 10 s · 60 · Diff 2 · Floor · Counteracts: weak deep neck flexors, forward head.
+**STR-36 · Deep neck flexor hold** — Neck · 5 × 10 s · 60 · Diff 2 · Floor · Requires floor · Counteracts: weak deep neck flexors, forward head.
 
 Lie on your back with knees bent, no pillow. Tuck the chin gently as if nodding "yes", then lift the head about a centimetre off the floor, keeping the chin tucked. Hold 10 s without letting the chin poke forward, then rest.
 
-**STR-37 · Wall slide with lift-off** — Shoulder, T-spine · 8 reps · 60 · Diff 2 · Wall · Counteracts: weak lower traps.
+**STR-37 · Wall slide with lift-off** — Shoulder, T-spine · 8 reps · 60 · Diff 2 · Wall · Requires wall · Counteracts: weak lower traps.
 
 Face a wall with forearms and hands flat on it, elbows at shoulder height. Slide the arms up the wall until they're nearly straight, then press the forearms lightly into the wall and lift them a centimetre off it, holding 2 s. Return to the wall and slide back down. Keep the ribs down.
 
 **STR-38 · Hip hinge with band abduction** — Glute, Ham · 12 reps · 45 · Diff 1 · Stand (Band) · Counteracts: glute inhibition, valgus tendency.
 
 Loop a mini-band just above the knees, feet hip width. Push the hips back into a hinge with a flat back while driving the knees outward against the band, then squeeze the glutes to stand tall, keeping the knees pushed out throughout.
+
+**STR-39 · Crunch** — L-spine/Core · 15 reps · 60 · Diff 1 · Floor · Requires floor · Counteracts: weak anterior core.
+
+Lie on your back with knees bent, feet flat, and fingertips lightly behind the ears. Exhale and curl the head and shoulder blades off the floor by drawing the ribs toward the hips, pause, then lower slowly. Keep the low back on the floor and the elbows wide; never pull on the head.
+
+**STR-40 · Sit-up** — L-spine/Core, Hip · 10 reps · 60 · Diff 2 · Floor · Requires floor · Counteracts: weak anterior core.
+
+Lie on your back with knees bent and feet flat, hooked under a desk edge if they lift. Cross the arms on the chest and curl up one segment at a time, head, shoulders, then mid-back, until you're sitting tall, then roll back down the same way. Lower slowly; that's where the work is, and the arms never swing to help.
+
+**STR-41 · Lying leg raise** — L-spine/Core, Hip · 10 reps · 60 · Diff 2 · Floor · Requires floor · Counteracts: weak lower abdominals.
+
+Lie on your back, legs straight, hands flat beside the hips. Keeping the legs together and straight, lift them until they point at the ceiling, then lower them slowly until the heels hover just above the floor. Stop lowering wherever the low back starts to arch; bend the knees a little to make it easier.
+
+**STR-42 · Scissor kicks** — L-spine/Core, Hip · 30–40 s · 60 · Diff 2 · Floor · Requires floor · Counteracts: weak lower abdominals.
+
+Lie on your back with the hands under the hips, press the low back into the floor, and lift both straight legs a hand's width off it. Cross one leg over the other, then switch, in a steady scissoring rhythm, keeping the movement small. Raise the legs higher if the low back starts to lift.
+
+**STR-43 · Bicycle crunch** — L-spine/Core · 20 reps · 60 · Diff 2 · Floor · Requires floor · Counteracts: weak obliques, trunk stiffness.
+
+Lie on your back with fingertips behind the ears and both knees lifted to 90°. Curl the shoulders up, then turn the right elbow toward the left knee as the right leg straightens out, and switch sides in a slow pedalling rhythm. Rotate from the ribs, not the neck, and keep the low back pressed down.
+
+**STR-44 · Reverse crunch** — L-spine/Core · 12 reps · 60 · Diff 2 · Floor · Requires floor · Counteracts: weak lower abdominals.
+
+Lie on your back, arms by your sides, knees bent to 90° and lifted over the hips. Exhale and curl the hips off the floor, drawing the knees toward the chest, then lower the hips slowly until the tailbone just touches down. Lift with the lower abdominals rather than swinging the legs.
+
+**STR-45 · Hollow body hold** — L-spine/Core · 20–30 s · 60 · Diff 2 · Floor · Requires floor · Counteracts: core deconditioning.
+
+Lie on your back with arms reaching overhead and legs straight. Press the low back firmly into the floor, then lift the arms, shoulders and legs a few inches so the body forms a shallow curve, and hold while breathing. Bend the knees or bring the arms to the sides if the low back lifts; rest and repeat.
+
+**STR-46 · Alternating heel taps** — L-spine/Core · 20 reps · 60 · Diff 1 · Floor · Requires floor · Counteracts: weak obliques.
+
+Lie on your back with knees bent and feet flat, a little wider than the hips. Lift the head and shoulders slightly and reach the right hand toward the right heel by bending sideways at the waist, then the left hand to the left heel. Keep the shoulders off the floor throughout and the movement small and steady.
+
+**STR-47 · V-up** — L-spine/Core, Hip · 8 reps · 60 · Diff 3 · Floor · Requires floor · Counteracts: core deconditioning.
+
+Lie flat with arms overhead and legs straight. In one motion, lift the arms and legs together and reach the hands toward the shins, balancing briefly on the seat in a V, then lower both back down slowly. Tuck the knees if the legs can't stay straight, and control the way down rather than dropping.
+
+**STR-48 · Standing oblique crunch** — L-spine/Core · 12/side · 60 · Diff 1 · Stand · **Micro** · Counteracts: trunk stiffness, weak obliques.
+
+Stand tall with feet hip width and the right hand behind the head. Lift the right knee out to the side as you bend sideways to bring the right elbow down to meet it, then return to standing. Do all reps on one side, then switch; squeeze the side of the waist rather than rounding forward.
+
+**STR-49 · Desk plank** — L-spine/Core, Shoulder · 30–45 s · 60 · Diff 1 · Desk · Counteracts: core deconditioning.
+
+Place the forearms on the edge of a sturdy desk, elbows under the shoulders, and walk the feet back until the body is a straight line from head to heels. Squeeze the glutes, draw the belly in gently, and hold while breathing steadily. Walk the feet further back to make it harder; don't let the hips sag or pike.
+
+**STR-50 · Seated knee tucks** — L-spine/Core, Hip · 12 reps · 60 · Diff 1 · Chair · **Micro** · Counteracts: weak lower abdominals.
+
+Sit near the front edge of a chair that won't roll and hold its sides, leaning back slightly with a long spine. Lift both feet and draw the knees toward the chest, then extend the legs out at a slight angle without touching the floor, and repeat. Keep the chest lifted and move slowly; touch the toes down between reps if needed.
 
 ## 7. BAL — Balance & proprioception
 
@@ -637,11 +686,11 @@ Inhale through the nose for a count of 4, hold for 4, exhale for 4, hold empty f
 
 Inhale through the nose for 4 counts, then exhale through pursed lips (as if blowing through a straw) for 6 to 8 counts, longer than the inhale. Let the shoulders drop on each exhale. Don't force air out; just lengthen it.
 
-**BRE-04 · Crocodile breathing** — Breath, L-spine/Core · 8 breaths · 75 · Diff 1 · Floor · Counteracts: rib cage immobility.
+**BRE-04 · Crocodile breathing** — Breath, L-spine/Core · 8 breaths · 75 · Diff 1 · Floor · Requires floor · Counteracts: rib cage immobility.
 
 Lie face down, forehead resting on stacked hands, legs relaxed. Breathe in through the nose so the belly presses into the floor and the low back and sides expand, then exhale slowly. The floor gives feedback that the breath is going low rather than into the chest.
 
-**BRE-05 · 90/90 breathing** — Breath, L-spine/Core · 8 breaths · 75 · Diff 1 · Floor/Chair · Counteracts: rib flare, anterior tilt.
+**BRE-05 · 90/90 breathing** — Breath, L-spine/Core · 8 breaths · 75 · Diff 1 · Floor/Chair · Requires floor · Counteracts: rib flare, anterior tilt.
 
 Lie on your back with the calves resting on a chair seat, hips and knees at 90°. Flatten the low back gently toward the floor and keep it there. Inhale through the nose into the belly and sides, then exhale fully and slowly through the mouth until the ribs drop down, pausing briefly before the next breath.
 
@@ -676,13 +725,13 @@ A custom sit length is also allowed; the app places a micro-break every 30 minut
 7. **Post-lunch:** the first micro-break after lunch is CIR-heavy (walk lap, march, calf pumps), since post-meal glucose is where breaking up sitting shows the largest metabolic benefit.
 8. **Snooze:** a micro-break can be deferred 5 minutes once; a second deferral skips it.
 
-### Micro-eligible movements (65)
+### Micro-eligible movements (67)
 
 Circulation (12): CIR-01 Walk lap (60 s version) · CIR-02 March in place · CIR-04 Calf pumps · CIR-05 Ankle pumps and circles · CIR-06 Arm circles · CIR-07 Step-out jacks · CIR-11 Standing hip circles · CIR-12 Brisk good mornings · CIR-13 Standing knee-to-elbow · CIR-15 Whole-body shake-out · CIR-16 Air squats · CIR-20 Speed skaters
 
 Flexibility (16): FLX-01 Standing hip flexor stretch · FLX-05 Standing figure-4 · FLX-06 Seated figure-4 lean · FLX-10 Active hamstring sweep · FLX-14 Chair-back thoracic extension · FLX-18 Standing chest opener · FLX-19 Desk lat stretch · FLX-20 Standing side-bend reach · FLX-21 Chin tucks · FLX-22 Active neck range · FLX-23 Levator scapulae stretch · FLX-24 Neck CARs · FLX-27 Standing thoracic rotation · FLX-31 Standing quad stretch · FLX-36 Standing pelvic tilts · FLX-37 Segmental roll-down
 
-Strength (5): STR-11 Wall sit · STR-20 Desk incline push-up · STR-31 Tibialis raise · STR-34 Bottom squat hold · STR-35 Standing glute squeezes
+Strength (7): STR-11 Wall sit · STR-20 Desk incline push-up · STR-31 Tibialis raise · STR-34 Bottom squat hold · STR-35 Standing glute squeezes · STR-48 Standing oblique crunch · STR-50 Seated knee tucks
 
 Balance (14): BAL-01 Single-leg stand · BAL-04 Tandem stance · BAL-11 Marching hold · BAL-14 Tree pose · BAL-17 Eagle pose · BAL-18 Crescent lunge hold · BAL-20 Hand-to-knee hold · BAL-22 Heel-toe rock · BAL-23 Single-leg stand with arm reaches · BAL-24 Backward walking · BAL-25 Quick side-steps · BAL-26 Tandem stance, eyes closed · BAL-28 Chair pose to toe raise · BAL-29 Slow 360° turns
 
@@ -747,4 +796,4 @@ CIR-10 Leg swings (75) → FLX-26 Hip CARs, one direction only (45) → BAL-14 T
 
 ## 14. Counts
 
-FLX 38 · CIR 20 · STR 38 · BAL 29 · HWF 11 · EYE 5 · BRE 6 — **147 movements** in 7 buckets. Equipment-tagged items: 18 (all with bodyweight substitutes per chaining rule 6). Micro-eligible items: 65.
+FLX 38 · CIR 20 · STR 50 · BAL 29 · HWF 11 · EYE 5 · BRE 6 — **159 movements** in 7 buckets. Equipment-tagged items: 18 (all with bodyweight substitutes per chaining rule 6). Micro-eligible items: 67. Requiring the floor: 38; a wall: 6; stairs: 3.

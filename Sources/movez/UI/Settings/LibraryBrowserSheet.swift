@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// All 147 movements, searchable, with a switch to take any of them out of rotation.
+/// Every movement in the library, searchable, with a switch to take any of them out of rotation.
 ///
 /// Excluding is deliberately the only thing this sheet does. The library is the app's content and
 /// the routine builder owns which movement runs when; the user's say is "not this one".

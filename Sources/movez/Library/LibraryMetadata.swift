@@ -59,8 +59,15 @@ struct BucketInfo: Codable, Hashable, Identifiable {
 struct MicroBreakSpec: Codable, Hashable {
     let seconds: Int
     let structure: String
+    /// How many movements the library tags Micro, so the loader can check the tags against it.
+    let eligibleCount: Int
     let eligibility: MicroEligibility
     let rules: [String]
+
+    enum CodingKeys: String, CodingKey {
+        case seconds, structure, eligibility, rules
+        case eligibleCount = "eligible_count"
+    }
 }
 
 struct MicroEligibility: Codable, Hashable {

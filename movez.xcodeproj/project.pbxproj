@@ -147,6 +147,7 @@
 		F16080DCF0D5B3FC40836C96 /* Movement.swift in Sources */ = {isa = PBXBuildFile; fileRef = E362393507283AB751AFD135 /* Movement.swift */; };
 		F28D60B36A71B8BE6B974503 /* PanelHygiene.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBA8B020C2EDC9BF09B9B140 /* PanelHygiene.swift */; };
 		F42F9DC41970EA742AD2CA0F /* EdgeCaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB130F89D1F33DE620263DDC /* EdgeCaseTests.swift */; };
+		F9F026BEF0A2D5253D7915A5 /* Requirement.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5D5430243244196E855C099 /* Requirement.swift */; };
 		FA3095A8003DBE5D1C5E8006 /* Chimes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180B30CF41793D9CAE5D22C8 /* Chimes.swift */; };
 		FA97BF785B6330263CB94429 /* AwayToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78E3FDC0CDAA721777AC550A /* AwayToastView.swift */; };
 		FDBB7E5A18656F9D53CA2DA2 /* LibraryLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A6BEA1E29B3BDA91DF3B33 /* LibraryLoader.swift */; };
@@ -254,6 +255,7 @@
 		A4954FDF028687ECBDC44740 /* Recency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recency.swift; sourceTree = "<group>"; };
 		A49E80929BB51EEDA20B470F /* StatePersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatePersistence.swift; sourceTree = "<group>"; };
 		A4DFD6E3893BC494249C0377 /* Preset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preset.swift; sourceTree = "<group>"; };
+		A5D5430243244196E855C099 /* Requirement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Requirement.swift; sourceTree = "<group>"; };
 		A79454DFD8FB5D5C68D4F0AD /* FontsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontsTests.swift; sourceTree = "<group>"; };
 		A85AE9D7EE6B6B218565A33D /* TokensTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokensTests.swift; sourceTree = "<group>"; };
 		A8F1E4BEB04E1CC72360081B /* MenuBarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarViewModel.swift; sourceTree = "<group>"; };
@@ -499,6 +501,7 @@
 				ABFC20128A308BD74AD1E790 /* MovementLibrary.swift */,
 				A4DFD6E3893BC494249C0377 /* Preset.swift */,
 				A3F75D6C7814FDA37FB714DD /* Region.swift */,
+				A5D5430243244196E855C099 /* Requirement.swift */,
 				B18D9238BAD43644A6B180B1 /* RoutineTemplate.swift */,
 				338688FA6237BBEDF3C03670 /* Setting.swift */,
 				E6EDEE7F8CC2A8806107B9E5 /* Substitutions.swift */,
@@ -828,6 +831,7 @@
 				47D730F2B581C31604F130CC /* Preset.swift in Sources */,
 				56964AB17B0D050C2FD63B8D /* Recency.swift in Sources */,
 				71A239A7D8F88B6323D2EDD9 /* Region.swift in Sources */,
+				F9F026BEF0A2D5253D7915A5 /* Requirement.swift in Sources */,
 				93E96C660961E469EC1C53D3 /* Routine.swift in Sources */,
 				0F074C7F41A3C8C7849C2F95 /* RoutineBuilder.swift in Sources */,
 				50D4E872D82B1BD926667F7A /* RoutineContext.swift in Sources */,

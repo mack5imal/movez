@@ -44,7 +44,7 @@ final class MicroBreakBuilderTests: XCTestCase {
             for block in micro.blocks {
                 XCTAssertTrue(block.movement.microEligible, "\(block.movement.id) is not micro-eligible")
                 XCTAssertFalse(block.movement.needsEquipment)
-                XCTAssertFalse(block.movement.isFloor)
+                XCTAssertFalse(block.movement.requiresFloor)
             }
         }
     }

@@ -1,8 +1,8 @@
 {
   "library": "movez movement library",
-  "version": "4",
+  "version": "4.1",
   "source": "movement-library-v4.md",
-  "generated": "2026-09-11",
+  "generated": "2026-10-10",
   "schema": {
     "movement": {
       "id": "bucket prefix + 2-digit number",
@@ -12,6 +12,7 @@
       "block_seconds": "approximate total block time",
       "difficulty": "1 easy, 2 moderate, 3 harder / more control",
       "settings": "where it can be done: Stand, Chair, Wall, Desk, Floor, Any",
+      "requires": "what the movement cannot be done without: floor, wall, stairs. Empty when it needs none; a wall or step that only helps balance is not listed",
       "equipment_optional": "optional equipment; every item has a bodyweight substitute per chaining rule 6",
       "micro_eligible": "true if allowed in the 1-minute micro-break",
       "counteracts": "sitting effect targeted",
@@ -126,7 +127,7 @@
     {
       "id": "STR",
       "name": "Strength",
-      "count": 38
+      "count": 50
     },
     {
       "id": "BAL",
@@ -191,6 +192,7 @@
   "micro_break": {
     "seconds": 60,
     "structure": "one 60 s block or two 30 s blocks",
+    "eligible_count": 67,
     "eligibility": {
       "max_block_seconds": 60,
       "no_floor": true,
@@ -310,6 +312,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "hip flexor shortening",
@@ -329,6 +332,9 @@
       "difficulty": 1,
       "settings": [
         "Floor"
+      ],
+      "requires": [
+        "floor"
       ],
       "equipment_optional": [],
       "micro_eligible": false,
@@ -352,6 +358,9 @@
         "Floor",
         "Wall"
       ],
+      "requires": [
+        "floor"
+      ],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "hip flexor + rectus femoris tightness",
@@ -371,6 +380,9 @@
       "difficulty": 2,
       "settings": [
         "Floor"
+      ],
+      "requires": [
+        "floor"
       ],
       "equipment_optional": [],
       "micro_eligible": false,
@@ -392,6 +404,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "glute/piriformis tightness",
@@ -412,6 +425,7 @@
       "settings": [
         "Chair"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "glute/piriformis tightness",
@@ -431,6 +445,9 @@
       "difficulty": 2,
       "settings": [
         "Floor"
+      ],
+      "requires": [
+        "floor"
       ],
       "equipment_optional": [],
       "micro_eligible": false,
@@ -454,6 +471,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "compressed hips, stiff ankles",
@@ -475,6 +493,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "adductor and hip stiffness",
@@ -495,6 +514,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "hamstring tightness",
@@ -516,6 +536,9 @@
       "settings": [
         "Floor"
       ],
+      "requires": [
+        "floor"
+      ],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "spinal stiffness",
@@ -535,6 +558,9 @@
       "difficulty": 1,
       "settings": [
         "Floor"
+      ],
+      "requires": [
+        "floor"
       ],
       "equipment_optional": [],
       "micro_eligible": false,
@@ -557,6 +583,9 @@
       "settings": [
         "Floor"
       ],
+      "requires": [
+        "floor"
+      ],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "thoracic rotation loss",
@@ -577,6 +606,7 @@
       "settings": [
         "Chair"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "kyphosis",
@@ -596,6 +626,9 @@
       "difficulty": 1,
       "settings": [
         "Floor"
+      ],
+      "requires": [
+        "floor"
       ],
       "equipment_optional": [
         "foam_roller"
@@ -620,6 +653,9 @@
       "settings": [
         "Wall"
       ],
+      "requires": [
+        "wall"
+      ],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "rounded shoulders, weak lower traps",
@@ -639,6 +675,9 @@
       "difficulty": 1,
       "settings": [
         "Wall"
+      ],
+      "requires": [
+        "wall"
       ],
       "equipment_optional": [],
       "micro_eligible": false,
@@ -661,6 +700,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "tight pecs, protracted shoulders",
@@ -682,6 +722,7 @@
       "settings": [
         "Desk"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "overhead stiffness, lat tightness",
@@ -703,6 +744,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "QL/lat tightness, rib immobility",
@@ -724,6 +766,7 @@
         "Chair",
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "forward head",
@@ -745,6 +788,7 @@
         "Chair",
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "upper trap / levator tightness",
@@ -766,6 +810,7 @@
         "Chair",
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "levator tightness",
@@ -786,6 +831,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "cervical stiffness",
@@ -806,6 +852,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "shoulder capsule stiffness",
@@ -827,6 +874,7 @@
         "Stand",
         "Wall"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "hip capsule stiffness",
@@ -847,6 +895,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "thoracic rotation loss",
@@ -869,6 +918,9 @@
       "settings": [
         "Floor"
       ],
+      "requires": [
+        "floor"
+      ],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "posterior chain tightness",
@@ -888,6 +940,9 @@
       "difficulty": 1,
       "settings": [
         "Wall"
+      ],
+      "requires": [
+        "wall"
       ],
       "equipment_optional": [],
       "micro_eligible": false,
@@ -910,6 +965,7 @@
         "Floor",
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "dorsiflexion loss",
@@ -932,6 +988,7 @@
         "Stand",
         "Wall"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "rectus femoris tightness",
@@ -951,6 +1008,9 @@
       "difficulty": 1,
       "settings": [
         "Floor"
+      ],
+      "requires": [
+        "floor"
       ],
       "equipment_optional": [],
       "micro_eligible": false,
@@ -972,6 +1032,9 @@
       "difficulty": 1,
       "settings": [
         "Floor"
+      ],
+      "requires": [
+        "floor"
       ],
       "equipment_optional": [],
       "micro_eligible": false,
@@ -995,6 +1058,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "whole posterior chain and hips",
@@ -1016,6 +1080,7 @@
       "settings": [
         "Desk"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "glute/external rotator tightness",
@@ -1037,6 +1102,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "lost lumbopelvic control",
@@ -1058,6 +1124,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "global spinal stiffness",
@@ -1079,6 +1146,7 @@
         "Stand",
         "Chair"
       ],
+      "requires": [],
       "equipment_optional": [
         "ball"
       ],
@@ -1101,6 +1169,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "low metabolic rate, venous pooling",
@@ -1121,6 +1190,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "venous pooling",
@@ -1140,6 +1210,9 @@
       "difficulty": 2,
       "settings": [
         "Stand"
+      ],
+      "requires": [
+        "stairs"
       ],
       "equipment_optional": [],
       "micro_eligible": false,
@@ -1162,6 +1235,7 @@
         "Stand",
         "Desk"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "venous pooling in calves",
@@ -1183,6 +1257,7 @@
         "Chair",
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "venous pooling",
@@ -1203,6 +1278,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "shoulder stiffness, upper-body circulation",
@@ -1223,6 +1299,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "heart rate too low",
@@ -1243,6 +1320,9 @@
       "difficulty": 2,
       "settings": [
         "Floor"
+      ],
+      "requires": [
+        "floor"
       ],
       "equipment_optional": [],
       "micro_eligible": false,
@@ -1265,6 +1345,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "low HR, shoulder stiffness",
@@ -1286,6 +1367,7 @@
         "Stand",
         "Wall"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "hip stiffness, lower-body circulation",
@@ -1307,6 +1389,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "lumbopelvic stiffness",
@@ -1328,6 +1411,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "glute inhibition, low HR",
@@ -1349,6 +1433,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "trunk stiffness, low HR",
@@ -1370,6 +1455,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "weak shins, foot circulation",
@@ -1390,6 +1476,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "static tension",
@@ -1411,6 +1498,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "low HR, glute inhibition",
@@ -1431,6 +1519,9 @@
       "difficulty": 1,
       "settings": [
         "Stand"
+      ],
+      "requires": [
+        "stairs"
       ],
       "equipment_optional": [],
       "micro_eligible": false,
@@ -1453,6 +1544,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [
         "kettlebell_or_dumbbell"
       ],
@@ -1476,6 +1568,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "hip flexor shortening, low HR",
@@ -1497,6 +1590,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "lateral hip weakness, low HR",
@@ -1516,6 +1610,9 @@
       "difficulty": 1,
       "settings": [
         "Floor"
+      ],
+      "requires": [
+        "floor"
       ],
       "equipment_optional": [],
       "micro_eligible": false,
@@ -1537,6 +1634,9 @@
       "settings": [
         "Floor"
       ],
+      "requires": [
+        "floor"
+      ],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "glute inhibition, asymmetry",
@@ -1556,6 +1656,9 @@
       "difficulty": 2,
       "settings": [
         "Chair"
+      ],
+      "requires": [
+        "floor"
       ],
       "equipment_optional": [],
       "micro_eligible": false,
@@ -1578,6 +1681,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "lower-body deconditioning",
@@ -1600,6 +1704,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "hip flexor shortening, single-leg weakness",
@@ -1621,6 +1726,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "glute inhibition",
@@ -1641,6 +1747,9 @@
       "difficulty": 1,
       "settings": [
         "Stand"
+      ],
+      "requires": [
+        "stairs"
       ],
       "equipment_optional": [],
       "micro_eligible": false,
@@ -1663,6 +1772,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [
         "kettlebell_or_dumbbell"
       ],
@@ -1687,6 +1797,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [
         "kettlebell_or_dumbbell"
       ],
@@ -1710,6 +1821,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [
         "kettlebell_or_dumbbell"
       ],
@@ -1732,6 +1844,9 @@
       "settings": [
         "Wall"
       ],
+      "requires": [
+        "wall"
+      ],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "quad deconditioning",
@@ -1753,6 +1868,9 @@
       "settings": [
         "Floor"
       ],
+      "requires": [
+        "floor"
+      ],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "weak spinal stabilizers",
@@ -1772,6 +1890,9 @@
       "difficulty": 1,
       "settings": [
         "Floor"
+      ],
+      "requires": [
+        "floor"
       ],
       "equipment_optional": [],
       "micro_eligible": false,
@@ -1793,6 +1914,9 @@
       "settings": [
         "Floor"
       ],
+      "requires": [
+        "floor"
+      ],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "lateral core weakness",
@@ -1812,6 +1936,9 @@
       "difficulty": 1,
       "settings": [
         "Floor"
+      ],
+      "requires": [
+        "floor"
       ],
       "equipment_optional": [],
       "micro_eligible": false,
@@ -1834,6 +1961,9 @@
       "settings": [
         "Floor"
       ],
+      "requires": [
+        "floor"
+      ],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "weak lower/mid traps",
@@ -1854,6 +1984,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [
         "band"
       ],
@@ -1876,6 +2007,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [
         "band"
       ],
@@ -1899,6 +2031,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [
         "band"
       ],
@@ -1922,6 +2055,7 @@
       "settings": [
         "Desk"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "upper-body deconditioning",
@@ -1944,6 +2078,9 @@
       "settings": [
         "Floor"
       ],
+      "requires": [
+        "floor"
+      ],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "upper-body deconditioning",
@@ -1963,6 +2100,9 @@
       "difficulty": 1,
       "settings": [
         "Floor"
+      ],
+      "requires": [
+        "floor"
       ],
       "equipment_optional": [],
       "micro_eligible": false,
@@ -1984,6 +2124,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [
         "band"
       ],
@@ -2005,6 +2146,9 @@
       "difficulty": 1,
       "settings": [
         "Floor"
+      ],
+      "requires": [
+        "floor"
       ],
       "equipment_optional": [
         "band"
@@ -2028,6 +2172,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [
         "kettlebell_or_dumbbell"
       ],
@@ -2051,6 +2196,7 @@
         "Stand",
         "Wall"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "calf weakness, venous pooling",
@@ -2072,6 +2218,9 @@
       "settings": [
         "Floor"
       ],
+      "requires": [
+        "floor"
+      ],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "weak spinal extensors",
@@ -2092,6 +2241,9 @@
       "difficulty": 2,
       "settings": [
         "Floor"
+      ],
+      "requires": [
+        "floor"
       ],
       "equipment_optional": [],
       "micro_eligible": false,
@@ -2115,6 +2267,9 @@
         "Floor",
         "Chair"
       ],
+      "requires": [
+        "floor"
+      ],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "adductor weakness",
@@ -2136,6 +2291,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [
         "band"
       ],
@@ -2158,6 +2314,9 @@
       "settings": [
         "Wall"
       ],
+      "requires": [
+        "wall"
+      ],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "weak shins, ankle stiffness",
@@ -2178,6 +2337,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [
         "kettlebell_or_dumbbell"
       ],
@@ -2201,6 +2361,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [
         "kettlebell_or_dumbbell",
         "band"
@@ -2225,6 +2386,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "hip compression, quad deconditioning",
@@ -2245,6 +2407,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "glute inhibition",
@@ -2264,6 +2427,9 @@
       "difficulty": 2,
       "settings": [
         "Floor"
+      ],
+      "requires": [
+        "floor"
       ],
       "equipment_optional": [],
       "micro_eligible": false,
@@ -2286,6 +2452,9 @@
       "settings": [
         "Wall"
       ],
+      "requires": [
+        "wall"
+      ],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "weak lower traps",
@@ -2307,12 +2476,289 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [
         "band"
       ],
       "micro_eligible": false,
       "counteracts": "glute inhibition, valgus tendency",
       "instructions": "Loop a mini-band just above the knees, feet hip width. Push the hips back into a hinge with a flat back while driving the knees outward against the band, then squeeze the glutes to stand tall, keeping the knees pushed out throughout."
+    },
+    {
+      "id": "STR-39",
+      "name": "Crunch",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "L-spine/Core"
+      ],
+      "dose": "15 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "requires": [
+        "floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "weak anterior core",
+      "instructions": "Lie on your back with knees bent, feet flat, and fingertips lightly behind the ears. Exhale and curl the head and shoulder blades off the floor by drawing the ribs toward the hips, pause, then lower slowly. Keep the low back on the floor and the elbows wide; never pull on the head."
+    },
+    {
+      "id": "STR-40",
+      "name": "Sit-up",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "L-spine/Core",
+        "Hip"
+      ],
+      "dose": "10 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "requires": [
+        "floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "weak anterior core",
+      "instructions": "Lie on your back with knees bent and feet flat, hooked under a desk edge if they lift. Cross the arms on the chest and curl up one segment at a time, head, shoulders, then mid-back, until you're sitting tall, then roll back down the same way. Lower slowly; that's where the work is, and the arms never swing to help."
+    },
+    {
+      "id": "STR-41",
+      "name": "Lying leg raise",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "L-spine/Core",
+        "Hip"
+      ],
+      "dose": "10 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "requires": [
+        "floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "weak lower abdominals",
+      "instructions": "Lie on your back, legs straight, hands flat beside the hips. Keeping the legs together and straight, lift them until they point at the ceiling, then lower them slowly until the heels hover just above the floor. Stop lowering wherever the low back starts to arch; bend the knees a little to make it easier."
+    },
+    {
+      "id": "STR-42",
+      "name": "Scissor kicks",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "L-spine/Core",
+        "Hip"
+      ],
+      "dose": "30–40 s",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "requires": [
+        "floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "weak lower abdominals",
+      "instructions": "Lie on your back with the hands under the hips, press the low back into the floor, and lift both straight legs a hand's width off it. Cross one leg over the other, then switch, in a steady scissoring rhythm, keeping the movement small. Raise the legs higher if the low back starts to lift."
+    },
+    {
+      "id": "STR-43",
+      "name": "Bicycle crunch",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "L-spine/Core"
+      ],
+      "dose": "20 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "requires": [
+        "floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "weak obliques, trunk stiffness",
+      "instructions": "Lie on your back with fingertips behind the ears and both knees lifted to 90°. Curl the shoulders up, then turn the right elbow toward the left knee as the right leg straightens out, and switch sides in a slow pedalling rhythm. Rotate from the ribs, not the neck, and keep the low back pressed down."
+    },
+    {
+      "id": "STR-44",
+      "name": "Reverse crunch",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "L-spine/Core"
+      ],
+      "dose": "12 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "requires": [
+        "floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "weak lower abdominals",
+      "instructions": "Lie on your back, arms by your sides, knees bent to 90° and lifted over the hips. Exhale and curl the hips off the floor, drawing the knees toward the chest, then lower the hips slowly until the tailbone just touches down. Lift with the lower abdominals rather than swinging the legs."
+    },
+    {
+      "id": "STR-45",
+      "name": "Hollow body hold",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "L-spine/Core"
+      ],
+      "dose": "20–30 s",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 2,
+      "settings": [
+        "Floor"
+      ],
+      "requires": [
+        "floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "core deconditioning",
+      "instructions": "Lie on your back with arms reaching overhead and legs straight. Press the low back firmly into the floor, then lift the arms, shoulders and legs a few inches so the body forms a shallow curve, and hold while breathing. Bend the knees or bring the arms to the sides if the low back lifts; rest and repeat."
+    },
+    {
+      "id": "STR-46",
+      "name": "Alternating heel taps",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "L-spine/Core"
+      ],
+      "dose": "20 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Floor"
+      ],
+      "requires": [
+        "floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "weak obliques",
+      "instructions": "Lie on your back with knees bent and feet flat, a little wider than the hips. Lift the head and shoulders slightly and reach the right hand toward the right heel by bending sideways at the waist, then the left hand to the left heel. Keep the shoulders off the floor throughout and the movement small and steady."
+    },
+    {
+      "id": "STR-47",
+      "name": "V-up",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "L-spine/Core",
+        "Hip"
+      ],
+      "dose": "8 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 3,
+      "settings": [
+        "Floor"
+      ],
+      "requires": [
+        "floor"
+      ],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "core deconditioning",
+      "instructions": "Lie flat with arms overhead and legs straight. In one motion, lift the arms and legs together and reach the hands toward the shins, balancing briefly on the seat in a V, then lower both back down slowly. Tuck the knees if the legs can't stay straight, and control the way down rather than dropping."
+    },
+    {
+      "id": "STR-48",
+      "name": "Standing oblique crunch",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "L-spine/Core"
+      ],
+      "dose": "12/side",
+      "per_side": true,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Stand"
+      ],
+      "requires": [],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "trunk stiffness, weak obliques",
+      "instructions": "Stand tall with feet hip width and the right hand behind the head. Lift the right knee out to the side as you bend sideways to bring the right elbow down to meet it, then return to standing. Do all reps on one side, then switch; squeeze the side of the waist rather than rounding forward."
+    },
+    {
+      "id": "STR-49",
+      "name": "Desk plank",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "L-spine/Core",
+        "Shoulder"
+      ],
+      "dose": "30–45 s",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Desk"
+      ],
+      "requires": [],
+      "equipment_optional": [],
+      "micro_eligible": false,
+      "counteracts": "core deconditioning",
+      "instructions": "Place the forearms on the edge of a sturdy desk, elbows under the shoulders, and walk the feet back until the body is a straight line from head to heels. Squeeze the glutes, draw the belly in gently, and hold while breathing steadily. Walk the feet further back to make it harder; don't let the hips sag or pike."
+    },
+    {
+      "id": "STR-50",
+      "name": "Seated knee tucks",
+      "bucket": "STR",
+      "bucket_name": "Strength",
+      "regions": [
+        "L-spine/Core",
+        "Hip"
+      ],
+      "dose": "12 reps",
+      "per_side": false,
+      "block_seconds": 60,
+      "difficulty": 1,
+      "settings": [
+        "Chair"
+      ],
+      "requires": [],
+      "equipment_optional": [],
+      "micro_eligible": true,
+      "counteracts": "weak lower abdominals",
+      "instructions": "Sit near the front edge of a chair that won't roll and hold its sides, leaning back slightly with a long spine. Lift both feet and draw the knees toward the chest, then extend the legs out at a slight angle without touching the floor, and repeat. Keep the chest lifted and move slowly; touch the toes down between reps if needed."
     },
     {
       "id": "BAL-01",
@@ -2329,6 +2775,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "lost proprioception",
@@ -2350,6 +2797,7 @@
         "Stand",
         "Wall"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "dependence on vision for balance",
@@ -2371,6 +2819,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "neck stiffness plus balance",
@@ -2391,6 +2840,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "narrow-base instability",
@@ -2411,6 +2861,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "gait control loss",
@@ -2432,6 +2883,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "hip control, ankle stability",
@@ -2453,6 +2905,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "posterior chain control",
@@ -2474,6 +2927,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "ankle stabilizer weakness",
@@ -2495,6 +2949,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "hip control",
@@ -2516,6 +2971,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "knee and hip control",
@@ -2537,6 +2993,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "hip flexor strength, balance",
@@ -2558,6 +3015,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "single-leg control",
@@ -2579,6 +3037,7 @@
         "Stand",
         "Wall"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "ankle stability, venous pooling",
@@ -2602,6 +3061,7 @@
         "Stand",
         "Wall"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "lost single-leg stability, hip rotator weakness",
@@ -2624,6 +3084,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "posterior chain control, hip stability",
@@ -2647,6 +3108,7 @@
         "Desk",
         "Wall"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "lateral hip weakness, rotational balance",
@@ -2669,6 +3131,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "narrow-base instability, shoulder and hip stiffness",
@@ -2691,6 +3154,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "hip flexor shortening, single-leg control",
@@ -2714,6 +3178,7 @@
         "Stand",
         "Wall"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "hip flexor tightness, single-leg control under a moving load",
@@ -2735,6 +3200,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "hip flexor strength through range, standing stability",
@@ -2757,6 +3223,7 @@
       "settings": [
         "Chair"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "weak sit-to-stand, single-leg control",
@@ -2778,6 +3245,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "reduced ankle strategy for balance",
@@ -2799,6 +3267,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "balance while the upper body moves",
@@ -2819,6 +3288,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "gait control, reduced awareness of the body in space",
@@ -2840,6 +3310,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "slow stepping reactions",
@@ -2861,6 +3332,7 @@
         "Stand",
         "Wall"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "dependence on vision for balance",
@@ -2883,6 +3355,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "posterior chain control, dynamic balance",
@@ -2905,6 +3378,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "quad and calf control, ankle stability",
@@ -2925,6 +3399,7 @@
       "settings": [
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "turning-related instability, vestibular under-use",
@@ -2946,6 +3421,7 @@
         "Stand",
         "Chair"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "keyboard flexor tension",
@@ -2967,6 +3443,7 @@
         "Stand",
         "Chair"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "mouse extensor tension",
@@ -2988,6 +3465,7 @@
         "Stand",
         "Chair"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "wrist stiffness",
@@ -3009,6 +3487,7 @@
         "Stand",
         "Chair"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "wrist stiffness",
@@ -3030,6 +3509,7 @@
         "Stand",
         "Chair"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "finger flexor dominance",
@@ -3051,6 +3531,7 @@
         "Stand",
         "Chair"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "tendon gliding restriction",
@@ -3072,6 +3553,7 @@
         "Stand",
         "Chair"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "forearm rotation stiffness",
@@ -3093,6 +3575,7 @@
         "Stand",
         "Chair"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "trackpad/thumb overuse",
@@ -3113,6 +3596,7 @@
       "settings": [
         "Desk"
       ],
+      "requires": [],
       "equipment_optional": [
         "ball"
       ],
@@ -3137,6 +3621,7 @@
         "Stand",
         "Chair"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "nerve tension from fixed elbow and wrist posture",
@@ -3158,6 +3643,7 @@
         "Stand",
         "Chair"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "static grip tension",
@@ -3178,6 +3664,7 @@
       "settings": [
         "Any"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "fixed near focus",
@@ -3198,6 +3685,7 @@
       "settings": [
         "Any"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "ciliary muscle fatigue",
@@ -3218,6 +3706,7 @@
       "settings": [
         "Any"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "ocular muscle stiffness",
@@ -3238,6 +3727,7 @@
       "settings": [
         "Chair"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "eye strain, light overload",
@@ -3258,6 +3748,7 @@
       "settings": [
         "Any"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "reduced blink rate, dry eye",
@@ -3279,6 +3770,7 @@
         "Chair",
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "shallow apical breathing",
@@ -3300,6 +3792,7 @@
         "Chair",
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "stress breathing pattern",
@@ -3321,6 +3814,7 @@
         "Chair",
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "sympathetic overdrive",
@@ -3341,6 +3835,9 @@
       "difficulty": 1,
       "settings": [
         "Floor"
+      ],
+      "requires": [
+        "floor"
       ],
       "equipment_optional": [],
       "micro_eligible": false,
@@ -3364,6 +3861,9 @@
         "Floor",
         "Chair"
       ],
+      "requires": [
+        "floor"
+      ],
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "rib flare, anterior tilt",
@@ -3386,6 +3886,7 @@
         "Chair",
         "Stand"
       ],
+      "requires": [],
       "equipment_optional": [
         "band"
       ],

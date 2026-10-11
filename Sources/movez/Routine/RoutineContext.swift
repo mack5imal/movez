@@ -9,6 +9,7 @@ enum Focus: String, Hashable, Codable, CaseIterable {
     case moreHips
     case moreNeckShoulders
     case moreHandsEyes
+    case moreCore
 
     var displayName: String {
         switch self {
@@ -17,6 +18,7 @@ enum Focus: String, Hashable, Codable, CaseIterable {
         case .moreHips: return "More hips"
         case .moreNeckShoulders: return "More neck and shoulders"
         case .moreHandsEyes: return "More hands and eyes"
+        case .moreCore: return "More core"
         }
     }
 
@@ -28,6 +30,7 @@ enum Focus: String, Hashable, Codable, CaseIterable {
         case .moreHips: return [.hip, .glute]
         case .moreNeckShoulders: return [.neck, .shoulder]
         case .moreHandsEyes: return [.wristForearm, .eyes]
+        case .moreCore: return [.lumbarCore]
         }
     }
 }

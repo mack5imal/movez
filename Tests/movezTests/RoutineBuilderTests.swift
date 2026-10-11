@@ -237,6 +237,11 @@ final class RoutineBuilderTests: XCTestCase {
         let focusedUpper = upperBack.filter { !Set($0.movement.regions).isDisjoint(with: upperRegions) }.count
         XCTAssertGreaterThan(focusedUpper, baselineUpper, "more upper back did not raise the T-spine share")
 
+        let core = blocks(focus: .moreCore)
+        let baselineCore = baseline.filter { $0.movement.regions.contains(.lumbarCore) }.count
+        let focusedCore = core.filter { $0.movement.regions.contains(.lumbarCore) }.count
+        XCTAssertGreaterThan(focusedCore, baselineCore, "more core did not raise the core share")
+
         RoutineTestSupport.write(
             """
             Bucket distribution over 200 generated routines per condition
@@ -245,9 +250,11 @@ final class RoutineBuilderTests: XCTestCase {
             \(row("none", baseline))
             \(row("moreHandsEyes", handsEyes))
             \(row("moreUpperBack", upperBack))
+            \(row("moreCore", core))
 
             Wrist/eye blocks   none \(baselineHandsEyes)   moreHandsEyes \(focusedHandsEyes)
             T-spine/Chest/Shoulder blocks   none \(baselineUpper)   moreUpperBack \(focusedUpper)
+            L-spine/Core blocks   none \(baselineCore)   moreCore \(focusedCore)
             """,
             to: "routine-distribution.txt"
         )

@@ -13,18 +13,19 @@ final class LibraryTests: XCTestCase {
     private var library: MovementLibrary { Self.library }
 
     func testDecodesEveryMovement() {
-        XCTAssertEqual(library.movements.count, 147)
-        XCTAssertEqual(library.microEligible.count, 65)
-        XCTAssertEqual(library.version, "4")
+        XCTAssertEqual(library.movements.count, 159)
+        XCTAssertEqual(library.microEligible.count, 67)
+        XCTAssertEqual(library.microBreak.eligibleCount, 67)
+        XCTAssertEqual(library.version, "4.1")
     }
 
     func testBucketCounts() {
-        let expected: [Bucket: Int] = [.flx: 38, .cir: 20, .str: 38, .bal: 29, .hwf: 11, .eye: 5, .bre: 6]
+        let expected: [Bucket: Int] = [.flx: 38, .cir: 20, .str: 50, .bal: 29, .hwf: 11, .eye: 5, .bre: 6]
         XCTAssertEqual(Bucket.allCases.count, 7)
         for (bucket, count) in expected {
             XCTAssertEqual(library.movements(in: bucket).count, count, "bucket \(bucket.rawValue)")
         }
-        XCTAssertEqual(expected.values.reduce(0, +), 147)
+        XCTAssertEqual(expected.values.reduce(0, +), 159)
         for info in library.buckets {
             XCTAssertEqual(info.count, expected[info.id], "declared count for \(info.id.rawValue)")
         }
@@ -132,8 +133,86 @@ final class LibraryTests: XCTestCase {
             guard case LibraryError.validation(let reason)? = error as? LibraryError else {
                 return XCTFail("expected a validation error, got \(error)")
             }
-            XCTAssertTrue(reason.contains("146"), reason)
+            XCTAssertTrue(reason.contains("158"), reason)
         }
+    }
+
+    // MARK: - Version
+
+    /// A library revision bumps the JSON's `version` and the Markdown's title together, and keeps
+    /// the major version the resource is named after; the Settings footer shows whatever the JSON
+    /// says, so a forgotten half would show up there as a mismatch.
+    func testTheVersionAgreesAcrossTheJSONTheMarkdownAndTheFilename() throws {
+        let major = library.version.split(separator: ".").first.map(String.init)
+        XCTAssertEqual(LibraryLoader.resourceName, "movement-library-v\(major ?? "")")
+
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let markdown = try String(contentsOf: root.appendingPathComponent("\(LibraryLoader.resourceName).md"), encoding: .utf8)
+        XCTAssertTrue(
+            markdown.hasPrefix("# movez — Movement Library v\(library.version)\n"),
+            String(markdown.prefix(60))
+        )
+    }
+
+    // MARK: - What a movement requires
+
+    func testEveryMovementSaysWhatItRequires() {
+        XCTAssertEqual(library.movements.filter { $0.requires.contains(.floor) }.count, 38)
+        XCTAssertEqual(library.movements.filter { $0.requires.contains(.wall) }.map(\.id).sorted(),
+                       ["FLX-16", "FLX-17", "FLX-29", "STR-11", "STR-31", "STR-37"])
+        XCTAssertEqual(library.movements.filter { $0.requires.contains(.stairs) }.map(\.id).sorted(),
+                       ["CIR-03", "CIR-17", "STR-07"])
+        for movement in library.movements where movement.settings == [.floor] {
+            XCTAssertTrue(movement.requiresFloor, "\(movement.id) can only be done on the floor")
+        }
+    }
+
+    /// Only what is required is listed: a wall for balance, or a choice of surfaces, is not.
+    func testOptionalSupportIsNotARequirement() throws {
+        XCTAssertEqual(try XCTUnwrap(library.movement(id: "FLX-03")).requires, [.floor], "a wall or a chair will do")
+        XCTAssertEqual(try XCTUnwrap(library.movement(id: "BAL-14")).requires, [], "fingertips on a wall are optional")
+        XCTAssertEqual(try XCTUnwrap(library.movement(id: "FLX-30")).requires, [], "half-kneel or stand")
+        XCTAssertEqual(try XCTUnwrap(library.movement(id: "BAL-16")).requires, [], "desk or wall")
+        XCTAssertEqual(try XCTUnwrap(library.movement(id: "STR-03")).requires, [.floor], "sitting on the floor")
+    }
+
+    func testNothingThatNeedsTheFloorIsMicro() {
+        XCTAssertTrue(library.microEligible.allSatisfy { !$0.requiresFloor })
+    }
+
+    func testValidationRejectsAFloorMovementTaggedMicro() throws {
+        let url = try XCTUnwrap(LibraryLoader.bundledURL())
+        var json = try JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? [String: Any] ?? [:]
+        var movements = try XCTUnwrap(json["movements"] as? [[String: Any]])
+        let index = try XCTUnwrap(movements.firstIndex { $0["id"] as? String == "STR-39" })
+        let previous = try XCTUnwrap(movements.firstIndex { $0["id"] as? String == "STR-48" })
+        movements[index]["micro_eligible"] = true
+        movements[previous]["micro_eligible"] = false
+        json["movements"] = movements
+
+        let library = try JSONDecoder().decode(MovementLibrary.self, from: JSONSerialization.data(withJSONObject: json))
+        XCTAssertThrowsError(try LibraryLoader.validate(library)) { error in
+            XCTAssertEqual(error as? LibraryError, .validation("STR-39 needs the floor but is tagged Micro"))
+        }
+    }
+
+    // MARK: - Core
+
+    func testTheCoreMovementsAreStrengthAndWorkTheCore() {
+        let core = (39...50).compactMap { library.movement(id: "STR-\($0)") }
+        XCTAssertEqual(core.map(\.name), [
+            "Crunch", "Sit-up", "Lying leg raise", "Scissor kicks", "Bicycle crunch", "Reverse crunch",
+            "Hollow body hold", "Alternating heel taps", "V-up", "Standing oblique crunch", "Desk plank",
+            "Seated knee tucks"
+        ])
+        for movement in core {
+            XCTAssertEqual(movement.bucket, .str)
+            XCTAssertTrue(movement.regions.contains(.lumbarCore), movement.id)
+            XCTAssertFalse(movement.needsEquipment, movement.id)
+        }
+        XCTAssertEqual(core.filter { !$0.requiresFloor }.map(\.id), ["STR-48", "STR-49", "STR-50"],
+                       "core work for anyone who won't get down on the floor")
     }
 
     func testMissingResourceSurfacesAnError() {

@@ -49,7 +49,7 @@ struct MicroBreakBuilder {
     func candidates(for context: MicroContext) -> [Movement] {
         library.microEligible.filter { movement in
             !movement.needsEquipment
-                && !movement.isFloor
+                && !movement.requiresFloor
                 && !context.excluded.contains(movement.id)
                 && !context.lastMicroMovementIds.contains(movement.id)
                 && !context.nextFullRoutineIds.contains(movement.id)

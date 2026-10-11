@@ -24,11 +24,10 @@ enum LibraryLoader {
     static let resourceName = "movement-library-v4"
     static let resourceExtension = "json"
 
-    /// Counts the shipped v4 library is expected to have. A mismatch means the bundled JSON and
-    /// the code have drifted apart, which would silently change every generated routine.
+    /// Counts of the parts of the library the code depends on directly. How many movements there
+    /// are, and how many are Micro, the JSON declares for itself (per bucket, and in `micro_break`)
+    /// and is checked against, so adding movements in a library revision needs no code change.
     enum Expected {
-        static let movements = 147
-        static let microEligible = 65
         static let routines = 9
         static let microRoutines = 8
         static let presets = 3
@@ -81,8 +80,9 @@ enum LibraryLoader {
     private static func validateMovements(_ library: MovementLibrary) throws {
         let movements = library.movements
 
-        guard movements.count == Expected.movements else {
-            throw LibraryError.validation("expected \(Expected.movements) movements, found \(movements.count)")
+        let declared = library.buckets.reduce(0) { $0 + $1.count }
+        guard movements.count == declared else {
+            throw LibraryError.validation("the buckets declare \(declared) movements, found \(movements.count)")
         }
 
         let ids = Set(movements.map(\.id))
@@ -92,8 +92,15 @@ enum LibraryLoader {
         }
 
         let microCount = movements.filter(\.microEligible).count
-        guard microCount == Expected.microEligible else {
-            throw LibraryError.validation("expected \(Expected.microEligible) micro-eligible movements, found \(microCount)")
+        guard microCount == library.microBreak.eligibleCount else {
+            throw LibraryError.validation(
+                "micro_break declares \(library.microBreak.eligibleCount) micro-eligible movements, found \(microCount)"
+            )
+        }
+
+        // A micro-break is done standing or seated, whatever the user has to hand.
+        if let floored = movements.first(where: { $0.microEligible && $0.requiresFloor }) {
+            throw LibraryError.validation("\(floored.id) needs the floor but is tagged Micro")
         }
 
         for info in library.buckets {

@@ -12,13 +12,16 @@ struct Movement: Codable, Identifiable, Hashable {
     let blockSeconds: Int
     let difficulty: Int
     let settings: [MovementSetting]
+    /// What it cannot be done without. Required in the JSON, so an untagged movement fails to load
+    /// rather than slipping through as needing nothing.
+    let requires: [Requirement]
     let equipmentOptional: [Equipment]
     let microEligible: Bool
     let counteracts: String
     let instructions: String
 
     enum CodingKeys: String, CodingKey {
-        case id, name, bucket, dose, difficulty, settings, counteracts, instructions, regions
+        case id, name, bucket, dose, difficulty, settings, requires, counteracts, instructions, regions
         case bucketName = "bucket_name"
         case perSide = "per_side"
         case blockSeconds = "block_seconds"
@@ -26,8 +29,14 @@ struct Movement: Codable, Identifiable, Hashable {
         case microEligible = "micro_eligible"
     }
 
-    /// True when the movement can only be done on the floor, which disqualifies it from micro-breaks.
-    var isFloor: Bool { settings == [.floor] }
+    /// True when the movement needs the floor, which disqualifies it from micro-breaks whatever the
+    /// user has to hand.
+    var requiresFloor: Bool { requires.contains(.floor) }
+
+    /// True when the movement needs something in `unavailable`.
+    func needsAny(of unavailable: Set<Requirement>) -> Bool {
+        !unavailable.isDisjoint(with: requires)
+    }
 
     /// True when the movement lists optional equipment and therefore needs a peer when the user has none.
     var needsEquipment: Bool { !equipmentOptional.isEmpty }
