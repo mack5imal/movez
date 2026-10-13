@@ -338,3 +338,40 @@ are in `docs/rule-changes-2026-10.md` and `scripts/simulate_selection.py`.
 44. **The away toast sits in the top-right corner**, twelve points under the menu bar like the
     panels and twenty in from the edge, rather than bottom-right as the handoff draws it. The
     panels sit top-centre, so the two never meet.
+
+## Library v4.2
+
+45. **Near-duplicates are grouped into families, and a family counts as one movement.** The
+    builders only ever stopped the same id repeating, so a single-leg calf raise hold (balance) and
+    a single-leg calf raise (strength) ran back to back in one break, and a standing, a
+    half-kneeling and a crescent-lunge hip-flexor stretch all came up in one day. Movement library
+    4.2 declares 28 families covering 73 movements; the test for membership is whether the two,
+    done back to back, would feel like the same exercise twice. Neither builder serves two members
+    of a family in one break or one day, the micro-break's last-micro and next-full-break rules
+    compare families too, and recency is summed across a family, so yesterday's FLX-01 weights
+    down FLX-02 today. A movement outside every family is a family of one, which keeps the old
+    per-movement rules exactly. Avoiding a body region within a break was considered and rejected:
+    regions such as Hip and Full cover too many unrelated movements, and it would not have touched
+    the hip-flexor case, which spanned several breaks. Because a family can now use up a bucket on
+    a long day — strength with no floor or wall shares its standing movements' families with
+    circulation and balance — a position that runs out takes a movement already served today
+    rather than leaving the break one short.
+46. **A movement is split into sides only when its instructions do one side and then the other.**
+    Thumb CARs and forearm pronation/supination are done with both hands at once for the whole
+    minute. Nine movements whose instructions alternate rep by rep (Cossack squat, standing
+    thoracic rotation, reverse lunge and its overhead-reach and paused variants, bird dog, dead
+    bug, marching hold, chair-to-single-leg stand) and child's pose with side reach, which runs
+    centre then each side, lose their sides, so the break no longer chimes halfway or says "THEN
+    RIGHT" over instructions that say to alternate. Shoulder CARs and the median nerve glide stay
+    per side: both arms at once lets the low back arch, and the nerve glide's head tilt can only
+    go one way.
+47. **Fifteen movements fill the library's gaps, with the first for the arms.** Six stretches
+    (seated spinal twist, cross-body shoulder, overhead triceps, biceps wall stretch, upper-trap,
+    seated butterfly), eight strength movements (isometric biceps curl under the desk, isometric
+    triceps press-down on it, 4-way neck isometrics, doorframe row, seated shoulder-blade squeeze,
+    standing side leg raise, arch doming, lateral lunge) and toe yoga, as FLX-39–44, STR-51–58 and
+    BAL-30, with a new Arm region. Most can be done in a chair, so twelve are micro-eligible. The
+    doorframe row is tagged as needing a wall, the closest switch settings offer to a door frame.
+    Rejected: chair dips, since most desk chairs roll; a pec-minor wall stretch, which the doorway
+    pec stretch already covers at its high elbow position; and a held side-lunge stretch, which is
+    the Cossack squat held still. The lateral lunge joins the Cossack squat's family instead.
