@@ -35,7 +35,7 @@ from what is installed, so nothing else needs editing when one of them moves:
   fixes; 1.0 is reserved for when the app is called done.
 - **Build number** (`38`): stamped on every build with the commit count (`git rev-list --count
   HEAD`), so it never needs bumping.
-- **Library version** (`v4.1`): the `version` field of `movement-library-v4.json`, with the same
+- **Library version** (`v4.2`): the `version` field of `movement-library-v4.json`, with the same
   number in the title of `movement-library-v4.md` (a test holds them together). The filename keeps
   only the major version, so a minor library revision touches the two library files and nothing
   else.
