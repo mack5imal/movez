@@ -13,19 +13,19 @@ final class LibraryTests: XCTestCase {
     private var library: MovementLibrary { Self.library }
 
     func testDecodesEveryMovement() {
-        XCTAssertEqual(library.movements.count, 159)
-        XCTAssertEqual(library.microEligible.count, 67)
-        XCTAssertEqual(library.microBreak.eligibleCount, 67)
+        XCTAssertEqual(library.movements.count, 174)
+        XCTAssertEqual(library.microEligible.count, 79)
+        XCTAssertEqual(library.microBreak.eligibleCount, 79)
         XCTAssertEqual(library.version, "4.2")
     }
 
     func testBucketCounts() {
-        let expected: [Bucket: Int] = [.flx: 38, .cir: 20, .str: 50, .bal: 29, .hwf: 11, .eye: 5, .bre: 6]
+        let expected: [Bucket: Int] = [.flx: 44, .cir: 20, .str: 58, .bal: 30, .hwf: 11, .eye: 5, .bre: 6]
         XCTAssertEqual(Bucket.allCases.count, 7)
         for (bucket, count) in expected {
             XCTAssertEqual(library.movements(in: bucket).count, count, "bucket \(bucket.rawValue)")
         }
-        XCTAssertEqual(expected.values.reduce(0, +), 159)
+        XCTAssertEqual(expected.values.reduce(0, +), 174)
         for info in library.buckets {
             XCTAssertEqual(info.count, expected[info.id], "declared count for \(info.id.rawValue)")
         }
@@ -133,7 +133,7 @@ final class LibraryTests: XCTestCase {
             guard case LibraryError.validation(let reason)? = error as? LibraryError else {
                 return XCTFail("expected a validation error, got \(error)")
             }
-            XCTAssertTrue(reason.contains("158"), reason)
+            XCTAssertTrue(reason.contains("173"), reason)
         }
     }
 
@@ -158,9 +158,9 @@ final class LibraryTests: XCTestCase {
     // MARK: - What a movement requires
 
     func testEveryMovementSaysWhatItRequires() {
-        XCTAssertEqual(library.movements.filter { $0.requires.contains(.floor) }.count, 38)
+        XCTAssertEqual(library.movements.filter { $0.requires.contains(.floor) }.count, 39)
         XCTAssertEqual(library.movements.filter { $0.requires.contains(.wall) }.map(\.id).sorted(),
-                       ["FLX-16", "FLX-17", "FLX-29", "STR-11", "STR-31", "STR-37"])
+                       ["FLX-16", "FLX-17", "FLX-29", "FLX-42", "STR-11", "STR-31", "STR-37", "STR-54"])
         XCTAssertEqual(library.movements.filter { $0.requires.contains(.stairs) }.map(\.id).sorted(),
                        ["CIR-03", "CIR-17", "STR-07"])
         for movement in library.movements where movement.settings == [.floor] {
@@ -285,6 +285,36 @@ final class LibraryTests: XCTestCase {
         }
         for movement in library.movements where movement.perSide {
             XCTAssertFalse(movement.instructions.lowercased().contains("alternat"), "\(movement.id) alternates but is split into sides")
+        }
+    }
+
+    // MARK: - v4.2 additions
+
+    func testTheFifteenNewMovementsFillTheGaps() throws {
+        let added = (39...44).map { "FLX-\($0)" } + (51...58).map { "STR-\($0)" } + ["BAL-30"]
+        for id in added {
+            let movement = try XCTUnwrap(library.movement(id: id), id)
+            XCTAssertFalse(movement.needsEquipment, id)
+            XCTAssertEqual(movement.blockSeconds, 60, id)
+            XCTAssertLessThanOrEqual(movement.difficulty, 2, "\(id) would wait behind the difficulty-3 unlock")
+        }
+        XCTAssertEqual(library.movements(in: .arm).map(\.id).sorted(), ["FLX-41", "FLX-42", "STR-51", "STR-52", "STR-54"])
+        let index = FamilyIndex(library: library)
+        XCTAssertEqual(index.key(of: "STR-58"), index.key(of: "FLX-09"), "the lateral lunge is the Cossack squat's strength twin")
+        XCTAssertEqual(index.key(of: "FLX-43"), index.key(of: "FLX-23"))
+        XCTAssertEqual(index.key(of: "STR-54"), index.key(of: "STR-19"))
+    }
+
+    /// Isometrics squeeze with both arms at once; the lateral lunge alternates.
+    func testTheNewMovementsThatUseBothSidesTogetherHaveNoSides() throws {
+        for id in ["STR-51", "STR-52", "STR-54", "STR-57", "STR-58", "BAL-30"] {
+            XCTAssertFalse(try XCTUnwrap(library.movement(id: id)).perSide, id)
+        }
+    }
+
+    func testEveryRegionHasAPlainWord() {
+        for region in Region.allCases {
+            XCTAssertNotNil(MicroBreak.plainRegionWords[region], region.rawValue)
         }
     }
 

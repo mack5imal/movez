@@ -1,6 +1,6 @@
 # movez — Movement Library v4.2
 
-Library of movements the app can prescribe at each movement break. v2 expanded every description into brief in-app instructions (enough for someone unfamiliar with the movement to do it imperfectly). v3 added the interval presets and the 1-minute micro-break (section 11) and flagged the movements suitable for it with a **Micro** tag. v4 expands the balance bucket (13 → 29) with yoga-derived balance-and-strength postures, adds a balance-focused sample routine, and separates each header line from its instructions. v4.1 marks what each movement cannot be done without (floor, wall, stairs), so a user without one is never served it, and adds twelve core movements to the strength bucket (STR-39–STR-50). v4.2 groups near-duplicates into families, so two versions of the same exercise are never served together (section 12).
+Library of movements the app can prescribe at each movement break. v2 expanded every description into brief in-app instructions (enough for someone unfamiliar with the movement to do it imperfectly). v3 added the interval presets and the 1-minute micro-break (section 11) and flagged the movements suitable for it with a **Micro** tag. v4 expands the balance bucket (13 → 29) with yoga-derived balance-and-strength postures, adds a balance-focused sample routine, and separates each header line from its instructions. v4.1 marks what each movement cannot be done without (floor, wall, stairs), so a user without one is never served it, and adds twelve core movements to the strength bucket (STR-39–STR-50). v4.2 groups near-duplicates into families, so two versions of the same exercise are never served together (section 12), runs alternating movements and two hand movements as one block rather than one side at a time, and adds fifteen movements, including the first for the arms (FLX-39–FLX-44, STR-51–STR-58, BAL-30).
 
 ## 1. Design rules
 
@@ -34,7 +34,7 @@ Each entry is formatted as:
 
 Instructions (2–4 sentences: setup, the movement, the one cue that matters most), always separated from the header line by a blank line. The header ends with a period after the Counteracts text.
 
-- **Region** — Neck, Shoulder, Chest, T-spine, L-spine/Core, Hip, Glute, Ham, Quad, Adductor, Calf/Ankle, Foot/Shin, Wrist/Forearm, Full, Eyes, Breath.
+- **Region** — Neck, Shoulder, Arm, Chest, T-spine, L-spine/Core, Hip, Glute, Ham, Quad, Adductor, Calf/Ankle, Foot/Shin, Wrist/Forearm, Full, Eyes, Breath.
 - **Dose** — time or reps. "/side" means do both sides; the block time already includes both.
 - **Block** — approximate total block time in seconds.
 - **Diff** — 1 easy, 2 moderate, 3 harder or needs more control.
@@ -81,7 +81,7 @@ Sit on the floor with the front leg bent 90° in front of you and the back leg b
 
 Feet slightly wider than the hips and turned out a little, sink as low as you can with heels down. Bring the palms together at the chest and use the elbows to gently push the knees outward. Keep the chest lifted and breathe. If heels lift, put a book under them.
 
-**FLX-09 · Cossack squat (slow)** — Adductor, Hip · 5 reps/side · 75 · Diff 2 · Stand · Counteracts: adductor and hip stiffness.
+**FLX-09 · Cossack squat (slow)** — Adductor, Hip · 5 reps/side · 75 · Diff 2 · Stand · Family: Lateral lunges · Counteracts: adductor and hip stiffness.
 
 Take a wide stance, toes pointed slightly out. Shift your weight to one side and bend that knee deeply while the other leg stays straight, toes pointing up. Keep the bent-side heel down and the chest up, then push back to centre and go the other way. Depth comes with practice.
 
@@ -137,7 +137,7 @@ Sit or stand tall and look straight ahead. Glide the chin straight backward, mak
 
 Sit tall with shoulders relaxed. Slowly tilt one ear toward the shoulder and back, then the other side. Then turn the chin toward each armpit. Then rotate left and right. Move only as far as feels easy; no hands, no pushing.
 
-**FLX-23 · Levator scapulae stretch** — Neck · 20 s/side · 45 · Diff 1 · Chair/Stand · **Micro** · Counteracts: levator tightness.
+**FLX-23 · Levator scapulae stretch** — Neck · 20 s/side · 45 · Diff 1 · Chair/Stand · **Micro** · Family: Neck side stretches · Counteracts: levator tightness.
 
 Turn your head 45° to the left, then nod the nose down toward the left armpit. Place the left hand on the back of the head and let its weight add gentle pressure. Put the right hand behind your back or hold the chair seat to keep the right shoulder down. Switch sides.
 
@@ -200,6 +200,30 @@ Stand tall, tuck the chin, and roll forward one vertebra at a time, letting the 
 **FLX-38 · Foot roll** — Foot/Shin · 30 s/side · 60 · Diff 1 · Stand/Chair (Ball) · Counteracts: plantar stiffness.
 
 Standing or sitting, place a lacrosse or tennis ball under the arch of one foot. Roll slowly from heel to toes, pausing a few breaths anywhere that feels tight. Use body weight to control pressure. No ball: roll on a water bottle.
+
+**FLX-39 · Seated spinal twist** — T-spine, L-spine/Core · 30 s/side · 60 · Diff 1 · Chair · **Micro** · Counteracts: trunk rotation stiffness.
+
+Sit tall near the front of the chair, feet flat. Turn your chest to the right, placing the left hand on the outside of the right knee and the right hand on the chair seat behind you. Grow taller on each inhale and turn a little further on each exhale, keeping both sit bones down. Come back through centre before switching.
+
+**FLX-40 · Cross-body shoulder stretch** — Shoulder · 30 s/side · 60 · Diff 1 · Stand/Chair · **Micro** · Counteracts: posterior shoulder tightness.
+
+Bring one arm straight across the chest at shoulder height. With the other hand, hold it just above the elbow and draw it gently closer until the back of the shoulder stretches. Keep that shoulder down away from the ear and the chest facing forward. Switch arms.
+
+**FLX-41 · Overhead triceps stretch** — Arm, Shoulder · 30 s/side · 60 · Diff 1 · Stand/Chair · **Micro** · Counteracts: triceps and lat tightness.
+
+Reach one arm overhead, then bend the elbow so the hand drops behind the head toward the upper back. With the other hand, gently press the elbow back and toward the head until the back of the upper arm stretches. Keep the ribs down so the low back doesn't arch. Switch arms.
+
+**FLX-42 · Biceps wall stretch** — Arm, Chest · 30 s/side · 60 · Diff 1 · Wall · Requires wall · **Micro** · Counteracts: biceps and front-of-shoulder tightness from reaching forward.
+
+Stand side-on to a wall and place the palm flat on it slightly behind you at shoulder height, fingers pointing back, arm straight. Slowly turn the body away from the wall until the front of the arm and shoulder stretch. Keep the shoulder down and back, and lower the hand if you feel it in the joint rather than the muscle. Switch arms.
+
+**FLX-43 · Upper-trap stretch** — Neck · 30 s/side · 60 · Diff 1 · Chair/Stand · **Micro** · Family: Neck side stretches · Counteracts: upper trapezius tension.
+
+Sit tall and hold the chair seat with the right hand to keep the right shoulder down. Tilt the left ear toward the left shoulder while looking straight ahead, and rest the left hand on the head for a little extra weight. Feel it along the right side of the neck into the top of the shoulder; let the hand rest, never pull. Switch sides.
+
+**FLX-44 · Seated butterfly** — Adductor, Hip · 60 s · 60 · Diff 1 · Floor · Requires floor · Counteracts: inner-thigh tightness from sitting.
+
+Sit on the floor with the soles of the feet together and the knees dropped out to the sides, heels a comfortable distance from the hips. Hold the ankles, sit tall, and let the knees sink toward the floor. For more, hinge forward from the hips with a long back rather than rounding over.
 
 ## 5. CIR — Blood flow & circulation
 
@@ -357,7 +381,7 @@ Hold a band in both hands at shoulder height, arms straight out in front, hands 
 
 Anchor a band at about face height (a door handle or hook). Hold both ends with palms facing each other and pull toward the face, letting the elbows flare wide and high, finishing with the hands beside the ears. Squeeze the back of the shoulders, then return slowly.
 
-**STR-19 · Band row** — Shoulder, T-spine · 12 reps · 60 · Diff 1 · Stand (Band) · Counteracts: weak upper back.
+**STR-19 · Band row** — Shoulder, T-spine · 12 reps · 60 · Diff 1 · Stand (Band) · Family: Rows · Counteracts: weak upper back.
 
 Anchor a band at waist height, or loop it around your feet while seated on the floor. Hold both ends with arms straight, then pull the elbows back past the ribs, squeezing the shoulder blades together, and pause. Return slowly. Stay tall; don't lean back to help.
 
@@ -485,6 +509,38 @@ Place the forearms on the edge of a sturdy desk, elbows under the shoulders, and
 
 Sit near the front edge of a chair that won't roll and hold its sides, leaning back slightly with a long spine. Lift both feet and draw the knees toward the chest, then extend the legs out at a slight angle without touching the floor, and repeat. Keep the chest lifted and move slowly; touch the toes down between reps if needed.
 
+**STR-51 · Isometric biceps curl (under the desk)** — Arm · 5 × 8 s holds · 60 · Diff 1 · Desk/Chair · **Micro** · Counteracts: arm deconditioning.
+
+Sit close to a heavy desk and place both palms up against the underside of the desktop, elbows bent to 90° and tucked at your sides. Pull up into the desk as if curling it, building to a hard effort over 2 s, and hold 8 s; relax a few seconds and repeat. Press hard but never to pain, and keep breathing. Skip it if the desk is light enough to lift.
+
+**STR-52 · Isometric triceps press-down (on the desk)** — Arm · 5 × 8 s holds · 60 · Diff 1 · Desk · **Micro** · Counteracts: arm deconditioning.
+
+Stand or sit facing the desk with both palms flat on top, elbows bent and tucked against your sides. Press straight down into the desk, building to a hard effort over 2 s, and hold 8 s with the shoulders down away from the ears; relax a few seconds and repeat. Press hard but never to pain, and keep breathing.
+
+**STR-53 · 4-way neck isometrics** — Neck · 2 rounds × 4 directions, 6 s each · 60 · Diff 1 · Chair/Stand · **Micro** · Counteracts: weak neck muscles, forward head posture.
+
+Sit tall with the head level. Place a palm on the forehead and press the head into it without letting the head move; hold 6 s. Repeat with the hand on the back of the head, then above each ear, and go round again. Use about half your effort; the head stays still and the chin stays level.
+
+**STR-54 · Doorframe row** — Shoulder, T-spine, Arm · 10 reps · 60 · Diff 2 · Wall · Requires wall · Family: Rows · Counteracts: weak upper back, rounded shoulders.
+
+Stand in a doorway and grip both sides of the frame at chest height, then walk the feet forward a little so you lean back on straight arms, body in one line. Pull the chest toward the frame by squeezing the shoulder blades together, pause, and lower slowly. Keep the lean small and the grip firm; standing more upright makes it easier.
+
+**STR-55 · Seated shoulder-blade squeeze** — T-spine, Shoulder · 10 × 3 s · 60 · Diff 1 · Chair · **Micro** · Counteracts: rounded shoulders, weak mid-back.
+
+Sit tall away from the chair back with the elbows bent at your sides. Draw the shoulder blades back and down toward the opposite back pockets, as if pinching a pencil between them, and hold 3 s, then release slowly. Keep the chin level and the ribs down; the shoulders shouldn't rise toward the ears.
+
+**STR-56 · Standing side leg raise** — Glute, Hip · 12/side · 60 · Diff 1 · Stand/Wall · **Micro** · Counteracts: weak hip abductors.
+
+Stand tall with a fingertip on the desk or a wall. Keeping the toes pointing forward and the knee straight, lift the outside leg out to the side about a foot, pause, and lower slowly without letting the foot rest. Stay upright; leaning away only makes the leg look higher. Do all reps on one side, then switch.
+
+**STR-57 · Arch doming** — Foot/Shin · 10 × 5 s · 60 · Diff 1 · Chair/Stand · **Micro** · Counteracts: weak foot muscles from shoes and sitting.
+
+Sit with both feet flat, bare or in socks. Without curling the toes, draw the ball of each foot toward the heel so the arch lifts into a small dome, and hold 5 s, then relax. The toes stay long and flat on the floor; the work is in the arch.
+
+**STR-58 · Lateral lunge** — Adductor, Glute, Quad · 8/side · 60 · Diff 2 · Stand · Family: Lateral lunges · Counteracts: weak side-to-side movement, inner-thigh stiffness.
+
+Stand with the feet together. Take a wide step out to one side and sit the hips back over that foot, bending the knee while the other leg stays straight and both feet point forward. Keep the chest up and the bent knee over the toes, then push off to return to standing. Alternate sides.
+
 ## 7. BAL — Balance & proprioception
 
 Balance declines with age faster than strength does and responds quickly to practice, so BAL items are meant to be served daily, not just when they fit the rotation. Progression for any single-leg item: fingertip on the wall → hands free → arms moving → head turning → eyes closed → soft surface. The app should hold a user at one rung until they complete it without a toe-touch, then advance. The yoga-derived postures (BAL-14 through BAL-20, BAL-28) double as strength work for the hips and trunk and count toward the STR slot in a break when needed.
@@ -604,6 +660,10 @@ Feet together or hip width, sit the hips back and down into a half squat with th
 **BAL-29 · Slow 360° turns** — Full · 3 each way · 45 · Diff 1 · Stand · **Micro** · Counteracts: turning-related instability, vestibular under-use.
 
 From standing, turn a full circle in place using small, deliberate steps, taking about 5 s per turn. Pause and let your balance settle before turning the other way. Once easy, keep the eyes fixed on one point for as long as possible during the turn, then snap them to the next point.
+
+**BAL-30 · Toe yoga** — Foot/Shin · 60 s · 60 · Diff 1 · Chair/Stand · **Micro** · Counteracts: stiff toes and poor foot control.
+
+Sit or stand with both feet flat. Lift only the big toes while the other toes stay down, then press the big toes down and lift the other four. Go back and forth slowly, about 2 s each way. It's harder than it sounds; hold the toes that should stay down with a hand at first.
 
 ## 8. HWF — Hands, wrists & forearms
 
@@ -726,15 +786,15 @@ A custom sit length is also allowed; the app places a micro-break every 30 minut
 7. **Post-lunch:** the first micro-break after lunch is CIR-heavy (walk lap, march, calf pumps), since post-meal glucose is where breaking up sitting shows the largest metabolic benefit.
 8. **Snooze:** a micro-break can be deferred 5 minutes once; a second deferral skips it.
 
-### Micro-eligible movements (67)
+### Micro-eligible movements (79)
 
 Circulation (12): CIR-01 Walk lap (60 s version) · CIR-02 March in place · CIR-04 Calf pumps · CIR-05 Ankle pumps and circles · CIR-06 Arm circles · CIR-07 Step-out jacks · CIR-11 Standing hip circles · CIR-12 Brisk good mornings · CIR-13 Standing knee-to-elbow · CIR-15 Whole-body shake-out · CIR-16 Air squats · CIR-20 Speed skaters
 
-Flexibility (16): FLX-01 Standing hip flexor stretch · FLX-05 Standing figure-4 · FLX-06 Seated figure-4 lean · FLX-10 Active hamstring sweep · FLX-14 Chair-back thoracic extension · FLX-18 Standing chest opener · FLX-19 Desk lat stretch · FLX-20 Standing side-bend reach · FLX-21 Chin tucks · FLX-22 Active neck range · FLX-23 Levator scapulae stretch · FLX-24 Neck CARs · FLX-27 Standing thoracic rotation · FLX-31 Standing quad stretch · FLX-36 Standing pelvic tilts · FLX-37 Segmental roll-down
+Flexibility (21): FLX-01 Standing hip flexor stretch · FLX-05 Standing figure-4 · FLX-06 Seated figure-4 lean · FLX-10 Active hamstring sweep · FLX-14 Chair-back thoracic extension · FLX-18 Standing chest opener · FLX-19 Desk lat stretch · FLX-20 Standing side-bend reach · FLX-21 Chin tucks · FLX-22 Active neck range · FLX-23 Levator scapulae stretch · FLX-24 Neck CARs · FLX-27 Standing thoracic rotation · FLX-31 Standing quad stretch · FLX-36 Standing pelvic tilts · FLX-37 Segmental roll-down · FLX-39 Seated spinal twist · FLX-40 Cross-body shoulder stretch · FLX-41 Overhead triceps stretch · FLX-42 Biceps wall stretch · FLX-43 Upper-trap stretch
 
-Strength (7): STR-11 Wall sit · STR-20 Desk incline push-up · STR-31 Tibialis raise · STR-34 Bottom squat hold · STR-35 Standing glute squeezes · STR-48 Standing oblique crunch · STR-50 Seated knee tucks
+Strength (13): STR-11 Wall sit · STR-20 Desk incline push-up · STR-31 Tibialis raise · STR-34 Bottom squat hold · STR-35 Standing glute squeezes · STR-48 Standing oblique crunch · STR-50 Seated knee tucks · STR-51 Isometric biceps curl (under the desk) · STR-52 Isometric triceps press-down (on the desk) · STR-53 4-way neck isometrics · STR-55 Seated shoulder-blade squeeze · STR-56 Standing side leg raise · STR-57 Arch doming
 
-Balance (14): BAL-01 Single-leg stand · BAL-04 Tandem stance · BAL-11 Marching hold · BAL-14 Tree pose · BAL-17 Eagle pose · BAL-18 Crescent lunge hold · BAL-20 Hand-to-knee hold · BAL-22 Heel-toe rock · BAL-23 Single-leg stand with arm reaches · BAL-24 Backward walking · BAL-25 Quick side-steps · BAL-26 Tandem stance, eyes closed · BAL-28 Chair pose to toe raise · BAL-29 Slow 360° turns
+Balance (15): BAL-01 Single-leg stand · BAL-04 Tandem stance · BAL-11 Marching hold · BAL-14 Tree pose · BAL-17 Eagle pose · BAL-18 Crescent lunge hold · BAL-20 Hand-to-knee hold · BAL-22 Heel-toe rock · BAL-23 Single-leg stand with arm reaches · BAL-24 Backward walking · BAL-25 Quick side-steps · BAL-26 Tandem stance, eyes closed · BAL-28 Chair pose to toe raise · BAL-29 Slow 360° turns · BAL-30 Toe yoga
 
 Hands / wrists (10): HWF-01 Wrist flexor stretch · HWF-02 Wrist extensor stretch · HWF-03 Prayer and reverse prayer · HWF-04 Wrist circles and figure-8s · HWF-05 Finger spreads · HWF-06 Tendon glides · HWF-07 Forearm pronation/supination · HWF-08 Thumb CARs and stretch · HWF-10 Median nerve glide · HWF-11 Hand shake-out
 
@@ -779,6 +839,7 @@ Some movements are filed under different buckets, or are separate entries, but w
 - **Squats** — CIR-16 Air squats (brisk), STR-04 Tempo squat, STR-09 Goblet squat
 - **Deep squat holds** — FLX-08 Deep squat hold with elbow pry, STR-34 Bottom squat hold
 - **Lunges** — CIR-19 Reverse lunge with overhead reach, STR-05 Split squat, STR-06 Reverse lunge, BAL-12 Step-back lunge with pause
+- **Lateral lunges** — FLX-09 Cossack squat (slow), STR-58 Lateral lunge
 - **Step-ups** — CIR-03 Stair climb, CIR-17 Step-ups, STR-07 Step-up (slow)
 - **Single-leg hinges** — STR-08 Single-leg RDL, BAL-07 Airplane / single-leg hinge hold, BAL-15 Warrior III, BAL-27 Single-leg RDL to knee drive
 - **Single-leg stands** — BAL-01 Single-leg stand, BAL-02 Single-leg stand, eyes closed, BAL-03 Single-leg stand with head turns, BAL-08 Towel or cushion single-leg stand, BAL-23 Single-leg stand with arm reaches
@@ -786,6 +847,7 @@ Some movements are filed under different buckets, or are separate entries, but w
 - **Heel and toe walks** — CIR-14 Heel walks and toe walks, BAL-22 Heel-toe rock
 - **Push-ups** — STR-20 Desk incline push-up, STR-21 Push-up
 - **Front planks** — STR-15 Front plank, STR-49 Desk plank
+- **Rows** — STR-19 Band row, STR-54 Doorframe row
 - **Prone upper-back raises** — STR-16 Prone Y-T-W, STR-28 Reverse snow angel
 - **Wall slides** — FLX-16 Wall angels, STR-37 Wall slide with lift-off
 - **Thoracic extensions** — FLX-14 Chair-back thoracic extension, FLX-15 Foam roller thoracic extension
@@ -793,6 +855,7 @@ Some movements are filed under different buckets, or are separate entries, but w
 - **Leg raises** — STR-41 Lying leg raise, STR-42 Scissor kicks, STR-44 Reverse crunch
 - **Chin tucks** — FLX-21 Chin tucks, STR-36 Deep neck flexor hold
 - **Neck circles** — FLX-22 Active neck range, FLX-24 Neck CARs
+- **Neck side stretches** — FLX-23 Levator scapulae stretch, FLX-43 Upper-trap stretch
 - **Wrist stretches** — HWF-01 Wrist flexor stretch, HWF-02 Wrist extensor stretch, HWF-03 Prayer and reverse prayer
 - **Focus shifts** — EYE-01 Distance gaze (20-20-20), EYE-02 Near-far focus shifts
 
@@ -827,4 +890,4 @@ CIR-10 Leg swings (75) → FLX-26 Hip CARs, one direction only (45) → BAL-14 T
 
 ## 14. Counts
 
-FLX 38 · CIR 20 · STR 50 · BAL 29 · HWF 11 · EYE 5 · BRE 6 — **159 movements** in 7 buckets. Equipment-tagged items: 18 (all with bodyweight substitutes per chaining rule 6). Micro-eligible items: 67. Requiring the floor: 38; a wall: 6; stairs: 3.
+FLX 44 · CIR 20 · STR 58 · BAL 30 · HWF 11 · EYE 5 · BRE 6 — **174 movements** in 7 buckets. Equipment-tagged items: 18 (all with bodyweight substitutes per chaining rule 6). Micro-eligible items: 79. Requiring the floor: 39; a wall: 8; stairs: 3. Families of near-duplicates: 28, covering 73 movements.

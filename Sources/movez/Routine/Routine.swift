@@ -102,6 +102,7 @@ struct MicroBreak: Hashable, Identifiable {
     /// The plain-language name for each region, used in micro-break eyebrows.
     static let plainRegionWords: [Region: String] = [
         .shoulder: "shoulders",
+        .arm: "arms",
         .neck: "neck",
         .calfAnkle: "calves",
         .eyes: "eyes",

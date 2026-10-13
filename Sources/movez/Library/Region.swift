@@ -3,6 +3,7 @@ import Foundation
 /// Body regions as normalised by the library generator. Raw values match `schema.regions` exactly.
 enum Region: String, Codable, CaseIterable, Hashable {
     case adductor = "Adductor"
+    case arm = "Arm"
     case breath = "Breath"
     case calfAnkle = "Calf/Ankle"
     case chest = "Chest"

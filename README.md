@@ -1,7 +1,7 @@
 # movez
 
 A macOS menu-bar agent that schedules short movement breaks through the working day and
-plays a generated routine from a 159-movement library.
+plays a generated routine from a 174-movement library.
 
 ## Prerequisites
 

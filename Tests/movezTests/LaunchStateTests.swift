@@ -246,7 +246,7 @@ final class LaunchStateTests: XCTestCase {
         XCTAssertNotNil(library)
         XCTAssertTrue(presenter.errors.isEmpty)
         XCTAssertEqual(library?.version, "4.2")
-        XCTAssertEqual(library?.movements.count, 159)
+        XCTAssertEqual(library?.movements.count, 174)
     }
 
     // MARK: - Nothing left to choose from

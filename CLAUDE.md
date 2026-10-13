@@ -3,7 +3,7 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 movez is a macOS 14+ menu-bar agent (`LSUIElement`, unsandboxed, no network) that schedules
-movement breaks through the working day and plays a routine generated from a 159-movement library.
+movement breaks through the working day and plays a routine generated from a 174-movement library.
 Swift 5 language mode, SwiftUI + AppKit, no third-party dependencies. Needs `brew install xcodegen swiftlint`.
 
 ## Commands
