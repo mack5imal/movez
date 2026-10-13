@@ -261,6 +261,7 @@ extension SnapshotFixtures {
             difficulty: 1,
             settings: [.stand],
             requires: [],
+            family: nil,
             equipmentOptional: [],
             microEligible: true,
             counteracts: "shoulder stiffness, upper-body circulation",

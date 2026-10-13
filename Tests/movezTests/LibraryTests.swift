@@ -16,7 +16,7 @@ final class LibraryTests: XCTestCase {
         XCTAssertEqual(library.movements.count, 159)
         XCTAssertEqual(library.microEligible.count, 67)
         XCTAssertEqual(library.microBreak.eligibleCount, 67)
-        XCTAssertEqual(library.version, "4.1")
+        XCTAssertEqual(library.version, "4.2")
     }
 
     func testBucketCounts() {
@@ -195,6 +195,75 @@ final class LibraryTests: XCTestCase {
         XCTAssertThrowsError(try LibraryLoader.validate(library)) { error in
             XCTAssertEqual(error as? LibraryError, .validation("STR-39 needs the floor but is tagged Micro"))
         }
+    }
+
+    // MARK: - Families
+
+    func testEveryFamilyIsDeclaredAndHasAtLeastTwoMembers() {
+        let declared = Set(library.families.map(\.id))
+        XCTAssertEqual(declared.count, library.families.count, "a family is declared twice")
+        for movement in library.movements {
+            if let family = movement.family {
+                XCTAssertTrue(declared.contains(family), "\(movement.id) names \(family)")
+            }
+        }
+        for family in library.families {
+            let members = library.movements.filter { $0.family == family.id }
+            XCTAssertGreaterThanOrEqual(members.count, 2, family.id)
+            XCTAssertFalse(family.name.isEmpty, family.id)
+        }
+    }
+
+    /// The two cases that prompted families: a calf raise and its held twin served back to back,
+    /// and three hip-flexor stretches in one day.
+    func testTheNearDuplicatesThatPromptedFamiliesShareOne() throws {
+        let index = FamilyIndex(library: library)
+        XCTAssertEqual(index.key(of: "STR-26"), index.key(of: "BAL-13"))
+        XCTAssertEqual(index.keys(of: ["FLX-01", "FLX-02", "FLX-03", "BAL-18"]).count, 1)
+        XCTAssertEqual(index.key(of: "CIR-01"), "CIR-01", "a movement outside a family is a family of one")
+        XCTAssertEqual(index.key(of: "XYZ-99"), "XYZ-99", "an id the library no longer has is a family of one")
+    }
+
+    func testFamilyRecencyIsSummedAcrossMembers() {
+        let index = FamilyIndex(library: library)
+        let scores = index.scores(["FLX-01": 1, "FLX-02": 0.5, "CIR-01": 1])
+        XCTAssertEqual(scores[index.key(of: "FLX-03")], 1.5)
+        XCTAssertEqual(scores["CIR-01"], 1)
+    }
+
+    func testValidationRejectsAnUndeclaredFamily() throws {
+        let library = try mutatedLibrary { json in
+            var movements = try XCTUnwrap(json["movements"] as? [[String: Any]])
+            let index = try XCTUnwrap(movements.firstIndex { $0["id"] as? String == "CIR-01" })
+            movements[index]["family"] = "walks"
+            json["movements"] = movements
+        }
+        XCTAssertThrowsError(try LibraryLoader.validate(library)) { error in
+            XCTAssertEqual(error as? LibraryError, .validation("CIR-01 names the undeclared family walks"))
+        }
+    }
+
+    func testValidationRejectsAFamilyOfOne() throws {
+        let library = try mutatedLibrary { json in
+            var families = try XCTUnwrap(json["families"] as? [[String: Any]])
+            families.append(["id": "walks", "name": "Walks"])
+            json["families"] = families
+            var movements = try XCTUnwrap(json["movements"] as? [[String: Any]])
+            let index = try XCTUnwrap(movements.firstIndex { $0["id"] as? String == "CIR-01" })
+            movements[index]["family"] = "walks"
+            json["movements"] = movements
+        }
+        XCTAssertThrowsError(try LibraryLoader.validate(library)) { error in
+            XCTAssertEqual(error as? LibraryError, .validation("family walks has fewer than two movements"))
+        }
+    }
+
+    /// The bundled JSON, changed by `mutate` and decoded without validation.
+    private func mutatedLibrary(_ mutate: (inout [String: Any]) throws -> Void) throws -> MovementLibrary {
+        let url = try XCTUnwrap(LibraryLoader.bundledURL())
+        var json = try XCTUnwrap(try JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? [String: Any])
+        try mutate(&json)
+        return try JSONDecoder().decode(MovementLibrary.self, from: JSONSerialization.data(withJSONObject: json))
     }
 
     // MARK: - Core

@@ -86,6 +86,33 @@ final class MicroBreakBuilderTests: XCTestCase {
         }
     }
 
+    /// The same rules, judged by family: a hip-flexor stretch in the last micro, the next full
+    /// break or earlier today rules out every hip-flexor stretch.
+    func testFamiliesCountAsTheMovementForEveryRule() {
+        assertNeverServed(["FLX-01", "FLX-03", "BAL-18"]) { $0.lastMicroMovementIds = ["FLX-02"] }
+        assertNeverServed(["CIR-04", "BAL-13"]) { $0.nextFullRoutineIds = ["STR-26"] }
+        assertNeverServed(["HWF-01", "HWF-03"]) { $0.usedMovementIdsToday = ["HWF-02"] }
+    }
+
+    private func assertNeverServed(
+        _ ids: Set<String>,
+        line: UInt = #line,
+        configure: (inout MicroContext) -> Void
+    ) {
+        for seed in 0..<300 {
+            let served = Set(micro(seed: UInt64(seed &* 53 &+ 1), configure: configure).movementIds)
+            XCTAssertTrue(served.isDisjoint(with: ids), "\(served)", line: line)
+        }
+    }
+
+    func testAPairIsNeverTwoOfOneFamily() {
+        for seed in 0..<2_000 {
+            let micro = micro(seed: UInt64(seed &* 59 &+ 4))
+            let keys = micro.blocks.map(\.movement.familyKey)
+            XCTAssertEqual(Set(keys).count, keys.count, "\(micro.movementIds)")
+        }
+    }
+
     /// A day long enough to use up the pool still gets a micro-break, rather than an empty panel.
     func testAnExhaustedDayStillServesSomething() {
         let everything = Set(library.microEligible.map(\.id))

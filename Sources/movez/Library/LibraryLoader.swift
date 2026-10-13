@@ -109,6 +109,25 @@ enum LibraryLoader {
                 throw LibraryError.validation("bucket \(info.id.rawValue) declares \(info.count) movements, found \(actual)")
             }
         }
+
+        try validateFamilies(library)
+    }
+
+    /// A family is only worth declaring when it groups two or more movements, and a movement can
+    /// only name a family that is declared: a typo would otherwise make a family of one and quietly
+    /// let its near-duplicates back together.
+    private static func validateFamilies(_ library: MovementLibrary) throws {
+        let declared = library.families.map(\.id)
+        guard Set(declared).count == declared.count else {
+            throw LibraryError.validation("a family is declared twice")
+        }
+        if let stray = library.movements.first(where: { $0.family.map { !declared.contains($0) } ?? false }) {
+            throw LibraryError.validation("\(stray.id) names the undeclared family \(stray.family ?? "")")
+        }
+        let members = Dictionary(grouping: library.movements.compactMap(\.family), by: { $0 }).mapValues(\.count)
+        if let lonely = declared.first(where: { (members[$0] ?? 0) < 2 }) {
+            throw LibraryError.validation("family \(lonely) has fewer than two movements")
+        }
     }
 
     private static func validateCollections(_ library: MovementLibrary) throws {

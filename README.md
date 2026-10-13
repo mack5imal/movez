@@ -27,7 +27,7 @@ committed so the repo opens in Xcode without XcodeGen, but `project.yml` is the 
 
 ## Versions
 
-Settings ends with a line like `movez 0.5.0 (38) · library v4.1 · 159 movements`. Each part is read
+Settings ends with a line like `movez 0.5.0 (38) · library v4.2 · 174 movements`. Each part is read
 from what is installed, so nothing else needs editing when one of them moves:
 
 - **App version** (`0.5.0`): `MARKETING_VERSION` in `project.yml`, changed with

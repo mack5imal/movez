@@ -42,6 +42,49 @@ final class RoutineBuilderTests: XCTestCase {
         }
     }
 
+    // MARK: - Families
+
+    /// A single-leg calf raise hold followed by a single-leg calf raise is the same exercise twice,
+    /// whatever buckets they are filed under.
+    func testNoBreakHoldsTwoMovementsOfOneFamily() {
+        for seed in 0..<1_000 {
+            let routine = RoutineTestSupport.routine(seed: UInt64(seed &* 29 &+ 5)) { $0.difficultyCap = 3 }
+            let keys = routine.blocks.map(\.movement.familyKey)
+            XCTAssertEqual(Set(keys).count, keys.count, "seed \(seed): \(routine.movementIds)")
+        }
+    }
+
+    func testNoFamilyRepeatsWithinADay() {
+        for day in 0..<40 {
+            var options = RoutineTestSupport.DayOptions()
+            options.breaks = 8
+            let routines = RoutineTestSupport.simulateDay(seed: UInt64(day &* 7_919 &+ 3), options: options)
+            var seen: [String: Int] = [:]
+            for block in routines.flatMap(\.blocks) {
+                seen[block.movement.familyKey, default: 0] += 1
+            }
+            let repeated = seen.filter { $0.value > 1 }.keys.sorted()
+            XCTAssertEqual(repeated, [], "day \(day) repeated \(repeated)")
+        }
+    }
+
+    /// Served yesterday, one hip-flexor stretch makes the others rarer today too.
+    func testAFamilyMemberServedYesterdayMakesItsSiblingsRarer() {
+        let hipFlexors: Set<String> = ["FLX-01", "FLX-02", "FLX-03", "BAL-18"]
+        func share(recency: [String: Double]) -> Double {
+            var hits = 0
+            let draws = 2_000
+            for seed in 0..<draws {
+                let routine = RoutineTestSupport.routine(seed: UInt64(seed &* 41 &+ 9)) { $0.recency = recency }
+                if !hipFlexors.isDisjoint(with: routine.movementIds) { hits += 1 }
+            }
+            return Double(hits) / Double(draws)
+        }
+        let fresh = share(recency: [:])
+        let afterOne = share(recency: ["FLX-01": Recency.weight(daysAgo: 1)])
+        XCTAssertLessThan(afterOne, fresh * 0.6, "fresh \(fresh), after FLX-01 yesterday \(afterOne)")
+    }
+
     // MARK: - Shape
 
     func testEveryRoutineHasTheSameShape() {

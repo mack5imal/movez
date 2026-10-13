@@ -143,6 +143,7 @@
 		DE81E55383C3209ECD6CD888 /* FontsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79454DFD8FB5D5C68D4F0AD /* FontsTests.swift */; };
 		DE9C8D386AA78DC76D6F1584 /* SettingsWindowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1040E51D576C558EAFDC2D5 /* SettingsWindowTests.swift */; };
 		EA176BDA4E8C7A3CF7BC8BAD /* SnapshotRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BB8830348BDE4E4031D5EA0 /* SnapshotRenderer.swift */; };
+		ED24CDC5CAF2E21E3F6DCA21 /* MovementFamily.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78ACC89C23A79F9B09DF337A /* MovementFamily.swift */; };
 		EE9E17EA7BA13496740FBEC5 /* TimerDisc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12186C3EB10709B6CBD27A71 /* TimerDisc.swift */; };
 		EEF1AD47315DF568B3A6AA31 /* LaunchStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95233A63AE2FADBEE3D1E06 /* LaunchStateTests.swift */; };
 		F16080DCF0D5B3FC40836C96 /* Movement.swift in Sources */ = {isa = PBXBuildFile; fileRef = E362393507283AB751AFD135 /* Movement.swift */; };
@@ -224,6 +225,7 @@
 		6E7DD03A596EDE389F7C25FB /* HistoryPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryPersistence.swift; sourceTree = "<group>"; };
 		743F13B911D68FC7B72458C7 /* MicroPanelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroPanelTests.swift; sourceTree = "<group>"; };
 		77913B41BA43A68FBCD32134 /* DebugState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugState.swift; sourceTree = "<group>"; };
+		78ACC89C23A79F9B09DF337A /* MovementFamily.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovementFamily.swift; sourceTree = "<group>"; };
 		78E3FDC0CDAA721777AC550A /* AwayToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AwayToastView.swift; sourceTree = "<group>"; };
 		7B6527E077C9D30BD770D4FE /* AccessibilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityTests.swift; sourceTree = "<group>"; };
 		7D3466382DDA0245F7F6AEB8 /* PanelViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanelViewModelTests.swift; sourceTree = "<group>"; };
@@ -501,6 +503,7 @@
 				56A6BEA1E29B3BDA91DF3B33 /* LibraryLoader.swift */,
 				54B929FFC124423F85034C3A /* LibraryMetadata.swift */,
 				E362393507283AB751AFD135 /* Movement.swift */,
+				78ACC89C23A79F9B09DF337A /* MovementFamily.swift */,
 				ABFC20128A308BD74AD1E790 /* MovementLibrary.swift */,
 				A4DFD6E3893BC494249C0377 /* Preset.swift */,
 				A3F75D6C7814FDA37FB714DD /* Region.swift */,
@@ -813,6 +816,7 @@
 				A0C943B9A00D128161B3F4A6 /* MicroBreakView.swift in Sources */,
 				CBD44C80766A8AA5DC6F172A /* MicrophoneMonitor.swift in Sources */,
 				F16080DCF0D5B3FC40836C96 /* Movement.swift in Sources */,
+				ED24CDC5CAF2E21E3F6DCA21 /* MovementFamily.swift in Sources */,
 				B32E6AC45DA1AAB0B4AE1BD1 /* MovementLibrary.swift in Sources */,
 				930E072744DEE5F4050F35E3 /* MovezBundle.swift in Sources */,
 				0A26A793F17B5C2374779C37 /* MovezFocusFilterIntent.swift in Sources */,

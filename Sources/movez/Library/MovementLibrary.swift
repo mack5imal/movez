@@ -13,6 +13,7 @@ struct MovementLibrary: Codable, Hashable {
     let designRules: DesignRules
     let sittingEffects: [SittingEffect]
     let buckets: [BucketInfo]
+    let families: [FamilyInfo]
     let presets: [Preset]
     let customPresetRule: String
     let microBreak: MicroBreakSpec
@@ -24,7 +25,7 @@ struct MovementLibrary: Codable, Hashable {
     let notes: [String]
 
     enum CodingKeys: String, CodingKey {
-        case library, version, source, generated, schema, buckets, presets, movements, routines, notes
+        case library, version, source, generated, schema, buckets, families, presets, movements, routines, notes
         case designRules = "design_rules"
         case sittingEffects = "sitting_effects"
         case customPresetRule = "custom_preset_rule"

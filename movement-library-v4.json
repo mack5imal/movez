@@ -1,8 +1,8 @@
 {
   "library": "movez movement library",
-  "version": "4.1",
+  "version": "4.2",
   "source": "movement-library-v4.md",
-  "generated": "2026-10-10",
+  "generated": "2026-10-13",
   "schema": {
     "movement": {
       "id": "bucket prefix + 2-digit number",
@@ -13,6 +13,7 @@
       "difficulty": "1 easy, 2 moderate, 3 harder / more control",
       "settings": "where it can be done: Stand, Chair, Wall, Desk, Floor, Any",
       "requires": "what the movement cannot be done without: floor, wall, stairs. Empty when it needs none; a wall or step that only helps balance is not listed",
+      "family": "optional: the family of near-duplicates this movement belongs to (see families). Absent when it has none. The routine builders treat a family as one movement: never two in a break or a day, and recency is shared",
       "equipment_optional": "optional equipment; every item has a bodyweight substitute per chaining rule 6",
       "micro_eligible": "true if allowed in the 1-minute micro-break",
       "counteracts": "sitting effect targeted",
@@ -148,6 +149,108 @@
       "id": "BRE",
       "name": "Breathing",
       "count": 6
+    }
+  ],
+  "families": [
+    {
+      "id": "calf-raise",
+      "name": "Calf raises"
+    },
+    {
+      "id": "hip-flexor-stretch",
+      "name": "Hip-flexor stretches"
+    },
+    {
+      "id": "standing-quad-stretch",
+      "name": "Standing quad stretches"
+    },
+    {
+      "id": "knee-lift-hold",
+      "name": "Knee-lift holds"
+    },
+    {
+      "id": "figure-4",
+      "name": "Figure-4 stretches"
+    },
+    {
+      "id": "glute-bridge",
+      "name": "Glute bridges"
+    },
+    {
+      "id": "squat",
+      "name": "Squats"
+    },
+    {
+      "id": "deep-squat-hold",
+      "name": "Deep squat holds"
+    },
+    {
+      "id": "lunge",
+      "name": "Lunges"
+    },
+    {
+      "id": "step-up",
+      "name": "Step-ups"
+    },
+    {
+      "id": "single-leg-hinge",
+      "name": "Single-leg hinges"
+    },
+    {
+      "id": "single-leg-stand",
+      "name": "Single-leg stands"
+    },
+    {
+      "id": "tandem-stance",
+      "name": "Tandem stances"
+    },
+    {
+      "id": "heel-toe",
+      "name": "Heel and toe walks"
+    },
+    {
+      "id": "push-up",
+      "name": "Push-ups"
+    },
+    {
+      "id": "front-plank",
+      "name": "Front planks"
+    },
+    {
+      "id": "prone-upper-back",
+      "name": "Prone upper-back raises"
+    },
+    {
+      "id": "wall-slide",
+      "name": "Wall slides"
+    },
+    {
+      "id": "thoracic-extension",
+      "name": "Thoracic extensions"
+    },
+    {
+      "id": "crunch",
+      "name": "Crunches"
+    },
+    {
+      "id": "leg-raise",
+      "name": "Leg raises"
+    },
+    {
+      "id": "chin-tuck",
+      "name": "Chin tucks"
+    },
+    {
+      "id": "neck-circle",
+      "name": "Neck circles"
+    },
+    {
+      "id": "wrist-stretch",
+      "name": "Wrist stretches"
+    },
+    {
+      "id": "focus-shift",
+      "name": "Focus shifts"
     }
   ],
   "presets": [
@@ -313,6 +416,7 @@
         "Stand"
       ],
       "requires": [],
+      "family": "hip-flexor-stretch",
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "hip flexor shortening",
@@ -336,6 +440,7 @@
       "requires": [
         "floor"
       ],
+      "family": "hip-flexor-stretch",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "hip flexor shortening",
@@ -361,6 +466,7 @@
       "requires": [
         "floor"
       ],
+      "family": "hip-flexor-stretch",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "hip flexor + rectus femoris tightness",
@@ -405,6 +511,7 @@
         "Stand"
       ],
       "requires": [],
+      "family": "figure-4",
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "glute/piriformis tightness",
@@ -426,6 +533,7 @@
         "Chair"
       ],
       "requires": [],
+      "family": "figure-4",
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "glute/piriformis tightness",
@@ -472,6 +580,7 @@
         "Stand"
       ],
       "requires": [],
+      "family": "deep-squat-hold",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "compressed hips, stiff ankles",
@@ -607,6 +716,7 @@
         "Chair"
       ],
       "requires": [],
+      "family": "thoracic-extension",
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "kyphosis",
@@ -630,6 +740,7 @@
       "requires": [
         "floor"
       ],
+      "family": "thoracic-extension",
       "equipment_optional": [
         "foam_roller"
       ],
@@ -656,6 +767,7 @@
       "requires": [
         "wall"
       ],
+      "family": "wall-slide",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "rounded shoulders, weak lower traps",
@@ -767,6 +879,7 @@
         "Stand"
       ],
       "requires": [],
+      "family": "chin-tuck",
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "forward head",
@@ -789,6 +902,7 @@
         "Stand"
       ],
       "requires": [],
+      "family": "neck-circle",
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "upper trap / levator tightness",
@@ -832,6 +946,7 @@
         "Stand"
       ],
       "requires": [],
+      "family": "neck-circle",
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "cervical stiffness",
@@ -989,6 +1104,7 @@
         "Wall"
       ],
       "requires": [],
+      "family": "standing-quad-stretch",
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "rectus femoris tightness",
@@ -1081,6 +1197,7 @@
         "Desk"
       ],
       "requires": [],
+      "family": "figure-4",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "glute/external rotator tightness",
@@ -1214,6 +1331,7 @@
       "requires": [
         "stairs"
       ],
+      "family": "step-up",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "sluggish circulation",
@@ -1236,6 +1354,7 @@
         "Desk"
       ],
       "requires": [],
+      "family": "calf-raise",
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "venous pooling in calves",
@@ -1456,6 +1575,7 @@
         "Stand"
       ],
       "requires": [],
+      "family": "heel-toe",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "weak shins, foot circulation",
@@ -1499,6 +1619,7 @@
         "Stand"
       ],
       "requires": [],
+      "family": "squat",
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "low HR, glute inhibition",
@@ -1523,6 +1644,7 @@
       "requires": [
         "stairs"
       ],
+      "family": "step-up",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "low HR, glute inhibition",
@@ -1569,6 +1691,7 @@
         "Stand"
       ],
       "requires": [],
+      "family": "lunge",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "hip flexor shortening, low HR",
@@ -1614,6 +1737,7 @@
       "requires": [
         "floor"
       ],
+      "family": "glute-bridge",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "glute inhibition",
@@ -1637,6 +1761,7 @@
       "requires": [
         "floor"
       ],
+      "family": "glute-bridge",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "glute inhibition, asymmetry",
@@ -1660,6 +1785,7 @@
       "requires": [
         "floor"
       ],
+      "family": "glute-bridge",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "glute inhibition",
@@ -1682,6 +1808,7 @@
         "Stand"
       ],
       "requires": [],
+      "family": "squat",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "lower-body deconditioning",
@@ -1705,6 +1832,7 @@
         "Stand"
       ],
       "requires": [],
+      "family": "lunge",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "hip flexor shortening, single-leg weakness",
@@ -1727,6 +1855,7 @@
         "Stand"
       ],
       "requires": [],
+      "family": "lunge",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "glute inhibition",
@@ -1751,6 +1880,7 @@
       "requires": [
         "stairs"
       ],
+      "family": "step-up",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "glute inhibition",
@@ -1773,6 +1903,7 @@
         "Stand"
       ],
       "requires": [],
+      "family": "single-leg-hinge",
       "equipment_optional": [
         "kettlebell_or_dumbbell"
       ],
@@ -1798,6 +1929,7 @@
         "Stand"
       ],
       "requires": [],
+      "family": "squat",
       "equipment_optional": [
         "kettlebell_or_dumbbell"
       ],
@@ -1940,6 +2072,7 @@
       "requires": [
         "floor"
       ],
+      "family": "front-plank",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "core deconditioning",
@@ -1964,6 +2097,7 @@
       "requires": [
         "floor"
       ],
+      "family": "prone-upper-back",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "weak lower/mid traps",
@@ -2056,6 +2190,7 @@
         "Desk"
       ],
       "requires": [],
+      "family": "push-up",
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "upper-body deconditioning",
@@ -2081,6 +2216,7 @@
       "requires": [
         "floor"
       ],
+      "family": "push-up",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "upper-body deconditioning",
@@ -2197,6 +2333,7 @@
         "Wall"
       ],
       "requires": [],
+      "family": "calf-raise",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "calf weakness, venous pooling",
@@ -2245,6 +2382,7 @@
       "requires": [
         "floor"
       ],
+      "family": "prone-upper-back",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "weak posterior shoulder",
@@ -2387,6 +2525,7 @@
         "Stand"
       ],
       "requires": [],
+      "family": "deep-squat-hold",
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "hip compression, quad deconditioning",
@@ -2431,6 +2570,7 @@
       "requires": [
         "floor"
       ],
+      "family": "chin-tuck",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "weak deep neck flexors, forward head",
@@ -2455,6 +2595,7 @@
       "requires": [
         "wall"
       ],
+      "family": "wall-slide",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "weak lower traps",
@@ -2502,6 +2643,7 @@
       "requires": [
         "floor"
       ],
+      "family": "crunch",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "weak anterior core",
@@ -2526,6 +2668,7 @@
       "requires": [
         "floor"
       ],
+      "family": "crunch",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "weak anterior core",
@@ -2550,6 +2693,7 @@
       "requires": [
         "floor"
       ],
+      "family": "leg-raise",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "weak lower abdominals",
@@ -2574,6 +2718,7 @@
       "requires": [
         "floor"
       ],
+      "family": "leg-raise",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "weak lower abdominals",
@@ -2597,6 +2742,7 @@
       "requires": [
         "floor"
       ],
+      "family": "crunch",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "weak obliques, trunk stiffness",
@@ -2620,6 +2766,7 @@
       "requires": [
         "floor"
       ],
+      "family": "leg-raise",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "weak lower abdominals",
@@ -2733,6 +2880,7 @@
         "Desk"
       ],
       "requires": [],
+      "family": "front-plank",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "core deconditioning",
@@ -2776,6 +2924,7 @@
         "Stand"
       ],
       "requires": [],
+      "family": "single-leg-stand",
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "lost proprioception",
@@ -2798,6 +2947,7 @@
         "Wall"
       ],
       "requires": [],
+      "family": "single-leg-stand",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "dependence on vision for balance",
@@ -2820,6 +2970,7 @@
         "Stand"
       ],
       "requires": [],
+      "family": "single-leg-stand",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "neck stiffness plus balance",
@@ -2841,6 +2992,7 @@
         "Stand"
       ],
       "requires": [],
+      "family": "tandem-stance",
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "narrow-base instability",
@@ -2906,6 +3058,7 @@
         "Stand"
       ],
       "requires": [],
+      "family": "single-leg-hinge",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "posterior chain control",
@@ -2928,6 +3081,7 @@
         "Stand"
       ],
       "requires": [],
+      "family": "single-leg-stand",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "ankle stabilizer weakness",
@@ -2994,6 +3148,7 @@
         "Stand"
       ],
       "requires": [],
+      "family": "knee-lift-hold",
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "hip flexor strength, balance",
@@ -3016,6 +3171,7 @@
         "Stand"
       ],
       "requires": [],
+      "family": "lunge",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "single-leg control",
@@ -3038,6 +3194,7 @@
         "Wall"
       ],
       "requires": [],
+      "family": "calf-raise",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "ankle stability, venous pooling",
@@ -3085,6 +3242,7 @@
         "Stand"
       ],
       "requires": [],
+      "family": "single-leg-hinge",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "posterior chain control, hip stability",
@@ -3155,6 +3313,7 @@
         "Stand"
       ],
       "requires": [],
+      "family": "hip-flexor-stretch",
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "hip flexor shortening, single-leg control",
@@ -3179,6 +3338,7 @@
         "Wall"
       ],
       "requires": [],
+      "family": "standing-quad-stretch",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "hip flexor tightness, single-leg control under a moving load",
@@ -3201,6 +3361,7 @@
         "Stand"
       ],
       "requires": [],
+      "family": "knee-lift-hold",
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "hip flexor strength through range, standing stability",
@@ -3246,6 +3407,7 @@
         "Stand"
       ],
       "requires": [],
+      "family": "heel-toe",
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "reduced ankle strategy for balance",
@@ -3268,6 +3430,7 @@
         "Stand"
       ],
       "requires": [],
+      "family": "single-leg-stand",
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "balance while the upper body moves",
@@ -3333,6 +3496,7 @@
         "Wall"
       ],
       "requires": [],
+      "family": "tandem-stance",
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "dependence on vision for balance",
@@ -3356,6 +3520,7 @@
         "Stand"
       ],
       "requires": [],
+      "family": "single-leg-hinge",
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "posterior chain control, dynamic balance",
@@ -3422,6 +3587,7 @@
         "Chair"
       ],
       "requires": [],
+      "family": "wrist-stretch",
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "keyboard flexor tension",
@@ -3444,6 +3610,7 @@
         "Chair"
       ],
       "requires": [],
+      "family": "wrist-stretch",
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "mouse extensor tension",
@@ -3466,6 +3633,7 @@
         "Chair"
       ],
       "requires": [],
+      "family": "wrist-stretch",
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "wrist stiffness",
@@ -3665,6 +3833,7 @@
         "Any"
       ],
       "requires": [],
+      "family": "focus-shift",
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "fixed near focus",
@@ -3686,6 +3855,7 @@
         "Any"
       ],
       "requires": [],
+      "family": "focus-shift",
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "ciliary muscle fatigue",
