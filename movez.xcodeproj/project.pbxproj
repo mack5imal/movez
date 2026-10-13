@@ -61,6 +61,7 @@
 		5987DDB5C15A06E93AD17AE8 /* SchedulerEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD7E4757BE6870716B20B25A /* SchedulerEvent.swift */; };
 		5A2FEA6C50A83464C64EEFAC /* MicroPanelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 743F13B911D68FC7B72458C7 /* MicroPanelTests.swift */; };
 		5DB3F9562B633581A83E2DAF /* Clock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B38057FE27BFBA4B888F5B0 /* Clock.swift */; };
+		6069674A1D564FB07A7627F0 /* ScratchDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2392D0540EC99809B8CE5260 /* ScratchDefaults.swift */; };
 		6144F8A35500D2DA0410DD2B /* StatePersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = A49E80929BB51EEDA20B470F /* StatePersistence.swift */; };
 		61F812800D92C69E54FD7CDE /* LibraryMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54B929FFC124423F85034C3A /* LibraryMetadata.swift */; };
 		630B9C1F06F04E0F5C06AA2F /* SequenceStrip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB46015B8F000DB1B938863 /* SequenceStrip.swift */; };
@@ -187,6 +188,7 @@
 		202C50EE6CC441F2982008AB /* PersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceTests.swift; sourceTree = "<group>"; };
 		20B33C16408A40490AAA2357 /* Controls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Controls.swift; sourceTree = "<group>"; };
 		239121F26DFAC82D2F7F9463 /* OverlayEffectSink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayEffectSink.swift; sourceTree = "<group>"; };
+		2392D0540EC99809B8CE5260 /* ScratchDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScratchDefaults.swift; sourceTree = "<group>"; };
 		2621B2E4AE73BFD17E6C7DCB /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		27909D93B5772796C24BB3DA /* Scheduler+Hours.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Scheduler+Hours.swift"; sourceTree = "<group>"; };
 		27F7A41D0D2F936D62D9033D /* FakeSignalsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FakeSignalsTests.swift; sourceTree = "<group>"; };
@@ -379,6 +381,7 @@
 				DCB939E301141030A259C591 /* SchedulerInterruptionTests.swift */,
 				62B4AC6C3F66A7E5ABB97CFF /* SchedulerMicroTests.swift */,
 				E039EE67EC22D7EDCFDF48A2 /* SchedulerTestSupport.swift */,
+				2392D0540EC99809B8CE5260 /* ScratchDefaults.swift */,
 				C1526A9966A58758C3CA5080 /* SecurityAndCopyTests.swift */,
 				69A5A22C49E79B4716011F33 /* SettingsLiveUpdateTests.swift */,
 				F65D6A682E17691E341C551D /* SettingsStoreTests.swift */,
@@ -911,6 +914,7 @@
 				7001EDB68E7070C58A31F3A9 /* SchedulerInterruptionTests.swift in Sources */,
 				4C0067EE2D2F0D172E5BAFC7 /* SchedulerMicroTests.swift in Sources */,
 				1BDCADC884E2EDDA6CE12624 /* SchedulerTestSupport.swift in Sources */,
+				6069674A1D564FB07A7627F0 /* ScratchDefaults.swift in Sources */,
 				D52E7039B0A6AA4B4750A8B2 /* SecurityAndCopyTests.swift in Sources */,
 				B97FCAE0DB52C04BFC253C40 /* SettingsLiveUpdateTests.swift in Sources */,
 				555117DC1840EC0AF6BA9596 /* SettingsStoreTests.swift in Sources */,

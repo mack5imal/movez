@@ -51,7 +51,7 @@ final class DebugViewModelTests: XCTestCase {
     /// while you watch it.
     func testSixtyTimesMovesTheCountdownWithinASecondOfRealTime() {
         let clock = SystemClock()
-        let suite = UserDefaults(suiteName: "movez.tests.\(UUID().uuidString)") ?? .standard
+        let suite = ScratchDefaults.make()
         let settings = SettingsStore(defaults: suite)
         settings.workingHours = .alwaysOn
         let coordinator = AppCoordinator(
@@ -256,8 +256,7 @@ final class DebugViewModelTests: XCTestCase {
     // MARK: - The disclosure
 
     func testTheDisclosureIsClosedByDefaultAndRemembersBeingOpened() {
-        let name = "movez.tests.\(UUID().uuidString)"
-        let suite = UserDefaults(suiteName: name) ?? .standard
+        let suite = ScratchDefaults.make()
 
         let first = SettingsStore(defaults: suite)
         XCTAssertFalse(first.debugExpanded, "debug tools are not what the window is for")

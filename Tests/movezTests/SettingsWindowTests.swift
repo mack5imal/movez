@@ -9,7 +9,7 @@ final class SettingsWindowTests: XCTestCase {
         launchAtLogin: FakeLaunchAtLogin? = nil,
         onChange: @escaping () -> Void = {}
     ) -> SettingsViewModel {
-        let suite = UserDefaults(suiteName: "movez.tests.\(UUID().uuidString)") ?? .standard
+        let suite = ScratchDefaults.make()
         return SettingsViewModel(
             settings: SettingsStore(defaults: suite),
             library: library,

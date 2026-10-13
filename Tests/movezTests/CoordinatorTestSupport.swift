@@ -20,7 +20,7 @@ final class CoordinatorHarness {
         configure: (SettingsStore) -> Void = { _ in }
     ) {
         clock = ManualClock(now: startAt)
-        let suite = UserDefaults(suiteName: "movez.tests.\(UUID().uuidString)") ?? .standard
+        let suite = ScratchDefaults.make()
         settings = SettingsStore(defaults: suite)
         settings.workingHours = workingHours
         configure(settings)

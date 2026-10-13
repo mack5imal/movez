@@ -40,6 +40,10 @@ final class FullscreenMonitorTests: XCTestCase {
 
     func testTheRealMonitorRunsWithoutCrashing() {
         let reading = FullscreenMonitor(ownBundleId: "com.kylemack.movez").reading(exceptions: [])
-        XCTAssertNotEqual(reading.bundleId, "com.kylemack.movez", "movez never suppresses itself")
+        // Whatever is frontmost on this Mac right now, which can be movez itself: then it is
+        // reported, but never as full screen.
+        if reading.bundleId == "com.kylemack.movez" {
+            XCTAssertFalse(reading.isFullscreen, "movez never suppresses itself")
+        }
     }
 }

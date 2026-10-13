@@ -90,7 +90,8 @@ fixtures so `make snapshots` covers it.
   `order(of:)`, since persist and menu-refresh effects interleave everywhere.
 - The app detects an XCTest host (`AppDelegate.isHostingTests`) and doesn't start the real
   coordinator. Tests must never read or write the user's real Application Support data or
-  `UserDefaults`; pass explicit stores and a scratch `UserDefaults` suite.
+  `UserDefaults`; pass explicit stores and `ScratchDefaults.make()`. Never create a named suite
+  (`UserDefaults(suiteName: "movez.tests…")`): each one leaves a plist in ~/Library/Preferences.
 
 ## Conventions
 

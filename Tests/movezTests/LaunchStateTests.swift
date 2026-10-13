@@ -13,7 +13,7 @@ final class LaunchStateTests: XCTestCase {
     }
 
     private func settings() -> SettingsStore {
-        SettingsStore(defaults: UserDefaults(suiteName: "movez.tests.\(UUID().uuidString)") ?? .standard)
+        SettingsStore(defaults: ScratchDefaults.make())
     }
 
     // MARK: - Relaunching into a running session

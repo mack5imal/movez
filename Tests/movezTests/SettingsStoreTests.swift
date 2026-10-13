@@ -4,7 +4,7 @@ import XCTest
 @MainActor
 final class SettingsStoreTests: XCTestCase {
     private func makeStore() -> (SettingsStore, UserDefaults) {
-        let suite = UserDefaults(suiteName: "movez.tests.\(UUID().uuidString)") ?? .standard
+        let suite = ScratchDefaults.make()
         return (SettingsStore(defaults: suite), suite)
     }
 
