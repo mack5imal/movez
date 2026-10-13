@@ -266,6 +266,28 @@ final class LibraryTests: XCTestCase {
         return try JSONDecoder().decode(MovementLibrary.self, from: JSONSerialization.data(withJSONObject: json))
     }
 
+    // MARK: - Sides
+
+    /// Both hands can circle their thumbs or turn their forearms at the same time, so the minute
+    /// is not split.
+    func testTheHandMovementsDoneWithBothHandsAtOnceHaveNoSides() throws {
+        for id in ["HWF-07", "HWF-08"] {
+            XCTAssertFalse(try XCTUnwrap(library.movement(id: id)).perSide, id)
+        }
+    }
+
+    /// A movement that alternates rep by rep has no left half and right half, so the break never
+    /// chimes halfway or says "THEN RIGHT" over instructions that say to alternate.
+    func testAlternatingMovementsHaveNoSides() throws {
+        let alternating = ["FLX-09", "FLX-27", "CIR-19", "STR-06", "STR-12", "STR-13", "BAL-11", "BAL-12", "BAL-21"]
+        for id in alternating {
+            XCTAssertFalse(try XCTUnwrap(library.movement(id: id)).perSide, id)
+        }
+        for movement in library.movements where movement.perSide {
+            XCTAssertFalse(movement.instructions.lowercased().contains("alternat"), "\(movement.id) alternates but is split into sides")
+        }
+    }
+
     // MARK: - Core
 
     func testTheCoreMovementsAreStrengthAndWorkTheCore() {

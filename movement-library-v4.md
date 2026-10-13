@@ -307,7 +307,7 @@ Stand in a long stride stance, rear heel up. Lower straight down until the rear 
 
 **STR-06 · Reverse lunge** — Glute, Quad · 8/side · 75 · Diff 1 · Stand · Family: Lunges · Counteracts: glute inhibition.
 
-From standing, step one foot back and lower until both knees are around 90°, torso tall. Push through the front heel to return to standing. Alternate legs or finish one side first. Hold a wall or desk if balance is an issue.
+From standing, step one foot back and lower until both knees are around 90°, torso tall. Push through the front heel to return to standing. Alternate legs. Hold a wall or desk if balance is an issue.
 
 **STR-07 · Step-up (slow)** — Glute, Quad · 8/side · 75 · Diff 1 · Stand · Requires stairs · Family: Step-ups · Counteracts: glute inhibition.
 
@@ -331,11 +331,11 @@ Lean your back against a wall and walk the feet forward, sliding down until the 
 
 **STR-12 · Bird dog** — L-spine/Core, Glute · 6/side, 3 s hold · 75 · Diff 1 · Floor · Requires floor · Counteracts: weak spinal stabilizers.
 
-On hands and knees, brace the belly as if about to be poked. Extend the right arm forward and the left leg back until both are level with the torso, without letting the hips or shoulders tilt. Hold 3 s, return, and switch. Keep the neck neutral, eyes on the floor.
+On hands and knees, brace the belly as if about to be poked. Extend the right arm forward and the left leg back until both are level with the torso, without letting the hips or shoulders tilt. Hold 3 s, return, and repeat with the other arm and leg. Keep the neck neutral, eyes on the floor.
 
 **STR-13 · Dead bug** — L-spine/Core · 8/side · 75 · Diff 1 · Floor · Requires floor · Counteracts: weak anterior core, rib flare.
 
-Lie on your back, arms pointing at the ceiling, hips and knees bent to 90°. Press the low back gently into the floor and keep it there. Slowly lower the right arm overhead and the left leg toward the floor together, exhale, then return and switch. Stop the range wherever the low back starts to lift.
+Lie on your back, arms pointing at the ceiling, hips and knees bent to 90°. Press the low back gently into the floor and keep it there. Slowly lower the right arm overhead and the left leg toward the floor together, exhale, then return and do the same with the other arm and leg. Stop the range wherever the low back starts to lift.
 
 **STR-14 · Side plank** — L-spine/Core · 20–30 s/side · 60 · Diff 2 · Floor · Requires floor · Counteracts: lateral core weakness.
 
@@ -531,7 +531,7 @@ Stand on one leg and bend that knee to lower a few inches, like a quarter squat,
 
 **BAL-11 · Marching hold** — Hip, Core · 5 × 5 s/side · 60 · Diff 1 · Stand · **Micro** · Family: Knee-lift holds · Counteracts: hip flexor strength, balance.
 
-Stand tall and lift one knee to hip height, thigh parallel to the floor, foot relaxed. Hold 5 s without leaning back or letting the hips tilt, then lower slowly and switch. Hands on hips.
+Stand tall and lift one knee to hip height, thigh parallel to the floor, foot relaxed. Hold 5 s without leaning back or letting the hips tilt, then lower slowly and lift the other knee. Hands on hips.
 
 **BAL-12 · Step-back lunge with pause** — Glute, Quad · 5/side · 75 · Diff 2 · Stand · Family: Lunges · Counteracts: single-leg control.
 
@@ -631,13 +631,13 @@ Hold the hands in front of you and spread the fingers as wide apart as they'll g
 
 Start with the fingers straight. Bend only the top two joints into a hook, keeping the knuckles straight; then close into a full fist; then bend only at the knuckles so the fingers form a flat tabletop; then straighten again. Move slowly through each shape, both hands together.
 
-**HWF-07 · Forearm pronation/supination** — Wrist/Forearm · 15 reps/side · 45 · Diff 1 · Stand/Chair · **Micro** · Counteracts: forearm rotation stiffness.
+**HWF-07 · Forearm pronation/supination** — Wrist/Forearm · 15 reps · 45 · Diff 1 · Stand/Chair · **Micro** · Counteracts: forearm rotation stiffness.
 
-Tuck the elbow against your side, bent to 90°, hand in front like holding a tray. Turn the palm fully up, then fully down, rotating the forearm as far as it goes each way while the elbow stays pinned. Switch arms.
+Tuck both elbows against your sides, bent to 90°, hands in front like holding a tray. Turn both palms fully up, then fully down, rotating the forearms as far as they go each way while the elbows stay pinned.
 
-**HWF-08 · Thumb CARs and stretch** — Wrist/Forearm · 30 s/side · 60 · Diff 1 · Stand/Chair · **Micro** · Counteracts: trackpad/thumb overuse.
+**HWF-08 · Thumb CARs and stretch** — Wrist/Forearm · 60 s · 60 · Diff 1 · Stand/Chair · **Micro** · Counteracts: trackpad/thumb overuse.
 
-Make slow big circles with the thumb in both directions, keeping the rest of the hand still. Then tuck the thumb inside a loose fist and gently tilt the wrist toward the little-finger side until the base of the thumb stretches; hold 10 s. Switch hands.
+Make slow big circles with both thumbs at once, in both directions, keeping the rest of the hands still. Then tuck each thumb inside a loose fist and gently tilt both wrists toward the little-finger side until the base of the thumbs stretches; hold 10 s.
 
 **HWF-09 · Forearm roll on ball** — Wrist/Forearm · 30 s/side · 60 · Diff 1 · Desk (Ball) · Counteracts: forearm soft-tissue tension.
 

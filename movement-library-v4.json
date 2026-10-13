@@ -596,7 +596,7 @@
         "Hip"
       ],
       "dose": "5 reps/side",
-      "per_side": true,
+      "per_side": false,
       "block_seconds": 75,
       "difficulty": 2,
       "settings": [
@@ -1004,7 +1004,7 @@
         "T-spine"
       ],
       "dose": "8/side",
-      "per_side": true,
+      "per_side": false,
       "block_seconds": 60,
       "difficulty": 1,
       "settings": [
@@ -1143,7 +1143,7 @@
         "Shoulder"
       ],
       "dose": "20 s centre + 20 s/side",
-      "per_side": true,
+      "per_side": false,
       "block_seconds": 60,
       "difficulty": 1,
       "settings": [
@@ -1684,7 +1684,7 @@
         "Full"
       ],
       "dose": "6/side",
-      "per_side": true,
+      "per_side": false,
       "block_seconds": 60,
       "difficulty": 1,
       "settings": [
@@ -1848,7 +1848,7 @@
         "Quad"
       ],
       "dose": "8/side",
-      "per_side": true,
+      "per_side": false,
       "block_seconds": 75,
       "difficulty": 1,
       "settings": [
@@ -1859,7 +1859,7 @@
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "glute inhibition",
-      "instructions": "From standing, step one foot back and lower until both knees are around 90°, torso tall. Push through the front heel to return to standing. Alternate legs or finish one side first. Hold a wall or desk if balance is an issue."
+      "instructions": "From standing, step one foot back and lower until both knees are around 90°, torso tall. Push through the front heel to return to standing. Alternate legs. Hold a wall or desk if balance is an issue."
     },
     {
       "id": "STR-07",
@@ -1994,7 +1994,7 @@
         "Glute"
       ],
       "dose": "6/side, 3 s hold",
-      "per_side": true,
+      "per_side": false,
       "block_seconds": 75,
       "difficulty": 1,
       "settings": [
@@ -2006,7 +2006,7 @@
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "weak spinal stabilizers",
-      "instructions": "On hands and knees, brace the belly as if about to be poked. Extend the right arm forward and the left leg back until both are level with the torso, without letting the hips or shoulders tilt. Hold 3 s, return, and switch. Keep the neck neutral, eyes on the floor."
+      "instructions": "On hands and knees, brace the belly as if about to be poked. Extend the right arm forward and the left leg back until both are level with the torso, without letting the hips or shoulders tilt. Hold 3 s, return, and repeat with the other arm and leg. Keep the neck neutral, eyes on the floor."
     },
     {
       "id": "STR-13",
@@ -2017,7 +2017,7 @@
         "L-spine/Core"
       ],
       "dose": "8/side",
-      "per_side": true,
+      "per_side": false,
       "block_seconds": 75,
       "difficulty": 1,
       "settings": [
@@ -2029,7 +2029,7 @@
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "weak anterior core, rib flare",
-      "instructions": "Lie on your back, arms pointing at the ceiling, hips and knees bent to 90°. Press the low back gently into the floor and keep it there. Slowly lower the right arm overhead and the left leg toward the floor together, exhale, then return and switch. Stop the range wherever the low back starts to lift."
+      "instructions": "Lie on your back, arms pointing at the ceiling, hips and knees bent to 90°. Press the low back gently into the floor and keep it there. Slowly lower the right arm overhead and the left leg toward the floor together, exhale, then return and do the same with the other arm and leg. Stop the range wherever the low back starts to lift."
     },
     {
       "id": "STR-14",
@@ -3141,7 +3141,7 @@
         "L-spine/Core"
       ],
       "dose": "5 × 5 s/side",
-      "per_side": true,
+      "per_side": false,
       "block_seconds": 60,
       "difficulty": 1,
       "settings": [
@@ -3152,7 +3152,7 @@
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "hip flexor strength, balance",
-      "instructions": "Stand tall and lift one knee to hip height, thigh parallel to the floor, foot relaxed. Hold 5 s without leaning back or letting the hips tilt, then lower slowly and switch. Hands on hips."
+      "instructions": "Stand tall and lift one knee to hip height, thigh parallel to the floor, foot relaxed. Hold 5 s without leaning back or letting the hips tilt, then lower slowly and lift the other knee. Hands on hips."
     },
     {
       "id": "BAL-12",
@@ -3164,7 +3164,7 @@
         "Quad"
       ],
       "dose": "5/side",
-      "per_side": true,
+      "per_side": false,
       "block_seconds": 75,
       "difficulty": 2,
       "settings": [
@@ -3378,7 +3378,7 @@
         "Full"
       ],
       "dose": "5/side",
-      "per_side": true,
+      "per_side": false,
       "block_seconds": 75,
       "difficulty": 2,
       "settings": [
@@ -3713,8 +3713,8 @@
       "regions": [
         "Wrist/Forearm"
       ],
-      "dose": "15 reps/side",
-      "per_side": true,
+      "dose": "15 reps",
+      "per_side": false,
       "block_seconds": 45,
       "difficulty": 1,
       "settings": [
@@ -3725,7 +3725,7 @@
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "forearm rotation stiffness",
-      "instructions": "Tuck the elbow against your side, bent to 90°, hand in front like holding a tray. Turn the palm fully up, then fully down, rotating the forearm as far as it goes each way while the elbow stays pinned. Switch arms."
+      "instructions": "Tuck both elbows against your sides, bent to 90°, hands in front like holding a tray. Turn both palms fully up, then fully down, rotating the forearms as far as they go each way while the elbows stay pinned."
     },
     {
       "id": "HWF-08",
@@ -3735,8 +3735,8 @@
       "regions": [
         "Wrist/Forearm"
       ],
-      "dose": "30 s/side",
-      "per_side": true,
+      "dose": "60 s",
+      "per_side": false,
       "block_seconds": 60,
       "difficulty": 1,
       "settings": [
@@ -3747,7 +3747,7 @@
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "trackpad/thumb overuse",
-      "instructions": "Make slow big circles with the thumb in both directions, keeping the rest of the hand still. Then tuck the thumb inside a loose fist and gently tilt the wrist toward the little-finger side until the base of the thumb stretches; hold 10 s. Switch hands."
+      "instructions": "Make slow big circles with both thumbs at once, in both directions, keeping the rest of the hands still. Then tuck each thumb inside a loose fist and gently tilt both wrists toward the little-finger side until the base of the thumbs stretches; hold 10 s."
     },
     {
       "id": "HWF-09",
