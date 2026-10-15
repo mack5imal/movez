@@ -33,7 +33,7 @@ extension Scheduler {
     }
 
     func headsUpInfo(now: Date, deferredSince: Date?) -> HeadsUpInfo {
-        let sittingSince = snapshot.lastCompletedBreakAt ?? snapshot.boutStartedAt
+        let sittingSince = snapshot.boutStartedAt
         let deferredFor = deferredSince.map { max(0, Int(now.timeIntervalSince($0))) }
         let longWait = (deferredFor ?? 0) > config.deferredBadgeSeconds
         return HeadsUpInfo(

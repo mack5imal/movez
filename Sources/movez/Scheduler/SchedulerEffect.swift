@@ -28,7 +28,8 @@ enum Chime: String, Codable, Equatable, CaseIterable {
 struct HeadsUpInfo: Equatable {
     var dueAt: Date
     var startsAt: Date
-    /// When the current sitting stretch began — the last completed break, or the bout start.
+    /// When the current sitting stretch began: the bout start, which a completed break and a standby
+    /// or reset absence move to their end, and a paused absence shifts forward by its length.
     var sittingSince: Date
     var sittingSeconds: Int
     var snoozesLeft: Int

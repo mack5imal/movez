@@ -375,3 +375,12 @@ are in `docs/rule-changes-2026-10.md` and `scripts/simulate_selection.py`.
     Rejected: chair dips, since most desk chairs roll; a pec-minor wall stretch, which the doorway
     pec stretch already covers at its high elbow position; and a held side-lunge stretch, which is
     the Cossack squat held still. The lateral lunge joins the Cossack squat's family instead.
+
+## Minor changes, October 2026
+
+48. **"Sitting for" counts the current sitting bout, not the time since the last break.** The
+    deferred badge on the heads-up measured from the last completed break, which was the same thing
+    while an absence counted as a break. Since 43 an absence no longer moves the last break, so a
+    morning after a night away read "Sitting for 17 h" although standby had restarted everything.
+    It now measures from the bout start, which a completed break, a reset absence and standby all
+    move to their end and a paused absence shifts forward by its length, so it counts desk time only.
