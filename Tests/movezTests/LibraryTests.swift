@@ -139,20 +139,11 @@ final class LibraryTests: XCTestCase {
 
     // MARK: - Version
 
-    /// A library revision bumps the JSON's `version` and the Markdown's title together, and keeps
-    /// the major version the resource is named after; the Settings footer shows whatever the JSON
-    /// says, so a forgotten half would show up there as a mismatch.
-    func testTheVersionAgreesAcrossTheJSONTheMarkdownAndTheFilename() throws {
+    /// A library revision bumps the JSON's `version` and keeps the major version the resource is
+    /// named after; the Settings footer shows whatever the JSON says.
+    func testTheVersionAgreesWithTheFilename() {
         let major = library.version.split(separator: ".").first.map(String.init)
         XCTAssertEqual(LibraryLoader.resourceName, "movement-library-v\(major ?? "")")
-
-        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
-            .deletingLastPathComponent()
-        let markdown = try String(contentsOf: root.appendingPathComponent("\(LibraryLoader.resourceName).md"), encoding: .utf8)
-        XCTAssertTrue(
-            markdown.hasPrefix("# movez — Movement Library v\(library.version)\n"),
-            String(markdown.prefix(60))
-        )
     }
 
     // MARK: - What a movement requires

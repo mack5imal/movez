@@ -1,8 +1,7 @@
 {
   "library": "movez movement library",
   "version": "4.2",
-  "source": "movement-library-v4.md",
-  "generated": "2026-10-13",
+  "updated": "2026-10-13",
   "schema": {
     "movement": {
       "id": "bucket prefix + 2-digit number",
@@ -4823,8 +4822,13 @@
     }
   ],
   "notes": [
-    "Region labels normalised from the markdown: 'Core' -> 'L-spine/Core'; 'Full spine' -> ['T-spine','L-spine/Core'].",
+    "Regions: 'Core' is always written 'L-spine/Core', and a full-spine movement lists both 'T-spine' and 'L-spine/Core'.",
     "block_seconds is the scheduling unit; dose is display text.",
-    "Routine block 'note' carries per-routine adjustments (e.g. 'trim to 60', 'one direction only')."
+    "Routine block 'note' carries per-routine adjustments (e.g. 'trim to 60', 'one direction only').",
+    "History: v2 expanded every description into brief in-app instructions (enough for someone unfamiliar with the movement to do it imperfectly).",
+    "History: v3 added the interval presets and the 1-minute micro-break and flagged the movements suitable for it with a Micro tag.",
+    "History: v4 expands the balance bucket (13 → 29) with yoga-derived balance-and-strength postures, adds a balance-focused sample routine, and separates each header line from its instructions.",
+    "History: v4.1 marks what each movement cannot be done without (floor, wall, stairs), so a user without one is never served it, and adds twelve core movements to the strength bucket (STR-39–STR-50).",
+    "History: v4.2 groups near-duplicates into families, so two versions of the same exercise are never served together, runs alternating movements and two hand movements as one block rather than one side at a time, and adds fifteen movements, including the first for the arms (FLX-39–FLX-44, STR-51–STR-58, BAL-30)."
   ]
 }

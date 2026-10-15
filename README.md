@@ -35,10 +35,9 @@ from what is installed, so nothing else needs editing when one of them moves:
   fixes; 1.0 is reserved for when the app is called done.
 - **Build number** (`38`): stamped on every build with the commit count (`git rev-list --count
   HEAD`), so it never needs bumping.
-- **Library version** (`v4.2`): the `version` field of `movement-library-v4.json`, with the same
-  number in the title of `movement-library-v4.md` (a test holds them together). The filename keeps
-  only the major version, so a minor library revision touches the two library files and nothing
-  else.
+- **Library version** (`v4.2`): the `version` field of `movement-library-v4.json`. The filename
+  keeps only the major version (a test holds them together), so a minor library revision touches
+  the library file and nothing else.
 
 ## Install
 
@@ -73,8 +72,8 @@ scripts/                    font fetch and chime synthesis
 ```
 
 The Markdown and JSON documents at the repository root — `product-brief-v1.md`,
-`scheduler-research-v1.md`, `movement-library-v4.md`, `movement-library-v4.json` and the
-`design_handoff_movez_ui/` folder — are the source of truth for behaviour and visual design.
+`scheduler-research-v1.md`, `movement-library-v4.json` and the `design_handoff_movez_ui/`
+folder — are the source of truth for behaviour and visual design.
 `movement-library-v4.json` is bundled into the app directly from the repository root; there is
 no second copy to keep in sync.
 

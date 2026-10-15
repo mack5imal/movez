@@ -1,7 +1,7 @@
 # movez — Product brief v1
 
 Owner: Kyle Mack · Date: 2026-09-11 · Status: ready for design mockups
-Companion docs: `movement-library-v4.md` / `.json` (content and rules), `scheduler-research-v1.md` (scheduler behavior and rationale)
+Companion docs: `movement-library-v4.json` (content and rules), `scheduler-research-v1.md` (scheduler behavior and rationale)
 
 ## 1. What it is
 
@@ -49,7 +49,7 @@ Preset (25/5, 55/5, 85/5, custom) and micro-break on/off · Working hours per da
 
 ## 8. Constraints and technical notes
 
-Native Swift/SwiftUI, macOS 14+, menu-bar app (`MenuBarExtra`), no Dock icon. Scheduler is a persisted state machine over wall-clock timestamps evaluated by a tick (see scheduler research §5 and §6 for states, transitions, and defaults). OS signals: idle via `CGEventSource.secondsSinceLastEventType` (no Accessibility permission); sleep/wake/lock via `NSWorkspace` notifications plus tick-gap detection; microphone via CoreAudio "device is running somewhere"; screen capture via ScreenCaptureKit or a process list fallback; fullscreen via `NSWorkspace.frontmostApplication` and window bounds; Focus via a shippable Focus Filter (no polling for DND). The library ships as `movement-library-v4.json`, regenerated from the markdown by `md_to_json.py`; the app must not hard-code movements. Overlay windows cover every display at a level above fullscreen apps, swallow keystrokes, and restore focus afterwards. Poll at 2 s, not at all while paused or off-hours.
+Native Swift/SwiftUI, macOS 14+, menu-bar app (`MenuBarExtra`), no Dock icon. Scheduler is a persisted state machine over wall-clock timestamps evaluated by a tick (see scheduler research §5 and §6 for states, transitions, and defaults). OS signals: idle via `CGEventSource.secondsSinceLastEventType` (no Accessibility permission); sleep/wake/lock via `NSWorkspace` notifications plus tick-gap detection; microphone via CoreAudio "device is running somewhere"; screen capture via ScreenCaptureKit or a process list fallback; fullscreen via `NSWorkspace.frontmostApplication` and window bounds; Focus via a shippable Focus Filter (no polling for DND). The library ships as `movement-library-v4.json`, which is edited directly; the app must not hard-code movements. Overlay windows cover every display at a level above fullscreen apps, swallow keystrokes, and restore focus afterwards. Poll at 2 s, not at all while paused or off-hours.
 
 ## 9. What design needs to produce
 

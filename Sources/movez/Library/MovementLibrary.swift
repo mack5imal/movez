@@ -7,8 +7,8 @@ import Foundation
 struct MovementLibrary: Codable, Hashable {
     let library: String
     let version: String
-    let source: String
-    let generated: String
+    /// The date of the last edit. The JSON is the library itself; nothing generates it.
+    let updated: String
     let schema: LibrarySchema
     let designRules: DesignRules
     let sittingEffects: [SittingEffect]
@@ -25,7 +25,7 @@ struct MovementLibrary: Codable, Hashable {
     let notes: [String]
 
     enum CodingKeys: String, CodingKey {
-        case library, version, source, generated, schema, buckets, families, presets, movements, routines, notes
+        case library, version, updated, schema, buckets, families, presets, movements, routines, notes
         case designRules = "design_rules"
         case sittingEffects = "sitting_effects"
         case customPresetRule = "custom_preset_rule"

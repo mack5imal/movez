@@ -2,8 +2,7 @@
   "library": "movez strength library",
   "mode": "strength",
   "version": "1",
-  "source": "strength-library-v1.md",
-  "generated": "2026-10-09",
+  "updated": "2026-10-09",
   "schema": {
     "movement": {
       "id": "bucket prefix + 2-digit number",
@@ -105,6 +104,17 @@
     ],
     "goal": "maintain or slowly build strength; not hypertrophy"
   },
+  "design_notes": [
+    "Shape. A full routine is 5 movements × 60 s, or 30 s a side for a per-side movement, each after the app's 5 s lead-in (5:25 in total, the same shape as a movement-mode break). A micro-routine is one per-side movement at 30 s a side, or two two-sided movements at 30 s each (the movement-mode micro rule, DECISIONS 30).",
+    "Doses are rep targets sized to the window. People think in reps when lifting, so each dose is the number of reps that fits the minute at a controlled tempo of about 3 s a rep (about 2 s for swings). Two-sided movements target 12–20 reps. Per-side movements target 8–12 a side in each 30 s half. Slow, multi-part movements (tempo push-ups, walkouts, windmills, get-ups) use fewer reps so every rep stays controlled. Isometric holds are given in seconds. The timer always wins: if the reps run out early, rest until the next movement; if the minute ends first, stop.",
+    "Effort ceiling: RPE 7. Every set should end with about three good reps still in reserve. High reps at moderate effort mean no grinding, no breath-holding, and no grunting. If a rep target can't be reached in good form, the user drops the load or the app serves the bodyweight version.",
+    "Quiet and small. No jumping and no dropping weights. Kettlebell swings are allowed, and the bell is always parked gently on the floor. Everything fits in a small office or cubicle: about a 2 m × 2 m square, with clear space in front of and behind the body for swings.",
+    "Equipment. Bodyweight, dumbbells (assumed to be a pair), and one kettlebell. The user selects what they own and the app serves only movements they can do. Nothing else is allowed: no bands, rollers, balls, towels, steps, benches, or bars. A chair and the floor are always available. When a movement puts weight on the chair (a foot, the back, the hands or a knee on the seat), it should be a fixed four-legged chair, or an office chair with its swivel and tilt locked, pushed against a wall or the desk so it can't roll. Wall movements need a solid wall, not a cubicle partition; the user should be able to switch walls off the way they switch off equipment (full_routine_rules, rule 3).",
+    "Grip budget. The user goes back to typing straight after a routine, so grip-heavy movements (tagged Grip) are capped per routine and never come last (full_routine_rules).",
+    "Goal. Maintain strength or build it slowly; this is not a hypertrophy program. Progress comes from the difficulty ladder (tempo, range, single-leg versions, then load), not from adding reps beyond the target.",
+    "Micro-routines are bodyweight only. The floor and the chair are both allowed, so floor-based end-range work (lift-offs, contract-relax holds) is in the pool.",
+    "No per-movement cautions. Safety stays in the app disclaimer, as in v4."
+  ],
   "desk_effects": [
     {
       "effect": "Quad and sit-to-stand strength decline, faster with age",
@@ -344,6 +354,231 @@
         "eligible": 29
       }
     }
+  },
+  "overlap_with_movement_library": {
+    "meaning": "Some movements here are the same as, or close to, a v4 movement. \"Same\" means the same exercise, so no-repeat rules should treat the two IDs as one when modes are mixed in a day. \"Similar\" means a related exercise with a different dose, load, or end-range emphasis; the two can safely share a day.",
+    "pairs": [
+      {
+        "strength": "SQT-01",
+        "movement": "CIR-16",
+        "kind": "similar"
+      },
+      {
+        "strength": "SQT-02",
+        "movement": "STR-04",
+        "kind": "same"
+      },
+      {
+        "strength": "SQT-04",
+        "movement": "STR-09",
+        "kind": "same"
+      },
+      {
+        "strength": "SQT-07",
+        "movement": "STR-05",
+        "kind": "same"
+      },
+      {
+        "strength": "SQT-09",
+        "movement": "STR-06",
+        "kind": "same"
+      },
+      {
+        "strength": "SQT-16",
+        "movement": "STR-11",
+        "kind": "same"
+      },
+      {
+        "strength": "HNG-01",
+        "movement": "STR-01",
+        "kind": "same"
+      },
+      {
+        "strength": "HNG-02",
+        "movement": "STR-02",
+        "kind": "same"
+      },
+      {
+        "strength": "HNG-04",
+        "movement": "STR-03",
+        "kind": "same"
+      },
+      {
+        "strength": "HNG-07",
+        "movement": "CIR-12",
+        "kind": "similar"
+      },
+      {
+        "strength": "HNG-09",
+        "movement": "STR-10",
+        "kind": "similar"
+      },
+      {
+        "strength": "HNG-10",
+        "movement": "CIR-18",
+        "kind": "similar"
+      },
+      {
+        "strength": "HNG-12",
+        "movement": "STR-08",
+        "kind": "same"
+      },
+      {
+        "strength": "HNG-15",
+        "movement": "STR-27",
+        "kind": "same"
+      },
+      {
+        "strength": "PSH-02",
+        "movement": "STR-20",
+        "kind": "same"
+      },
+      {
+        "strength": "PSH-04",
+        "movement": "STR-21",
+        "kind": "same"
+      },
+      {
+        "strength": "PSH-10",
+        "movement": "STR-22",
+        "kind": "similar"
+      },
+      {
+        "strength": "PSH-15",
+        "movement": "STR-32",
+        "kind": "same"
+      },
+      {
+        "strength": "PUL-01",
+        "movement": "STR-16",
+        "kind": "same"
+      },
+      {
+        "strength": "PUL-02",
+        "movement": "STR-28",
+        "kind": "same"
+      },
+      {
+        "strength": "PUL-12",
+        "movement": "STR-33",
+        "kind": "same"
+      },
+      {
+        "strength": "COR-01",
+        "movement": "STR-13",
+        "kind": "same"
+      },
+      {
+        "strength": "COR-03",
+        "movement": "STR-15",
+        "kind": "same"
+      },
+      {
+        "strength": "COR-04",
+        "movement": "STR-14",
+        "kind": "same"
+      },
+      {
+        "strength": "COR-05",
+        "movement": "STR-12",
+        "kind": "same"
+      },
+      {
+        "strength": "COR-12",
+        "movement": "STR-25",
+        "kind": "similar"
+      },
+      {
+        "strength": "ACC-01",
+        "movement": "CIR-04",
+        "kind": "similar"
+      },
+      {
+        "strength": "ACC-02",
+        "movement": "STR-26",
+        "kind": "same"
+      },
+      {
+        "strength": "ACC-05",
+        "movement": "STR-31",
+        "kind": "same"
+      },
+      {
+        "strength": "ACC-08",
+        "movement": "STR-29",
+        "kind": "same"
+      },
+      {
+        "strength": "ACC-10",
+        "movement": "STR-36",
+        "kind": "same"
+      },
+      {
+        "strength": "END-06",
+        "movement": "FLX-09",
+        "kind": "similar"
+      },
+      {
+        "strength": "END-07",
+        "movement": "FLX-08",
+        "kind": "similar"
+      },
+      {
+        "strength": "END-08",
+        "movement": "FLX-26",
+        "kind": "same"
+      },
+      {
+        "strength": "END-12",
+        "movement": "BAL-07",
+        "kind": "similar"
+      },
+      {
+        "strength": "END-17",
+        "movement": "FLX-37",
+        "kind": "similar"
+      },
+      {
+        "strength": "END-22",
+        "movement": "FLX-12",
+        "kind": "similar"
+      },
+      {
+        "strength": "END-23",
+        "movement": "FLX-11",
+        "kind": "similar"
+      },
+      {
+        "strength": "END-24",
+        "movement": "FLX-25",
+        "kind": "same"
+      },
+      {
+        "strength": "END-29",
+        "movement": "STR-37",
+        "kind": "same"
+      },
+      {
+        "strength": "END-31",
+        "movement": "FLX-21",
+        "kind": "similar"
+      },
+      {
+        "strength": "END-34",
+        "movement": "FLX-30",
+        "kind": "similar"
+      },
+      {
+        "strength": "END-35",
+        "movement": "BAL-13",
+        "kind": "similar"
+      },
+      {
+        "strength": "END-41",
+        "movement": "FLX-04",
+        "kind": "similar"
+      }
+    ]
   },
   "movements": [
     {

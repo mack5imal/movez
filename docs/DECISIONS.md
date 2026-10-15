@@ -390,3 +390,11 @@ are in `docs/rule-changes-2026-10.md` and `scripts/simulate_selection.py`.
     them run off the one break, so the timer, the buttons, the side toggle and a collapsed
     instruction stay in step whichever screen is used, and each chime plays once. The display with
     the cursor still holds keyboard focus, and the arrow, Return and Space keys work from anywhere.
+50. **The JSON is the library.** Each library had a Markdown version, a JSON version and a script
+    meant to turn the first into the second. Nobody edits the Markdown by hand, the JSON had been
+    edited alongside it since v4.1, and the movement library's converter no longer ran. The
+    Markdown files and both converters are gone, and changes are made to the JSON directly. What
+    only the Markdown held moved into the JSON first: the movement library's version history into
+    its `notes`, and the strength library's design rules and its overlap table with the movement
+    library as `design_notes` and `overlap_with_movement_library`. `source` is dropped and
+    `generated` becomes `updated`, the date of the last edit.
