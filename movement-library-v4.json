@@ -433,7 +433,7 @@
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "hip flexor shortening",
-      "instructions": "Step one foot back about a metre, both feet pointing forward, rear heel up. Tuck your tailbone under (as if zipping tight jeans), squeeze the rear glute, and reach the same-side arm overhead. You should feel the front of the rear hip, not the low back. Keep the front knee over the ankle."
+      "instructions": "Step one foot back about a meter, both feet pointing forward, rear heel up. Tuck your tailbone under (as if zipping tight jeans), squeeze the rear glute, and reach the same-side arm overhead. You should feel the front of the rear hip, not the low back. Keep the front knee over the ankle."
     },
     {
       "id": "FLX-02",
@@ -620,7 +620,7 @@
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "adductor and hip stiffness",
-      "instructions": "Take a wide stance, toes pointed slightly out. Shift your weight to one side and bend that knee deeply while the other leg stays straight, toes pointing up. Keep the bent-side heel down and the chest up, then push back to centre and go the other way. Depth comes with practice."
+      "instructions": "Take a wide stance, toes pointed slightly out. Shift your weight to one side and bend that knee deeply while the other leg stays straight, toes pointing up. Keep the bent-side heel down and the chest up, then push back to center and go the other way. Depth comes with practice."
     },
     {
       "id": "FLX-10",
@@ -874,7 +874,7 @@
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "QL/lat tightness, rib immobility",
-      "instructions": "Reach one arm straight overhead and place the other hand on the hip. Lean sideways away from the raised arm, keeping both feet planted and hips square. Breathe into the ribs on the open side. Come back through centre before switching."
+      "instructions": "Reach one arm straight overhead and place the other hand on the hip. Lean sideways away from the raised arm, keeping both feet planted and hips square. Breathe into the ribs on the open side. Come back through center before switching."
     },
     {
       "id": "FLX-21",
@@ -1054,7 +1054,7 @@
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "posterior chain tightness",
-      "instructions": "From hands and knees, tuck the toes and lift the hips up and back so the body makes an inverted V, arms straight, heels reaching toward the floor. Alternately bend one knee while pressing the other heel down, pedalling slowly. Keep the spine long; a bent knee is fine."
+      "instructions": "From hands and knees, tuck the toes and lift the hips up and back so the body makes an inverted V, arms straight, heels reaching toward the floor. Alternately bend one knee while pressing the other heel down, pedaling slowly. Keep the spine long; a bent knee is fine."
     },
     {
       "id": "FLX-29",
@@ -1157,7 +1157,7 @@
         "L-spine/Core",
         "Shoulder"
       ],
-      "dose": "20 s centre + 20 s/side",
+      "dose": "20 s center + 20 s/side",
       "per_side": false,
       "block_seconds": 60,
       "difficulty": 1,
@@ -1170,7 +1170,7 @@
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "lumbar and lat stiffness",
-      "instructions": "Kneel and sit back toward the heels, arms stretched forward on the floor, forehead down. Breathe into the low back. Then walk both hands to one side, keeping the hips centred, to stretch the side of the torso. Repeat on the other side."
+      "instructions": "Kneel and sit back toward the heels, arms stretched forward on the floor, forehead down. Breathe into the low back. Then walk both hands to one side, keeping the hips centered, to stretch the side of the torso. Repeat on the other side."
     },
     {
       "id": "FLX-34",
@@ -1306,7 +1306,7 @@
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "trunk rotation stiffness",
-      "instructions": "Sit tall near the front of the chair, feet flat. Turn your chest to the right, placing the left hand on the outside of the right knee and the right hand on the chair seat behind you. Grow taller on each inhale and turn a little further on each exhale, keeping both sit bones down. Come back through centre before switching."
+      "instructions": "Sit tall near the front of the chair, feet flat. Turn your chest to the right, placing the left hand on the outside of the right knee and the right hand on the chair seat behind you. Grow taller on each inhale and turn a little further on each exhale, keeping both sit bones down. Come back through center before switching."
     },
     {
       "id": "FLX-40",
@@ -2728,7 +2728,7 @@
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "weak deep neck flexors, forward head",
-      "instructions": "Lie on your back with knees bent, no pillow. Tuck the chin gently as if nodding \"yes\", then lift the head about a centimetre off the floor, keeping the chin tucked. Hold 10 s without letting the chin poke forward, then rest."
+      "instructions": "Lie on your back with knees bent, no pillow. Tuck the chin gently as if nodding \"yes\", then lift the head about a centimeter off the floor, keeping the chin tucked. Hold 10 s without letting the chin poke forward, then rest."
     },
     {
       "id": "STR-37",
@@ -2753,7 +2753,7 @@
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "weak lower traps",
-      "instructions": "Face a wall with forearms and hands flat on it, elbows at shoulder height. Slide the arms up the wall until they're nearly straight, then press the forearms lightly into the wall and lift them a centimetre off it, holding 2 s. Return to the wall and slide back down. Keep the ribs down."
+      "instructions": "Face a wall with forearms and hands flat on it, elbows at shoulder height. Slide the arms up the wall until they're nearly straight, then press the forearms lightly into the wall and lift them a centimeter off it, holding 2 s. Return to the wall and slide back down. Keep the ribs down."
     },
     {
       "id": "STR-38",
@@ -2900,7 +2900,7 @@
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "weak obliques, trunk stiffness",
-      "instructions": "Lie on your back with fingertips behind the ears and both knees lifted to 90°. Curl the shoulders up, then turn the right elbow toward the left knee as the right leg straightens out, and switch sides in a slow pedalling rhythm. Rotate from the ribs, not the neck, and keep the low back pressed down."
+      "instructions": "Lie on your back with fingertips behind the ears and both knees lifted to 90°. Curl the shoulders up, then turn the right elbow toward the left knee as the right leg straightens out, and switch sides in a slow pedaling rhythm. Rotate from the ribs, not the neck, and keep the low back pressed down."
     },
     {
       "id": "STR-44",
@@ -3375,7 +3375,7 @@
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "hip control, ankle stability",
-      "instructions": "Stand on one leg with a slight knee bend. Reach the free foot as far as you can straight forward and tap the floor lightly, return to centre, then reach diagonally back to one side, return, then diagonally back to the other side. Keep the standing heel down and hips level. Switch legs."
+      "instructions": "Stand on one leg with a slight knee bend. Reach the free foot as far as you can straight forward and tap the floor lightly, return to center, then reach diagonally back to one side, return, then diagonally back to the other side. Keep the standing heel down and hips level. Switch legs."
     },
     {
       "id": "BAL-07",
@@ -3443,7 +3443,7 @@
       "equipment_optional": [],
       "micro_eligible": false,
       "counteracts": "hip control",
-      "instructions": "Imagine standing at the centre of a clock face on one leg. With the free foot, tap lightly to 12 o'clock, then 3, 6, and 9 (going behind or across the body as needed), returning to centre between taps. Keep the standing knee soft and the torso upright. Switch legs."
+      "instructions": "Imagine standing at the center of a clock face on one leg. With the free foot, tap lightly to 12 o'clock, then 3, 6, and 9 (going behind or across the body as needed), returning to center between taps. Keep the standing knee soft and the torso upright. Switch legs."
     },
     {
       "id": "BAL-10",
@@ -3701,7 +3701,7 @@
       "equipment_optional": [],
       "micro_eligible": true,
       "counteracts": "hip flexor strength through range, standing stability",
-      "instructions": "Stand on one leg and hold the other knee with the same-side hand, thigh at hip height. Once steady, open the knee out to the side, keeping the hips square and the standing leg straight. Hold, bring the knee back to centre, and lower. Switch sides."
+      "instructions": "Stand on one leg and hold the other knee with the same-side hand, thigh at hip height. Once steady, open the knee out to the side, keeping the hips square and the standing leg straight. Hold, bring the knee back to center, and lower. Switch sides."
     },
     {
       "id": "BAL-21",

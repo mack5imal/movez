@@ -96,11 +96,11 @@ Hold a dumbbell in each hand at your sides, or the kettlebell at your chest. Ste
 
 **SQT-11 · Lateral lunge** — Adductor, Quad, Glute · 8/side · 60 · Diff 2 · Stand · Counteracts: no side-to-side loading, stiff adductors.
 
-From a wide stance with toes forward, sit back into one hip, bending that knee while the other leg stays straight. Keep the bent-side heel down and the chest up, then push back to centre. Do all the reps to one side, then switch.
+From a wide stance with toes forward, sit back into one hip, bending that knee while the other leg stays straight. Keep the bent-side heel down and the chest up, then push back to center. Do all the reps to one side, then switch.
 
 **SQT-12 · Goblet lateral lunge** — Adductor, Quad, Glute · 8/side · 60 · Diff 2 · Stand (DB/KB) · Load M · Counteracts: no side-to-side loading, adductor weakness.
 
-Hold a dumbbell or the kettlebell at your chest as for a goblet squat. From a wide stance, sit into one hip with the other leg straight, then push back to centre. Finish one side, then switch. Go only as deep as you can with the bent-side heel flat.
+Hold a dumbbell or the kettlebell at your chest as for a goblet squat. From a wide stance, sit into one hip with the other leg straight, then push back to center. Finish one side, then switch. Go only as deep as you can with the bent-side heel flat.
 
 **SQT-13 · Curtsy lunge** — Glute, Quad, Adductor · 10/side · 60 · Diff 2 · Stand · Counteracts: weak side glutes, hip stiffness.
 
@@ -154,7 +154,7 @@ Stand holding a dumbbell in each hand in front of your thighs, or the kettlebell
 
 **HNG-09 · Sumo deadlift** — Ham, Glute, Adductor · 15 reps · 60 · Diff 1 · Stand (DB/KB) · Load H · **Grip** · Counteracts: posterior chain weakness, adductor weakness.
 
-Stand wide with toes turned out and the kettlebell, or one dumbbell standing on its end, on the floor between your feet. Push the hips back and bend the knees until you can grip it with a flat back, then stand tall by driving the hips forward. Lower it under control and just tap the floor, or stop a few centimetres above it to stay quiet.
+Stand wide with toes turned out and the kettlebell, or one dumbbell standing on its end, on the floor between your feet. Push the hips back and bend the knees until you can grip it with a flat back, then stand tall by driving the hips forward. Lower it under control and just tap the floor, or stop a few centimeters above it to stay quiet.
 
 **HNG-10 · Kettlebell swing** — Glute, Ham, Full · 20 reps · 60 · Diff 3 · Stand (KB) · Load H · **Grip** · Counteracts: posterior chain weakness, low power.
 
@@ -178,7 +178,7 @@ Stand with one foot slightly behind the other, rear heel up and only the ball of
 
 **HNG-15 · Prone back extension** — L-spine/Core, Glute · 15 reps · 60 · Diff 1 · Floor · Counteracts: weak back extensors from a supported seat.
 
-Lie face down with your hands lightly at your temples and legs straight. Squeeze the glutes and lift the chest a few centimetres off the floor using the back muscles, hold 1 s, and lower slowly. Keep the chin tucked and the eyes looking at the floor.
+Lie face down with your hands lightly at your temples and legs straight. Squeeze the glutes and lift the chest a few centimeters off the floor using the back muscles, hold 1 s, and lower slowly. Keep the chin tucked and the eyes looking at the floor.
 
 **HNG-16 · Frog pump** — Glute · 20 reps · 60 · Diff 1 · Floor · Counteracts: glute inhibition.
 
@@ -276,11 +276,11 @@ Lie face down with your forehead resting on the floor and chin tucked. With thum
 
 **PUL-02 · Reverse snow angel** — Shoulder, T-spine · 10 reps · 60 · Diff 2 · Floor · Counteracts: weak posterior shoulder.
 
-Lie face down with arms at your sides, palms down, forehead on the floor. Lift both arms a few centimetres and sweep them slowly out and up overhead like a snow angel, then back to the hips, without letting them touch the floor. Keep the shoulder blades pulled down.
+Lie face down with arms at your sides, palms down, forehead on the floor. Lift both arms a few centimeters and sweep them slowly out and up overhead like a snow angel, then back to the hips, without letting them touch the floor. Keep the shoulder blades pulled down.
 
 **PUL-03 · Prone lat pull-down** — Shoulder, T-spine · 15 reps · 60 · Diff 1 · Floor · Counteracts: weak lats and lower traps.
 
-Lie face down with arms reaching overhead, thumbs up, and lift them a few centimetres off the floor. Pull the elbows down toward your ribs as if pulling a bar to your chest, squeeze the shoulder blades together for 1 s, then reach back overhead. The arms stay off the floor for the whole set.
+Lie face down with arms reaching overhead, thumbs up, and lift them a few centimeters off the floor. Pull the elbows down toward your ribs as if pulling a bar to your chest, squeeze the shoulder blades together for 1 s, then reach back overhead. The arms stay off the floor for the whole set.
 
 **PUL-04 · Prone cobra hold** — T-spine, Shoulder · 6 × 5 s · 60 · Diff 1 · Floor · Counteracts: rounded upper back, weak mid-back.
 
@@ -374,7 +374,7 @@ Start on hands and knees with toes tucked under. Brace the belly and lift the kn
 
 **COR-08 · Hollow body hold** — L-spine/Core · 4 × 10 s · 60 · Diff 3 · Floor · Counteracts: weak anterior core.
 
-Lie on your back, press the low back firmly into the floor, and lift the head, shoulders, and legs a few centimetres, arms reaching toward the feet. Hold for 10 s, keeping the low back down and breathing steadily, then rest briefly and repeat. Bend the knees to make it easier.
+Lie on your back, press the low back firmly into the floor, and lift the head, shoulders, and legs a few centimeters, arms reaching toward the feet. Hold for 10 s, keeping the low back down and breathing steadily, then rest briefly and repeat. Bend the knees to make it easier.
 
 **COR-09 · Reverse crunch** — L-spine/Core · 15 reps · 60 · Diff 1 · Floor · Counteracts: weak lower abs.
 
@@ -444,7 +444,7 @@ Lie on your side with the bottom knee bent and the top leg straight, in line wit
 
 **ACC-07 · Side-lying adductor raise** — Adductor · 10/side · 60 · Diff 1 · Floor · Counteracts: weak adductors.
 
-Lie on your side, propped on the forearm, and cross the top leg over so its foot is flat on the floor in front of the bottom knee. Keeping the bottom leg straight, lift it a few centimetres off the floor using the inner thigh, hold for 1 s, then lower. Switch sides at the chime.
+Lie on your side, propped on the forearm, and cross the top leg over so its foot is flat on the floor in front of the bottom knee. Keeping the bottom leg straight, lift it a few centimeters off the floor using the inner thigh, hold for 1 s, then lower. Switch sides at the chime.
 
 **ACC-08 · Copenhagen plank (short lever)** — Adductor, L-spine/Core · 20 s/side · 60 · Diff 3 · Floor/Chair · Counteracts: weak adductors.
 
@@ -452,11 +452,11 @@ Lie on your side beside a fixed or braced chair, propped on the forearm. Rest th
 
 **ACC-09 · Standing hip hike** — Glute · 12/side · 60 · Diff 1 · Stand · Counteracts: weak side glutes, hip drop when walking.
 
-Stand on one leg, a fingertip on the desk if you need it, standing knee straight and the other foot just off the floor. Let the free-side hip drop a few centimetres, then lift it back up level and a little higher using the outer hip of the standing leg. Keep the torso upright. Switch sides at the chime.
+Stand on one leg, a fingertip on the desk if you need it, standing knee straight and the other foot just off the floor. Let the free-side hip drop a few centimeters, then lift it back up level and a little higher using the outer hip of the standing leg. Keep the torso upright. Switch sides at the chime.
 
 **ACC-10 · Deep neck flexor head lift** — Neck · 6 × 5 s · 60 · Diff 2 · Floor · Counteracts: weak deep neck flexors, forward head.
 
-Lie on your back with knees bent and no pillow. Tuck the chin gently as if nodding "yes", then lift the head about a centimetre off the floor, keeping the chin tucked. Hold for 5 s without letting the chin poke forward, then rest for a few seconds.
+Lie on your back with knees bent and no pillow. Tuck the chin gently as if nodding "yes", then lift the head about a centimeter off the floor, keeping the chin tucked. Hold for 5 s without letting the chin poke forward, then rest for a few seconds.
 
 **ACC-11 · Wall-press knee hold** — Glute, Hip · 25 s/side · 60 · Diff 1 · Stand/Wall · Counteracts: weak side glutes.
 
@@ -468,7 +468,7 @@ Every END movement is bodyweight only and tagged **Micro**. The floor and the ch
 
 **END-01 · Standing knee-lift hold** — Hip, L-spine/Core · 25 s/side · 60 · Diff 1 · Stand · **Micro** · Counteracts: deep hip flexion range never used in a chair.
 
-Stand tall with a fingertip on the desk. Lift one knee as high above hip height as you can without rounding the back or leaning back, and hold it there with the leg muscles alone; every few seconds, try to lift it a centimetre higher. Switch legs at the chime.
+Stand tall with a fingertip on the desk. Lift one knee as high above hip height as you can without rounding the back or leaning back, and hold it there with the leg muscles alone; every few seconds, try to lift it a centimeter higher. Switch legs at the chime.
 
 **END-02 · Seated knee lift-off** — Hip · 6/side · 60 · Diff 2 · Chair · **Micro** · Counteracts: weak hip flexors at full flexion.
 
@@ -476,7 +476,7 @@ Sit tall on the front of the chair with your hands holding the sides of the seat
 
 **END-03 · Seated straight-leg lift-off** — Hip, Quad, L-spine/Core · 6/side · 60 · Diff 3 · Floor · **Micro** · Counteracts: weak hip flexors in a compressed position.
 
-Sit on the floor with legs straight and hands on the floor beside the knees, sitting as tall as you can. Keeping the knee locked, lift one heel a few centimetres off the floor, hold for 2 s, and lower slowly. If the heel won't lift, put the hands on the floor behind the hips and lean back slightly. Switch legs at the chime.
+Sit on the floor with legs straight and hands on the floor beside the knees, sitting as tall as you can. Keeping the knee locked, lift one heel a few centimeters off the floor, hold for 2 s, and lower slowly. If the heel won't lift, put the hands on the floor behind the hips and lean back slightly. Switch legs at the chime.
 
 **END-04 · 90/90 back-leg lift-off** — Hip · 6/side · 60 · Diff 2 · Floor · **Micro** · Counteracts: lost hip internal rotation.
 
@@ -488,7 +488,7 @@ Kneel on one knee, other foot flat in front, tuck the pelvis, and squeeze the re
 
 **END-06 · Cossack squat with end-range pause** — Adductor, Hip · 4/side · 60 · Diff 2 · Stand · **Micro** · Counteracts: stiff adductors, no side-to-side range.
 
-Take a wide stance with toes slightly out. Shift to one side and bend that knee deeply while the other leg stays straight with its toes pointing up. Pause for 2 s at your lowest point, trying to sink a little further, then push back to centre. Do all reps on one side, then switch.
+Take a wide stance with toes slightly out. Shift to one side and bend that knee deeply while the other leg stays straight with its toes pointing up. Pause for 2 s at your lowest point, trying to sink a little further, then push back to center. Do all reps on one side, then switch.
 
 **END-07 · Deep squat hold with reach** — Hip, Calf/Ankle, T-spine · 30 s · 30 · Diff 2 · Stand · **Micro** · Counteracts: compressed hips, stiff ankles.
 
@@ -508,7 +508,7 @@ Kneel on all fours, then extend one leg straight out to the side with the foot f
 
 **END-11 · Prone straight-leg hip extension** — Glute, Hip · 8/side · 60 · Diff 1 · Floor · **Micro** · Counteracts: glutes never working at full hip extension.
 
-Lie face down with your forehead on your stacked hands. Squeeze one glute to lift that straight leg a few centimetres off the floor, hold for 2 s, and lower; the hip bones stay pressed down. Switch legs at the chime.
+Lie face down with your forehead on your stacked hands. Squeeze one glute to lift that straight leg a few centimeters off the floor, hold for 2 s, and lower; the hip bones stay pressed down. Switch legs at the chime.
 
 **END-12 · Standing hip airplane** — Hip, Glute · 4/side · 60 · Diff 3 · Stand · **Micro** · Counteracts: weak hip rotators, balance loss.
 
@@ -540,11 +540,11 @@ On hands and knees, sit the hips back halfway toward the heels and put one hand 
 
 **END-19 · Seated rotation lift-off** — T-spine · 5/side · 60 · Diff 1 · Chair · **Micro** · Counteracts: thoracic rotation loss.
 
-Sit sideways on the chair with the backrest beside you, feet flat and knees together. Rotate toward the backrest as far as you can, using both hands on it to pull into the end of the turn, then let go and hold the position with your trunk muscles alone for 3 s while trying to turn further. Return to centre. At the chime, sit facing the other way and repeat.
+Sit sideways on the chair with the backrest beside you, feet flat and knees together. Rotate toward the backrest as far as you can, using both hands on it to pull into the end of the turn, then let go and hold the position with your trunk muscles alone for 3 s while trying to turn further. Return to center. At the chime, sit facing the other way and repeat.
 
 **END-20 · Sphinx lift-off** — T-spine, L-spine/Core, Shoulder · 6 reps · 30 · Diff 2 · Floor · **Micro** · Counteracts: spinal extension range lost to slouching.
 
-Lie face down propped on your forearms, elbows under the shoulders, chest up. Keeping the chest where it is, lift both forearms a centimetre off the floor and hold for 2 s using the back muscles, then set them down. Keep the neck long.
+Lie face down propped on your forearms, elbows under the shoulders, chest up. Keeping the chest where it is, lift both forearms a centimeter off the floor and hold for 2 s using the back muscles, then set them down. Keep the neck long.
 
 **END-21 · Standing side-bend lift-off** — L-spine/Core, T-spine · 5/side · 60 · Diff 1 · Stand · **Micro** · Counteracts: side-bending range never used.
 
@@ -552,7 +552,7 @@ Stand with feet hip width and reach one arm overhead. Bend sideways away from th
 
 **END-22 · Open book with lift-off** — T-spine, Chest · 5/side · 60 · Diff 1 · Floor · **Micro** · Counteracts: thoracic rotation loss, tight chest.
 
-Lie on your side with knees bent to 90° and stacked, both arms straight out in front. Keeping the knees together, arc the top arm over to the other side, letting the chest follow. At the end of the turn, lift that hand a centimetre off the floor and hold for 2 s, then return. Switch sides at the chime.
+Lie on your side with knees bent to 90° and stacked, both arms straight out in front. Keeping the knees together, arc the top arm over to the other side, letting the chest follow. At the end of the turn, lift that hand a centimeter off the floor and hold for 2 s, then return. Switch sides at the chime.
 
 **END-23 · Segmental cat-cow** — T-spine, L-spine/Core · 30 s · 30 · Diff 1 · Floor · **Micro** · Counteracts: spinal stiffness.
 
@@ -564,7 +564,7 @@ Stand tall, make a loose fist, and brace the trunk so nothing moves but the arm.
 
 **END-25 · Wall-facing overhead lift-off** — Shoulder, T-spine · 8 reps · 30 · Diff 2 · Stand/Wall · **Micro** · Counteracts: lost overhead range, weak lower traps.
 
-Stand facing a wall with toes about 30 cm from it, arms overhead in a Y, thumbs pointing back, palms on the wall. Without arching the low back, lift both hands a centimetre or two off the wall, hold for 2 s, and touch back. Step closer to the wall to make it harder.
+Stand facing a wall with toes about 30 cm from it, arms overhead in a Y, thumbs pointing back, palms on the wall. Without arching the low back, lift both hands a centimeter or two off the wall, hold for 2 s, and touch back. Step closer to the wall to make it harder.
 
 **END-26 · Behind-the-back arm lift** — Shoulder, Chest · 8 reps · 30 · Diff 1 · Stand · **Micro** · Counteracts: tight chest, weak shoulder extension.
 
@@ -572,7 +572,7 @@ Stand tall with straight arms by your sides, palms facing behind you. Squeeze th
 
 **END-27 · Prone overhead lift-off** — Shoulder, T-spine · 8 reps · 30 · Diff 2 · Floor · **Micro** · Counteracts: lost overhead range.
 
-Lie face down with arms overhead in a Y, thumbs up, forehead on the floor. Lift both arms a few centimetres off the floor, hold for 2 s, and lower. Keep the low back relaxed; the lift comes from between the shoulder blades.
+Lie face down with arms overhead in a Y, thumbs up, forehead on the floor. Lift both arms a few centimeters off the floor, hold for 2 s, and lower. Keep the low back relaxed; the lift comes from between the shoulder blades.
 
 **END-28 · Prone 90/90 external rotation lift-off** — Shoulder · 6/side · 60 · Diff 2 · Floor · **Micro** · Counteracts: weak rotator cuff at end range.
 
@@ -580,11 +580,11 @@ Lie face down with one upper arm out to the side at shoulder height and the elbo
 
 **END-29 · Wall slide with lift-off** — Shoulder, T-spine · 6 reps · 30 · Diff 2 · Stand/Wall · **Micro** · Counteracts: weak lower traps.
 
-Face a wall with forearms flat on it, elbows at shoulder height. Slide the arms up until they're nearly straight, then lift the forearms a centimetre off the wall and hold for 2 s. Return to the wall and slide back down, keeping the ribs down.
+Face a wall with forearms flat on it, elbows at shoulder height. Slide the arms up until they're nearly straight, then lift the forearms a centimeter off the wall and hold for 2 s. Return to the wall and slide back down, keeping the ribs down.
 
 **END-30 · Hand-behind-back lift-off** — Shoulder · 6/side · 60 · Diff 2 · Stand · **Micro** · Counteracts: lost shoulder internal rotation.
 
-Stand tall and place the back of one hand against your low back, palm facing out, elbow bent. Without arching the back or tipping the shoulder forward, lift the hand a few centimetres away from the body and hold for 2 s, then touch back. Slide the hand higher up the back as this gets easier. Switch arms at the chime.
+Stand tall and place the back of one hand against your low back, palm facing out, elbow bent. Without arching the back or tipping the shoulder forward, lift the hand a few centimeters away from the body and hold for 2 s, then touch back. Slide the hand higher up the back as this gets easier. Switch arms at the chime.
 
 **END-31 · Chin tuck hold** — Neck · 6 × 4 s · 30 · Diff 1 · Chair · **Micro** · Counteracts: forward head posture.
 
@@ -592,11 +592,11 @@ Sit or stand tall, eyes level. Glide the head straight back, making a double chi
 
 **END-32 · Neck side-bend isometric** — Neck · 30 s/side · 60 · Diff 1 · Chair · **Micro** · Counteracts: tight upper traps, stiff neck.
 
-Sit tall and tilt one ear toward the shoulder as far as is comfortable. Reach the hand on the side you're tilting toward over the top of your head to the opposite ear, and press the head back toward centre into the hand at about 20% effort for 5 s, then relax and let the hand ease the head a little further. Repeat once more, then take the hand away and hold the tilt on your own for the last few seconds. Switch sides at the chime.
+Sit tall and tilt one ear toward the shoulder as far as is comfortable. Reach the hand on the side you're tilting toward over the top of your head to the opposite ear, and press the head back toward center into the hand at about 20% effort for 5 s, then relax and let the hand ease the head a little further. Repeat once more, then take the hand away and hold the tilt on your own for the last few seconds. Switch sides at the chime.
 
 **END-33 · Neck rotation end-range hold** — Neck · 4/side, 3 s hold · 60 · Diff 1 · Chair · **Micro** · Counteracts: lost neck rotation.
 
-Sit tall with the shoulders still. Turn the head as far as you can to one side, leading with the eyes, hold for 3 s while gently trying to turn a little further, then return to centre. Switch sides at the chime.
+Sit tall with the shoulders still. Turn the head as far as you can to one side, leading with the eyes, hold for 3 s while gently trying to turn a little further, then return to center. Switch sides at the chime.
 
 **END-34 · Half-kneeling ankle rock** — Calf/Ankle · 8/side · 60 · Diff 1 · Floor · **Micro** · Counteracts: stiff ankles.
 

@@ -51,7 +51,7 @@ Buckets: **FLX** flexibility & mobility, **CIR** blood flow & circulation, **STR
 
 **FLX-01 · Standing hip flexor stretch** — Hip · 30 s/side · 60 · Diff 1 · Stand · **Micro** · Family: Hip-flexor stretches · Counteracts: hip flexor shortening.
 
-Step one foot back about a metre, both feet pointing forward, rear heel up. Tuck your tailbone under (as if zipping tight jeans), squeeze the rear glute, and reach the same-side arm overhead. You should feel the front of the rear hip, not the low back. Keep the front knee over the ankle.
+Step one foot back about a meter, both feet pointing forward, rear heel up. Tuck your tailbone under (as if zipping tight jeans), squeeze the rear glute, and reach the same-side arm overhead. You should feel the front of the rear hip, not the low back. Keep the front knee over the ankle.
 
 **FLX-02 · Half-kneeling hip flexor stretch** — Hip · 30 s/side · 60 · Diff 1 · Floor · Requires floor · Family: Hip-flexor stretches · Counteracts: hip flexor shortening.
 
@@ -83,7 +83,7 @@ Feet slightly wider than the hips and turned out a little, sink as low as you ca
 
 **FLX-09 · Cossack squat (slow)** — Adductor, Hip · 5 reps/side · 75 · Diff 2 · Stand · Family: Lateral lunges · Counteracts: adductor and hip stiffness.
 
-Take a wide stance, toes pointed slightly out. Shift your weight to one side and bend that knee deeply while the other leg stays straight, toes pointing up. Keep the bent-side heel down and the chest up, then push back to centre and go the other way. Depth comes with practice.
+Take a wide stance, toes pointed slightly out. Shift your weight to one side and bend that knee deeply while the other leg stays straight, toes pointing up. Keep the bent-side heel down and the chest up, then push back to center and go the other way. Depth comes with practice.
 
 **FLX-10 · Active hamstring sweep** — Ham · 6 reps/side · 60 · Diff 1 · Stand · **Micro** · Counteracts: hamstring tightness.
 
@@ -127,7 +127,7 @@ Place both hands on the desk edge, shoulder width, and step back until the arms 
 
 **FLX-20 · Standing side-bend reach** — L-spine/Core, Shoulder · 20 s/side · 60 · Diff 1 · Stand · **Micro** · Counteracts: QL/lat tightness, rib immobility.
 
-Reach one arm straight overhead and place the other hand on the hip. Lean sideways away from the raised arm, keeping both feet planted and hips square. Breathe into the ribs on the open side. Come back through centre before switching.
+Reach one arm straight overhead and place the other hand on the hip. Lean sideways away from the raised arm, keeping both feet planted and hips square. Breathe into the ribs on the open side. Come back through center before switching.
 
 **FLX-21 · Chin tucks** — Neck · 10 × 3 s · 45 · Diff 1 · Chair/Stand · **Micro** · Family: Chin tucks · Counteracts: forward head.
 
@@ -159,7 +159,7 @@ Stand with feet hip width, knees soft, hands crossed on the chest. Rotate the ri
 
 **FLX-28 · Downward dog with pedals** — Ham, Calf/Ankle, Shoulder · 45 s · 60 · Diff 2 · Floor · Requires floor · Counteracts: posterior chain tightness.
 
-From hands and knees, tuck the toes and lift the hips up and back so the body makes an inverted V, arms straight, heels reaching toward the floor. Alternately bend one knee while pressing the other heel down, pedalling slowly. Keep the spine long; a bent knee is fine.
+From hands and knees, tuck the toes and lift the hips up and back so the body makes an inverted V, arms straight, heels reaching toward the floor. Alternately bend one knee while pressing the other heel down, pedaling slowly. Keep the spine long; a bent knee is fine.
 
 **FLX-29 · Wall calf stretch** — Calf/Ankle · 20 s × 2/side · 80 · Diff 1 · Wall · Requires wall · Counteracts: gastroc/soleus stiffness.
 
@@ -177,9 +177,9 @@ Stand on one leg, holding a wall if needed, and grab the other ankle behind you.
 
 Lie face down with hands under the shoulders. Press through the hands to lift the chest while the hips and legs stay relaxed on the floor, letting the low back arch. Go only as high as is comfortable, hold 2 s, and lower.
 
-**FLX-33 · Child's pose with side reach** — L-spine/Core, Shoulder · 20 s centre + 20 s/side · 60 · Diff 1 · Floor · Requires floor · Counteracts: lumbar and lat stiffness.
+**FLX-33 · Child's pose with side reach** — L-spine/Core, Shoulder · 20 s center + 20 s/side · 60 · Diff 1 · Floor · Requires floor · Counteracts: lumbar and lat stiffness.
 
-Kneel and sit back toward the heels, arms stretched forward on the floor, forehead down. Breathe into the low back. Then walk both hands to one side, keeping the hips centred, to stretch the side of the torso. Repeat on the other side.
+Kneel and sit back toward the heels, arms stretched forward on the floor, forehead down. Breathe into the low back. Then walk both hands to one side, keeping the hips centered, to stretch the side of the torso. Repeat on the other side.
 
 **FLX-34 · Squat-to-stand** — Hip, Ham, T-spine · 8 reps · 60 · Diff 2 · Stand · Counteracts: whole posterior chain and hips.
 
@@ -203,7 +203,7 @@ Standing or sitting, place a lacrosse or tennis ball under the arch of one foot.
 
 **FLX-39 · Seated spinal twist** — T-spine, L-spine/Core · 30 s/side · 60 · Diff 1 · Chair · **Micro** · Counteracts: trunk rotation stiffness.
 
-Sit tall near the front of the chair, feet flat. Turn your chest to the right, placing the left hand on the outside of the right knee and the right hand on the chair seat behind you. Grow taller on each inhale and turn a little further on each exhale, keeping both sit bones down. Come back through centre before switching.
+Sit tall near the front of the chair, feet flat. Turn your chest to the right, placing the left hand on the outside of the right knee and the right hand on the chair seat behind you. Grow taller on each inhale and turn a little further on each exhale, keeping both sit bones down. Come back through center before switching.
 
 **FLX-40 · Cross-body shoulder stretch** — Shoulder · 30 s/side · 60 · Diff 1 · Stand/Chair · **Micro** · Counteracts: posterior shoulder tightness.
 
@@ -451,11 +451,11 @@ Stand tall with feet hip width. Squeeze both glutes as hard as you can, as if pi
 
 **STR-36 · Deep neck flexor hold** — Neck · 5 × 10 s · 60 · Diff 2 · Floor · Requires floor · Family: Chin tucks · Counteracts: weak deep neck flexors, forward head.
 
-Lie on your back with knees bent, no pillow. Tuck the chin gently as if nodding "yes", then lift the head about a centimetre off the floor, keeping the chin tucked. Hold 10 s without letting the chin poke forward, then rest.
+Lie on your back with knees bent, no pillow. Tuck the chin gently as if nodding "yes", then lift the head about a centimeter off the floor, keeping the chin tucked. Hold 10 s without letting the chin poke forward, then rest.
 
 **STR-37 · Wall slide with lift-off** — Shoulder, T-spine · 8 reps · 60 · Diff 2 · Wall · Requires wall · Family: Wall slides · Counteracts: weak lower traps.
 
-Face a wall with forearms and hands flat on it, elbows at shoulder height. Slide the arms up the wall until they're nearly straight, then press the forearms lightly into the wall and lift them a centimetre off it, holding 2 s. Return to the wall and slide back down. Keep the ribs down.
+Face a wall with forearms and hands flat on it, elbows at shoulder height. Slide the arms up the wall until they're nearly straight, then press the forearms lightly into the wall and lift them a centimeter off it, holding 2 s. Return to the wall and slide back down. Keep the ribs down.
 
 **STR-38 · Hip hinge with band abduction** — Glute, Ham · 12 reps · 45 · Diff 1 · Stand (Band) · Counteracts: glute inhibition, valgus tendency.
 
@@ -479,7 +479,7 @@ Lie on your back with the hands under the hips, press the low back into the floo
 
 **STR-43 · Bicycle crunch** — L-spine/Core · 20 reps · 60 · Diff 2 · Floor · Requires floor · Family: Crunches · Counteracts: weak obliques, trunk stiffness.
 
-Lie on your back with fingertips behind the ears and both knees lifted to 90°. Curl the shoulders up, then turn the right elbow toward the left knee as the right leg straightens out, and switch sides in a slow pedalling rhythm. Rotate from the ribs, not the neck, and keep the low back pressed down.
+Lie on your back with fingertips behind the ears and both knees lifted to 90°. Curl the shoulders up, then turn the right elbow toward the left knee as the right leg straightens out, and switch sides in a slow pedaling rhythm. Rotate from the ribs, not the neck, and keep the low back pressed down.
 
 **STR-44 · Reverse crunch** — L-spine/Core · 12 reps · 60 · Diff 2 · Floor · Requires floor · Family: Leg raises · Counteracts: weak lower abdominals.
 
@@ -567,7 +567,7 @@ Walk forward in a straight line placing the heel of each step directly against t
 
 **BAL-06 · Single-leg reach (Y-balance)** — Hip, Glute · 3 rounds/side · 90 · Diff 2 · Stand · Counteracts: hip control, ankle stability.
 
-Stand on one leg with a slight knee bend. Reach the free foot as far as you can straight forward and tap the floor lightly, return to centre, then reach diagonally back to one side, return, then diagonally back to the other side. Keep the standing heel down and hips level. Switch legs.
+Stand on one leg with a slight knee bend. Reach the free foot as far as you can straight forward and tap the floor lightly, return to center, then reach diagonally back to one side, return, then diagonally back to the other side. Keep the standing heel down and hips level. Switch legs.
 
 **BAL-07 · Airplane / single-leg hinge hold** — Ham, Glute · 20 s/side · 60 · Diff 2 · Stand · Family: Single-leg hinges · Counteracts: posterior chain control.
 
@@ -579,7 +579,7 @@ Fold a towel a few times or use a firm cushion and stand on it on one foot. The 
 
 **BAL-09 · Clock toe taps** — Hip, Glute · 2 rounds/side · 75 · Diff 2 · Stand · Counteracts: hip control.
 
-Imagine standing at the centre of a clock face on one leg. With the free foot, tap lightly to 12 o'clock, then 3, 6, and 9 (going behind or across the body as needed), returning to centre between taps. Keep the standing knee soft and the torso upright. Switch legs.
+Imagine standing at the center of a clock face on one leg. With the free foot, tap lightly to 12 o'clock, then 3, 6, and 9 (going behind or across the body as needed), returning to center between taps. Keep the standing knee soft and the torso upright. Switch legs.
 
 **BAL-10 · Single-leg mini-squat** — Quad, Glute · 8/side · 75 · Diff 2 · Stand · Counteracts: knee and hip control.
 
@@ -623,7 +623,7 @@ Stand on one leg and hold the other ankle behind you with the same-side hand, kn
 
 **BAL-20 · Hand-to-knee hold** — Hip, Core · 20 s/side · 60 · Diff 2 · Stand · **Micro** · Family: Knee-lift holds · Counteracts: hip flexor strength through range, standing stability.
 
-Stand on one leg and hold the other knee with the same-side hand, thigh at hip height. Once steady, open the knee out to the side, keeping the hips square and the standing leg straight. Hold, bring the knee back to centre, and lower. Switch sides.
+Stand on one leg and hold the other knee with the same-side hand, thigh at hip height. Once steady, open the knee out to the side, keeping the hips square and the standing leg straight. Hold, bring the knee back to center, and lower. Switch sides.
 
 **BAL-21 · Chair-to-single-leg stand** — Glute, Quad, Full · 5/side · 75 · Diff 2 · Chair · Counteracts: weak sit-to-stand, single-leg control.
 
