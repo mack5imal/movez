@@ -384,3 +384,9 @@ are in `docs/rule-changes-2026-10.md` and `scripts/simulate_selection.py`.
     morning after a night away read "Sitting for 17 h" although standby had restarted everything.
     It now measures from the bout start, which a completed break, a reset absence and standby all
     move to their end and a paused absence shifts forward by its length, so it counts desk time only.
+49. **The whole break shows on every display.** The handoff put the card only on the display with
+    the cursor and gave the others the dim with "MOVEMENT BREAK · 4:12 left", which left someone
+    facing the other screen with nothing to follow. Every display now gets the full card. All of
+    them run off the one break, so the timer, the buttons, the side toggle and a collapsed
+    instruction stay in step whichever screen is used, and each chime plays once. The display with
+    the cursor still holds keyboard focus, and the arrow, Return and Space keys work from anywhere.

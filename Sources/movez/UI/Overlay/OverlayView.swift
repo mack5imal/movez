@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// The break itself: a 1000×660 card centred on the active display, with the timer disc sitting
-/// on its top-right corner.
+/// The break itself: a 1000×660 card centred on each display, with the timer disc sitting on its
+/// top-right corner.
 struct OverlayView: View {
     var state: OverlayState
     var actions = OverlayActions()
@@ -158,15 +158,5 @@ struct SideToggle: View {
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(side == target ? [.isButton, .isSelected] : .isButton)
-    }
-}
-
-/// What the other displays show while a break runs.
-struct OtherDisplayLabel: View {
-    var timeLeft: String
-
-    var body: some View {
-        MovezText("MOVEMENT BREAK · \(timeLeft)", MovezType.eyebrowOverlay, color: Tokens.text2, alignment: .center)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }

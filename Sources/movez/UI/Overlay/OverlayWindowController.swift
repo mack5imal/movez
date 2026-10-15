@@ -46,14 +46,16 @@ final class OverlayWindowController {
         // be key — which is what lets keystrokes fall through to whatever is underneath.
         activateApp()
 
+        // Every display shows the whole break, all driven by the one view model, so a user who
+        // looks at either screen can follow it and use its buttons. The display with the cursor
+        // only decides which window is key; the key monitor hears the keyboard whichever it is.
         let cursorScreen = PanelWindowController.activeScreen()
         var activeWindow: NSWindow?
         for screen in NSScreen.screens {
-            let isActive = screen == cursorScreen
-            let window = makeWindow(on: screen, active: isActive)
+            let window = makeWindow(on: screen)
             windows.append(window)
             window.orderFrontRegardless()
-            if isActive { activeWindow = window }
+            if screen == cursorScreen { activeWindow = window }
         }
 
         guard let activeWindow else { return }
@@ -75,7 +77,7 @@ final class OverlayWindowController {
         NSRunningApplication.current.activate(options: [.activateAllWindows])
     }
 
-    private func makeWindow(on screen: NSScreen, active: Bool) -> NSWindow {
+    private func makeWindow(on screen: NSScreen) -> NSWindow {
         let window = OverlayWindow(
             contentRect: dimFrame(for: screen),
             styleMask: [.borderless, .nonactivatingPanel],
@@ -93,15 +95,15 @@ final class OverlayWindowController {
         // Above fullscreen apps, on every Space, and it does not follow the user between Spaces.
         window.level = NSWindow.Level(rawValue: Int(CGShieldingWindowLevel()))
         window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary]
-        window.contentView = NSHostingView(rootView: content(active: active))
+        window.contentView = NSHostingView(rootView: content())
         window.setFrame(dimFrame(for: screen), display: true)
         return window
     }
 
     @ViewBuilder
-    private func content(active: Bool) -> some View {
+    private func content() -> some View {
         if let viewModel {
-            OverlayScreen(viewModel: viewModel, showsCard: active)
+            OverlayScreen(viewModel: viewModel)
         } else {
             Color.clear
         }
@@ -147,7 +149,7 @@ final class OverlayWindowController {
         }
     }
 
-    /// A display plugged in or unplugged mid-break gets its own dim rather than a gap.
+    /// A display plugged in or unplugged mid-break gets its own copy of the break rather than a gap.
     private func rebuildForScreenChange() {
         guard isPresenting, viewModel != nil else { return }
         closeWindows()
@@ -238,7 +240,6 @@ final class OverlayWindowController {
 /// One screen's worth of overlay: the dim, and the card if this is the screen the user is on.
 struct OverlayScreen: View {
     @ObservedObject var viewModel: OverlayViewModel
-    var showsCard: Bool
 
     var body: some View {
         ZStack {
@@ -246,12 +247,8 @@ struct OverlayScreen: View {
             (viewModel.state.phase == .complete ? Tokens.dimEnd : Tokens.dim).color
                 .animation(.easeInOut(duration: 0.3), value: viewModel.state.phase)
 
-            if showsCard {
-                OverlayView(state: viewModel.state, actions: actions, animated: viewModel.animationsEnabled)
-                    .transition(.opacity)
-            } else {
-                OtherDisplayLabel(timeLeft: "\(OverlayState.clock(viewModel.breakRemaining)) left")
-            }
+            OverlayView(state: viewModel.state, actions: actions, animated: viewModel.animationsEnabled)
+                .transition(.opacity)
         }
         .ignoresSafeArea()
     }

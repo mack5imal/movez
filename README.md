@@ -86,7 +86,7 @@ screen is reviewed without waiting an hour for a break to come round.
 | Surface | What it is |
 |---|---|
 | `gallery` | Every colour, type style and control in the design system on one sheet |
-| `overlay-full`, `overlay-collapsed`, `overlay-side`, `overlay-end`, `overlay-other-display` | The full break: a movement running, an instruction the user has collapsed, a per-side movement, the end card, and what the other displays show |
+| `overlay-full`, `overlay-collapsed`, `overlay-side`, `overlay-end` | The full break, shown on every display: a movement running, an instruction the user has collapsed, a per-side movement, and the end card |
 | `headsup`, `headsup-deferred` | The minute before a break, and the variant for a break that waited for a call |
 | `micro-countin`, `micro-running` | The micro-break's thirty-second count-in and its minute |
 | `toast` | "Away 7 min · counted as your break", with the reversal |
