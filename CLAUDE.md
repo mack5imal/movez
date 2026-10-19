@@ -98,4 +98,3 @@ fixtures so `make snapshots` covers it.
 - Everything that touches state or UI is `@MainActor`; strict concurrency is `targeted`.
 - Comments explain *why*, in full sentences, matching the existing doc comments.
 - Commit subjects use `feat:` / `fix:` / `docs:` prefixes, lower-case, describing behaviour.
-- `.supergoal/` holds the original build run's roadmap and state; it's history, not something to edit.
