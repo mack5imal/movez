@@ -13,7 +13,10 @@ struct MovezFocusFilterIntent: SetFocusFilterIntent {
         IntentDescription("Pause movement breaks while this Focus is on.")
     }
 
-    @Parameter(title: "Pause breaks", default: true)
+    /// Off by default, because macOS sends the default whenever no Focus is on: once after every
+    /// boot, and each time a Focus ends. A default of on paused movez at every boot and never let
+    /// a Focus that ended resume it (DECISIONS 51).
+    @Parameter(title: "Pause breaks", default: false)
     var pauseBreaks: Bool
 
     var displayRepresentation: DisplayRepresentation {

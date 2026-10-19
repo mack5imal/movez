@@ -398,3 +398,9 @@ are in `docs/rule-changes-2026-10.md` and `scripts/simulate_selection.py`.
     its `notes`, and the strength library's design rules and its overlap table with the movement
     library as `design_notes` and `overlap_with_movement_library`. `source` is dropped and
     `generated` becomes `updated`, the date of the last edit.
+51. **The Focus filter's "Pause breaks" is off by default** (amending 26). macOS performs a Focus
+    filter with its default values whenever no Focus is on: once after every boot, for every app
+    that has a filter, and each time a Focus ends. With the default on, a reboot paused movez with
+    no Focus running, and a Focus that ended could never resume the breaks it had paused. Off by
+    default, both now leave breaks running, and a pause the user set is still never undone by a
+    Focus. Attaching movez to a Focus means switching "Pause breaks" on in that Focus's filter.
