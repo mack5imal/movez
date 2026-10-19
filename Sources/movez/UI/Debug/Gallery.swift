@@ -13,7 +13,7 @@ struct GalleryView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 34) {
-                MovezText("movez design system", MovezType.panelTitle, color: Tokens.text)
+                MovezText("Movez design system", MovezType.panelTitle, color: Tokens.text)
                 colours
                 typeScale
                 buttons

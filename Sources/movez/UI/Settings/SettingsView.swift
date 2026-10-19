@@ -34,7 +34,7 @@ struct SettingsScreen: View {
 
     private var titleBar: some View {
         ZStack {
-            MovezText("movez settings", MovezType.menuTitle, alignment: .center)
+            MovezText("Movez settings", MovezType.menuTitle, alignment: .center)
         }
         .frame(maxWidth: .infinity)
         .frame(height: Self.titleBarHeight)

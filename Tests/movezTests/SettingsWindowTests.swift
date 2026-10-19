@@ -243,7 +243,7 @@ final class SettingsWindowTests: XCTestCase {
         let build = info["CFBundleVersion"] as? String ?? ""
         XCTAssertEqual(
             viewModel.versionLine,
-            "movez \(version) (\(build)) · library v\(viewModel.library.version) · \(viewModel.library.movements.count) movements"
+            "Movez \(version) (\(build)) · library v\(viewModel.library.version) · \(viewModel.library.movements.count) movements"
         )
     }
 
@@ -253,7 +253,7 @@ final class SettingsWindowTests: XCTestCase {
             info: ["CFBundleShortVersionString": "0.7.2", "CFBundleVersion": "51"],
             library: library
         )
-        XCTAssertEqual(line, "movez 0.7.2 (51) · library v\(library.version) · \(library.movements.count) movements")
+        XCTAssertEqual(line, "Movez 0.7.2 (51) · library v\(library.version) · \(library.movements.count) movements")
     }
 
     /// The version is set once in `project.yml` and the build number is stamped from the commit

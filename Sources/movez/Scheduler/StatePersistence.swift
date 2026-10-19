@@ -11,7 +11,7 @@ enum PersistenceError: LocalizedError, Equatable {
 
     var errorDescription: String? {
         switch self {
-        case .directoryUnavailable(let reason): return "movez could not open its data directory: \(reason)"
+        case .directoryUnavailable(let reason): return "Movez could not open its data directory: \(reason)"
         }
     }
 }

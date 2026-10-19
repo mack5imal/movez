@@ -7,7 +7,7 @@ import Foundation
 /// current Focus, and polling DND state is exactly the kind of guessing that gets these apps
 /// uninstalled — so the user attaches movez to the Focus they care about instead.
 struct MovezFocusFilterIntent: SetFocusFilterIntent {
-    static var title: LocalizedStringResource = "movez"
+    static var title: LocalizedStringResource = "Movez"
 
     static var description: IntentDescription? {
         IntentDescription("Pause movement breaks while this Focus is on.")
@@ -23,8 +23,8 @@ struct MovezFocusFilterIntent: SetFocusFilterIntent {
         DisplayRepresentation(
             title: pauseBreaks ? "Movement breaks paused" : "Movement breaks running",
             subtitle: pauseBreaks
-                ? "movez will wait until this Focus ends."
-                : "movez keeps its usual schedule."
+                ? "Movez will wait until this Focus ends."
+                : "Movez keeps its usual schedule."
         )
     }
 

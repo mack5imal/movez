@@ -144,7 +144,7 @@ struct MenuBarView: View {
         }
         .keyboardShortcut(MenuShortcutSpec.settings.keyEquivalent, modifiers: .command)
 
-        MenuRow(title: "Quit movez", action: actions.quit) {
+        MenuRow(title: "Quit Movez", action: actions.quit) {
             MenuShortcut(text: MenuShortcutSpec.quit.label)
         }
         .keyboardShortcut(MenuShortcutSpec.quit.keyEquivalent, modifiers: .command)

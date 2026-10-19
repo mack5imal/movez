@@ -1,6 +1,6 @@
 # Decisions
 
-Where movez departs from, or resolves an ambiguity in, the product brief, the scheduler research
+Where Movez departs from, or resolves an ambiguity in, the product brief, the scheduler research
 and the design handoff. Each entry says what was decided and why, so a future change can be made
 knowingly rather than by accident.
 
@@ -82,7 +82,7 @@ Sources of truth, in order: `product-brief-v1.md`, `scheduler-research-v1.md`,
     minutes from a break at 00:01, and the alternative — handing back a fresh fifty-five minutes —
     is the one thing a break reminder must never do. This matters most to anyone working across
     midnight, for whom the old behaviour cost a break every night.
-20b. **Time movez was not running is moved past, not judged.** The state file records when it was
+20b. **Time Movez was not running is moved past, not judged.** The state file records when it was
     written, so a relaunch knows whether it was gone for two minutes or two days. A gap shorter
     than the sitting interval shifts the whole bout forward by its length; a gap at least that
     long is standby (23c) and the interval starts again. It is never credited as a break: a
@@ -109,7 +109,7 @@ Sources of truth, in order: `product-brief-v1.md`, `scheduler-research-v1.md`,
 22. **A break counts as done at half the movements or half the time** (research §4.11).
 23. *(Superseded by 43.)* **Idle is credited in two tiers**: three to five minutes hands the countdown back with the
     time it had left; five minutes up to a whole sitting interval is a full break. Both are
-    reversible while the away toast is up, because movez cannot tell a walk to the kitchen from a
+    reversible while the away toast is up, because Movez cannot tell a walk to the kitchen from a
     long read on paper. Longer than that is standby (23c), and is not credited at all.
 23a. **The away toast stays fifteen seconds, chimes, and can be dismissed.** The research (§4.2)
     and the handoff say six seconds. In use the toast nearly always appears the moment a display
@@ -132,7 +132,7 @@ Sources of truth, in order: `product-brief-v1.md`, `scheduler-research-v1.md`,
     56 credited absences against 5 routines actually done. The threshold follows the preset, so
     it is 55 minutes on 55/5 and 25 on 25/5, and the same rule judges a gap when the app was not
     running (20b). What standby does not do is end the day: only midnight does that (20a), and a
-    working day opening while movez was away, which is what a gap crossing working hours means.
+    working day opening while Movez was away, which is what a gap crossing working hours means.
 23d. **The menu shows snoozed and skipped, not done.** "Done" counted credited absences beside
     routines, which made it the one number in the menu that could climb on a day with no movement
     in it at all. It stays in the record, where the streak and the history read it. A break turned
@@ -196,11 +196,11 @@ Sources of truth, in order: `product-brief-v1.md`, `scheduler-research-v1.md`,
 ## Known compromises
 
 25. **Screen-capture detection is a heuristic.** macOS exposes no public API for "my screen is
-    being recorded", so movez watches for the tools people actually use, conservatively: a false
+    being recorded", so Movez watches for the tools people actually use, conservatively: a false
     positive quietly postpones a break, which is better than interrupting a live share. Tools that
     idle in the menu bar all day (Loom, CleanShot X, Kap) are listed but disabled.
 26. **Focus is read through a Focus Filter, not the system.** There is no supported way to read
-    the current Focus, so movez ships a `SetFocusFilterIntent` the user adds to their own Focus.
+    the current Focus, so Movez ships a `SetFocusFilterIntent` the user adds to their own Focus.
 27. **Launch at login needs a permanent home, not a signed build.** `SMAppService` records the
     bundle's path, so an app registered out of `build/DerivedData` stops launching the moment
     `make clean` removes it — install it to `/Applications` before turning the toggle on.
@@ -400,7 +400,13 @@ are in `docs/rule-changes-2026-10.md` and `scripts/simulate_selection.py`.
     `generated` becomes `updated`, the date of the last edit.
 51. **The Focus filter's "Pause breaks" is off by default** (amending 26). macOS performs a Focus
     filter with its default values whenever no Focus is on: once after every boot, for every app
-    that has a filter, and each time a Focus ends. With the default on, a reboot paused movez with
+    that has a filter, and each time a Focus ends. With the default on, a reboot paused Movez with
     no Focus running, and a Focus that ended could never resume the breaks it had paused. Off by
     default, both now leave breaks running, and a pause the user set is still never undone by a
-    Focus. Attaching movez to a Focus means switching "Pause breaks" on in that Focus's filter.
+    Focus. Attaching Movez to a Focus means switching "Pause breaks" on in that Focus's filter.
+52. **The app is called Movez.** Every name a person reads (the Settings window title, "Quit Movez",
+    the version line, the start-up and error messages, the Focus filter's name, and the bundle's
+    display name) and the documentation's prose now say Movez. Everything that is a name on disk
+    or on the web stays lowercase: the repository, `movez.app`, the executable, the bundle
+    identifier `com.kylemack.movez`, the Xcode project and source folders, and the data folder in
+    Application Support, so builds, links, Launch at Login and saved state are untouched.

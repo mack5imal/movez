@@ -1,4 +1,4 @@
-# movez — Scheduler research and recommendations v1
+# Movez — Scheduler research and recommendations v1
 
 Purpose: answer the "spec the scheduler as a state machine" questions from the pre-build checklist, using what the competition does and what their users reward or punish. Section 4 is the part that feeds the product brief and Supergoal intake; sections 2–3 are the evidence.
 
@@ -105,9 +105,9 @@ Table stakes: cover every display, don't leak keystrokes, restore focus, low pow
 
 ---
 
-## 3. Where movez differs from the eye-strain apps
+## 3. Where Movez differs from the eye-strain apps
 
-Most of these products exist to rest eyes and wrists, so "not typing" is a reasonable proxy for "resting." movez exists to break up sitting bouts, which changes three things:
+Most of these products exist to rest eyes and wrists, so "not typing" is a reasonable proxy for "resting." Movez exists to break up sitting bouts, which changes three things:
 
 1. **Idle at the desk is not a break.** Reading a paper, thinking, or being on a call are all sitting. Only *leaving* counts, so the idle threshold that credits a break should be tied to how long it plausibly takes to have got up, not to how long the eyes have been off the screen. That argues for keeping Time Out's "pause the countdown" behavior out of the default and instead treating short idle as sitting.
 2. **A 5-minute break has content.** The break isn't a blank screen; it's a routine the user does away from the keyboard. So the overlay must be glanceable from standing distance, the routine needs a visible per-movement timer and next/previous controls, and "end early" should record which movements were completed.
@@ -161,7 +161,7 @@ Behavior while suppressed: **defer, never reset** (the Stretchly #1433 complaint
 
 ### 4.5 Do Not Disturb and Focus
 
-Do not poll for Focus state. Stretchly's `defaults read` hack broke on Tahoe, and Apple provides no supported read API. Instead ship a **Focus Filter** (App Intents `SetFocusFilterIntent`) so the user can add "movez: pause breaks" to any Focus mode; LookAway does exactly this. Plus a manual **Pause for…** menu with 15 min / 30 min / 1 h / 2 h / rest of day, with the remaining pause shown in the menu bar and a notification when it lifts. A manual pause is a `paused` state, distinct from `suppressed`, and the countdown resumes with remaining time when it ends (again: no reset).
+Do not poll for Focus state. Stretchly's `defaults read` hack broke on Tahoe, and Apple provides no supported read API. Instead ship a **Focus Filter** (App Intents `SetFocusFilterIntent`) so the user can add "Movez: pause breaks" to any Focus mode; LookAway does exactly this. Plus a manual **Pause for…** menu with 15 min / 30 min / 1 h / 2 h / rest of day, with the remaining pause shown in the menu bar and a notification when it lifts. A manual pause is a `paused` state, distinct from `suppressed`, and the countdown resumes with remaining time when it ends (again: no reset).
 
 ### 4.6 Mid-input deferral
 
@@ -174,7 +174,7 @@ Two phases, both skippable:
 1. **Heads-up, T−60 s.** A small non-focusable panel at the top of the active display (BreakTimer / LookAway style), also mirrored in the menu bar: "Movement break in 1:00 — Hip reset · [Start now] [+5 min]". Optional gentle sound. This is where "Start now" lives, which users request constantly.
 2. **Fade-in, T−0.** Over ~3 s, dim and blur every display to ~70% and bring up the break overlay. Not input-blocking: the keyboard still reaches the overlay's own controls, and the menu-bar icon remains reachable (Stretchly #1479: strict fullscreen breaks blocked the tray so users couldn't even pause).
 
-Overlay content for movez: current movement name in large type, the 2–4 sentence instruction, a per-movement countdown ring, a strip showing the routine's blocks with the current one highlighted, [Next] [Previous] [Skip movement], overall time remaining, and at the bottom [Snooze 5 min] and [Skip break]. Readable from 2 m away. After the break, restore focus to the previously frontmost app (Intermission gets dinged for not doing this) and play a soft completion sound.
+Overlay content for Movez: current movement name in large type, the 2–4 sentence instruction, a per-movement countdown ring, a strip showing the routine's blocks with the current one highlighted, [Next] [Previous] [Skip movement], overall time remaining, and at the bottom [Snooze 5 min] and [Skip break]. Readable from 2 m away. After the break, restore focus to the previously frontmost app (Intermission gets dinged for not doing this) and play a soft completion sound.
 
 Micro-break UI is the heads-up panel only, with a 60-second countdown and the single movement's instruction; no dimming.
 

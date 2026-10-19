@@ -130,7 +130,7 @@ final class SecurityAndCopyTests: XCTestCase {
     func testUserCopyIsSentenceCase() throws {
         let properNouns = [
             "Focus", "Application", "Support", "Manrope", "Calf", "Ankle", "Foot", "Shin",
-            "L-spine", "Core", "Wrist", "Forearm", "Next", "Known", "Diff", "movez",
+            "L-spine", "Core", "Wrist", "Forearm", "Next", "Known", "Diff", "Movez",
             "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Beginner", "Moderate", "Advanced",
             "Band", "Kettlebell", "Roller", "Ball", "Debug", "Rest", "Idle", "Sleep", "Wake",
             "Lock", "Unlock", "Mic", "Capture", "Fullscreen", "Fire", "Simulate", "Cancel",

@@ -1,10 +1,10 @@
-# Handoff: movez UI — full-break overlay, panels, menu, settings
+# Handoff: Movez UI — full-break overlay, panels, menu, settings
 
 ## Overview
-movez is a macOS menu-bar app that interrupts long sitting bouts with scheduled movement breaks. This package covers the approved v1 visual design for every user-facing surface listed in Product brief v1 §5–§7: the full-break overlay (four states), the heads-up panel, the micro-break panel (count-in and countdown), the away toast, the menu-bar dropdown (three states), and the Settings window. Scheduler behaviour is specified in `reference/scheduler-research-v1.md`; this document only covers what it looks like.
+Movez is a macOS menu-bar app that interrupts long sitting bouts with scheduled movement breaks. This package covers the approved v1 visual design for every user-facing surface listed in Product brief v1 §5–§7: the full-break overlay (four states), the heads-up panel, the micro-break panel (count-in and countdown), the away toast, the menu-bar dropdown (three states), and the Settings window. Scheduler behaviour is specified in `reference/scheduler-research-v1.md`; this document only covers what it looks like.
 
 ## About the design files
-`movez-ui-designs.dc.html` is a **design reference built in HTML** (open it in a browser; `support.js` must sit beside it). It is a mockup canvas, not production code. The job is to **recreate these designs in the movez codebase** (SwiftUI / AppKit per the brief) using its own patterns. Do not port the HTML.
+`movez-ui-designs.dc.html` is a **design reference built in HTML** (open it in a browser; `support.js` must sit beside it). It is a mockup canvas, not production code. The job is to **recreate these designs in the Movez codebase** (SwiftUI / AppKit per the brief) using its own patterns. Do not port the HTML.
 
 The canvas has three turns, newest at top. **Only turn 3 (`#3a`, `#3b`, `#3c`) and option `#2a` in turn 2 are approved.** Turn 1 (`#1a`–`#1e`) is rejected exploration kept for history; ignore it.
 
@@ -77,14 +77,14 @@ Same shell as heads-up (400px). No screen dim.
 380px, bottom-right, 20px inset, radius 16, padding 14 16 12, auto-dismiss 6 s. Row: 10px accent dot · title 14px 700 "Away 7 min · counted as your break" + 12px text-2 "Next break at 14:02" · secondary button "I was sitting" (13px). Bottom edge: 2px progress hairline (track rule .18, fill accent) shrinking left→right over the 6 s; tapping the button reverses the credit.
 
 ### 3b · Menu-bar dropdown
-264px, padding 6, radius 12, custom MenuBarExtra view. Header block (padding 10 10 12, bottom rule, margin-bottom 6): 40px disc + title 14px 700 + subtitle 12px. Rows 7×10 padding, radius 7; the recommended action row has accent-tint .14 background. Dividers 1px rule with 6px 4px margin. Stats block two lines 400 weight (text-2, then text-3). Footer rows Settings… ⌘, and Quit movez ⌘Q with shortcuts in text-3.
+264px, padding 6, radius 12, custom MenuBarExtra view. Header block (padding 10 10 12, bottom rule, margin-bottom 6): 40px disc + title 14px 700 + subtitle 12px. Rows 7×10 padding, radius 7; the recommended action row has accent-tint .14 background. Dividers 1px rule with 6px 4px margin. Stats block two lines 400 weight (text-2, then text-3). Footer rows Settings… ⌘, and Quit Movez ⌘Q with shortcuts in text-3.
 - Sitting: disc accent with ring at remaining fraction, "32" inside; "Next break in 32 min" / "Hip reset · hips and glutes"; rows Take a break now (highlighted), Make due in ▸ (5 · 10 · 15 · 30 min), Pause for ▸.
 - Paused: disc = 40px dashed circle 2.5px text-3 with "‖"; "Paused · 42 min left" / "Countdown resumes at 15:00 with 23 min left"; rows Resume now (highlighted), Extend pause ▸, Take a break now (text-3).
 - Off-hours: disc = 2.5px ring rgba(127,200,183,.25), empty; "Off hours" / "Breaks resume Monday at 9:00"; rows Start a session now (highlighted), Take a break now. Stats show the last working day.
 Menu-bar icon: 12px ring, filled arc = fraction elapsed, followed by minutes remaining ("32m"); dashed ring + "‖" when paused; ring only at 55% opacity off-hours.
 
 ### 3c · Settings window
-760×700 single scrolling window, background #12283a, 52px title bar with centred "movez settings". Content padding 24 32, sections separated by 1px rule .14 with 22px gaps. Each section is a 160px label column (section label style) + rows (gap 12, label left / control right).
+760×700 single scrolling window, background #12283a, 52px title bar with centred "Movez settings". Content padding 24 32, sections separated by 1px rule .14 with 22px gaps. Each section is a 160px label column (section label style) + rows (gap 12, label left / control right).
 - Schedule: Preset segmented control (track accent-tint .12, 3px padding, segments 6×14 12px 600, active accent/ink): 25/5 · 55/5 · 85/5 · Custom. Toggle "Micro-break every 30 min · 60 s" (toggle 38×22, on = accent track with ink knob, off = .2 track with text-2 knob). Working hours "Mon–Fri · 9:00–18:00" + accent "Edit" link.
 - Movements: Equipment chips (selected = accent fill, unselected = secondary outline) Band · Kettlebell · Dumbbell · Roller / ball. Difficulty cap segmented Beginner · Moderate · Advanced. Excluded movements "3 excluded" + "Browse library…" link. Focus select (outlined 8px field, 160 min-width) "More upper back".
 - Stay out of the way: three toggles (microphone, screen share/record, fullscreen app + "2 exceptions" link), "Count me away after" select "3 min".

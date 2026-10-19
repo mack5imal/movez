@@ -61,7 +61,7 @@ final class SettingsWindowController {
             backing: .buffered,
             defer: false
         )
-        window.title = "movez settings"
+        window.title = "Movez settings"
         // The title is drawn in the app's own type inside the content view instead.
         window.titlebarAppearsTransparent = true
         window.titleVisibility = .hidden

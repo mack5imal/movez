@@ -1,17 +1,17 @@
-# movez — Product brief v1
+# Movez — Product brief v1
 
 Owner: Kyle Mack · Date: 2026-09-11 · Status: ready for design mockups
 Companion docs: `movement-library-v4.json` (content and rules), `scheduler-research-v1.md` (scheduler behavior and rationale)
 
 ## 1. What it is
 
-movez is a macOS menu-bar app that limits how long you sit at the computer. You choose how long you're allowed to sit (default 55 minutes); when the time is up, the screen dims and the app walks you through a 5-minute movement routine built from a library of 147 movements chosen to counteract the effects of sitting and screen work: hip flexor shortening, glute inhibition, thoracic kyphosis, forward head, venous pooling, stiff ankles, eroding balance, and wrist, eye, and breathing strain. On the longer presets, a 1-minute micro-break every 30 minutes keeps sitting bouts under the threshold the research associates with harm.
+Movez is a macOS menu-bar app that limits how long you sit at the computer. You choose how long you're allowed to sit (default 55 minutes); when the time is up, the screen dims and the app walks you through a 5-minute movement routine built from a library of 147 movements chosen to counteract the effects of sitting and screen work: hip flexor shortening, glute inhibition, thoracic kyphosis, forward head, venous pooling, stiff ankles, eroding balance, and wrist, eye, and breathing strain. On the longer presets, a 1-minute micro-break every 30 minutes keeps sitting bouts under the threshold the research associates with harm.
 
 The tone is light and encouraging, never nagging. The app gets out of the way when you're on a call or sharing your screen, credits you when you get up on your own, and makes skipping possible but visible.
 
 ## 2. Why
 
-The strongest evidence on sedentary work (Dunstan 2012, Diaz 2017, Duran 2023) says two things: interrupt sitting at least every 30 minutes, and a 5-minute movement bout does measurably more than a 1-minute one for glucose, blood pressure, mood, and fatigue. Existing break apps are built for eyes and wrists, treat "not typing" as resting, and either interrupt at the worst moments or are so easy to dismiss they get ignored. None prescribes a progressive movement routine. movez combines an interruption-aware scheduler with a real movement library.
+The strongest evidence on sedentary work (Dunstan 2012, Diaz 2017, Duran 2023) says two things: interrupt sitting at least every 30 minutes, and a 5-minute movement bout does measurably more than a 1-minute one for glucose, blood pressure, mood, and fatigue. Existing break apps are built for eyes and wrists, treat "not typing" as resting, and either interrupt at the worst moments or are so easy to dismiss they get ignored. None prescribes a progressive movement routine. Movez combines an interruption-aware scheduler with a real movement library.
 
 ## 3. Who it's for, and v1 scope
 

@@ -27,7 +27,7 @@ struct MenuBarRoot: View {
         if let menuBar = delegate.menuBar {
             MenuBarContent(viewModel: menuBar)
         } else {
-            MovezText("movez is starting…", MovezType.menuRow, color: Tokens.text2)
+            MovezText("Movez is starting…", MovezType.menuRow, color: Tokens.text2)
                 .padding(12)
         }
     }
@@ -81,7 +81,7 @@ struct MovezCommands: Commands {
             .keyboardShortcut(MenuShortcutSpec.settings.keyEquivalent, modifiers: .command)
         }
         CommandGroup(replacing: .appTermination) {
-            Button("Quit movez") {
+            Button("Quit Movez") {
                 NSApplication.shared.terminate(nil)
             }
             .keyboardShortcut(MenuShortcutSpec.quit.keyEquivalent, modifiers: .command)

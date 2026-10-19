@@ -15,7 +15,7 @@ protocol FatalPresenter: AnyObject {
 final class AlertFatalPresenter: FatalPresenter {
     func presentFatal(_ error: Error) {
         let alert = NSAlert()
-        alert.messageText = "movez could not start"
+        alert.messageText = "Movez could not start"
         alert.informativeText = error.localizedDescription
         alert.alertStyle = .critical
         alert.addButton(withTitle: "Quit")
