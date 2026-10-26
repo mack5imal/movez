@@ -20,6 +20,9 @@ final class SettingsViewModel: ObservableObject {
     let library: MovementLibrary
     let launchAtLogin: LaunchAtLoginService
     private let onChange: () -> Void
+    /// Opens the health and safety notice, read-only. Nil where there is no notice window — a
+    /// snapshot, or a test that does not care.
+    private let onOpenNotice: (() -> Void)?
     private var debugCancellables: Set<AnyCancellable> = []
 
     @Published var openSheet: Sheet?
@@ -37,13 +40,27 @@ final class SettingsViewModel: ObservableObject {
         settings: SettingsStore,
         library: MovementLibrary,
         launchAtLogin: LaunchAtLoginService? = nil,
+        openNotice: (() -> Void)? = nil,
         onChange: @escaping () -> Void = {}
     ) {
         self.settings = settings
         self.library = library
         self.launchAtLogin = launchAtLogin ?? SystemLaunchAtLogin()
+        onOpenNotice = openNotice
         self.onChange = onChange
         hoursDraft = settings.workingHours
+    }
+
+    // MARK: - The health and safety notice
+
+    /// "Accepted 26 Oct 2026 · version 1.0", or nothing before it has been accepted.
+    var noticeDetail: String? {
+        guard let version = settings.acceptedNoticeVersion, let date = settings.acceptedNoticeAt else { return nil }
+        return "Accepted \(NoticeViewModel.dateText(date)) · version \(version)"
+    }
+
+    func openNotice() {
+        onOpenNotice?()
     }
 
     // MARK: - The option tables

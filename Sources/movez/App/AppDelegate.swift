@@ -12,7 +12,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     var fatalPresenter: FatalPresenter = AlertFatalPresenter()
     /// Published so the menu-bar scene picks the view model up the moment the coordinator exists.
     @Published private(set) var menuBar: MenuBarViewModel?
+    /// True while the health and safety notice is waiting to be accepted, so the menu can say so.
+    @Published private(set) var awaitingNotice = false
     private var settingsWindow: SettingsWindowController?
+    private let noticeWindow = NoticeWindowController()
 
     func applicationWillFinishLaunching(_ notification: Notification) {
         MovezFont.register()
@@ -27,7 +30,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
         guard !Self.isHostingTests else { return }
 
         guard arguments.isHeadless else {
-            startCoordinator()
+            launch()
             return
         }
         if arguments.probeSignals {
@@ -70,12 +73,39 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
 
     func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool { true }
 
-    /// Builds the coordinator from the bundled library and the user's saved state. A library that
-    /// will not load is fatal and loud: an app that quietly serves no movements is worse than one
-    /// that says why it cannot.
-    private func startCoordinator() {
-        guard let library = Launch.loadLibrary(presenter: fatalPresenter) else { return }
+    /// Loads what the app cannot run without, then starts it, or first asks for the health and
+    /// safety notice to be accepted. Until it is, nothing is scheduled, polled or written: the
+    /// coordinator does not exist yet. A library or notice that will not load is fatal and loud.
+    private func launch() {
+        guard let library = Launch.loadLibrary(presenter: fatalPresenter),
+              let notice = Launch.loadNotice(presenter: fatalPresenter) else { return }
         let settings = SettingsStore()
+        guard NoticeAcceptance.isNeeded(acceptedVersion: settings.acceptedNoticeVersion, notice: notice) else {
+            startCoordinator(library: library, notice: notice, settings: settings)
+            return
+        }
+        awaitingNotice = true
+        noticeWindow.show(NoticeViewModel(
+            notice: notice,
+            mode: .accept,
+            settings: settings,
+            onAgree: { [weak self] in
+                guard let self else { return }
+                noticeWindow.close()
+                awaitingNotice = false
+                startCoordinator(library: library, notice: notice, settings: settings)
+            },
+            onQuit: { NSApp.terminate(nil) }
+        ))
+    }
+
+    /// The menu's "Show notice", while it waits to be accepted.
+    func showPendingNotice() {
+        noticeWindow.bringForward()
+    }
+
+    /// Builds the coordinator from the bundled library and the user's saved state.
+    private func startCoordinator(library: MovementLibrary, notice: HealthNotice, settings: SettingsStore) {
         let historyStore = try? FileHistoryStore.historyFile()
         let snapshotStore = try? FileSnapshotStore.stateFile()
         let coordinator = AppCoordinator(
@@ -94,6 +124,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
         let settingsViewModel = SettingsViewModel(
             settings: settings,
             library: library,
+            openNotice: { [weak self] in
+                guard let self else { return }
+                noticeWindow.show(NoticeViewModel(
+                    notice: notice,
+                    mode: .read,
+                    settings: settings,
+                    onClose: { [weak self] in self?.noticeWindow.close() }
+                ))
+            },
             onChange: { [weak coordinator] in coordinator?.settingsChanged() }
         )
         settingsWindow = SettingsWindowController(viewModel: settingsViewModel) {

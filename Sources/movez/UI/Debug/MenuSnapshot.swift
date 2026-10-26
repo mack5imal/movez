@@ -4,6 +4,8 @@ import SwiftUI
 /// the framing `screenshots/3b-menu-dropdown.png` uses, so the two can be held side by side.
 struct MenuSnapshot: View {
     var state: MenuBarState
+    /// Shows the dropdown as it is before the health and safety notice has been accepted.
+    var pendingNotice = false
 
     /// The light desktop the handoff draws its menus over.
     private static let desktop = MovezColor(hex: 0xD9D6_CF)
@@ -19,9 +21,15 @@ struct MenuSnapshot: View {
                 menuBar
                 HStack(spacing: 0) {
                     Spacer(minLength: 0)
-                    MenuBarView(state: state)
-                        .padding(.top, 6)
-                        .padding(.trailing, 28)
+                    Group {
+                        if pendingNotice {
+                            NoticePendingMenu(showNotice: {})
+                        } else {
+                            MenuBarView(state: state)
+                        }
+                    }
+                    .padding(.top, 6)
+                    .padding(.trailing, 28)
                 }
                 Spacer(minLength: 0)
             }

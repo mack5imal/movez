@@ -52,6 +52,20 @@ enum Launch {
             return nil
         }
     }
+
+    /// The health and safety notice has to be accepted before anything runs, so a notice that
+    /// will not load is as fatal as a missing library: there would be nothing to accept.
+    static func loadNotice(
+        using load: () throws -> HealthNotice = HealthNotice.loadBundled,
+        presenter: FatalPresenter
+    ) -> HealthNotice? {
+        do {
+            return try load()
+        } catch {
+            presenter.presentFatal(error)
+            return nil
+        }
+    }
 }
 
 /// The app's one logger. Used where something went wrong that the user cannot see and must not

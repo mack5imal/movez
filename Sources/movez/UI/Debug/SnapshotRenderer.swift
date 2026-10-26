@@ -27,12 +27,16 @@ enum SnapshotSurface: String, CaseIterable {
     case menuOffHours = "menu-offhours"
     case menuAway = "menu-away"
     case menuIcon = "menu-icon"
+    case menuNotice = "menu-notice"
     case settings
     case settingsHours = "settings-hours"
     case settingsLibrary = "settings-library"
     case settingsExceptions = "settings-exceptions"
     case settingsCustom = "settings-custom"
     case debug
+    case notice
+    case noticeEnd = "notice-end"
+    case noticeRead = "notice-read"
 
     /// A 1440×900 display, which is what the handoff's overlay screenshots are drawn on.
     static let screen = CGSize(width: 1440, height: 900)
@@ -49,12 +53,14 @@ enum SnapshotSurface: String, CaseIterable {
         case .headsUp, .headsUpDeferred, .microCountIn, .microFirstLeadIn, .microRunning, .microLeadIn, .microSecond, .microSide:
             return Self.panelCanvas
         case .toast: return Self.toastCanvas
-        case .menuSitting, .menuPaused, .menuOffHours, .menuAway: return Self.menuCanvas
+        case .menuSitting, .menuPaused, .menuOffHours, .menuAway, .menuNotice: return Self.menuCanvas
         case .menuIcon: return CGSize(width: 880, height: 260)
         case .settings, .settingsHours, .settingsLibrary, .settingsExceptions, .settingsCustom:
             return SettingsScreen.size
         case .debug:
             return CGSize(width: SettingsScreen.size.width, height: 1_500)
+        case .notice, .noticeEnd, .noticeRead:
+            return NoticeScreen.size
         case .overlayFull, .overlayLeadIn, .overlayPaused, .overlaySide, .overlayEnd, .overlayLongName:
             return Self.screen
         }
@@ -86,7 +92,8 @@ enum SnapshotRenderer {
     static let scale: CGFloat = 2
 
     static func view(for surface: SnapshotSurface) -> AnyView {
-        panelView(for: surface) ?? menuView(for: surface) ?? settingsView(for: surface) ?? overlayView(for: surface)
+        panelView(for: surface) ?? menuView(for: surface) ?? settingsView(for: surface) ?? noticeView(for: surface)
+            ?? overlayView(for: surface)
     }
 
     /// The settings window, and the three sheets that open over it.
@@ -112,6 +119,22 @@ enum SnapshotRenderer {
             return AnyView(MovezText("The bundled movement library did not load.", MovezType.panelTitle))
         }
         return AnyView(SettingsScreen(viewModel: viewModel, height: surface.size.height))
+    }
+
+    /// The health and safety notice: waiting to be accepted, scrolled to its end, and reopened
+    /// from Settings.
+    private static func noticeView(for surface: SnapshotSurface) -> AnyView? {
+        let viewModel: NoticeViewModel?
+        switch surface {
+        case .notice: viewModel = SnapshotFixtures.noticeViewModel(mode: .accept)
+        case .noticeEnd: viewModel = SnapshotFixtures.noticeViewModel(mode: .accept, reachedEnd: true)
+        case .noticeRead: viewModel = SnapshotFixtures.noticeViewModel(mode: .read)
+        default: return nil
+        }
+        guard let viewModel else {
+            return AnyView(MovezText("The bundled notice did not load.", MovezType.panelTitle))
+        }
+        return AnyView(NoticeScreen(viewModel: viewModel))
     }
 
     /// The gallery and the floating panels.
@@ -166,6 +189,8 @@ enum SnapshotRenderer {
             return AnyView(MenuSnapshot(state: SnapshotFixtures.menuAway()))
         case .menuIcon:
             return AnyView(MenuIconStrip())
+        case .menuNotice:
+            return AnyView(MenuSnapshot(state: SnapshotFixtures.menuOffHours(), pendingNotice: true))
         default:
             return nil
         }

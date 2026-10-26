@@ -27,7 +27,7 @@
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>movez. Manrope is licensed under the SIL Open Font License 1.1.</string>
+	<string>Copyright © 2026 Kyle Mack. Movez is free software under the GNU GPL, version 3 or later. Manrope is licensed under the SIL Open Font License 1.1.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>movez checks whether the microphone is in use so it never interrupts a call. It never records audio.</string>
 	<key>ATSApplicationFontsPath</key>

@@ -371,6 +371,7 @@ extension SnapshotFixtures {
         settings.focus = .moreUpperBack
         settings.fullscreenExceptions = exceptionFixtureIds
         settings.awayThresholdMinutes = 3
+        settings.acceptNotice(version: "1.0", at: noticeAcceptedAt)
 
         let viewModel = SettingsViewModel(
             settings: settings,
@@ -380,6 +381,29 @@ extension SnapshotFixtures {
         viewModel.librarySearch = search
         viewModel.hoursDraft = settings.workingHours
         viewModel.openSheet = sheet
+        return viewModel
+    }
+}
+
+extension SnapshotFixtures {
+    /// When the snapshot user accepted the notice: a fixed day, so the image never drifts.
+    static let noticeAcceptedAt: Date = {
+        var components = DateComponents()
+        components.year = 2026
+        components.month = 10
+        components.day = 26
+        components.hour = 9
+        return Calendar.current.date(from: components) ?? Date(timeIntervalSince1970: 1_792_998_000)
+    }()
+
+    @MainActor
+    static func noticeViewModel(mode: NoticeViewModel.Mode, reachedEnd: Bool = false) -> NoticeViewModel? {
+        guard let notice = try? HealthNotice.loadBundled() else { return nil }
+        UserDefaults().removePersistentDomain(forName: settingsSuite)
+        let settings = SettingsStore(defaults: UserDefaults(suiteName: settingsSuite) ?? .standard)
+        if mode == .read { settings.acceptNotice(version: notice.version, at: noticeAcceptedAt) }
+        let viewModel = NoticeViewModel(notice: notice, mode: mode, settings: settings)
+        if reachedEnd { viewModel.endReached() }
         return viewModel
     }
 }

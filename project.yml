@@ -40,6 +40,8 @@ targets:
         buildPhase: resources
       - path: movement-library-v4.json
         buildPhase: resources
+      - path: HEALTH_AND_SAFETY.md
+        buildPhase: resources
     settings:
       base:
         INFOPLIST_FILE: Sources/movez/Resources/Info.plist

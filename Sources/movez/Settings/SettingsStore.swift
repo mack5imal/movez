@@ -28,6 +28,8 @@ final class SettingsStore: ObservableObject {
         static let launchAtLogin = "launchAtLogin"
         static let debugTimeScale = "debugTimeScale"
         static let debugExpanded = "debugExpanded"
+        static let acceptedNoticeVersion = "acceptedNoticeVersion"
+        static let acceptedNoticeAt = "acceptedNoticeAt"
     }
 
     static let suiteName = "movez"
@@ -61,6 +63,12 @@ final class SettingsStore: ObservableObject {
     @Published var launchAtLogin: Bool { didSet { write(launchAtLogin, Key.launchAtLogin) } }
     @Published var debugTimeScale: Double { didSet { write(debugTimeScale, Key.debugTimeScale) } }
     @Published var debugExpanded: Bool { didSet { write(debugExpanded, Key.debugExpanded) } }
+    /// The version of the health and safety notice the user accepted, and when. Nil until they
+    /// have; a newer notice version asks again.
+    @Published var acceptedNoticeVersion: String? {
+        didSet { writeOptional(acceptedNoticeVersion, Key.acceptedNoticeVersion) }
+    }
+    @Published var acceptedNoticeAt: Date? { didSet { writeOptional(acceptedNoticeAt, Key.acceptedNoticeAt) } }
 
     init(defaults: UserDefaults? = nil) {
         let defaults = defaults ?? UserDefaults(suiteName: Self.suiteName) ?? .standard
@@ -87,6 +95,8 @@ final class SettingsStore: ObservableObject {
         launchAtLogin = defaults.object(forKey: Key.launchAtLogin) as? Bool ?? false
         debugTimeScale = defaults.object(forKey: Key.debugTimeScale) as? Double ?? 1
         debugExpanded = defaults.object(forKey: Key.debugExpanded) as? Bool ?? false
+        acceptedNoticeVersion = defaults.string(forKey: Key.acceptedNoticeVersion)
+        acceptedNoticeAt = defaults.object(forKey: Key.acceptedNoticeAt) as? Date
     }
 
     /// What the user has said they do not have, so no movement that needs it is served.
@@ -123,6 +133,16 @@ final class SettingsStore: ObservableObject {
 
     private func write(_ value: Any, _ key: String) {
         defaults.set(value, forKey: key)
+    }
+
+    private func writeOptional(_ value: Any?, _ key: String) {
+        if let value { defaults.set(value, forKey: key) } else { defaults.removeObject(forKey: key) }
+    }
+
+    /// Records that the user accepted this version of the notice, now.
+    func acceptNotice(version: String, at date: Date) {
+        acceptedNoticeVersion = version
+        acceptedNoticeAt = date
     }
 
     private func writeJSON<Value: Encodable>(_ value: Value, _ key: String) {

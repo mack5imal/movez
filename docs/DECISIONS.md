@@ -410,3 +410,14 @@ are in `docs/rule-changes-2026-10.md` and `scripts/simulate_selection.py`.
     or on the web stays lowercase: the repository, `movez.app`, the executable, the bundle
     identifier `com.kylemack.movez`, the Xcode project and source folders, and the data folder in
     Application Support, so builds, links, Launch at Login and saved state are untouched.
+53. **Nothing runs until the health and safety notice is accepted.** On launch Movez reads
+    `HEALTH_AND_SAFETY.md`, bundled from the repository root like the movement library, so the
+    app and the repository can never show two different texts. If its version has not been
+    accepted, the notice opens in a window of its own, and the coordinator is not built: nothing
+    is scheduled, polled or written. "I understand and agree" stays unavailable until the end of
+    the notice has scrolled into view, and Quit, or closing the window, quits. Accepting records
+    the version and the time. The "Notice version" line in the file is what asks again: raising
+    it re-asks everyone, and an edit that keeps it does not. Settings → General → "Health, safety
+    and terms" shows when it was accepted and reopens it read-only. While it waits, the menu says
+    so and offers "Show notice" and Quit. A notice that is missing or has no version is fatal at
+    launch, like a missing library.

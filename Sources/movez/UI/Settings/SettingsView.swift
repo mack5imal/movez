@@ -219,6 +219,9 @@ struct SettingsView: View {
             if let error = viewModel.launchAtLoginError {
                 MovezText(error, MovezType.version, color: Tokens.text3)
             }
+            SettingsRow(label: "Health, safety and terms", detail: viewModel.noticeDetail) {
+                SettingsLinkButton(title: "Read…", action: viewModel.openNotice)
+            }
         }
     }
 }

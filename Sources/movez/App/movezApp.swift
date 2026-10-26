@@ -26,10 +26,44 @@ struct MenuBarRoot: View {
     var body: some View {
         if let menuBar = delegate.menuBar {
             MenuBarContent(viewModel: menuBar)
+        } else if delegate.awaitingNotice {
+            NoticePendingMenu(showNotice: delegate.showPendingNotice)
         } else {
             MovezText("Movez is starting…", MovezType.menuRow, color: Tokens.text2)
                 .padding(12)
         }
+    }
+}
+
+/// The dropdown while the health and safety notice waits to be accepted: nothing is running yet,
+/// so all it can do is bring the notice back or quit.
+struct NoticePendingMenu: View {
+    var showNotice: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            MovezText(
+                "Accept the health and safety notice to start.",
+                MovezType.menuSecondary,
+                color: Tokens.text2
+            )
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
+            MenuRow(title: "Show notice", highlighted: true, action: showNotice, trailing: { EmptyView() })
+            MenuRow(
+                title: "Quit Movez",
+                action: { NSApplication.shared.terminate(nil) },
+                trailing: { MenuShortcut(text: MenuShortcutSpec.quit.label) }
+            )
+        }
+        .padding(6)
+        .frame(width: Tokens.Metric.menuWidth, alignment: .leading)
+        .background(Tokens.panelMenu.color)
+        .overlay(
+            RoundedRectangle(cornerRadius: Tokens.Radius.menu, style: .continuous)
+                .strokeBorder(Tokens.panelBorder.color, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: Tokens.Radius.menu, style: .continuous))
     }
 }
 
