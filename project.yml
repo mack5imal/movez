@@ -64,6 +64,10 @@ targets:
       # before the implicit code-sign step, so the signature covers the edited Info.plist.
       - name: Stamp build number
         basedOnDependencyAnalysis: false
+        # Declaring the processed Info.plist as an input is what orders this after Xcode writes
+        # it; without it the plist could be processed afterwards and reset the number to 1.
+        inputFiles:
+          - $(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)
         script: |
           plist="${TARGET_BUILD_DIR}/${INFOPLIST_PATH}"
           if count=$(git -C "${SRCROOT}" rev-list --count HEAD 2>/dev/null); then
