@@ -75,7 +75,7 @@ struct NoticeText: View {
     var body: some View {
         LazyVStack(alignment: .leading, spacing: 10) {
             MovezText(notice.title, MovezType.panelTitle)
-            MovezText(versionLine, MovezType.version, color: Tokens.text3)
+            MovezText(versionLine, MovezType.version, color: Tokens.text2)
                 .padding(.bottom, 6)
             ForEach(Array(notice.blocks.enumerated()), id: \.offset) { _, block in
                 blockView(block)
@@ -94,18 +94,18 @@ struct NoticeText: View {
             MovezText(text, MovezType.settingsTitle)
                 .padding(.top, 12)
         case .paragraph(let text):
-            styled(text, color: Tokens.text2)
+            styled(text, color: Tokens.text)
         case .bullet(let text):
             HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text("•").movezType(MovezType.panelBody).foregroundStyle(Tokens.text3.color)
-                styled(text, color: Tokens.text2)
+                Text("•").movezType(MovezType.panelBody).foregroundStyle(Tokens.text2.color)
+                styled(text, color: Tokens.text)
             }
             .padding(.leading, 6)
         case .rule:
             MovezDivider(color: Tokens.ruleSettings)
                 .padding(.vertical, 8)
         case .note(let text):
-            styled(text, color: Tokens.text3)
+            styled(text, color: Tokens.text)
                 .italic()
         }
     }
