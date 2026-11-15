@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>strength-set — Strength break, working set</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#7fc8b7}a:hover{color:#a6dccf}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; position: relative; overflow: hidden; background: #0f1820; font-family: Manrope, system-ui, sans-serif; color: #e6f1ee">
+
+  <!-- Overlay card 1000x660 -->
+  <div style="position: absolute; left: 220px; top: 120px; width: 1000px; height: 660px; box-sizing: border-box; padding: 56px 80px 44px; background: rgba(18,42,58,.92); border: 1px solid rgba(127,200,183,.28); border-radius: 36px; box-shadow: 0 40px 100px rgba(0,0,0,.5); display: flex; flex-direction: column">
+
+    <!-- Header row: eyebrow with Strength badge · time left -->
+    <div style="display: flex; justify-content: space-between; align-items: center; padding-right: 200px">
+      <div style="display: flex; align-items: center; gap: 10px; color: #7fc8b7; font-size: 18px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; line-height: 1">
+        <svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="#7fc8b7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="3.5" height="10" rx="1.2"></rect><rect x="13" y="5" width="3.5" height="10" rx="1.2"></rect><line x1="7" y1="10" x2="13" y2="10"></line><line x1="1.5" y1="10" x2="3.5" y2="10"></line><line x1="16.5" y1="10" x2="18.5" y2="10"></line></svg>
+        <span>Strength break</span>
+      </div>
+      <div style="color: #a9c3c0; font-size: 18px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; line-height: 1">3:58 left</div>
+    </div>
+
+    <!-- Body: rep meter · set text -->
+    <div style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 56px; min-height: 0">
+
+      <!-- RepMeter (new) -->
+      <div style="width: 180px; display: flex; flex-direction: column; align-items: center; gap: 18px; flex-shrink: 0">
+        <div role="img" aria-label="Rep meter, rising" style="position: relative; width: 64px; height: 264px; border-radius: 999px; background: rgba(127,200,183,.14); overflow: hidden">
+          <div style="position: absolute; left: 0; right: 0; bottom: 0; height: {{fillPct}}; min-height: 64px; border-radius: 999px; background: #7fc8b7; display: flex; justify-content: center; padding-top: 16px; box-sizing: border-box">
+            <sc-if value="{{rising}}" hint-placeholder-val="{{ true }}">
+              <svg width="28" height="16" viewBox="0 0 28 16" fill="none" stroke="#08161f" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4,13 14,4 24,13"></polyline></svg>
+            </sc-if>
+            <sc-if value="{{falling}}" hint-placeholder-val="{{ false }}">
+              <svg width="28" height="16" viewBox="0 0 28 16" fill="none" stroke="#08161f" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4,3 14,12 24,3"></polyline></svg>
+            </sc-if>
+          </div>
+        </div>
+        <div style="font-size: 28px; font-weight: 700; letter-spacing: -.015em; line-height: 1.1; white-space: nowrap; color: #e6f1ee">Rep 7 of 12</div>
+      </div>
+
+      <!-- Set text column -->
+      <div style="width: 604px; display: flex; flex-direction: column; align-items: flex-start; text-align: left">
+        <div style="font-size: 20px; font-weight: 600; color: #a9c3c0; line-height: 1.2">Set 1 of 3</div>
+        <div style="margin-top: 8px; font-size: 56px; font-weight: 700; letter-spacing: -.03em; line-height: 1.05; color: #e6f1ee">Goblet squat</div>
+        <div style="margin-top: 4px; font-size: 28px; font-weight: 700; letter-spacing: -.035em; line-height: 1; color: #e6f1ee">12 reps</div>
+        <p style="margin: 22px 0 0; font-size: 24px; font-weight: 400; line-height: 1.45; color: #a9c3c0; text-wrap: pretty">Hold the weight at your chest. Sit back between your heels, chest up, then stand tall.</p>
+      </div>
+    </div>
+
+    <!-- SequenceStrip: warm-up · 1 · 2 · 3 · cool-down -->
+    <div style="margin-top: 28px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px">
+      <div style="border-top: 3px solid rgba(127,200,183,.25); padding-top: 12px; color: #5a7a86">
+        <div style="font-size: 24px; font-weight: 800; line-height: 1.25">Warm-up</div>
+        <div style="margin-top: 6px; font-size: 17px; line-height: 1.3; text-decoration: line-through">Bodyweight squat</div>
+      </div>
+      <div style="border-top: 3px solid #7fc8b7; padding-top: 12px; color: #e6f1ee">
+        <div style="font-size: 24px; font-weight: 800; line-height: 1.25">Set 1</div>
+        <div style="margin-top: 6px; font-size: 17px; line-height: 1.3">Goblet squat</div>
+      </div>
+      <div style="border-top: 3px solid rgba(127,200,183,.25); padding-top: 12px; color: #5a7a86">
+        <div style="font-size: 24px; font-weight: 800; line-height: 1.25">Set 2</div>
+        <div style="margin-top: 6px; font-size: 17px; line-height: 1.3">Push-up</div>
+      </div>
+      <div style="border-top: 3px solid rgba(127,200,183,.25); padding-top: 12px; color: #5a7a86">
+        <div style="font-size: 24px; font-weight: 800; line-height: 1.25">Set 3</div>
+        <div style="margin-top: 6px; font-size: 17px; line-height: 1.3">Goblet squat</div>
+      </div>
+      <div style="border-top: 3px solid rgba(127,200,183,.25); padding-top: 12px; color: #5a7a86">
+        <div style="font-size: 24px; font-weight: 800; line-height: 1.25">Cool-down</div>
+        <div style="margin-top: 6px; font-size: 17px; line-height: 1.3">Standing quad stretch</div>
+      </div>
+    </div>
+
+    <!-- Action row -->
+    <div style="margin-top: 22px; display: flex; justify-content: center; align-items: center; gap: 12px">
+      <button type="button" style="font-family: inherit; font-size: 13px; font-weight: 600; padding: 9px 18px; border-radius: 999px; background: transparent; border: 1.5px solid rgba(127,200,183,.35); color: #a9c3c0; cursor: pointer">Pause</button>
+      <button type="button" style="font-family: inherit; font-size: 13px; font-weight: 600; padding: 9px 18px; border-radius: 999px; background: transparent; border: 1.5px solid #7fc8b7; color: #7fc8b7; cursor: pointer">Snooze 5 min</button>
+      <a href="#" style="font-size: 13px; font-weight: 500; color: #5a7a86; text-decoration: underline; text-underline-offset: 3px">Skip · 1 today</a>
+    </div>
+  </div>
+
+  <!-- TimerDisc 300px — the disc is the Done button -->
+  <button type="button" aria-label="Done, end this set" style="position: absolute; left: 1070px; top: 50px; width: 300px; height: 300px; border-radius: 50%; border: 0; padding: 0; background: #7fc8b7; box-shadow: 0 30px 60px rgba(0,0,0,.5); cursor: pointer; font-family: inherit; color: #08161f">
+    <svg width="300" height="300" viewBox="0 0 300 300" style="position: absolute; left: 0; top: 0" aria-hidden="true">
+      <circle cx="150" cy="150" r="139" fill="none" stroke="rgba(8,22,31,.15)" stroke-width="6"></circle>
+      <circle cx="150" cy="150" r="139" fill="none" stroke="#08161f" stroke-width="6" stroke-linecap="round" stroke-dasharray="469 874" transform="rotate(-90 150 150)"></circle>
+    </svg>
+    <span style="position: absolute; left: 0; right: 0; top: 96px; text-align: center; font-size: 84px; font-weight: 600; letter-spacing: -.04em; line-height: 1">0:22</span>
+    <span style="position: absolute; left: 0; right: 0; top: 196px; text-align: center; font-size: 16px; font-weight: 700; letter-spacing: .12em; line-height: 1; text-transform: uppercase">Done</span>
+  </button>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;meterLevel&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:56,&quot;min&quot;:0,&quot;max&quot;:100,&quot;step&quot;:1,&quot;unit&quot;:&quot;%&quot;,&quot;section&quot;:&quot;Rep meter&quot;},&quot;direction&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;up&quot;,&quot;options&quot;:[&quot;up&quot;,&quot;down&quot;],&quot;section&quot;:&quot;Rep meter&quot;},&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  renderVals() {
+    const lvl = this.props.meterLevel ?? 56;
+    const dir = this.props.direction ?? 'up';
+    return { fillPct: lvl + '%', rising: dir === 'up', falling: dir === 'down' };
+  }
+}
+</script>
+</body>
+</html>
