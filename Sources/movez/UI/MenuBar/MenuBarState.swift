@@ -74,6 +74,44 @@ struct MenuBarState: Equatable {
     var breakLabel = ""
     var pauseExpanded = false
     var extendExpanded = false
+    /// The scheduler is plainly sitting, the one state in which it moves the due time. Anywhere
+    /// else "Make due in" did nothing when clicked, so it is not offered (DECISIONS 86).
+    var makeDueAvailable = true
+    /// False while a full break is on screen: the break the row would start is already running.
+    var takeBreakAvailable = true
+    /// A Focus pause, which ends when the Focus does rather than at a time. It has no minutes to
+    /// show and nothing to extend.
+    var pauseIndefinite = false
+
+    /// One action row in the dropdown.
+    enum Row: Equatable {
+        case takeBreak
+        case makeDue
+        case pauseFor
+        case endSession
+        case resume
+        case extendPause
+        case startSession
+    }
+
+    /// The action rows for this state, in order. Kept here rather than in the view so a test can
+    /// hold each row to the states where the scheduler acts on it.
+    var rows: [Row] {
+        switch mode {
+        // Away offers what sitting does: someone reading this menu is back at the desk.
+        case .sitting, .away:
+            var rows: [Row] = []
+            if takeBreakAvailable { rows.append(.takeBreak) }
+            if makeDueAvailable { rows.append(.makeDue) }
+            // A session started by hand ends by hand; pausing it would be the long way round.
+            rows.append(isAdHocSession ? .endSession : .pauseFor)
+            return rows
+        case .paused:
+            return pauseIndefinite ? [.resume, .takeBreak] : [.resume, .extendPause, .takeBreak]
+        case .offHours:
+            return [.startSession, .takeBreak]
+        }
+    }
 
     /// "32m" · "‖ 42m" · "" — the text beside the menu-bar icon.
     ///
@@ -83,7 +121,8 @@ struct MenuBarState: Equatable {
         if isBreaking { return breakLabel }
         switch mode {
         case .sitting: return "\(minutesRemaining)m"
-        case .paused: return "‖ \(minutesRemaining)m"
+        // A Focus pause has no end the clock knows, and "‖ 0m" read as about to resume.
+        case .paused: return pauseIndefinite ? "‖" : "‖ \(minutesRemaining)m"
         case .offHours: return ""
         // A dash rather than a number: the countdown is not running, and it is not nothing
         // either, which is what an empty label means off hours.
@@ -129,6 +168,13 @@ struct MenuBarState: Equatable {
         let minutes = max(0, seconds) / 60
         guard minutes >= 120 else { return "Away \(minutes) min" }
         return "Away \(AppCoordinator.duration(seconds))"
+    }
+
+    /// A break that has fallen due and is waiting: for the user's next keystroke, or for a call,
+    /// screen share or fullscreen app to end. "Next break in 0 min" said it was starting now.
+    static func waitingTitle(for reason: SuppressionReason?) -> String {
+        guard let reason else { return "Break due" }
+        return "Break waiting for \(reason.phrase)"
     }
 
     /// Not "paused": a pause is something the user asks for, with an end the menu can name.

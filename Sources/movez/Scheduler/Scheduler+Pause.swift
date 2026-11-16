@@ -55,9 +55,12 @@ extension Scheduler {
         return [.persist, .menuRefresh]
     }
 
+    /// A pause with no end (a Focus pause) is left alone: extending it from now turned "until the
+    /// Focus ends" into a timed pause, which then lifted with the Focus still on and left the
+    /// Focus ending with nothing to lift.
     mutating func extendPause(seconds: Int, now: Date) -> [SchedulerEffect] {
-        guard case .paused(let until) = snapshot.state else { return [] }
-        let extended = (until ?? now).addingTimeInterval(TimeInterval(seconds))
+        guard case .paused(let until?) = snapshot.state else { return [] }
+        let extended = until.addingTimeInterval(TimeInterval(seconds))
         transition(to: .paused(until: extended), reason: "pause extended", at: now)
         return [.persist, .menuRefresh]
     }

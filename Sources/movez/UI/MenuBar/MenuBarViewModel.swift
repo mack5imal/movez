@@ -155,8 +155,11 @@ final class MenuBarViewModel: ObservableObject {
         next.mode = Self.mode(for: coordinator.menuState.mode)
         next.breakMode = coordinator.menuState.breakMode
         next.isAdHocSession = coordinator.scheduler.snapshot.adHocSession
-        next.isBreaking = coordinator.scheduler.state.isBreakSurfaceVisible
-        next.breakLabel = Self.breakLabel(for: coordinator.scheduler.state)
+        let schedulerState = coordinator.scheduler.state
+        next.isBreaking = schedulerState.isBreakSurfaceVisible
+        next.breakLabel = Self.breakLabel(for: schedulerState)
+        next.makeDueAvailable = schedulerState == .sitting
+        if case .fullBreak = schedulerState { next.takeBreakAvailable = false }
 
         switch next.mode {
         case .sitting: applySitting(to: &next, now: now)
@@ -171,15 +174,58 @@ final class MenuBarViewModel: ObservableObject {
     }
 
     private func applySitting(to next: inout MenuBarState, now: Date) {
-        let sitSeconds = coordinator.settings.schedulerConfig.sitSeconds
-        let remaining = coordinator.scheduler.snapshot.secondsUntilFullBreak(at: now) ?? 0
-        next.minutesRemaining = Self.minutes(remaining)
-        next.elapsedFraction = sitSeconds > 0 ? 1 - Double(remaining) / Double(sitSeconds) : 0
-        next.title = MenuBarState.title(mode: .sitting, minutesRemaining: next.minutesRemaining)
+        let countdown = Self.countdown(
+            state: coordinator.scheduler.state,
+            snapshot: coordinator.scheduler.snapshot,
+            config: coordinator.scheduler.config,
+            now: now
+        )
+        next.minutesRemaining = Self.minutes(countdown.remaining)
+        next.elapsedFraction = Self.iconFraction(remaining: countdown.remaining, of: countdown.length)
+        next.title = countdown.waitingTitle
+            ?? MenuBarState.title(mode: .sitting, minutesRemaining: next.minutesRemaining)
         // Movement routines have no names to preview, and the title already says when the break
         // is. A mode that plans its day names where in the day the next break falls.
         next.subtitle = coordinator.menuState.dayProgress?.menuSubtitle ?? ""
         applyStats(to: &next, day: "Today", stats: coordinator.history.stats(on: now))
+    }
+
+    /// What the sitting header counts down to, how long that countdown is, and, for a break that
+    /// is already due and waiting, the title that says so.
+    struct Countdown: Equatable {
+        var remaining: Int
+        var length: Int
+        var waitingTitle: String?
+    }
+
+    /// A snooze leaves the original due time behind it, in the past: the break comes back when
+    /// the snooze ends, so that is what the countdown runs to (UI-6). A break that has fallen due
+    /// and is waiting for a keystroke or for a call to end has nothing to count down.
+    static func countdown(state: SchedulerState, snapshot: SchedulerSnapshot, config: SchedulerConfig, now: Date) -> Countdown {
+        let toBreak = Countdown(remaining: snapshot.secondsUntilFullBreak(at: now) ?? 0, length: config.sitSeconds)
+        switch state {
+        case .snoozed(let until):
+            return Countdown(remaining: max(0, Int(until.timeIntervalSince(now))), length: config.snoozeSeconds)
+        case .pendingFull:
+            return Countdown(remaining: 0, length: config.sitSeconds, waitingTitle: MenuBarState.waitingTitle(for: nil))
+        case .suppressed(_, let deferred) where deferred != nil:
+            return Countdown(
+                remaining: 0,
+                length: config.sitSeconds,
+                waitingTitle: MenuBarState.waitingTitle(for: snapshot.deferredReason ?? .microphone)
+            )
+        default:
+            return toBreak
+        }
+    }
+
+    /// How much of the icon's ring has gone, in hundredths. The 18 pt ring cannot draw anything
+    /// finer, and a fraction that moved on every two-second tick made the state unequal on every
+    /// publish, so the menu-bar item redrew all day for nothing (UI-16).
+    static func iconFraction(remaining: Int, of length: Int) -> Double {
+        guard length > 0 else { return 0 }
+        let fraction = 1 - Double(remaining) / Double(length)
+        return (max(0, min(1, fraction)) * 100).rounded() / 100
     }
 
     /// Away, the countdown on show would be counting down an interval nobody is sitting through,
@@ -211,6 +257,7 @@ final class MenuBarViewModel: ObservableObject {
         let held = coordinator.scheduler.snapshot.remainingAtPauseSeconds
             ?? coordinator.settings.schedulerConfig.sitSeconds
         next.minutesRemaining = Self.minutes(pauseLeft)
+        next.pauseIndefinite = until == nil
         next.title = MenuBarState.title(
             mode: .paused,
             minutesRemaining: next.minutesRemaining,

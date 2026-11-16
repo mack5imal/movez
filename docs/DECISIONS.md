@@ -771,3 +771,14 @@ Entries from fixing the findings in `docs/code-review-2026-11.md`.
     natural line, which is what they were already drawn at, and a test holds every style to 1 or
     to at least the natural ratio. The difference only shows when one of them wraps to a second
     line, which a two-line set name or up-next line can (UI-14).
+86. **The dropdown offers a row only where the scheduler acts on it.** "Make due in" moves the due
+    time of a countdown that is running, so it is shown only while plainly sitting: not during a
+    snooze, a waiting or deferred break, a call, the quiet minute after one, a heads-up, a
+    micro-break or an absence, where its steps did nothing. "Take a break now" during a
+    micro-break replaces the micro-break with the full break, which the scheduler now accepts
+    (the micro panel is taken down first, and recorded if it ran half its length); it is hidden
+    only while a full break is on screen. A Focus pause has no end the clock knows, so the menu
+    bar shows "‖" with no minutes and the dropdown offers no "Extend pause", and the scheduler
+    ignores an extension of a pause with no end. A snooze counts down to its own end, and a break
+    that is due and waiting reads "Break due", or "Break waiting for your call" (or screen share,
+    or fullscreen app), instead of "Next break in 0 min" (UI-4, UI-5, UI-6).

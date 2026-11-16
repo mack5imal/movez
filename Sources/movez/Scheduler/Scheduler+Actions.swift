@@ -64,6 +64,10 @@ extension Scheduler {
             prelude = endPauseBookkeeping(now: now)
         case .offHours:
             prelude = beginAdHocSession(now: now)
+        case .microCountIn, .microRunning:
+            // The full break the user asked for replaces the micro-break, which is taken down
+            // (and recorded, if it ran long enough) the way any other interruption takes it down.
+            prelude = dismissSurfaces(now: now)
         default:
             return []
         }

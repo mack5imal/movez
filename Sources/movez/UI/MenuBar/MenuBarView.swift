@@ -89,46 +89,45 @@ struct MenuBarView: View {
 
     // MARK: - Rows
 
-    @ViewBuilder
+    /// The rows the state lists. Which rows a state offers is decided in `MenuBarState.rows`, so
+    /// the view only says how each one looks.
     private var rows: some View {
-        switch state.mode {
-        // Away offers exactly what sitting does: someone reading this menu is back at the desk.
-        case .sitting, .away: sittingRows
-        case .paused: pausedRows
-        case .offHours: offHoursRows
+        ForEach(Array(state.rows.enumerated()), id: \.offset) { index, row in
+            self.row(row, first: index == 0)
         }
     }
 
+    /// The first row is the one the eye should land on, except "Take a break now" while paused,
+    /// which is quiet but never unavailable: a break the user asks for always happens.
     @ViewBuilder
-    private var sittingRows: some View {
-        MenuRow(title: state.takeBreakLabel, highlighted: true, action: actions.takeBreakNow)
-        makeDueRow
-        if state.isAdHocSession {
-            // A session started by hand ends by hand; pausing it would be the long way round.
-            MenuRow(title: "End session", action: actions.endSession)
-        } else {
-            MenuRow(title: "Pause for", action: actions.togglePauseOptions) { Chevron() }
+    private func row(_ row: MenuBarState.Row, first: Bool) -> some View {
+        switch row {
+        case .takeBreak:
+            MenuRow(
+                title: state.takeBreakLabel,
+                highlighted: first && !state.takeBreakDimmed,
+                dimmed: state.takeBreakDimmed,
+                action: actions.takeBreakNow
+            )
+        case .makeDue:
+            makeDueRow
+        case .pauseFor:
+            MenuRow(title: "Pause for", highlighted: first, action: actions.togglePauseOptions) { Chevron() }
             if state.pauseExpanded {
                 PillRow(options: PauseOption.allCases, action: actions.pause)
             }
+        case .endSession:
+            MenuRow(title: "End session", highlighted: first, action: actions.endSession)
+        case .resume:
+            MenuRow(title: "Resume now", highlighted: true, action: actions.resume)
+        case .extendPause:
+            MenuRow(title: "Extend pause", action: actions.toggleExtendOptions) { Chevron() }
+            if state.extendExpanded {
+                PillRow(options: PauseOption.extendable, action: actions.extendPause)
+            }
+        case .startSession:
+            MenuRow(title: "Start a session now", highlighted: true, action: actions.startSession)
         }
-    }
-
-    @ViewBuilder
-    private var pausedRows: some View {
-        MenuRow(title: "Resume now", highlighted: true, action: actions.resume)
-        MenuRow(title: "Extend pause", action: actions.toggleExtendOptions) { Chevron() }
-        if state.extendExpanded {
-            PillRow(options: PauseOption.extendable, action: actions.extendPause)
-        }
-        // Quiet, but never unavailable: a break the user asks for always happens.
-        MenuRow(title: state.takeBreakLabel, dimmed: true, action: actions.takeBreakNow)
-    }
-
-    @ViewBuilder
-    private var offHoursRows: some View {
-        MenuRow(title: "Start a session now", highlighted: true, action: actions.startSession)
-        MenuRow(title: state.takeBreakLabel, action: actions.takeBreakNow)
     }
 
     /// "Make due in    5 · 10 · 15 · 30 min ▸" — each number is its own target, because the row
