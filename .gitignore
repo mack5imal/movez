@@ -8,3 +8,6 @@ xcuserdata/
 # macOS
 .DS_Store
 
+
+# Python bytecode from the scripts
+__pycache__/
