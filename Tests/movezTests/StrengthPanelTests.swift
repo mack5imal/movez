@@ -186,7 +186,7 @@ final class StrengthPanelTests: XCTestCase {
 
         XCTAssertTrue(move.instructions.hasSuffix("Switch feet at the chime."))
         XCTAssertEqual(model.body, move.instructions, "an instruction that already names the chime is not repeated")
-        XCTAssertEqual(model.microDose?.line, "20 s each side")
+        XCTAssertEqual(model.microDose?.line, "30 s each side", "a lone move runs the minute, 30 s a side (LIB-16)")
 
         clock.advance(5)
         model.tick()

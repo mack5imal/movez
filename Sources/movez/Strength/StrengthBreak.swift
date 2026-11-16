@@ -85,6 +85,21 @@ struct StrengthBlock: Hashable, Identifiable {
 
     /// Seconds given to each side of a per-side move.
     var secondsPerSide: Int { perSide ? seconds / 2 : seconds }
+
+    /// The dose a block shows. A block's length is set by its builder (the 30 s cool-down, the
+    /// minute of an end-range block or a lone micro-break move), not by the library, so a dose
+    /// that is only a time ("25 s/side", "30 s") is shown as the time the block runs; otherwise
+    /// the card would read "25 s each side" over a disc that switches sides at 15 s. A rep dose,
+    /// or a time with reps in it ("6 × 4 s"), is shown as the library writes it.
+    var shownDose: String {
+        guard Self.isTimeOnly(movement.dose) else { return movement.dose }
+        return perSide ? "\(secondsPerSide) s/side" : "\(seconds) s"
+    }
+
+    /// "30 s" or "25 s/side", and nothing else.
+    private static func isTimeOnly(_ dose: String) -> Bool {
+        dose.range(of: #"^\d+ s(/side)?$"#, options: .regularExpression) != nil
+    }
 }
 
 /// One working set of a strength break.

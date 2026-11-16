@@ -82,7 +82,7 @@ extension MicroPanelBreak {
             MicroPanelMove(
                 name: block.movement.name,
                 instructions: block.movement.instructions,
-                dose: DoseText(block.movement.dose),
+                dose: DoseText(block.shownDose),
                 perSide: block.perSide,
                 seconds: block.seconds,
                 seated: StrengthPosture(block.movement) == .seated

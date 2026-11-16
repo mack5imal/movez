@@ -284,4 +284,29 @@ final class StrengthTimelineTests: XCTestCase {
         XCTAssertEqual(timeline.current?.column, 1)
         XCTAssertEqual(timeline.completedWork, 1, "only the block that ran out counts")
     }
+
+    /// A block the builder times shows the time it runs, not the library's: the cool-down runs
+    /// 30 s, so 15 s a side, and an end-range block a minute. A rep dose is still shown as it is
+    /// (LIB-16).
+    func testTimedBlocksShowTheTimeTheyRunNotTheLibrarys() {
+        XCTAssertEqual(StrengthTestSupport.movement("END-01").dose, "25 s/side")
+        XCTAssertEqual(StrengthTestSupport.movement("END-07").dose, "30 s")
+        let strength = StrengthSessionTimeline(strengthBreak: StrengthTimelineFixture.strengthBreak(), startedAt: Date())
+        XCTAssertEqual(strength.segments.last?.dose, "15 s/side")
+
+        let endRange = StrengthSessionTimeline(endRangeBreak: StrengthTimelineFixture.endRangeBreak(), startedAt: Date())
+        let doses = endRange.segments.filter { $0.movement != nil }.map(\.dose)
+        XCTAssertEqual(doses, ["30 s/side", "60 s", "6/side", "4 reps"])
+
+        XCTAssertEqual(StrengthBlock(movement: StrengthTestSupport.movement("END-07"), seconds: 30).shownDose, "30 s")
+        XCTAssertEqual(StrengthBlock(movement: StrengthTestSupport.movement("END-07"), seconds: 60).shownDose, "60 s")
+        XCTAssertEqual(StrengthBlock(movement: StrengthTestSupport.movement("END-02"), seconds: 60).shownDose, "6/side")
+    }
+
+    /// A strength micro-break's lone move runs the whole minute, and its panel says so.
+    func testAStrengthMicroBlockShowsTheTimeItRuns() {
+        let block = StrengthBlock(movement: StrengthTestSupport.movement("END-07"), seconds: 60)
+        let panel = MicroPanelBreak(StrengthMicroBreak(id: UUID(), blocks: [block], relaxed: []))
+        XCTAssertEqual(panel.moves.first?.dose, DoseText("60 s"))
+    }
 }

@@ -109,7 +109,7 @@ struct StrengthSessionTimeline: Equatable {
         }
         let coolDown = strengthBreak.coolDown
         segments.append(Segment(
-            kind: .coolDown, seconds: coolDown.seconds, movement: coolDown.movement, dose: coolDown.movement.dose,
+            kind: .coolDown, seconds: coolDown.seconds, movement: coolDown.movement, dose: coolDown.shownDose,
             pacer: nil, sideSwitchAt: coolDown.perSide ? TimeInterval(coolDown.secondsPerSide) : nil,
             column: strengthBreak.sets.count + 1
         ))
@@ -122,7 +122,7 @@ struct StrengthSessionTimeline: Equatable {
                 Self.leadIn(column: offset),
                 Segment(
                     kind: .block(offset + 1), seconds: block.seconds, movement: block.movement,
-                    dose: block.movement.dose, pacer: nil,
+                    dose: block.shownDose, pacer: nil,
                     sideSwitchAt: block.perSide ? TimeInterval(block.secondsPerSide) : nil, column: offset
                 )
             ]
