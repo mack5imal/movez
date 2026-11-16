@@ -252,7 +252,7 @@ struct StrengthRuleChecker {
     }
 
     private func microLadderRules(_ context: StrengthMicroContext) -> [Rule] {
-        let previous = regions(of: context.lastMicroMovementIds)
+        let previous = regions(of: context.lastMicroMovementIds).union(context.lastMicroRegions)
         return [
             Rule(id: "s7-served-today") { !context.usedStrengthIdsToday.contains($0.id) },
             Rule(id: "s7-previous-region") { previous.isDisjoint(with: $0.regions) },

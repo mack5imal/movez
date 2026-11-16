@@ -17,7 +17,7 @@ struct MovementModeBuilder: ModeBreakBuilding {
         let settings = coordinator.settings
         var context = MicroContext()
         context.usedMovementIdsToday = coordinator.movementIdsUsedToday(at: now)
-        context.lastMicroMovementIds = coordinator.lastMicroIds
+        context.lastMicroMovementIds = coordinator.lastMicroMovementIds()
         context.nextFullRoutineIds = nextFullBreakIds
         context.excluded = settings.excludedMovementIds
         context.equipment = settings.equipment

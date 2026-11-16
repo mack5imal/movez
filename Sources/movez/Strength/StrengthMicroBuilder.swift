@@ -19,7 +19,7 @@ struct StrengthMicroBuilder {
 
     func build(context: StrengthMicroContext) -> StrengthMicroBreak {
         var state = StrengthDrawState(seed: context.seed)
-        let previousRegions = regions(of: context.lastMicroMovementIds)
+        let previousRegions = regions(of: context.lastMicroMovementIds).union(context.lastMicroRegions)
         let nextRegions = regions(of: context.nextFullBreakIds)
         let weight: (StrengthMovement) -> Double = { StrengthDraw.recencyWeight($0, recency: context.recency) }
 

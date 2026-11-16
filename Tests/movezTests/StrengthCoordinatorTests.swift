@@ -592,4 +592,5 @@ extension StrengthCoordinatorTests {
         XCTAssertGreaterThan(served.count, 1)
         XCTAssertEqual(coordinator.movementIdsUsedToday(at: harness.now), served, "S18: Movement is unaffected")
     }
+
 }

@@ -48,11 +48,21 @@ struct StrengthModeBuilder: ModeBreakBuilding {
     }
 
     func microBreak(for coordinator: AppCoordinator, at now: Date, nextFullBreakIds: Set<String>) -> PlannedMicro {
+        .strength(StrengthMicroBuilder(library: library).build(
+            context: microContext(for: coordinator, at: now, nextFullBreakIds: nextFullBreakIds)
+        ))
+    }
+
+    func microContext(for coordinator: AppCoordinator, at now: Date, nextFullBreakIds: Set<String>) -> StrengthMicroContext {
         let settings = coordinator.settings
         let snapshot = coordinator.scheduler.snapshot
         var context = StrengthMicroContext()
         context.usedStrengthIdsToday = usedStrengthIds(for: coordinator, at: now)
         context.lastMicroMovementIds = coordinator.lastMicroIds
+        // The last micro-break may have been a Movement one, before a switch, whose ids the
+        // strength library does not know; its regions still count (S7).
+        let movementMicro = coordinator.lastMicroIds.compactMap { coordinator.library.movement(id: $0) }
+        context.lastMicroRegions = Set(movementMicro.flatMap(\.regions))
         context.nextFullBreakIds = nextFullBreakIds
         context.solidWallNearby = settings.strengthSolidWallNearby
         context.difficultyCap = settings.strengthDifficultyCap
@@ -60,7 +70,7 @@ struct StrengthModeBuilder: ModeBreakBuilding {
         context.recency = coordinator.history.recencyScores(before: now)
         context.excluded = settings.strengthExcludedIds
         context.seed = SplitMix64.seed(day: snapshot.dayKey, index: 1_000 + snapshot.microEmphasisIndex)
-        return .strength(StrengthMicroBuilder(library: library).build(context: context))
+        return context
     }
 
     func dayProgress(for coordinator: AppCoordinator, at now: Date) -> ModeDayProgress? {

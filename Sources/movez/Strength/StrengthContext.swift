@@ -24,6 +24,9 @@ struct StrengthMicroContext: Hashable {
     var usedStrengthIdsToday: Set<String> = []
     /// The previous micro-break's moves, whose regions this one leaves alone.
     var lastMicroMovementIds: Set<String> = []
+    /// The previous micro-break's regions where its ids are another library's: a Movement
+    /// micro-break just before a switch to Strength. Left alone with the strength ids' regions.
+    var lastMicroRegions: Set<Region> = []
     /// The next full break's moves, whose regions are avoided when an alternative exists.
     var nextFullBreakIds: Set<String> = []
     var solidWallNearby = true

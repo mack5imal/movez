@@ -196,4 +196,29 @@ final class StrengthEdgeTests: XCTestCase {
         XCTAssertEqual(buckets, [.tri, .tri, .tri])
         XCTAssertEqual(harness.coordinator.menuState.dayProgress?.breakNumber, nil, "the day's strength breaks are done")
     }
+
+    /// The micro-break after a switch still leaves the previous one's regions alone, whichever
+    /// library that one came from (S7, LIB-15).
+    func testAMicroBreakAfterASwitchKnowsThePreviousOnesRegions() throws {
+        let harness = strengthHarness(micro: true)
+        let coordinator = harness.coordinator
+        let shoulder = try XCTUnwrap(RoutineTestSupport.library.microEligible.first { $0.regions == [.shoulder] })
+        coordinator.lastMicroIds = [shoulder.id]
+        let builder = StrengthModeBuilder(
+            library: RoutineTestSupport.strengthLibrary,
+            usage: CrossModeUsage(movementLibrary: RoutineTestSupport.library, strengthLibrary: RoutineTestSupport.strengthLibrary)
+        )
+        var context = builder.microContext(for: coordinator, at: harness.now, nextFullBreakIds: [])
+        XCTAssertEqual(context.lastMicroRegions, [.shoulder])
+        for seed in 0..<100 {
+            context.seed = UInt64(seed)
+            let micro = StrengthMicroBuilder(library: RoutineTestSupport.strengthLibrary).build(context: context)
+            XCTAssertFalse(micro.blocks.contains { $0.movement.regions.contains(.shoulder) }, "\(micro.movementIds)")
+        }
+
+        // And the other way: a Movement micro-break after a strength one leaves its `same` twin alone.
+        let twin = try XCTUnwrap(RoutineTestSupport.strengthLibrary.movements.first { $0.bucket == .end && $0.v4Overlap?.kind == .same })
+        coordinator.lastMicroIds = [twin.id]
+        XCTAssertTrue(coordinator.lastMicroMovementIds().contains(try XCTUnwrap(twin.v4Overlap?.id)))
+    }
 }

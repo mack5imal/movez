@@ -343,6 +343,16 @@ extension AppCoordinator {
         return served.union(crossModeUsage.used(movementIds: [], strengthIds: strength).movementIds)
     }
 
+    /// The last micro-break's ids as a Movement micro-break must leave them alone: a strength
+    /// micro-break just before a switch counts by its `same` overlaps and their families, as
+    /// everything served today does (S8). After a Movement micro-break it is exactly its ids.
+    func lastMicroMovementIds() -> Set<String> {
+        guard let strengthLibrary, let crossModeUsage else { return lastMicroIds }
+        let strength = lastMicroIds.filter { strengthLibrary.movement(id: $0) != nil }
+        guard !strength.isEmpty else { return lastMicroIds }
+        return lastMicroIds.union(crossModeUsage.used(movementIds: [], strengthIds: strength).movementIds)
+    }
+
     /// Which of the day's seeds the next full break is built from: the breaks recorded today,
     /// absences aside. Every full break that reached the heads-up is recorded however it ended,
     /// so the index moves on with each one. It is read from history rather than counted in
