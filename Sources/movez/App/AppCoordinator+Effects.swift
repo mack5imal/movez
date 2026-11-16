@@ -292,6 +292,9 @@ extension AppCoordinator {
         let shared = [
             scheduler.snapshot.dayKey,
             String(index),
+            // The breaks put on screen this run count as served today, so one more of them
+            // changes what the next break may draw even before its record is written.
+            String(breaksToday.count),
             String(history.data.completions.count),
             String(settings.schedulerConfig.stableHash),
             String(settings.excludedMovementIds.count),
@@ -340,9 +343,15 @@ extension AppCoordinator {
         return served.union(crossModeUsage.used(movementIds: [], strengthIds: strength).movementIds)
     }
 
+    /// Which of the day's seeds the next full break is built from: the breaks recorded today,
+    /// absences aside. Every full break that reached the heads-up is recorded however it ended,
+    /// so the index moves on with each one. It is read from history rather than counted in
+    /// memory, so a relaunch carries on from the same index: counted in memory it went back to 0,
+    /// and a break skipped before any block was done, which leaves no completion behind, was
+    /// built again exactly as the user had just turned it down (DECISIONS 79).
     func breakIndexToday(at now: Date) -> Int {
         rollDayIfNeeded(at: now)
-        return breaksToday.count
+        return history.breaks(on: now).filter { !$0.outcome.isAbsence }.count
     }
 
     func rememberBreak(_ planned: PlannedBreak, at now: Date) {

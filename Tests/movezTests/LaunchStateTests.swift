@@ -193,6 +193,28 @@ final class LaunchStateTests: XCTestCase {
         XCTAssertDate(until, relaunchAt.addingTimeInterval(4 * 60), accuracy: 2)
     }
 
+    /// A Movement break skipped before any block was done leaves nothing in the completions, so
+    /// the index into the day's seeds is all that tells the next break from it. Kept in memory,
+    /// that index went back to 0 at a relaunch and the next break was the very routine the user
+    /// had just turned down (LIB-8). Read from history, it survives the relaunch.
+    func testABreakSkippedBeforeARelaunchIsNotServedAgainAfterIt() throws {
+        let harness = CoordinatorHarness(workingHours: .alwaysOn) { $0.microEnabled = false }
+        XCTAssertTrue(harness.run(until: { $0.isHeadsUp }))
+        XCTAssertEqual(harness.coordinator.breakIndexToday(at: harness.now), 0)
+        harness.coordinator.startNow()
+        let skipped = try XCTUnwrap(harness.coordinator.currentBreak).planned.movementIds
+        harness.clock.advance(10)
+        harness.coordinator.skip()
+        XCTAssertNil(harness.coordinator.currentBreak)
+        XCTAssertTrue(harness.coordinator.history.data.completions.isEmpty, "nothing was done")
+
+        harness.relaunch()
+
+        XCTAssertEqual(harness.coordinator.breakIndexToday(at: harness.now), 1)
+        let afterRelaunch = harness.coordinator.previewNextBreak(now: harness.now).movementIds
+        XCTAssertNotEqual(afterRelaunch, skipped, "the skipped break came back after the relaunch")
+    }
+
     func testTheStateFileIsRefreshedWhileTheAppIsQuiet() {
         let harness = CoordinatorHarness(workingHours: .alwaysOn)
         let before = harness.snapshotStore.saveCount

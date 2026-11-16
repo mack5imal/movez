@@ -98,11 +98,10 @@ struct StrengthModeBuilder: ModeBreakBuilding {
         return usage.used(movementIds: served.subtracting(strength), strengthIds: strength).strengthIds
     }
 
-    /// The breaks recorded today, absences aside. Every full break that reached the heads-up is
-    /// recorded however it ended, so the index moves on with each one, and it is read from history
-    /// so that it is the same after a relaunch.
+    /// The breaks recorded today, absences aside, which Movement mode's index reads as well. It
+    /// is read from history so that it is the same after a relaunch.
     func seedIndex(for coordinator: AppCoordinator, at now: Date) -> Int {
-        coordinator.history.breaks(on: now).filter { !$0.outcome.isAbsence }.count
+        coordinator.breakIndexToday(at: now)
     }
 
     private func unlockedBuckets(for coordinator: AppCoordinator) -> Set<StrengthBucket> {

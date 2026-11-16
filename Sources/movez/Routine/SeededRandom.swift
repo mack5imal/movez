@@ -2,9 +2,12 @@ import Foundation
 
 /// SplitMix64 — a tiny, stable PRNG.
 ///
-/// The coordinator seeds the builder with `hash(day, breakIndex)` so a relaunch mid-day
-/// regenerates exactly the same routine. That requires a generator whose output does not depend
-/// on the standard library's version, which `SystemRandomNumberGenerator` does not promise.
+/// The coordinator seeds the builder with `hash(day, breakIndex)`, where the index is the day's
+/// recorded breaks, so a relaunch mid-day builds the next break from the same seed it would have
+/// had. The routine is the same only when the rest of its context is too: the movements of a
+/// break put on screen but not done are remembered as served only until the app quits. A stable
+/// seed requires a generator whose output does not depend on the standard library's version,
+/// which `SystemRandomNumberGenerator` does not promise.
 struct SplitMix64: RandomNumberGenerator {
     private var state: UInt64
 

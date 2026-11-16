@@ -696,3 +696,14 @@ Entries from fixing the findings in `docs/code-review-2026-11.md`.
     non-default mic but still cannot tell direction on a duplex device. This is the next step 23h
     named. The minute's sustain stays, since a dictation burst is still a process recording
     (SIG-2).
+79. **A Movement break's seed comes from the day's recorded breaks, as a strength break's does.**
+    The full break is built from a seed of the day and an index, and the index was the breaks
+    this run of the app had put on screen. A relaunch set it back to 0, so a break skipped before
+    any block was done, which leaves no completion in history, was built again from exactly the
+    same context and came back as the five movements the user had just turned down, against
+    entry 32. The index is now the breaks recorded today, absences aside, the count Strength mode
+    already used, so a relaunch carries on where it was. Two things follow. A break snoozed or
+    skipped at the heads-up writes a record, so the break offered after it is a fresh draw rather
+    than the one announced, as in Strength mode. And a break put on screen but not done still
+    counts as served only until the app quits; storing its movements in history was left out,
+    since a new seed already makes the same break again unlikely, though not impossible (LIB-8).
