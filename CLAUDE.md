@@ -16,6 +16,8 @@ make snapshots      # render every UI surface to build/snapshots/*.png, fails if
 make hygiene        # overlay window-hygiene check; must launch via `open` (see README)
 make panel-hygiene  # floating panels must never take focus; run straight from the binary
 make run            # open the Debug app
+make simulate       # rerun the strength simulation; rewrites docs/strength-simulation.md and its picks fixture
+make simulate-check # check the simulation still matches the Swift builders (about a minute)
 ```
 
 Run a single test class or method (run `make gen` first if `project.yml` or the file list changed):
@@ -63,7 +65,8 @@ decides when a break happens. The coordinator hands effects on to UI through `Ef
 panels, menu bar, chimes), so it never touches AppKit itself; tests use `RecordingEffectSink`.
 
 **Signals** (`Signals/`): idle, microphone, screen capture, fullscreen and power, each behind a
-protocol in `SignalSources.swift` with fakes in `FakeSignals.swift`. `SignalAggregator` polls them
+protocol in `SignalSources.swift`; the test fakes are in `Tests/movezTests/FakeSignalSources.swift`, and
+the debug panel's injectors (`SignalInjector`, `SignalHold`) in `Signals/SignalInjector.swift`. `SignalAggregator` polls them
 and stops entirely while paused or off hours (`Scheduler.pollingRequired`). Screen-capture
 detection is a heuristic driven by `Resources/capture-signatures.json`. Debug injections go through
 `SignalOverrides`, which holds a value in front of the real source; a one-shot injection is undone
@@ -71,8 +74,18 @@ by the next poll.
 
 **Routines** (`Library/` → `Routine/`): `LibraryLoader` decodes and validates the JSON into
 `MovementLibrary`; `RoutineBuilder` and `MicroBreakBuilder` generate from it with `SeededRandom`,
-using `RoutineContext` (what was served today, recency, equipment, settings); `RoutineValidator` checks
-the shape of the result.
+using `RoutineContext` (what was served today, recency, equipment, settings). `RoutineValidator`, which
+checks the shape of the result, lives in the test target: only tests call it.
+
+**Modes** (`Modes/`, `Strength/`): a mode is a row in a table (DECISIONS 54). `BreakMode` is the enum,
+`ModeDefinition` gives each mode its names, glyphs and settings group, and `ModeBuilderTable.standard`
+in `Modes/ModeBuilder.swift` maps each mode id to its `ModeBreakBuilding` (`MovementModeBuilder` in
+`Routine/`, `StrengthModeBuilder` in `Strength/`), which also brings that mode's library. A new mode
+(the planned "100s" rep mode and physical therapy mode) is wired there: a `BreakMode` case, a
+`ModeDefinition`, and a builder registered in `ModeBuilderTable.standard`. There is no separate
+"library kind" hook; it was removed as unused. Code that tells modes apart lives only in `Modes/`,
+which `ModeExtensibilityTests` enforces by grepping the rest of `Sources/`. Strength's builders are
+mirrored in `scripts/simulate_strength.py`; change the two together and run `make simulate-check`.
 
 **UI** (`UI/`): `DesignSystem/` (tokens, Manrope text styles, controls) plus the surfaces
 (full-break `Overlay/`, heads-up/micro/toast `Panels/`, `MenuBar/`, `Settings/`), each with a view
