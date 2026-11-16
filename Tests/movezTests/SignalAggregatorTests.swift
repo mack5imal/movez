@@ -157,6 +157,45 @@ final class SignalAggregatorTests: XCTestCase {
         XCTAssertTrue(gapEvents.isEmpty, "the real notification already covered it")
     }
 
+    /// At 60x the timer is floored at a quarter of a real second, which is fifteen scaled seconds
+    /// between polls. Judged against the scaled clock, every one of those polls was a synthesised
+    /// wake, the quiet minute restarted on each, and no break ever fired.
+    func testSixtyTimesPollsAtTheFloorAreNotWakes() {
+        let harness = CoordinatorHarness(workingHours: .alwaysOn)
+        harness.settings.debugTimeScale = 60
+        let aggregator = makeAggregator(harness: harness).aggregator
+        let scaledGap = SignalAggregator.minimumPollSeconds * 60
+        XCTAssertGreaterThan(scaledGap, SignalAggregator.tickGapThresholdSeconds, "the case this test exists for")
+
+        aggregator.poll()
+        for _ in 0..<480 {
+            harness.clock.advance(scaledGap)
+            aggregator.poll()
+            harness.coordinator.tick()
+        }
+
+        let gapEvents = harness.scheduler.snapshot.transitions.transitions.filter { $0.reason.contains("tick gap") }
+        XCTAssertTrue(gapEvents.isEmpty, gapEvents.map(\.reason).joined(separator: " | "))
+        XCTAssertTrue(
+            harness.scheduler.snapshot.transitions.transitions.contains { $0.to.name == "pending_full" },
+            "two scaled hours of polling reach the full break"
+        )
+    }
+
+    /// The threshold is real time at any scale, so a real ten-second suspension is still a wake.
+    func testSixtyTimesStillSeesARealSleep() {
+        let harness = CoordinatorHarness(workingHours: .alwaysOn)
+        harness.settings.debugTimeScale = 60
+        let aggregator = makeAggregator(harness: harness).aggregator
+        aggregator.poll()
+
+        harness.clock.advance(12 * 60)
+        aggregator.poll()
+
+        let gapEvents = harness.scheduler.snapshot.transitions.transitions.filter { $0.reason.contains("tick gap") }
+        XCTAssertFalse(gapEvents.isEmpty, "twelve real seconds without a poll is a sleep at any scale")
+    }
+
     // MARK: - The microphone has to hold
 
     /// Dictation holds the mic for a few seconds at a time, and every one of those bursts used to

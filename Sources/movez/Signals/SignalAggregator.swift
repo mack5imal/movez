@@ -156,11 +156,18 @@ final class SignalAggregator {
 
     /// A long gap between polls means the process was suspended — the machine slept without the
     /// notification arriving, or arriving late.
+    ///
+    /// The gap is judged in real seconds. The clock runs at the debug time scale but the timer is
+    /// floored at `minimumPollSeconds`, so at 60x two ordinary polls are fifteen scaled seconds
+    /// apart; measured on the clock, every one of them was a synthesised wake, the quiet minute
+    /// restarted on each, and no break ever fired. The scheduler still gets the scaled gap, since
+    /// that is the stretch its countdowns lost.
     private func detectTickGap(now: Date) {
         guard let last = lastPollAt else { return }
         let gap = now.timeIntervalSince(last)
-        guard gap > Self.tickGapThresholdSeconds else { return }
-        if let lastWake = lastWakeAt, now.timeIntervalSince(lastWake) < Self.wakeCoalesceSeconds { return }
+        let scale = max(1, settings.debugTimeScale)
+        guard gap / scale > Self.tickGapThresholdSeconds else { return }
+        if let lastWake = lastWakeAt, now.timeIntervalSince(lastWake) / scale < Self.wakeCoalesceSeconds { return }
         lastWakeAt = now
         dispatch(.gapDetected(seconds: Int(gap)))
     }
