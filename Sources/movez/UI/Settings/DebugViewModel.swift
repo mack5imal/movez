@@ -15,11 +15,26 @@ final class DebugViewModel: ObservableObject {
 
     init(coordinator: AppCoordinator) {
         self.coordinator = coordinator
+        start()
+    }
+
+    /// Whether the inspector is following the coordinator's publishes.
+    var isActive: Bool { !cancellables.isEmpty }
+
+    /// Follows the coordinator, refreshing on every publish. The settings window starts it only
+    /// while the Debug section can be seen: the poll count changes on every poll, so a running
+    /// inspector republishes every couple of seconds.
+    func start() {
+        guard cancellables.isEmpty else { return }
         coordinator.objectWillChange
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in self?.refresh() }
             .store(in: &cancellables)
         refresh()
+    }
+
+    func stop() {
+        cancellables.removeAll()
     }
 
     var actions: DebugActions {

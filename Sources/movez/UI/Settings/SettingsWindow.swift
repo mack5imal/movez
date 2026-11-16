@@ -11,8 +11,10 @@ final class SettingsWindowController {
     let viewModel: SettingsViewModel
     private(set) var window: NSWindow?
     private var observer: NSObjectProtocol?
-    /// Built on the first open. The inspector rebuilds itself on every coordinator publish, and
-    /// a window nobody has opened has no business doing that from launch until quit.
+    private var closeObserver: NSObjectProtocol?
+    /// Built on the first open, and run only while the window is open with the Debug section
+    /// expanded: the inspector rebuilds itself on every coordinator publish, and a window nobody
+    /// is looking at has no business doing that.
     private let makeDebug: (() -> DebugViewModel)?
     private var debug: DebugViewModel?
 
@@ -36,6 +38,7 @@ final class SettingsWindowController {
 
     deinit {
         if let observer { NotificationCenter.default.removeObserver(observer) }
+        if let closeObserver { NotificationCenter.default.removeObserver(closeObserver) }
     }
 
     var isOpen: Bool { window?.isVisible ?? false }
@@ -49,6 +52,7 @@ final class SettingsWindowController {
         viewModel.syncLaunchAtLogin()
         let window = self.window ?? makeWindow()
         self.window = window
+        viewModel.windowOpened()
         window.center()
         // An accessory app is never frontmost by default, so the window would open behind
         // whatever the user was in.
@@ -58,6 +62,7 @@ final class SettingsWindowController {
 
     func close() {
         window?.orderOut(nil)
+        viewModel.windowClosed()
     }
 
     private func makeWindow() -> NSWindow {
@@ -76,6 +81,15 @@ final class SettingsWindowController {
         window.isReleasedWhenClosed = false
         window.contentView = NSHostingView(rootView: SettingsScreen(viewModel: viewModel))
         window.setContentSize(SettingsScreen.size)
+        // The red button closes a window that is kept, not released, so whatever sheet was open
+        // would otherwise greet the next open.
+        closeObserver = NotificationCenter.default.addObserver(
+            forName: NSWindow.willCloseNotification,
+            object: window,
+            queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.viewModel.windowClosed() }
+        }
         return window
     }
 }

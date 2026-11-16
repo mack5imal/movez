@@ -34,6 +34,9 @@ final class SettingsViewModel: ObservableObject {
     /// Told when a mode request needs a setup shown instead of switching.
     private let onModeAction: (ModeSwitchAction) -> Void
     private var debugCancellables: Set<AnyCancellable> = []
+    /// The inspector behind `debug`, kept so it can be started and stopped with the window.
+    private weak var debugSource: DebugViewModel?
+    private var isWindowVisible = false
     /// Forwards the store's own changes, so a change made elsewhere (the menu bar's mode row)
     /// redraws an open window.
     private var storeCancellable: AnyCancellable?
@@ -362,17 +365,53 @@ final class SettingsViewModel: ObservableObject {
     func setDebugExpanded(_ expanded: Bool) {
         settings.debugExpanded = expanded
         objectWillChange.send()
+        updateDebugSubscription()
     }
 
     /// Connects the debug tools to the window. Everything the section draws flows through
     /// `debug`, so the section itself never reaches for a coordinator.
     func attach(debug viewModel: DebugViewModel) {
+        debugSource = viewModel
         debugActions = viewModel.actions
         debug = viewModel.state
-        viewModel.$state
-            .receive(on: RunLoop.main)
-            .sink { [weak self] state in self?.debug = state }
-            .store(in: &debugCancellables)
+        updateDebugSubscription()
+    }
+
+    /// The window is on screen.
+    func windowOpened() {
+        isWindowVisible = true
+        updateDebugSubscription()
+    }
+
+    /// The window closed, by its red button or otherwise. A sheet left open is closed the way its
+    /// own cancel button would close it: the Strength setup is declined and a working-hours draft
+    /// is dropped, so the next open starts on the settings rather than on a stale question (UI-25).
+    func windowClosed() {
+        isWindowVisible = false
+        declineStrengthSetup()
+        openSheet = nil
+        hoursDraft = settings.workingHours
+        hoursError = nil
+        updateDebugSubscription()
+    }
+
+    /// The inspector runs only while it can be seen: the window open and the Debug section
+    /// expanded. Left running, its poll count republished this view model every couple of
+    /// seconds for the rest of the run (UI-24).
+    private func updateDebugSubscription() {
+        guard let source = debugSource else { return }
+        let wanted = isWindowVisible && settings.debugExpanded
+        if wanted, debugCancellables.isEmpty {
+            source.start()
+            debug = source.state
+            source.$state
+                .receive(on: RunLoop.main)
+                .sink { [weak self] state in self?.debug = state }
+                .store(in: &debugCancellables)
+        } else if !wanted {
+            debugCancellables.removeAll()
+            source.stop()
+        }
     }
 
     private func changed() {
