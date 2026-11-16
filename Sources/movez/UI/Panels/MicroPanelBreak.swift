@@ -29,23 +29,23 @@ struct MicroPanelBreak: Equatable {
     /// A strength per-side move must tell the user when to change sides, because the side switches
     /// at the halfway chime; Movement's instructions are shown as they were.
     let switchesAtChime: Bool
+    /// The source's timeline, its own library's lead-in included, so the panel runs the moves to
+    /// the same clock that decides which of them are recorded.
+    let timeline: MicroTimeline
 
     static let switchAtChime = "Switch at the chime."
 
     /// 65 s for one move, 70 s for two, lead-ins included.
-    var totalSeconds: Int {
-        moves.reduce(0) { $0 + Routine.leadInSeconds + $1.seconds }
-    }
+    var totalSeconds: Int { timeline.totalSeconds }
+
+    /// The lead-in before each move.
+    var leadInSeconds: Int { timeline.leadInSeconds }
 
     /// Seconds into the running micro-break at which each move appears; its lead-in starts there.
-    func appearsAt(move index: Int) -> Int {
-        moves.prefix(index).reduce(0) { $0 + Routine.leadInSeconds + $1.seconds }
-    }
+    func appearsAt(move index: Int) -> Int { timeline.appearsAt(block: index) }
 
     /// Seconds into the running micro-break at which each move starts.
-    func startsAt(move index: Int) -> Int {
-        appearsAt(move: index) + Routine.leadInSeconds
-    }
+    func startsAt(move index: Int) -> Int { timeline.startsAt(block: index) }
 
     /// The instruction the panel shows for a move. Most strength instructions already end by saying
     /// which limb to switch at the chime, and those are left alone rather than said twice.
@@ -74,6 +74,7 @@ extension MicroPanelBreak {
         // anything that can be done standing is standing.
         posture = !moves.isEmpty && moves.allSatisfy(\.seated) ? "seated" : "standing"
         switchesAtChime = false
+        timeline = micro.timeline
     }
 
     /// A strength micro-break: END moves, each with its dose under its name.
@@ -90,6 +91,7 @@ extension MicroPanelBreak {
         }
         posture = Self.strengthPosture(moves.map(\.seated))
         switchesAtChime = true
+        timeline = micro.timeline
     }
 
     /// "sitting", "standing" or "sitting then standing". S7 keeps both moves in one posture, so the

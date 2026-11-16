@@ -226,4 +226,37 @@ final class StrengthEdgeTests: XCTestCase {
         coordinator.lastMicroIds = [twin.id]
         XCTAssertTrue(coordinator.lastMicroMovementIds().contains(try XCTUnwrap(twin.v4Overlap?.id)))
     }
+
+    /// A two-move strength micro-break left at 40 s records only its first move: the second
+    /// appeared at 35 s and starts moving at 40, after its own lead-in (LIB-5).
+    func testAStrengthMicroBreakLeftPartWayRecordsOnlyWhatRan() throws {
+        // Excluding the one-sided END moves leaves only the pairs of two-sided ones.
+        let oneSided = RoutineTestSupport.strengthLibrary.movements.filter { $0.bucket == .end && $0.perSide }.map(\.id)
+        let harness = strengthHarness(micro: true) { $0.strengthExcludedIds = Set(oneSided) }
+        var pair: StrengthMicroBreak?
+        for _ in 0..<12 where pair == nil {
+            XCTAssertTrue(harness.run(until: { $0.isMicroRunning || $0.isHeadsUp }))
+            if harness.state.isHeadsUp {
+                harness.coordinator.startNow()
+                harness.completeBreak()
+                continue
+            }
+            let micro = try XCTUnwrap(harness.coordinator.currentMicro?.strengthMicro)
+            if micro.blocks.count == 2 {
+                pair = micro
+            } else {
+                harness.clock.advance(TimeInterval(micro.totalSeconds))
+                harness.coordinator.microEnded()
+            }
+        }
+        let micro = try XCTUnwrap(pair, "no two-move strength micro-break in twelve tries")
+        XCTAssertEqual(micro.blocks.map(\.seconds), [30, 30])
+        let before = harness.history.data.completions.count
+
+        harness.clock.advance(40)
+        harness.coordinator.inject(.userMicroSkip)
+
+        let recorded = harness.history.data.completions.dropFirst(before).map(\.movementId)
+        XCTAssertEqual(recorded, [micro.blocks[0].movement.id])
+    }
 }

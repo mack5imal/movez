@@ -57,30 +57,22 @@ struct MicroBreak: Hashable, Identifiable {
     let id: UUID
     let blocks: [RoutineBlock]
 
-    /// 65 s for one movement, 70 s for two. The first movement gets a lead-in too: the count-in
-    /// names it, but only the lead-in shows its instructions before its clock starts.
-    var totalSeconds: Int {
-        blocks.reduce(0) { $0 + $1.seconds } + Routine.leadInSeconds * blocks.count
+    /// Each block after a lead-in. The first movement gets one too: the count-in names it, but
+    /// only the lead-in shows its instructions before its clock starts.
+    var timeline: MicroTimeline {
+        MicroTimeline(blockSeconds: blocks.map(\.seconds), leadInSeconds: Routine.leadInSeconds)
     }
+
+    /// 65 s for one movement, 70 s for two.
+    var totalSeconds: Int { timeline.totalSeconds }
 
     var movementIds: [String] { blocks.map(\.movement.id) }
 
-    /// Seconds into the running micro-break at which each block appears; its lead-in starts
-    /// there.
-    func appearsAt(block index: Int) -> Int {
-        blocks.prefix(index).reduce(0) { $0 + Routine.leadInSeconds + $1.seconds }
-    }
-
     /// Seconds into the running micro-break at which each block's movement starts.
-    func startsAt(block index: Int) -> Int {
-        appearsAt(block: index) + Routine.leadInSeconds
-    }
+    func startsAt(block index: Int) -> Int { timeline.startsAt(block: index) }
 
-    /// The blocks the user got at least halfway through in `seconds` of running time — the rule a
-    /// full break is held to, applied to each movement.
+    /// The blocks the user got at least halfway through in `seconds` of running time.
     func blocksRun(seconds: Int) -> [RoutineBlock] {
-        blocks.indices.filter { index in
-            (seconds - startsAt(block: index)) * 2 >= blocks[index].seconds
-        }.map { blocks[$0] }
+        timeline.indicesRun(seconds: seconds).map { blocks[$0] }
     }
 }

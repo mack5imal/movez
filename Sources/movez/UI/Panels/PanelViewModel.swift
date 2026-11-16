@@ -255,7 +255,7 @@ final class PanelViewModel: ObservableObject {
     /// per side for a per-side one, and a lead-in or count-in drains it towards the start.
     var discProgress: Double {
         guard phase == .microRunning, let block = microBlock else { return progress }
-        if isMicroLeadIn { return microBlockRemainingExact / Double(Routine.leadInSeconds) }
+        if isMicroLeadIn { return microBlockRemainingExact / Double(micro?.leadInSeconds ?? Routine.leadInSeconds) }
         guard block.perSide else { return max(0, min(1, 1 - microBlockRemainingExact / Double(max(1, block.seconds)))) }
         let half = Double(max(1, block.secondsPerSide))
         let sideRemaining = microSide == .left ? microBlockRemainingExact - half : microBlockRemainingExact

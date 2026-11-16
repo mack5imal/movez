@@ -237,12 +237,20 @@ struct StrengthMicroBreak: Hashable, Identifiable {
     let blocks: [StrengthBlock]
     let relaxed: [StrengthRelaxation]
 
-    /// 65 s for one move, 70 s for two, as in movement mode.
-    var totalSeconds: Int {
-        blocks.reduce(0) { $0 + StrengthTiming.leadInSeconds + $1.seconds }
+    /// Each move after a strength lead-in, laid out as a movement micro-break is.
+    var timeline: MicroTimeline {
+        MicroTimeline(blockSeconds: blocks.map(\.seconds), leadInSeconds: StrengthTiming.leadInSeconds)
     }
 
+    /// 65 s for one move, 70 s for two, as in movement mode.
+    var totalSeconds: Int { timeline.totalSeconds }
+
     var movementIds: [String] { blocks.map(\.movement.id) }
+
+    /// The blocks the user got at least halfway through in `seconds` of running time.
+    func blocksRun(seconds: Int) -> [StrengthBlock] {
+        timeline.indicesRun(seconds: seconds).map { blocks[$0] }
+    }
 }
 
 extension UUID {

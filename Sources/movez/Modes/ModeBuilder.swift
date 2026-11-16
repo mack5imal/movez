@@ -86,24 +86,14 @@ enum PlannedMicro: Hashable {
         return micro
     }
 
-    /// The parts the user got at least halfway through in `seconds` of running time. Both kinds
-    /// lay their blocks out the same way, each after a five-second lead-in, so the rule is the one
-    /// `MicroBreak.blocksRun` applies.
+    /// The parts the user got at least halfway through in `seconds` of running time, by the
+    /// `MicroTimeline` the panel ran.
     func partsRun(seconds: Int) -> [BreakPart] {
         switch self {
         case let .movement(micro):
             return micro.blocksRun(seconds: seconds).map { BreakPart(movementId: $0.movement.id, seconds: $0.seconds) }
         case let .strength(micro):
-            var startsAt = 0
-            var run: [BreakPart] = []
-            for block in micro.blocks {
-                startsAt += StrengthTiming.leadInSeconds
-                if (seconds - startsAt) * 2 >= block.seconds {
-                    run.append(BreakPart(movementId: block.movement.id, seconds: block.seconds))
-                }
-                startsAt += block.seconds
-            }
-            return run
+            return micro.blocksRun(seconds: seconds).map { BreakPart(movementId: $0.movement.id, seconds: $0.seconds) }
         }
     }
 }

@@ -211,6 +211,7 @@
 		D60462131795A23088939F1F /* OverlayState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD996CAE1CAE24052BF77E3 /* OverlayState.swift */; };
 		D743EBAC3DF196459BCE30D0 /* StrengthUnlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4227A3ABA9A77EAF8F78BE2 /* StrengthUnlock.swift */; };
 		D82D8E877AC0EE6B93652726 /* MicroBreakBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0358B4658CB12F9685A9098 /* MicroBreakBuilder.swift */; };
+		D8B9E7410F1F3CA8458FC49A /* MicroTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A95156FAE382FD53181DD7C /* MicroTimeline.swift */; };
 		DC4ECE0480D69C5F50F122E7 /* OverlayWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9996B1C5E2AF9F01AEF92CA3 /* OverlayWindowController.swift */; };
 		DC701B6A25EFEA4C0DBF9685 /* MovementModeBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8921F47104E00A48AB3529B7 /* MovementModeBuilder.swift */; };
 		DE81E55383C3209ECD6CD888 /* FontsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79454DFD8FB5D5C68D4F0AD /* FontsTests.swift */; };
@@ -317,6 +318,7 @@
 		4880E3A5C4CA66BFA31A1C1D /* Scheduler+Suppression.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Scheduler+Suppression.swift"; sourceTree = "<group>"; };
 		48BA5FF572E0A2F7A60570D7 /* NoticeWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticeWindowController.swift; sourceTree = "<group>"; };
 		48F6414E4D76752A2502F568 /* StrengthDayPlannerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrengthDayPlannerTests.swift; sourceTree = "<group>"; };
+		4A95156FAE382FD53181DD7C /* MicroTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroTimeline.swift; sourceTree = "<group>"; };
 		4BC2DA2DB7050A2083A2C262 /* FakeSignalSources.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FakeSignalSources.swift; sourceTree = "<group>"; };
 		4BD996CAE1CAE24052BF77E3 /* OverlayState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayState.swift; sourceTree = "<group>"; };
 		4BE2060ABEFD9EFCA9032097 /* SettingsWindowLifecycleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindowLifecycleTests.swift; sourceTree = "<group>"; };
@@ -693,6 +695,7 @@
 			isa = PBXGroup;
 			children = (
 				E0358B4658CB12F9685A9098 /* MicroBreakBuilder.swift */,
+				4A95156FAE382FD53181DD7C /* MicroTimeline.swift */,
 				8921F47104E00A48AB3529B7 /* MovementModeBuilder.swift */,
 				A4954FDF028687ECBDC44740 /* Recency.swift */,
 				52237A737E2C1AFF6A78303C /* Routine.swift */,
@@ -1122,6 +1125,7 @@
 				A0C943B9A00D128161B3F4A6 /* MicroBreakView.swift in Sources */,
 				40487390C04FDEC4AB6536C1 /* MicroPanelBreak+PlannedMicro.swift in Sources */,
 				F188D6E3A0C60023A8192466 /* MicroPanelBreak.swift in Sources */,
+				D8B9E7410F1F3CA8458FC49A /* MicroTimeline.swift in Sources */,
 				CBD44C80766A8AA5DC6F172A /* MicrophoneMonitor.swift in Sources */,
 				3B026B4F0F4FB9EA01808AFD /* ModeBadge.swift in Sources */,
 				932BFF111729E71DFC4DCDC3 /* ModeBuilder.swift in Sources */,
