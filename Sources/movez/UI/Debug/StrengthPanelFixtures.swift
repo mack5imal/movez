@@ -41,7 +41,7 @@ extension SnapshotFixtures {
     }
 
     /// The longest text a strength micro-break can show: the longest standing END name over the
-    /// longest END instruction, on a per-side move, first side.
+    /// longest END instruction, on a per-side move, on its second side.
     static func strengthMicroLongText() -> PanelViewModel {
         strengthMicroRunning(elapsed: microSideElapsed, micro: strengthMicroLong())
     }
@@ -62,7 +62,9 @@ extension SnapshotFixtures {
               let named = library.movement(id: microLongNameId),
               let texted = library.movement(id: microLongTextId)
         else { return nil }
-        let movement = renamed(texted, after: named)
+        // Everything but the name is the long-instruction move's. `renamed(_:after:)` takes the
+        // instruction from the named move too, which drew the name's own shorter instruction.
+        let movement = texted.named(named.name)
         let block = StrengthBlock(movement: movement, seconds: StrengthTiming.microHalfSeconds * 2)
         return MicroPanelBreak(StrengthMicroBreak(id: UUID(), blocks: [block], relaxed: []))
     }
@@ -79,5 +81,20 @@ extension SnapshotFixtures {
         guard let library = strengthLibrary else { return nil }
         let blocks = ids.compactMap(library.movement(id:)).map { StrengthBlock(movement: $0, seconds: seconds) }
         return MicroPanelBreak(StrengthMicroBreak(id: UUID(), blocks: blocks, relaxed: []))
+    }
+}
+
+private extension StrengthMovement {
+    /// This move under another name, for a fixture that needs the longest name over the longest
+    /// instruction when no single move has both.
+    func named(_ name: String) -> StrengthMovement {
+        StrengthMovement(
+            id: id, name: name, bucket: bucket, regions: regions, dose: dose,
+            perSide: perSide, blockSeconds: blockSeconds, difficulty: difficulty,
+            settings: settings, onFloor: onFloor, equipment: equipment,
+            vigorous: vigorous, load: load,
+            gripDemand: gripDemand, microEligible: microEligible, instructions: instructions,
+            v4Overlap: v4Overlap
+        )
     }
 }

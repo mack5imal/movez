@@ -227,7 +227,7 @@ extension SnapshotFixtures {
     }
 
     /// `dosed` under `named`'s name and instruction, for the long-dose snapshot: no single move
-    /// has both the longest name and the longest dose.
+    /// has both the longest name and the longest dose. Only the dose and the timing are `dosed`'s.
     static func renamed(_ dosed: StrengthMovement, after named: StrengthMovement) -> StrengthMovement {
         StrengthMovement(
             id: dosed.id, name: named.name, bucket: dosed.bucket, regions: dosed.regions, dose: dosed.dose,
@@ -247,6 +247,9 @@ extension SnapshotFixtures {
     }
 
     /// Ticks a second at a time until the overlay shows `kind`.
+    ///
+    /// A break that never reaches it (a library edit that changed a pinned move, say) stops at
+    /// the cap loudly rather than handing back whatever segment it got to.
     private static func run(
         _ model: StrengthOverlayViewModel,
         _ clock: ManualClock,
@@ -257,6 +260,9 @@ extension SnapshotFixtures {
             tick(model, clock)
             ticks += 1
         } while model.state.segment != kind && ticks < 1_000
+        if model.state.segment != kind {
+            assertionFailure("a strength fixture never reached \(kind)")
+        }
     }
 
     /// Moves the clock on within the segment on screen and redraws, without a tick that could

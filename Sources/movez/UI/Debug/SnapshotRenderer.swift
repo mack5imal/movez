@@ -116,6 +116,41 @@ enum SnapshotSurface: String, CaseIterable {
 
     /// The colour behind the surface, so panels are legible against something.
     var backdrop: MovezColor { Tokens.panelSolid }
+
+    /// Which table of fixtures draws the surface.
+    enum Family {
+        case gallery, panel, micro, strengthPanel, menu, modeSheet, settings, notice, overlay, strengthOverlay
+    }
+
+    /// An exhaustive switch with no default, so a new surface does not compile until it is given
+    /// a family. Before, the lookups fell through to the Movement overlay, and a surface nobody
+    /// had wired up rendered that picture under its own name.
+    var family: Family {
+        switch self {
+        case .gallery: return .gallery
+        case .headsUp, .headsUpDeferred, .toast: return .panel
+        case .microCountIn, .microFirstLeadIn, .microRunning, .microLeadIn, .microSecond, .microSide: return .micro
+        case .headsUpStrength, .headsUpStrengthEndRange, .headsUpStrengthDeferred, .microStrengthCountIn,
+             .microStrengthLeadIn, .microStrengthRunning, .microStrengthSide, .microStrengthSecond,
+             .microStrengthLongText:
+            return .strengthPanel
+        case .menuSitting, .menuPaused, .menuOffHours, .menuAway, .menuNotice, .menuStrength,
+             .menuStrengthPaused, .menuStrengthOffHours, .menuStrengthAway:
+            return .menu
+        case .menuIcon, .menuIconStrength, .menuIcons, .menuIconsPaused, .menuIconsOffHours, .modeBadges:
+            return .modeSheet
+        case .settings, .settingsHours, .settingsLibrary, .settingsExceptions, .settingsCustom,
+             .settingsStrength, .settingsStrengthLibrary, .settingsStrengthSetup, .debug:
+            return .settings
+        case .notice, .noticeEnd, .noticeRead: return .notice
+        case .overlayFull, .overlayLeadIn, .overlayPaused, .overlaySide, .overlayLongName: return .overlay
+        case .overlayStrengthSet, .overlayStrengthWarmUp, .overlayStrengthLeadIn, .overlayStrengthRest,
+             .overlayStrengthCoolDown, .overlayStrengthSide, .overlayStrengthHold, .overlayStrengthPaused,
+             .overlayStrengthReducedMotion, .overlayStrengthLongDose, .overlayStrengthRelaxed, .overlayEndRange,
+             .overlayEndRangeLeadIn, .overlayEndRangeSide, .overlayEndRangePaused:
+            return .strengthOverlay
+        }
+    }
 }
 
 enum SnapshotError: LocalizedError {
@@ -140,9 +175,26 @@ enum SnapshotRenderer {
     static let scale: CGFloat = 2
 
     static func view(for surface: SnapshotSurface) -> AnyView {
-        strengthPanelView(for: surface) ?? panelView(for: surface) ?? menuView(for: surface)
-            ?? settingsView(for: surface) ?? noticeView(for: surface)
-            ?? strengthOverlayView(for: surface) ?? overlayView(for: surface)
+        if let view = fixtureView(for: surface) { return view }
+        assertionFailure("no fixture draws \(surface.rawValue)")
+        return AnyView(MovezText("No fixture draws \(surface.rawValue).", MovezType.panelTitle))
+    }
+
+    /// The surface drawn from its family's fixtures, or nil when its family has no entry for it,
+    /// which a test checks never happens.
+    static func fixtureView(for surface: SnapshotSurface) -> AnyView? {
+        switch surface.family {
+        case .gallery: return AnyView(GalleryView())
+        case .panel: return panelView(for: surface)
+        case .micro: return microView(for: surface)
+        case .strengthPanel: return strengthPanelView(for: surface)
+        case .menu: return menuView(for: surface)
+        case .modeSheet: return modeSheetView(for: surface)
+        case .settings: return settingsView(for: surface)
+        case .notice: return noticeView(for: surface)
+        case .overlay: return overlayView(for: surface)
+        case .strengthOverlay: return strengthOverlayView(for: surface)
+        }
     }
 
     /// The strength and end-range break, each state from `StrengthSnapshotFixtures`.
@@ -206,11 +258,9 @@ enum SnapshotRenderer {
         return AnyView(NoticeScreen(viewModel: viewModel))
     }
 
-    /// The gallery and the floating panels.
+    /// The Movement heads-up and the away toast.
     private static func panelView(for surface: SnapshotSurface) -> AnyView? {
         switch surface {
-        case .gallery:
-            return AnyView(GalleryView())
         case .headsUp:
             return AnyView(PanelSnapshot(viewModel: SnapshotFixtures.headsUp()))
         case .headsUpDeferred:
@@ -218,7 +268,7 @@ enum SnapshotRenderer {
         case .toast:
             return AnyView(PanelSnapshot(viewModel: SnapshotFixtures.awayToast(), placement: .topRight))
         default:
-            return microView(for: surface)
+            return nil
         }
     }
 
@@ -287,7 +337,7 @@ enum SnapshotRenderer {
         case .menuStrengthAway:
             return AnyView(MenuSnapshot(state: SnapshotFixtures.menuStrengthAway()))
         default:
-            return modeSheetView(for: surface)
+            return nil
         }
     }
 
@@ -311,8 +361,10 @@ enum SnapshotRenderer {
         }
     }
 
-    private static func overlayView(for surface: SnapshotSurface) -> AnyView {
+    private static func overlayView(for surface: SnapshotSurface) -> AnyView? {
         switch surface {
+        case .overlayFull:
+            return AnyView(OverlaySnapshot(state: SnapshotFixtures.overlayRunning()))
         case .overlayLeadIn:
             return AnyView(OverlaySnapshot(state: SnapshotFixtures.overlayLeadIn()))
         case .overlayPaused:
@@ -322,7 +374,7 @@ enum SnapshotRenderer {
         case .overlayLongName:
             return AnyView(OverlaySnapshot(state: SnapshotFixtures.overlayLongName()))
         default:
-            return AnyView(OverlaySnapshot(state: SnapshotFixtures.overlayRunning()))
+            return nil
         }
     }
 
