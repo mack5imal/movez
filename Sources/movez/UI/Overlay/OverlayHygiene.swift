@@ -63,9 +63,7 @@ enum OverlayHygiene {
             startedAt: clock.now,
             clock: clock,
             chimes: chimes,
-            skipsToday: 1,
-            streak: 2,
-            nextBreakAt: clock.now.addingTimeInterval(3300)
+            skipsToday: 1
         )
         // How long the break takes to actually appear. A break that arrives a second late has
         // already interrupted whatever the user was doing, twice.

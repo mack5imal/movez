@@ -69,7 +69,6 @@ final class AppCoordinator: ObservableObject {
     @Published var headsUpInfo: HeadsUpInfo?
     @Published var toastInfo: ToastInfo?
     @Published var todayStats = DailyStats.empty
-    @Published var streak = 0
     @Published var nextBreakPreview: PlannedBreak?
 
     /// The running coordinator. App Intents are created by the system with no way to be handed
@@ -385,7 +384,6 @@ final class AppCoordinator: ObservableObject {
     func refreshPublished() {
         let now = clock.now
         assign(history.stats(on: now), to: \.todayStats)
-        assign(history.streak(on: now), to: \.streak)
         let preview = previewNextBreak(now: now)
         assign(preview, to: \.nextBreakPreview)
         dayProgress = activeModeBuilder.dayProgress(for: self, at: now)

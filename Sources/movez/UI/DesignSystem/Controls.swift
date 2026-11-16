@@ -146,27 +146,6 @@ struct InfoBadge: View {
     }
 }
 
-/// "4 breaks in a row today" on the end-of-break screen.
-struct StreakChip: View {
-    var count: Int
-
-    var body: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 10) {
-            MovezText("\(count)", MovezType.streakNumber, color: Tokens.accent)
-            MovezText(label, MovezType.streakLabel, color: Tokens.accent)
-        }
-        .padding(.horizontal, 26)
-        .padding(.vertical, 14)
-        .background(Capsule().fill(Tokens.accentTint.color))
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(count) \(label)")
-    }
-
-    private var label: String {
-        count == 1 ? "break in a row today" : "breaks in a row today"
-    }
-}
-
 /// The uppercase accent label at the head of each settings section.
 struct SectionLabel: View {
     var text: String

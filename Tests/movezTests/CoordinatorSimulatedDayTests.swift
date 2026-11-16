@@ -62,7 +62,6 @@ final class CoordinatorSimulatedDayTests: XCTestCase {
 
         let stats = harness.history.stats(on: harness.now)
         XCTAssertEqual(stats.done, 9)
-        XCTAssertEqual(harness.history.streak(on: harness.now), 9)
 
         for (index, entry) in breaks.enumerated() {
             XCTAssertEqual(
@@ -91,7 +90,6 @@ final class CoordinatorSimulatedDayTests: XCTestCase {
             \(lines.joined(separator: "\n"))
 
             done \(stats.done) · snoozed \(stats.snoozed) · skipped \(stats.skipped)
-            streak \(harness.history.streak(on: harness.now))
             longest sitting bout \(AppCoordinator.duration(stats.longestBoutSeconds))
             distinct movements served \(distinctMovements)
             """,
@@ -99,7 +97,7 @@ final class CoordinatorSimulatedDayTests: XCTestCase {
         )
     }
 
-    func testSkippingABreakResetsTheStreak() {
+    func testASkippedBreakIsRecordedInPlace() {
         let harness = CoordinatorHarness()
         let breaks = simulateDay(harness: harness, skipBreakIndex: 2, hours: 5 * 3600)
         XCTAssertGreaterThanOrEqual(breaks.count, 4)
@@ -110,11 +108,7 @@ final class CoordinatorSimulatedDayTests: XCTestCase {
         let records = harness.history.breaks(on: today)
         XCTAssertEqual(records[2].outcome, .skipped)
         XCTAssertEqual(records[3].outcome, .done)
-
-        // Streak after the skip is 0, and 1 again once the next break is completed.
-        let throughSkip = Array(records.prefix(3))
-        XCTAssertEqual(throughSkip.last?.outcome, .skipped)
-        XCTAssertEqual(harness.history.streak(on: today), records.count - 3)
+        XCTAssertEqual(harness.history.stats(on: today).done, records.count - 1)
     }
 
     func testEffectOrderForOneCompletedBreak() {
@@ -227,13 +221,12 @@ final class CoordinatorSimulatedDayTests: XCTestCase {
         XCTAssertEqual(harness.coordinator.currentBreak?.planned.movementIds, preview?.movementIds)
     }
 
-    /// An absence is written down, moves none of the day's numbers or the streak, and "I was
-    /// sitting" takes the entry back out.
+    /// An absence is written down, moves none of the day's numbers, and "I was sitting" takes the
+    /// entry back out.
     func testAnAbsenceIsLoggedButIsNotABreakAndIsReversible() {
         for behaviour in AwayBehaviour.allCases {
             let harness = CoordinatorHarness { $0.awayBehaviour = behaviour }
             harness.run(seconds: 10 * minute)
-            let streak = harness.history.streak(on: harness.now)
 
             harness.clock.advance(7 * minute)
             harness.coordinator.inject(.idle(seconds: 7 * 60))
@@ -242,7 +235,6 @@ final class CoordinatorSimulatedDayTests: XCTestCase {
             XCTAssertEqual(harness.history.data.breakRecords.first?.routineName, "Away 7 min")
             let stats = harness.history.stats(on: harness.now)
             XCTAssertEqual([stats.done, stats.skipped, stats.snoozed], [0, 0, 0], "not done, skipped or snoozed")
-            XCTAssertEqual(harness.history.streak(on: harness.now), streak)
             XCTAssertEqual(harness.coordinator.toastInfo?.behaviour, behaviour)
 
             harness.clock.advance(3)
@@ -271,7 +263,6 @@ final class CoordinatorSimulatedDayTests: XCTestCase {
         skipped.coordinator.inject(.userSkip)
 
         XCTAssertEqual(skipped.history.stats(on: skipped.now).skipped, 1)
-        XCTAssertEqual(skipped.history.streak(on: skipped.now), 0, "a skip ends the streak wherever it is made")
     }
 
     /// History used to be written whenever the panel came down, so a micro-break taken off screen

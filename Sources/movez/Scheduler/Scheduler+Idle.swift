@@ -4,7 +4,7 @@ import Foundation
 ///
 /// An absence shorter than the user's "Count me away after" is sitting, and nothing happens. A
 /// longer one either resets both countdowns or pauses them, as the user has chosen, and is never a
-/// break: it adds nothing to the day's count or the streak. It is logged, and the toast that says
+/// break: it adds nothing to the day's count. It is logged, and the toast that says
 /// what happened offers "I was sitting", because the app cannot tell a walk to the kitchen from a
 /// long read on paper.
 ///

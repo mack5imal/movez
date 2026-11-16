@@ -16,7 +16,7 @@ final class AccessibilityTests: XCTestCase {
     func testEveryDesignSystemControlSaysWhatItIs() throws {
         let controls = [
             "MovezToggle", "SegmentedControl", "Chip", "SelectField", "MenuRow", "TimerDisc",
-            "SequenceStrip", "StreakChip", "SideToggle", "StepperField", "ExceptionRow",
+            "SequenceStrip", "SideToggle", "StepperField", "ExceptionRow",
             "DebugContainer"
         ]
         var silent: [String] = []

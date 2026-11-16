@@ -23,9 +23,6 @@ enum BreakResult: String, Codable, Equatable, CaseIterable {
     /// An absence that paused the countdowns. Logged the same way.
     case awayPaused
 
-    /// Snoozing is a deferral and an absence is not a break, so neither counts for or against the
-    /// streak.
-    var affectsStreak: Bool { self != .snoozed && !isAbsence }
     var countsAsCompleted: Bool { self == .done || self == .credited }
     var isAbsence: Bool { self == .awayReset || self == .awayPaused }
 
@@ -232,17 +229,6 @@ final class HistoryStore {
             today.append(record)
         }
         return today.reversed()
-    }
-
-    /// Consecutive completed breaks, counting back from the most recent one. A skip resets it; a
-    /// snooze is a deferral and does not.
-    func streak(on date: Date) -> Int {
-        var streak = 0
-        for record in breaks(on: date).reversed() where record.outcome.affectsStreak {
-            guard record.outcome.countsAsCompleted else { break }
-            streak += 1
-        }
-        return streak
     }
 
     /// The most recent day with any break recorded — what the off-hours menu shows. A day with

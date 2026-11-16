@@ -11,7 +11,6 @@ enum SnapshotSurface: String, CaseIterable {
     case overlayLeadIn = "overlay-leadin"
     case overlayPaused = "overlay-paused"
     case overlaySide = "overlay-side"
-    case overlayEnd = "overlay-end"
     case overlayLongName = "overlay-long-name"
     case overlayStrengthSet = "overlay-strength-set"
     case overlayStrengthWarmUp = "overlay-strength-warmup"
@@ -105,7 +104,7 @@ enum SnapshotSurface: String, CaseIterable {
             return CGSize(width: SettingsScreen.size.width, height: 1_500)
         case .notice, .noticeEnd, .noticeRead:
             return NoticeScreen.size
-        case .overlayFull, .overlayLeadIn, .overlayPaused, .overlaySide, .overlayEnd, .overlayLongName:
+        case .overlayFull, .overlayLeadIn, .overlayPaused, .overlaySide, .overlayLongName:
             return Self.screen
         case .overlayStrengthSet, .overlayStrengthWarmUp, .overlayStrengthLeadIn, .overlayStrengthRest,
              .overlayStrengthCoolDown, .overlayStrengthSide, .overlayStrengthHold, .overlayStrengthPaused,
@@ -320,8 +319,6 @@ enum SnapshotRenderer {
             return AnyView(OverlaySnapshot(state: SnapshotFixtures.overlayPaused()))
         case .overlaySide:
             return AnyView(OverlaySnapshot(state: SnapshotFixtures.overlaySide()))
-        case .overlayEnd:
-            return AnyView(OverlaySnapshot(state: SnapshotFixtures.overlayEnd()))
         case .overlayLongName:
             return AnyView(OverlaySnapshot(state: SnapshotFixtures.overlayLongName()))
         default:

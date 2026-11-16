@@ -5,7 +5,6 @@ import Foundation
 /// handoff's routine name is gone: routines no longer have one.
 enum SnapshotFixtures {
     static let eyebrow = OverlayState.movementBreakEyebrow
-    static let completionTitle = "Break done"
 
     static let movementName = "March in place"
     static let movementInstruction = """
@@ -36,9 +35,6 @@ enum SnapshotFixtures {
 
     static let breakRemaining = "4:12 LEFT"
     static let blockNumerals = "0:42"
-    static let nextBreakAt = "12:05"
-    static let endSummary = "Five movements done. Next break at 12:05."
-    static let streak = 4
     static let skipsToday = 1
 }
 
@@ -58,7 +54,6 @@ extension SnapshotFixtures {
         state.snoozeAvailable = true
         state.skipEnabled = true
         state.skipsToday = skipsToday
-        state.streak = streak
         return state
     }
 
@@ -96,18 +91,6 @@ extension SnapshotFixtures {
         state.isSideBlock = true
         state.side = .left
         state.strip = strip(currentIndex: 2, sideIndex: 0)
-        return state
-    }
-
-    static func overlayEnd() -> OverlayState {
-        var state = OverlayState()
-        state.phase = .complete
-        state.eyebrow = "\(OverlayState.movementBreakEyebrow) · COMPLETE"
-        state.headerTrailing = "NEXT BREAK \(nextBreakAt)"
-        state.completionTitle = completionTitle
-        state.endSummary = endSummary
-        state.streak = streak
-        state.strip = strip(currentIndex: 5)
         return state
     }
 

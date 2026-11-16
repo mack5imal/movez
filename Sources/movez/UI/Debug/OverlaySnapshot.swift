@@ -11,7 +11,7 @@ struct OverlaySnapshot: View {
     var body: some View {
         ZStack {
             Self.desktop
-            (state.phase == .complete ? Tokens.dimEnd : Tokens.dim).color
+            Tokens.dim.color
             OverlayView(state: state, animated: false)
         }
         .frame(width: SnapshotSurface.screen.width, height: SnapshotSurface.screen.height)

@@ -43,7 +43,6 @@ final class TokensTests: XCTestCase {
         assertRGB(Tokens.ruleSettings, 127, 200, 183, alpha: 0.14)
         assertRGB(Tokens.emptyRing, 127, 200, 183, alpha: 0.25)
         assertRGB(Tokens.dim, 8, 22, 34, alpha: 0.86)
-        assertRGB(Tokens.dimEnd, 8, 22, 34, alpha: 0.78)
         assertRGB(Tokens.ringTrack, 8, 22, 31, alpha: 0.15)
     }
 

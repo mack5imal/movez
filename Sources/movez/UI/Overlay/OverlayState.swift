@@ -27,12 +27,12 @@ struct OverlayState: Equatable {
     /// and a title could only describe whichever region the draw landed on.
     static let movementBreakEyebrow = "MOVEMENT BREAK"
 
+    /// Where the view model is in its break. The view has nothing to draw for a finished break:
+    /// it leaves the screen as it ends, with no end screen (DECISIONS 76).
     enum Phase: Equatable {
         case running
         case complete
     }
-
-    var phase: Phase = .running
 
     // Header
     /// The mode the break was built in, whose badge leads the header.
@@ -60,19 +60,10 @@ struct OverlayState: Equatable {
     var isPaused = false
     var skipsToday = 0
 
-    // End state
-    var completionTitle = ""
-    var endSummary = ""
-    var streak = 0
-
     var skipLabel: String { "Skip · \(skipsToday) today" }
     var pauseLabel: String { isPaused ? "Resume" : "Pause" }
 
-    /// "Four movements done. Next break at 12:05." — the counts small enough to spell out are.
-    static func summary(movements: Int, nextBreakAt: String) -> String {
-        "\(numberWord(movements)) movements done. Next break at \(nextBreakAt)."
-    }
-
+    /// The counts small enough to spell out are: "Four", not "4".
     static func numberWord(_ count: Int) -> String {
         switch count {
         case 1: return "One"
@@ -106,5 +97,4 @@ struct OverlayActions {
     var skip: () -> Void = {}
     var pause: () -> Void = {}
     var chooseSide: (BreakSide) -> Void = { _ in }
-    var backToWork: () -> Void = {}
 }

@@ -337,8 +337,7 @@ struct OverlayScreen: View {
     var body: some View {
         ZStack {
             VisualEffectBackdrop()
-            (viewModel.state.phase == .complete ? Tokens.dimEnd : Tokens.dim).color
-                .animation(.easeInOut(duration: 0.3), value: viewModel.state.phase)
+            Tokens.dim.color
 
             OverlayView(state: viewModel.state, actions: actions, animated: viewModel.animationsEnabled)
                 .transition(.opacity)
@@ -353,8 +352,7 @@ struct OverlayScreen: View {
             done: viewModel.done,
             skip: viewModel.skip,
             pause: viewModel.togglePause,
-            chooseSide: viewModel.choose(side:),
-            backToWork: viewModel.done
+            chooseSide: viewModel.choose(side:)
         )
     }
 }

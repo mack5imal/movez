@@ -39,8 +39,6 @@ enum MovezType {
     static let stripName = MovezTextStyle(size: 17, weight: .regular)
     static let endTitle = MovezTextStyle(size: 84, weight: .bold, trackingEm: -0.035)
     static let endBody = MovezTextStyle(size: 28, weight: .regular)
-    static let streakNumber = MovezTextStyle(size: 32, weight: .bold)
-    static let streakLabel = MovezTextStyle(size: 20, weight: .semibold)
     static let backToWork = MovezTextStyle(size: 22, weight: .bold)
     static let sideToggle = MovezTextStyle(size: 30, weight: .bold)
     /// The movement name on a rep-based set, smaller than `overlayName` to make room for the meter.
@@ -90,7 +88,7 @@ enum MovezType {
         ("instruction", instruction), ("instructionSide", instructionSide), ("helperLink", helperLink),
         ("discNumerals", discNumerals), ("discLabel", discLabel), ("stripNumber", stripNumber),
         ("stripName", stripName), ("endTitle", endTitle), ("endBody", endBody),
-        ("streakNumber", streakNumber), ("streakLabel", streakLabel), ("backToWork", backToWork),
+        ("backToWork", backToWork),
         ("sideToggle", sideToggle), ("eyebrowPanel", eyebrowPanel), ("panelTitle", panelTitle),
         ("panelBody", panelBody), ("panelDisc", panelDisc), ("panelButton", panelButton),
         ("badge", badge), ("toastTitle", toastTitle), ("toastBody", toastBody),

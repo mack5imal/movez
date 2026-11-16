@@ -27,8 +27,6 @@ final class OverlayViewModelTests: XCTestCase {
             chimes: chimes ?? RecordingChimePlayer(),
             snoozesLeft: 2,
             skipsToday: 1,
-            streak: 4,
-            nextBreakAt: clock.now.addingTimeInterval(3600),
             reduceMotion: reduceMotion
         )
     }
@@ -309,28 +307,30 @@ final class OverlayViewModelTests: XCTestCase {
         }
     }
 
-    // MARK: - End state
+    // MARK: - The end
 
-    func testEndStateCopy() {
+    /// A finished break leaves no end screen behind (DECISIONS 76): the overlay fades out on the
+    /// last state it drew, and finishing reports the break once.
+    func testAFinishedBreakKeepsItsLastStateAndReportsOnce() {
         let clock = ManualClock(now: SchedulerHarness.mondayMorning)
-        let viewModel = OverlayViewModel(
-            routine: fixtureRoutine(),
-            startedAt: clock.now,
-            clock: clock,
-            streak: 4,
-            nextBreakAt: clock.now.addingTimeInterval(3 * 3600 + 5 * 60)
-        )
-        for _ in 0..<4 { viewModel.next() }
+        let viewModel = OverlayViewModel(routine: fixtureRoutine(), startedAt: clock.now, clock: clock)
+        var finished = 0
+        viewModel.onFinished = { _, _, _ in finished += 1 }
+        for _ in 0..<3 { viewModel.next() }
+        let last = viewModel.state
 
-        XCTAssertEqual(viewModel.state.phase, .complete)
-        XCTAssertEqual(viewModel.state.eyebrow, "MOVEMENT BREAK · COMPLETE")
-        XCTAssertEqual(viewModel.state.headerTrailing, "NEXT BREAK 12:05")
-        XCTAssertEqual(viewModel.state.completionTitle, "Break done")
-        XCTAssertEqual(viewModel.state.endSummary, "Four movements done. Next break at 12:05.")
-        XCTAssertEqual(viewModel.state.streak, 4)
+        viewModel.next()
+        clock.advance(5)
+        viewModel.tick()
+
+        XCTAssertEqual(viewModel.phase, .complete)
+        XCTAssertEqual(viewModel.state.movementName, last.movementName, "the card it fades on is the last movement")
+        XCTAssertEqual(viewModel.state.eyebrow, OverlayState.movementBreakEyebrow, "not a completion screen")
+        XCTAssertTrue(viewModel.state.strip.allSatisfy { $0.state == .done })
+        XCTAssertEqual(finished, 1)
     }
 
-    func testStreakChipIsSingularForOne() {
+    func testSmallCountsAreSpelledOutAndClocksReadMinutesAndSeconds() {
         XCTAssertEqual(OverlayState.numberWord(3), "Three")
         XCTAssertEqual(OverlayState.numberWord(5), "Five")
         XCTAssertEqual(OverlayState.clock(252), "4:12")

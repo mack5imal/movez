@@ -169,7 +169,6 @@ struct GalleryView: View {
                         Button("I was sitting") {}.buttonStyle(SecondaryButtonStyle())
                     }
                 }
-                StreakChip(count: SnapshotFixtures.streak)
             }
         }
     }

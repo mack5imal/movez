@@ -47,8 +47,6 @@ final class OverlayViewModel: ObservableObject {
 
     var snoozesLeft: Int
     var skipsToday: Int
-    var streak: Int
-    var nextBreakAt: Date?
 
     /// Callbacks into the app. Set by the window controller; inert for snapshots and unit tests
     /// that only care about the state.
@@ -68,8 +66,6 @@ final class OverlayViewModel: ObservableObject {
         chimes: ChimePlayer? = nil,
         snoozesLeft: Int = 2,
         skipsToday: Int = 0,
-        streak: Int = 0,
-        nextBreakAt: Date? = nil,
         reduceMotion: Bool = false,
         mode: BreakMode = .fallback,
         resumingAt resumedBlock: Int = 0,
@@ -83,8 +79,6 @@ final class OverlayViewModel: ObservableObject {
         self.chimes = chimes
         self.snoozesLeft = snoozesLeft
         self.skipsToday = skipsToday
-        self.streak = streak
-        self.nextBreakAt = nextBreakAt
         self.reduceMotion = reduceMotion
         blockStartedAt = startedAt
         // A break the lid closed on comes back on the block the user was on, with what they had
@@ -301,25 +295,18 @@ final class OverlayViewModel: ObservableObject {
     // MARK: - State
 
     /// Rebuilds the plain value the view draws from.
+    ///
+    /// A finished break keeps the last state it drew, with every block in the strip ticked off:
+    /// the overlay fades out on it, and there is no end screen to change to (DECISIONS 76).
     func refresh() {
-        var state = OverlayState()
-        state.phase = phase
-        state.mode = mode.definition
-        state.strip = cachedStrip
-        state.streak = streak
-        state.skipsToday = skipsToday
-
         guard phase == .running else {
-            state.eyebrow = "\(OverlayState.movementBreakEyebrow) · COMPLETE"
-            state.headerTrailing = nextBreakAt.map { "NEXT BREAK \(MovezClock.label($0))" } ?? ""
-            state.completionTitle = "Break done"
-            state.endSummary = OverlayState.summary(
-                movements: completedBlocks,
-                nextBreakAt: nextBreakAt.map(MovezClock.label) ?? "the usual time"
-            )
-            self.state = state
+            state.strip = cachedStrip
             return
         }
+        var state = OverlayState()
+        state.mode = mode.definition
+        state.strip = cachedStrip
+        state.skipsToday = skipsToday
 
         state.eyebrow = OverlayState.movementBreakEyebrow
         state.headerTrailing = isPaused

@@ -14,28 +14,13 @@ final class HistoryStoreTests: XCTestCase {
         ))
     }
 
-    func testStreakCountsConsecutiveCompletions() {
-        let store = HistoryStore()
-        XCTAssertEqual(store.streak(on: day), 0)
-
-        record(store, .done, offset: 3600)
-        record(store, .done, offset: 7200)
-        XCTAssertEqual(store.streak(on: day), 2)
-
-        record(store, .skipped, offset: 10_800)
-        XCTAssertEqual(store.streak(on: day), 0, "a skip resets the streak")
-
-        record(store, .done, offset: 14_400)
-        XCTAssertEqual(store.streak(on: day), 1)
-    }
-
-    func testSnoozeNeitherBreaksNorBuildsTheStreak() {
+    func testASnoozeIsCountedAsASnoozeAndNotAsDone() {
         let store = HistoryStore()
         record(store, .done, offset: 3600)
         record(store, .snoozed, offset: 5400)
         record(store, .done, offset: 7200)
-        XCTAssertEqual(store.streak(on: day), 2, "a snooze is a deferral, not a failure")
         XCTAssertEqual(store.stats(on: day).snoozed, 1)
+        XCTAssertEqual(store.stats(on: day).done, 2)
     }
 
     /// Written by an earlier build. It keeps counting, so days already recorded keep their numbers.
@@ -43,19 +28,16 @@ final class HistoryStoreTests: XCTestCase {
         let store = HistoryStore()
         record(store, .done, offset: 3600)
         record(store, .credited, offset: 7200)
-        XCTAssertEqual(store.streak(on: day), 2)
         XCTAssertEqual(store.stats(on: day).done, 2)
     }
 
-    /// An absence is logged and counts for nothing: not done, not skipped, and it neither adds to
-    /// nor breaks the streak.
-    func testAnAbsenceNeitherCountsNorBreaksTheStreak() {
+    /// An absence is logged and counts for nothing: not done, not skipped, not snoozed.
+    func testAnAbsenceCountsForNothing() {
         let store = HistoryStore()
         record(store, .done, offset: 3600)
         record(store, .awayReset, offset: 5400)
         record(store, .done, offset: 7200)
         record(store, .awayPaused, offset: 9000)
-        XCTAssertEqual(store.streak(on: day), 2)
         let stats = store.stats(on: day)
         XCTAssertEqual([stats.done, stats.skipped, stats.snoozed], [2, 0, 0])
         XCTAssertEqual(store.data.breakRecords.count, 4, "both absences are in the record")
@@ -222,7 +204,6 @@ final class HistoryStoreTests: XCTestCase {
 
         XCTAssertTrue(store.removeLastBreakRecord(matching: .credited))
         XCTAssertEqual(store.stats(on: day).done, 1)
-        XCTAssertEqual(store.streak(on: day), 1)
         XCTAssertFalse(store.removeLastBreakRecord(matching: .credited))
     }
 

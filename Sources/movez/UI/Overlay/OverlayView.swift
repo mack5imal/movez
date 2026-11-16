@@ -11,13 +11,12 @@ struct OverlayView: View {
 
     var body: some View {
         OverlayCard(disc: disc) {
-            cardBody
+            runningBody
         }
     }
 
     private var disc: TimerDisc? {
-        guard state.phase == .running else { return nil }
-        return TimerDisc(
+        TimerDisc(
             size: Tokens.Metric.overlayDisc,
             progress: state.discProgress,
             numerals: state.discNumerals,
@@ -25,15 +24,6 @@ struct OverlayView: View {
             mode: state.discMode,
             action: actions.next
         )
-    }
-
-    @ViewBuilder
-    private var cardBody: some View {
-        if state.phase == .complete {
-            OverlayEndView(state: state, actions: actions)
-        } else {
-            runningBody
-        }
     }
 
     private var runningBody: some View {

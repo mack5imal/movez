@@ -99,7 +99,6 @@ enum Tokens {
 
     /// The screen dim behind the overlay, and the lighter dim of the end state.
     static let dim = MovezColor(red: 8 / 255, green: 22 / 255, blue: 34 / 255, alpha: 0.86)
-    static let dimEnd = dim.opacity(0.78)
 
     /// The unfilled part of a timer ring, drawn on the accent disc.
     static let ringTrack = ink.opacity(0.15)

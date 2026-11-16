@@ -21,9 +21,7 @@ final class OverlayTimingTests: XCTestCase {
             clock: clock,
             chimes: chimes ?? RecordingChimePlayer(),
             snoozesLeft: 2,
-            skipsToday: 1,
-            streak: 4,
-            nextBreakAt: clock.now.addingTimeInterval(3600)
+            skipsToday: 1
         )
     }
 

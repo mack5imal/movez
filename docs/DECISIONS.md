@@ -22,7 +22,7 @@ Sources of truth, in order: `product-brief-v1.md`, `scheduler-research-v1.md`,
 
 ## The break
 
-4. **The end-of-break streak chip stays.** A streak is consecutive completed full breaks today;
+4. *Superseded by 76: there is no end screen and no streak.* **The end-of-break streak chip stays.** A streak is consecutive completed full breaks today;
    a skip resets it, a snooze does not, and a credited absence of five minutes or more counts as
    completed.
 5. **The overlay has Next and no Back.** → and Return advance; Escape deliberately does nothing,
@@ -257,8 +257,8 @@ are in `docs/rule-changes-2026-10.md` and `scripts/simulate_selection.py`.
     the next full break, so a movement from the morning's break could come back in the afternoon.
 33. **Routines have no names.** They are drawn at random, so a name could only describe whichever
     region the draw landed on. The heads-up reads "Movement break in a minute", the overlay's
-    eyebrow "MOVEMENT BREAK", the completion screen "Break done", and history records "Movement
-    break" (the field keeps its name so older history still decodes). The menu no longer has a
+    eyebrow "MOVEMENT BREAK", the completion screen "Break done" (*removed by 76*), and history
+    records "Movement break" (the field keeps its name so older history still decodes). The menu no longer has a
     line under the countdown.
 34. **Focus is a body region, not a kind of movement.** "More balance" is gone: balance is in every
     break. "More hands and eyes" stays, as the wrist/forearm and eye regions. A stored
@@ -678,3 +678,10 @@ Entries from fixing the findings in `docs/code-review-2026-11.md`.
     laptop on battery, which the scheduler takes for a closed lid. Panels hold nothing: a heads-up
     or a micro-break that the display sleeps through is no loss. A closed lid or a lock by hand
     still interrupts a break (UI-2).
+76. **A movement break has no end screen, and there is no streak.** When the last block ends, or
+    Done is pressed, the break leaves the screen with the completion chime, as a strength break
+    already did (58). The "Break done" card was only ever on screen for the 0.3 s fade, its Back to
+    work button could not close it, and its numbers were captured as the break began. The streak
+    was shown nowhere else, so it is gone with the card: the chip, its text styles, the end dim,
+    the coordinator's published count and the history's calculation. This supersedes entry 4 and
+    the end-screen part of 33 (UI-7).

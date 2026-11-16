@@ -81,8 +81,6 @@ final class OverlayEffectSink: EffectSink {
             chimes: chimes,
             snoozesLeft: coordinator.scheduler.snoozesLeft,
             skipsToday: coordinator.scheduler.snapshot.skipsToday,
-            streak: coordinator.streak,
-            nextBreakAt: coordinator.scheduler.snapshot.nextFullDueAt,
             reduceMotion: reduceMotion,
             mode: session.mode,
             resumingAt: session.blockIndex,

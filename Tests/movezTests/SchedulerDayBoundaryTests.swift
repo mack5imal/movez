@@ -3,7 +3,7 @@ import XCTest
 
 /// Midnight, crossed while the user is still at the desk.
 ///
-/// The day-scoped counters, the routine seed and the streak key all start over. The sitting bout
+/// The day-scoped counters and the routine seed all start over. The sitting bout
 /// does not: fifteen minutes from a break at 23:45 is fifteen minutes from a break at 00:01.
 final class SchedulerDayBoundaryTests: XCTestCase {
     private let minute: TimeInterval = 60

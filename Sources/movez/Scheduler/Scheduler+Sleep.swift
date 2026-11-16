@@ -167,7 +167,7 @@ extension Scheduler {
     /// Judges an interrupted break that is over by the completion rule, and says so with the
     /// same `.endFullBreak` a break on screen ends with. The coordinator, which kept the session
     /// the lid closed on, writes the record from it: without the effect it never learnt the
-    /// break had happened, and the menu, the streak and the strength planner all read history.
+    /// break had happened, and the menu and the strength planner both read history.
     mutating func settleInterruptedBreak(now: Date) -> [SchedulerEffect] {
         guard let interrupted = snapshot.interruptedBreak else { return [] }
         snapshot.interruptedBreak = nil
@@ -291,7 +291,7 @@ extension Scheduler {
 
     /// Midnight, crossed while the app was running or while it was gone.
     ///
-    /// The counters, the routine seed and the streak all key off `dayKey`, so a stale one is
+    /// The counters and the routine seed key off `dayKey`, so a stale one is
     /// rolled forward before anything reads it — otherwise Monday opens with Friday's numbers and
     /// Friday's routines. The sitting bout is deliberately not rolled with them: a body fifteen
     /// minutes from a break at 23:45 is fifteen minutes from a break at 00:01, and handing it a
