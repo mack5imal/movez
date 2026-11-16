@@ -16,8 +16,9 @@ final class NoticeWindowController: NSObject, NSWindowDelegate {
         self.viewModel = viewModel
         let window = self.window ?? makeWindow()
         self.window = window
-        window.contentView = NSHostingView(rootView: NoticeScreen(viewModel: viewModel))
-        window.setContentSize(NoticeScreen.size)
+        let height = NoticeScreen.height(fitting: PanelWindowController.activeScreen()?.visibleFrame.height)
+        window.contentView = NSHostingView(rootView: NoticeScreen(viewModel: viewModel, height: height))
+        window.setContentSize(CGSize(width: NoticeScreen.size.width, height: height))
         window.center()
         // An accessory app is never frontmost by default, so the window would open behind
         // whatever the user was in.

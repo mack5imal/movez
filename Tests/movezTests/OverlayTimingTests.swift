@@ -202,4 +202,23 @@ final class OverlayTimingTests: XCTestCase {
         XCTAssertEqual(expired, 0, "eight minutes paused, but never five at once")
         XCTAssertEqual(viewModel.state.headerTrailing, "PAUSED · ENDS IN 1:00")
     }
+
+    // MARK: - Small displays
+
+    /// The card is drawn as designed wherever it fits, and shrunk to fit a display that is too
+    /// small for it, so the disc, which is Next and Done, is never cut off.
+    func testTheCardIsShrunkOnlyOnADisplayTooSmallForIt() {
+        XCTAssertEqual(FitsOverlayCard.scale(for: CGSize(width: 1440, height: 875)), 1, "a 13-inch laptop, menu bar off")
+        XCTAssertEqual(FitsOverlayCard.scale(for: CGSize(width: 2560, height: 1415)), 1)
+        let projector = FitsOverlayCard.scale(for: CGSize(width: 1024, height: 743))
+        XCTAssertLessThan(projector, 1)
+        XCTAssertLessThanOrEqual(FitsOverlayCard.footprint.width * projector, 1024)
+        XCTAssertLessThanOrEqual(FitsOverlayCard.footprint.height * projector, 743)
+    }
+
+    func testTheNoticeFitsAShortDisplay() {
+        XCTAssertEqual(NoticeScreen.height(fitting: 1079), 760)
+        XCTAssertEqual(NoticeScreen.height(fitting: 680), 640, "a 1280 × 720 scaling keeps its footer on screen")
+        XCTAssertEqual(NoticeScreen.height(fitting: nil), 760)
+    }
 }

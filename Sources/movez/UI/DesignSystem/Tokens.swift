@@ -165,6 +165,9 @@ enum Tokens {
     enum Metric {
         static let overlayCard = CGSize(width: 1000, height: 660)
         static let overlayDisc: CGFloat = 300
+        /// The disc's centre sits on the card's right edge this far below its top: on a 1440×900
+        /// screen the handoff puts the card at (220, 130) and the disc at (1070, 60).
+        static let overlayDiscCentreBelowTop: CGFloat = 80
         static let panelWidth: CGFloat = 400
         static let panelWidthDeferred: CGFloat = 420
         static let panelDisc: CGFloat = 64

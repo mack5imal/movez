@@ -346,6 +346,7 @@ struct OverlayScreen: View {
             Tokens.dim.color
 
             OverlayView(state: viewModel.state, actions: actions, animated: viewModel.animationsEnabled)
+                .modifier(FitsOverlayCard())
                 .transition(.opacity)
         }
         .ignoresSafeArea()

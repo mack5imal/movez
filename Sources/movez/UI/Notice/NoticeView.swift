@@ -4,8 +4,18 @@ import SwiftUI
 /// bar and a footer with the buttons, in the settings window's palette.
 struct NoticeScreen: View {
     @ObservedObject var viewModel: NoticeViewModel
+    /// The design's height, or less on a display too short for it: the text scrolls, and the
+    /// footer with its buttons must always be on screen, because nothing else in the app works
+    /// until the notice is accepted.
+    var height: CGFloat = Self.size.height
 
     static let size = CGSize(width: 720, height: 760)
+
+    /// How tall the window can be on a display whose working area is `visible` tall.
+    static func height(fitting visible: CGFloat?) -> CGFloat {
+        guard let visible else { return size.height }
+        return max(360, min(size.height, visible - 40))
+    }
 
     var body: some View {
         ZStack {
@@ -22,7 +32,7 @@ struct NoticeScreen: View {
                 footer
             }
         }
-        .frame(width: Self.size.width, height: Self.size.height)
+        .frame(width: Self.size.width, height: height)
     }
 
     private var titleBar: some View {

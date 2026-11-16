@@ -223,6 +223,7 @@ struct StrengthOverlayScreen: View {
             VisualEffectBackdrop()
             Tokens.dim.color
             card
+                .modifier(FitsOverlayCard())
                 .opacity(viewModel.state.isClosed ? 0 : 1)
                 .animation(.easeOut(duration: Self.cardFade), value: viewModel.state.isClosed)
         }

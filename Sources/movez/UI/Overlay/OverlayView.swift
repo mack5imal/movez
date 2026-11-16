@@ -111,7 +111,7 @@ struct OverlayCard<Content: View>: View {
     private let discSize = Tokens.Metric.overlayDisc
     /// On a 1440×900 screen the handoff puts the card at (220, 130) and the disc at (1070, 60),
     /// so the disc's centre sits on the card's right edge, 70 pt below its top corner.
-    private let discCentreBelowTop: CGFloat = 80
+    private var discCentreBelowTop: CGFloat { Tokens.Metric.overlayDiscCentreBelowTop }
 
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -188,5 +188,35 @@ struct SideToggle: View {
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(side == target ? [.isButton, .isSelected] : .isButton)
+    }
+}
+
+/// Shrinks the break card to fit a display smaller than the one the handoff draws it for.
+///
+/// The card is a fixed 1000 × 660 pt with the disc hanging off its top-right corner, so a centred
+/// break needs about 1350 × 850 pt. On a smaller display (an iPad over Sidecar, a projector, a
+/// scaled laptop panel) the disc, which is the Next and Done control, was cut off. Anything that
+/// big or bigger is drawn exactly as designed.
+struct FitsOverlayCard: ViewModifier {
+    static let margin: CGFloat = 24
+
+    /// The card with the disc's overhang on both sides, so it can sit centred, and a margin.
+    static var footprint: CGSize {
+        let card = Tokens.Metric.overlayCard
+        let disc = Tokens.Metric.overlayDisc
+        let overhangAbove = disc / 2 - Tokens.Metric.overlayDiscCentreBelowTop
+        return CGSize(width: card.width + disc + margin * 2, height: card.height + overhangAbove * 2 + margin * 2)
+    }
+
+    static func scale(for available: CGSize) -> CGFloat {
+        min(1, available.width / footprint.width, available.height / footprint.height)
+    }
+
+    func body(content: Content) -> some View {
+        GeometryReader { geometry in
+            content
+                .scaleEffect(Self.scale(for: geometry.size))
+                .frame(width: geometry.size.width, height: geometry.size.height)
+        }
     }
 }
