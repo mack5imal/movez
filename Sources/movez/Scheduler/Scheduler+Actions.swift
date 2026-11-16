@@ -255,13 +255,15 @@ extension Scheduler {
     }
 
     /// Ends the micro cycle and re-anchors the next one to the cycle's original start, so a
-    /// snooze never pushes the whole cadence later.
+    /// snooze never pushes the whole cadence later. An anchor so old that its next micro-break
+    /// is already due is planned from now instead: a micro-break is never due in the past.
     private mutating func closeMicroCycle(now: Date, reason: String) {
         let anchor = snapshot.microAnchorAt ?? now
         snapshot.microAnchorAt = nil
         snapshot.microSnoozeUsed = false
         snapshot.microEmphasisIndex += 1
-        snapshot.nextMicroDueAt = microDue(anchoredAt: anchor)
+        let next = microDue(anchoredAt: anchor)
+        snapshot.nextMicroDueAt = next.map { $0 > now } ?? true ? next : microDue(anchoredAt: now)
         transition(to: .sitting, reason: reason, at: now)
     }
 }

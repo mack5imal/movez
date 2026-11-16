@@ -103,7 +103,7 @@ extension Scheduler {
     mutating func endPauseBookkeeping(now: Date) -> [SchedulerEffect] {
         let remaining = snapshot.remainingAtPauseSeconds ?? config.sitSeconds
         snapshot.nextFullDueAt = now.addingTimeInterval(TimeInterval(remaining))
-        snapshot.nextMicroDueAt = microDue(anchoredAt: now)
+        abandonMicroCycle(now: now)
         clearPauseBookkeeping()
         return [.pollingChanged(true)]
     }

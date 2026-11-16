@@ -238,6 +238,16 @@ struct Scheduler {
         return candidate
     }
 
+    /// Drops the micro cycle in progress (a snoozed micro-break that a call or a pause swallowed)
+    /// and plans a fresh one from now. The cycle's anchor and its used snooze belong to the
+    /// micro-break that was lost: kept, they made the next one's snooze a skip and planned the
+    /// one after it from a time already past.
+    mutating func abandonMicroCycle(now: Date) {
+        snapshot.microAnchorAt = nil
+        snapshot.microSnoozeUsed = false
+        snapshot.nextMicroDueAt = microDue(anchoredAt: now)
+    }
+
     mutating func recordBout(endingAt end: Date) {
         let seconds = Int(end.timeIntervalSince(snapshot.boutStartedAt))
         snapshot.longestBoutSeconds = max(snapshot.longestBoutSeconds, max(0, seconds))

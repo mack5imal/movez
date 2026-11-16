@@ -76,7 +76,7 @@ extension Scheduler {
 
         if let micro = snapshot.nextMicroDueAt, now >= micro {
             // A micro-break during a call is simply not worth having.
-            snapshot.nextMicroDueAt = microDue(anchoredAt: now)
+            abandonMicroCycle(now: now)
             effects.append(.persist)
         }
         return effects

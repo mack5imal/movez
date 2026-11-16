@@ -229,4 +229,29 @@ final class SchedulerMicroTests: XCTestCase {
         XCTAssertFalse(harness.effectNames.contains("showMicroCountIn"))
         XCTAssertTrue(harness.state.isHeadsUp || harness.state.isFullBreak)
     }
+
+    /// On 85/5: the 09:30 micro-break is snoozed, and a call from 09:34 to 09:50 swallows it.
+    /// The micro-break planned after the call is a fresh cycle, with its own snooze, and the
+    /// one after it is not due the moment it closes.
+    func testAMicroBreakACallSwallowedLeavesNoStaleCycleBehind() {
+        let harness = SchedulerHarness(config: SchedulerConfig.from(preset: .eightyFiveFive))
+        harness.run(until: { $0.isMicroCountIn }, limit: 40 * minute)
+        harness.clock.advance(10)
+        harness.send(.userMicroSnooze)
+        XCTAssertTrue(harness.snapshot.microSnoozeUsed)
+
+        harness.run(seconds: 3 * minute)
+        harness.send(.signals(SignalSnapshot(microphoneActive: true)))
+        harness.run(seconds: 16 * minute)
+        harness.send(.signals(SignalSnapshot()))
+        XCTAssertFalse(harness.snapshot.microSnoozeUsed, "the swallowed micro-break's snooze is not carried over")
+
+        XCTAssertTrue(harness.run(until: { $0.isMicroCountIn }, limit: 30 * minute), "got \(harness.state)")
+        harness.run(until: { $0.isSitting }, limit: 3 * minute)
+        harness.run(seconds: 10)
+        XCTAssertTrue(harness.state.isSitting, "no second count-in straight after, got \(harness.state)")
+        if let next = harness.snapshot.nextMicroDueAt {
+            XCTAssertGreaterThan(next, harness.now, "the next micro-break is in the future")
+        }
+    }
 }
