@@ -28,9 +28,14 @@ offer it again, until each kind reaches 5,000. The weekly tables come from 5-day
 default settings, and at those defaults with dumbbells, with and without More arms, with every
 break taken.
 
-Writes docs/strength-simulation.md and prints a summary. Exits 1 on any violation, any eligible
+Writes docs/strength-simulation.md and Tests/movezTests/Fixtures/strength-simulation-picks.json,
+four days of every configuration with each break's explicit context and the moves drawn, which
+StrengthSimulationPicksTests rebuilds with the Swift code: that test, not this docstring, is what
+shows the mirror is exact (DECISIONS 81). Prints a summary. Exits 1 on any violation, any eligible
 move never served, or when the default week (3 a day, no focus, 5 days) leaves the research
-targets; exits 2 when this script and strength-rules.json disagree on the rule list.
+targets; exits 2 when this script and strength-rules.json disagree on the rule list. With
+`--check` it writes nothing and exits 3 when either committed file differs from what it would
+write (`make simulate-check`).
 """
 import json
 import os
@@ -43,6 +48,8 @@ STRENGTH = json.load(open(os.path.join(ROOT, "strength-library-v1.json")))
 MOVEMENT = json.load(open(os.path.join(ROOT, "movement-library-v4.json")))
 RULES = json.load(open(os.path.join(ROOT, "scripts", "strength-rules.json")))["rules"]
 REPORT = os.path.join(ROOT, "docs", "strength-simulation.md")
+PICKS = os.path.join(ROOT, "Tests", "movezTests", "Fixtures", "strength-simulation-picks.json")
+PICK_DAYS = 4
 
 TARGET = 5000
 FULL_PER_DAY = 6
@@ -822,8 +829,27 @@ def describe(brk):
     return " · ".join(m.id for m, _ in brk["blocks"])
 
 
-def simulate(cfg, seed, per_day_for, until=None, days=None, skip=True, tally=None):
-    """Runs whole days with `cfg` until each kind of break reaches `until`, or for `days` days."""
+def slot_code(slot):
+    """A set-order slot as the picks fixture spells it: `pattern:SQT`, `core`, `arm:TRI`."""
+    return slot[0] if len(slot) == 1 else f"{slot[0]}:{slot[1]}"
+
+
+def relaxed_codes(brk):
+    return [f"{slot}:{rule}" for slot, rule in brk["relaxed"]]
+
+
+def drawn_ids(brk):
+    """Every move a break serves in order, a repeated set included."""
+    if brk["kind"] == "strength":
+        return [brk["warm"][0].id] + [m.id for m, _ in brk["sets"]] + [brk["cool"][0].id]
+    return [m.id for m, _ in brk["blocks"]]
+
+
+def simulate(cfg, seed, per_day_for, until=None, days=None, skip=True, tally=None, trace=None):
+    """Runs whole days with `cfg` until each kind of break reaches `until`, or for `days` days.
+
+    With `trace`, each day is appended to it with every break's explicit context and the moves
+    drawn, which is the picks fixture the Swift builders are checked against."""
     tally = tally or Tally()
     rng = SplitMix64(seed)
     planner = Planner(cfg["focus"], arm_break_possible(cfg["equipment"]))
@@ -848,6 +874,11 @@ def simulate(cfg, seed, per_day_for, until=None, days=None, skip=True, tally=Non
         done_today = 0
         pattern_done = 0
         sets_today = Counter()
+        events = None
+        if trace is not None:
+            events = []
+            trace.append({"day": day, "perDay": per_day,
+                          "recency": {k: v for k, v in sorted(recency.items()) if v > 0}, "events": events})
         for _ in range(FULL_PER_DAY):
             full_seed = rng.next()
             micro_seed = rng.next()
@@ -862,6 +893,10 @@ def simulate(cfg, seed, per_day_for, until=None, days=None, skip=True, tally=Non
             preview, _ = build_full(widen(served))
             micro_ctx = Context(cfg, widen(served), recency, micro_seed, last_micro, ids_of(preview))
             micro = build_micro(micro_ctx)
+            if events is not None:
+                events.append({"kind": "micro", "seed": str(micro_seed), "used": sorted(micro_ctx.used),
+                               "lastMicro": sorted(micro_ctx.last_micro), "nextFull": sorted(micro_ctx.next_full),
+                               "ids": drawn_ids(micro), "relaxed": relaxed_codes(micro)})
             tally.counts["micro"] += 1
             tally.micro_shapes[micro_shape(micro)] += 1
             tally.add_violations(checker.check_micro(micro, micro_ctx), micro)
@@ -870,6 +905,14 @@ def simulate(cfg, seed, per_day_for, until=None, days=None, skip=True, tally=Non
             last_micro = set(ids_of(micro))
 
             brk, ctx = build_full(widen(served))
+            event = None
+            if events is not None:
+                event = {"kind": "full", "seed": str(full_seed), "used": sorted(ctx.used),
+                         "plan": "endRange" if kind != "strength" else
+                         " ".join([letter] + [slot_code(s) for s in order]),
+                         "avoiding": sorted(worked) if kind != "strength" else [],
+                         "ids": drawn_ids(brk), "relaxed": relaxed_codes(brk), "skipped": False}
+                events.append(event)
             tally.add_violations(checker.check_plan(brk, day, per_day, done_today, pattern_done, sets_today), brk)
             note_relaxed(tally, brk)
             if brk["kind"] == "strength":
@@ -878,6 +921,8 @@ def simulate(cfg, seed, per_day_for, until=None, days=None, skip=True, tally=Non
                 tally.add_violations(checker.check_strength(brk, ctx), brk)
                 if skip and rng.next() % SKIP_ONE_IN == 0:
                     tally.counts["skipped"] += 1
+                    if event is not None:
+                        event["skipped"] = True
                     continue
                 tally.counts["strength"] += 1
                 tally.counts["arm"] += arm_break
@@ -1106,8 +1151,17 @@ def main():
 
     problems = []
     lines = report(configs, tallies, week_tallies, problems)
-    with open(REPORT, "w") as handle:
-        handle.write("\n".join(lines) + "\n")
+    outputs = {REPORT: "\n".join(lines) + "\n", PICKS: picks_fixture(configs)}
+    if "--check" in sys.argv[1:]:
+        stale = [path for path, text in outputs.items() if not os.path.exists(path) or open(path).read() != text]
+        for path in stale:
+            say(f"{os.path.relpath(path, ROOT)} is out of date: run python3 -I scripts/simulate_strength.py", sys.stderr)
+        if stale:
+            return 3
+    else:
+        for path, text in outputs.items():
+            with open(path, "w") as handle:
+                handle.write(text)
 
     total_v = sum(sum(t.violations.values()) for t in tallies + list(week_tallies.values()))
     say(f"configurations: {len(configs)} + default weeks; elapsed {time.time() - started:.0f} s")
@@ -1123,6 +1177,23 @@ def main():
         say(f"  {problem}")
     say(f"report: {os.path.relpath(REPORT, ROOT)}")
     return 1 if problems else 0
+
+
+def picks_fixture(configs):
+    """Four days of every configuration, the strength breaks a day running 1 to 4 so the last day
+    reaches the arm break, with each break's explicit context and the moves it drew.
+    StrengthSimulationCrossCheckTests rebuilds every one with the Swift planner and builders and
+    requires the same plan, the same moves and the same relaxations, so this script cannot drift
+    from the app unnoticed (TST-1)."""
+    out = []
+    for index, cfg in enumerate(configs):
+        trace = []
+        simulate(cfg, 0xF1C5_0000 + index, lambda day: 1 + day % 4, days=PICK_DAYS, trace=trace)
+        out.append({"name": cfg["name"], "equipment": sorted(cfg["equipment"]), "wall": cfg["wall"],
+                    "cap": cfg["cap"], "unlocked": sorted(cfg["unlocked"]), "focus": cfg["focus"],
+                    "days": trace})
+    return json.dumps({"about": "Generated by scripts/simulate_strength.py; do not edit by hand.",
+                       "configurations": out}, indent=1, sort_keys=True) + "\n"
 
 
 def week_code(short, focus, per_day):

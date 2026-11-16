@@ -11,7 +11,7 @@ BIN := $(APP)/Contents/MacOS/movez
 XCB := xcodebuild -project $(PROJECT) -scheme $(SCHEME) -configuration Debug \
 	-destination 'platform=macOS' -derivedDataPath $(DERIVED)
 
-.PHONY: version gen build test lint app run snapshots hygiene panel-hygiene assets clean
+.PHONY: version gen build test lint simulate simulate-check app run snapshots hygiene panel-hygiene assets clean
 
 gen:
 	xcodegen generate --spec project.yml
@@ -36,6 +36,16 @@ test: gen
 
 lint:
 	swiftlint lint --strict --quiet
+
+# The strength simulation writes docs/strength-simulation.md and the picks fixture that
+# StrengthSimulationPicksTests holds the Swift builders to (DECISIONS 81). Re-run it after any
+# change to a strength builder or the strength library; `simulate-check` fails when either
+# committed file is out of date. Each takes about a minute and a half.
+simulate:
+	python3 -I scripts/simulate_strength.py
+
+simulate-check:
+	python3 -I scripts/simulate_strength.py --check
 
 app:
 	@echo $(APP)

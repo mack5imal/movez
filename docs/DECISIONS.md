@@ -598,7 +598,11 @@ of its picks, taken before any of this was built, is replayed by a test to prove
     `scripts/strength-rules.json` and writes `docs/strength-simulation.md`: at least 5,000
     strength, end-range and micro-breaks for every combination of dumbbells, kettlebell and wall
     at caps 2 and 3, plus the app defaults, with zero violations and no eligible move never
-    served; a Swift test cross-checks 200 seeds against it. Weekly sets count a direct set as 1
+    served; a Swift test runs the real builders over 200 seeds against the same rule list, and
+    another rebuilds, from the explicit contexts the script writes to
+    `Tests/movezTests/Fixtures/strength-simulation-picks.json`, four days of every configuration
+    and requires the same plan, moves and relaxations, so the mirror is checked rather than
+    claimed (*amended by 81*). Weekly sets count a direct set as 1
     and a helper set as ½, the fractional counting that fit best in Pelland 2026: squat/lunge
     gives quads 1 and glutes ½, hinge hamstrings 1 and glutes 1, push chest 1 and triceps ½, pull
     back 1 and biceps ½, core 1. At the default (3 strength breaks a day, every break taken,
@@ -718,3 +722,15 @@ Entries from fixing the findings in `docs/code-review-2026-11.md`.
     a setup confirmed with nothing ticked is bodyweight only (56), and that user read the request
     before every break. A break with no loaded set now reads "About 5 minutes, three sets.", and
     one with any loaded set keeps the design's sentence (LIB-6).
+81. **The strength simulation is checked against the app, not only against the rules.**
+    `simulate_strength.py` reimplements the planner, the builders, the generator and the
+    ladders, and its report and weekly targets are only as good as that copy, but the Swift
+    "cross-check" judged the Swift builders by the rule list alone and never compared a draw.
+    The script now also writes a picks fixture: four days of each configuration it simulates,
+    the strength breaks a day running 1 to 4, with every break's explicit context (seed, moves
+    served today, recency, last micro-break, next full break, regions avoided) and the plan,
+    moves and relaxations it drew. `StrengthSimulationPicksTests` rebuilds each one with the
+    Swift code and requires the same. The fixture is the script's output, regenerated with the
+    report; `make simulate` writes both, and `make simulate-check` fails when either committed
+    file is stale, which takes about a minute and a half and so is not part of `make test`
+    (TST-1).
