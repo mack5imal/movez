@@ -200,7 +200,6 @@
 		D60462131795A23088939F1F /* OverlayState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD996CAE1CAE24052BF77E3 /* OverlayState.swift */; };
 		D743EBAC3DF196459BCE30D0 /* StrengthUnlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4227A3ABA9A77EAF8F78BE2 /* StrengthUnlock.swift */; };
 		D82D8E877AC0EE6B93652726 /* MicroBreakBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0358B4658CB12F9685A9098 /* MicroBreakBuilder.swift */; };
-		DA4ABEB0FF46D92D868CB66C /* OverlayEndView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA53CFBE556F0655B2B3734C /* OverlayEndView.swift */; };
 		DC4ECE0480D69C5F50F122E7 /* OverlayWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9996B1C5E2AF9F01AEF92CA3 /* OverlayWindowController.swift */; };
 		DC701B6A25EFEA4C0DBF9685 /* MovementModeBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8921F47104E00A48AB3529B7 /* MovementModeBuilder.swift */; };
 		DE81E55383C3209ECD6CD888 /* FontsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79454DFD8FB5D5C68D4F0AD /* FontsTests.swift */; };
@@ -425,7 +424,6 @@
 		C8C62D9F791457B612525A3B /* movez.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = movez.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8F16E197BB8CBCF7D345DCC /* RoutineContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineContext.swift; sourceTree = "<group>"; };
 		C9E26891ADC7FBC2AF915194 /* StrengthSnapshotFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrengthSnapshotFixtures.swift; sourceTree = "<group>"; };
-		CA53CFBE556F0655B2B3734C /* OverlayEndView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayEndView.swift; sourceTree = "<group>"; };
 		CAAA3D3EA536817F34D08C4D /* PanelEffectSink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanelEffectSink.swift; sourceTree = "<group>"; };
 		CC8950326C947E500031E06E /* HealthNoticeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthNoticeTests.swift; sourceTree = "<group>"; };
 		CD7B7B111EB429C77FB966C1 /* ModeSheets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeSheets.swift; sourceTree = "<group>"; };
@@ -695,7 +693,6 @@
 			isa = PBXGroup;
 			children = (
 				239121F26DFAC82D2F7F9463 /* OverlayEffectSink.swift */,
-				CA53CFBE556F0655B2B3734C /* OverlayEndView.swift */,
 				97F6A1321175B9FCA2472778 /* OverlayHygiene.swift */,
 				4BD996CAE1CAE24052BF77E3 /* OverlayState.swift */,
 				96BCB5C9CA9B01DDDCE890E8 /* OverlayView.swift */,
@@ -1109,7 +1106,6 @@
 				F225C2E14BE8845710674B50 /* NoticeViewModel.swift in Sources */,
 				F563B83AFF8A3CD46D6F711E /* NoticeWindowController.swift in Sources */,
 				702E3B2F37C6C1507F4B3F9D /* OverlayEffectSink.swift in Sources */,
-				DA4ABEB0FF46D92D868CB66C /* OverlayEndView.swift in Sources */,
 				B009F23A61871F04E02B2BE3 /* OverlayHygiene.swift in Sources */,
 				AD2FA2EE3CF8DC90757338FA /* OverlaySnapshot.swift in Sources */,
 				D60462131795A23088939F1F /* OverlayState.swift in Sources */,
