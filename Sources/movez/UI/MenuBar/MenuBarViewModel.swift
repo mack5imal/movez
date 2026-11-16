@@ -187,7 +187,13 @@ final class MenuBarViewModel: ObservableObject {
         // Movement routines have no names to preview, and the title already says when the break
         // is. A mode that plans its day names where in the day the next break falls.
         next.subtitle = coordinator.menuState.dayProgress?.menuSubtitle ?? ""
-        applyStats(to: &next, day: "Today", stats: coordinator.history.stats(on: now))
+        // The bout in progress counts too: a skip leaves it running, and it is measured into the
+        // history only when it ends, which a morning of skips never does (APP-5).
+        var stats = coordinator.history.stats(on: now)
+        if let running = coordinator.runningBoutSeconds(at: now) {
+            stats.longestBoutSeconds = max(stats.longestBoutSeconds, running)
+        }
+        applyStats(to: &next, day: "Today", stats: stats)
     }
 
     /// What the sitting header counts down to, how long that countdown is, and, for a break that

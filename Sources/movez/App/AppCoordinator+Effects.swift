@@ -158,6 +158,7 @@ extension AppCoordinator {
                 totalBlocks: current.totalBlocks,
                 kind: kind
             ))
+            recordRunningBout()
         case .snoozed:
             history.record(breakRecord: BreakRecord(
                 at: clock.now,
@@ -167,12 +168,32 @@ extension AppCoordinator {
                 totalBlocks: current.totalBlocks,
                 kind: kind
             ))
+            recordRunningBout()
         case .interrupted:
             // Sleep or a locked screen: nothing is recorded until the machine comes back and the
             // scheduler decides what the interruption meant. The session is kept so the break
             // that resumes is this one.
             interruptedSession = current
         }
+    }
+
+    /// How long the user has been sitting in the bout that is still going, or nil when no bout is
+    /// running (a break on screen, away, paused or off hours).
+    func runningBoutSeconds(at now: Date) -> Int? {
+        switch scheduler.state {
+        case .sitting, .suppressed, .pendingFull, .headsUp, .snoozed, .microCountIn, .microRunning:
+            return max(0, Int(now.timeIntervalSince(scheduler.snapshot.boutStartedAt)))
+        default:
+            return nil
+        }
+    }
+
+    /// A skip or a snooze leaves the bout running, and the scheduler measures a bout only when it
+    /// ends, so the bout so far is written down here. Without it a day of skips recorded a longest
+    /// bout of nothing (APP-5).
+    private func recordRunningBout() {
+        guard let running = runningBoutSeconds(at: clock.now) else { return }
+        history.recordLongestBout(running, on: clock.now)
     }
 
     /// Writes down a break that was turned away at the heads-up, which never became a session.
@@ -192,6 +213,7 @@ extension AppCoordinator {
             totalBlocks: planned.parts.count,
             kind: planned.kind
         ))
+        recordRunningBout()
     }
 
     /// Writes one finished part of a break, a strength set as much as a movement block, so the
