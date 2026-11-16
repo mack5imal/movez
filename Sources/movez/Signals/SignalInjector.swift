@@ -1,34 +1,5 @@
 import Foundation
 
-/// Settable stand-ins for the four system sources, used by the tests and by the debug injectors
-/// in the settings window.
-final class FakeIdleSource: IdleSource {
-    var seconds: TimeInterval = 0
-    func idleSeconds() -> TimeInterval { seconds }
-}
-
-final class FakeMicSource: MicSource {
-    var inUse = false
-    func isInUse() -> Bool { inUse }
-}
-
-final class FakeCaptureSource: CaptureSource {
-    var captured = false
-    func isCaptured() -> Bool { captured }
-}
-
-final class FakeFullscreenSource: FullscreenSource {
-    var isFullscreen = false
-    var bundleId: String?
-
-    func reading(exceptions: Set<String>) -> FullscreenReading {
-        if let bundleId, exceptions.contains(bundleId) {
-            return FullscreenReading(isFullscreen: false, bundleId: bundleId)
-        }
-        return FullscreenReading(isFullscreen: isFullscreen, bundleId: bundleId)
-    }
-}
-
 /// The events the debug panel's injector buttons send. Kept as one list so the panel, the tests
 /// and the documentation cannot drift apart.
 enum SignalInjector: String, CaseIterable, Identifiable {

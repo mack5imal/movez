@@ -27,7 +27,6 @@
 		0E8D878682F4ABE344D4D397 /* SignalAggregatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DF40E023521C26572E6BD61 /* SignalAggregatorTests.swift */; };
 		0F074C7F41A3C8C7849C2F95 /* RoutineBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64B812A24864DC7766D2B8E2 /* RoutineBuilder.swift */; };
 		12A569A63B9D80B070A91B73 /* SignalSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D24389D182EC724A1CFC3A /* SignalSnapshot.swift */; };
-		1624923BADB114F2B86AF9FB /* FakeSignals.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9C6024A9D61238B12502027 /* FakeSignals.swift */; };
 		17BBAC1362BB4FB7E6E5F809 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD9EEE57E8EDF899EE10357B /* AppDelegate.swift */; };
 		18BA680E0ADAE934BCDADD3F /* HistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5C4D82E0AC1EA22B17EAD56 /* HistoryStore.swift */; };
 		1A219B3E0575F31039C05463 /* StrengthOverlayState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B794DE8D46B6D98D2565B36C /* StrengthOverlayState.swift */; };
@@ -83,6 +82,7 @@
 		56964AB17B0D050C2FD63B8D /* Recency.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4954FDF028687ECBDC44740 /* Recency.swift */; };
 		58809FEBA39684F0D89A6FC7 /* Gallery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C72D952CD33F4E122997B90 /* Gallery.swift */; };
 		5987DDB5C15A06E93AD17AE8 /* SchedulerEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD7E4757BE6870716B20B25A /* SchedulerEvent.swift */; };
+		59F60955101563420F22FF89 /* FakeSignalSources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BC2DA2DB7050A2083A2C262 /* FakeSignalSources.swift */; };
 		5A2FEA6C50A83464C64EEFAC /* MicroPanelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 743F13B911D68FC7B72458C7 /* MicroPanelTests.swift */; };
 		5B81790F9B08A580F276DBB7 /* NoticeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45084FC50901E1E5319FCCEC /* NoticeView.swift */; };
 		5BA15EF615A9E0636DD60F9B /* RepPacer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF20677659841B04E97672EF /* RepPacer.swift */; };
@@ -172,6 +172,7 @@
 		B2127A1B829076C958D0E8CB /* MenuBarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8F1E4BEB04E1CC72360081B /* MenuBarViewModel.swift */; };
 		B248E757587C0B032E4A0C5F /* FocusFilterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB27B820F5A8AB61582F2B98 /* FocusFilterTests.swift */; };
 		B32E6AC45DA1AAB0B4AE1BD1 /* MovementLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABFC20128A308BD74AD1E790 /* MovementLibrary.swift */; };
+		B3B911F5943A25232DF89CB5 /* SignalInjector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7137CA55D99F91C9D83AEA20 /* SignalInjector.swift */; };
 		B507BE5D19AF2EDD62225F9E /* HealthNoticeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC8950326C947E500031E06E /* HealthNoticeTests.swift */; };
 		B82E16DBC6A8CAF3BD748D23 /* DebugState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77913B41BA43A68FBCD32134 /* DebugState.swift */; };
 		B97FCAE0DB52C04BFC253C40 /* SettingsLiveUpdateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A5A22C49E79B4716011F33 /* SettingsLiveUpdateTests.swift */; };
@@ -305,6 +306,7 @@
 		4880E3A5C4CA66BFA31A1C1D /* Scheduler+Suppression.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Scheduler+Suppression.swift"; sourceTree = "<group>"; };
 		48BA5FF572E0A2F7A60570D7 /* NoticeWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticeWindowController.swift; sourceTree = "<group>"; };
 		48F6414E4D76752A2502F568 /* StrengthDayPlannerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrengthDayPlannerTests.swift; sourceTree = "<group>"; };
+		4BC2DA2DB7050A2083A2C262 /* FakeSignalSources.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FakeSignalSources.swift; sourceTree = "<group>"; };
 		4BD996CAE1CAE24052BF77E3 /* OverlayState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayState.swift; sourceTree = "<group>"; };
 		4DF40E023521C26572E6BD61 /* SignalAggregatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalAggregatorTests.swift; sourceTree = "<group>"; };
 		4EE54B4CE88693D730866958 /* MovezBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovezBundle.swift; sourceTree = "<group>"; };
@@ -336,6 +338,7 @@
 		6E47EF436BDD3C23084D28F4 /* SeededRandom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeededRandom.swift; sourceTree = "<group>"; };
 		6E7DD03A596EDE389F7C25FB /* HistoryPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryPersistence.swift; sourceTree = "<group>"; };
 		7080EAB41114DB39C051849D /* StrengthSettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrengthSettingsSection.swift; sourceTree = "<group>"; };
+		7137CA55D99F91C9D83AEA20 /* SignalInjector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalInjector.swift; sourceTree = "<group>"; };
 		71DD25E3B4364297CB398069 /* NoticeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticeViewModel.swift; sourceTree = "<group>"; };
 		743F13B911D68FC7B72458C7 /* MicroPanelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroPanelTests.swift; sourceTree = "<group>"; };
 		76D859DE3DBD56B6D6632784 /* StrengthLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrengthLibrary.swift; sourceTree = "<group>"; };
@@ -393,7 +396,6 @@
 		A85AE9D7EE6B6B218565A33D /* TokensTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokensTests.swift; sourceTree = "<group>"; };
 		A8F1E4BEB04E1CC72360081B /* MenuBarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarViewModel.swift; sourceTree = "<group>"; };
 		A9B9838D81524A40DB3881AB /* RoutineTestSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineTestSupport.swift; sourceTree = "<group>"; };
-		A9C6024A9D61238B12502027 /* FakeSignals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FakeSignals.swift; sourceTree = "<group>"; };
 		A9D24389D182EC724A1CFC3A /* SignalSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalSnapshot.swift; sourceTree = "<group>"; };
 		AA7755E69C1D236B6C12BDC1 /* StrengthMovement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrengthMovement.swift; sourceTree = "<group>"; };
 		AAB51BB62438DFF1D924BEB1 /* InterruptedBreakHistoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterruptedBreakHistoryTests.swift; sourceTree = "<group>"; };
@@ -524,6 +526,7 @@
 				F59779E0169891E909D76A4C /* DoseTextTests.swift */,
 				DB130F89D1F33DE620263DDC /* EdgeCaseTests.swift */,
 				87C3FC9D5B4CF03225E398D0 /* EndRangeBreakBuilderTests.swift */,
+				4BC2DA2DB7050A2083A2C262 /* FakeSignalSources.swift */,
 				27F7A41D0D2F936D62D9033D /* FakeSignalsTests.swift */,
 				BB27B820F5A8AB61582F2B98 /* FocusFilterTests.swift */,
 				A79454DFD8FB5D5C68D4F0AD /* FontsTests.swift */,
@@ -594,13 +597,13 @@
 		1DC02234894D98EC7DDC7E30 /* Signals */ = {
 			isa = PBXGroup;
 			children = (
-				A9C6024A9D61238B12502027 /* FakeSignals.swift */,
 				9AD5659750FD89BBB4552066 /* FullscreenMonitor.swift */,
 				1D83FC30AC8126887FB2A394 /* IdleMonitor.swift */,
 				B5298FE787A7CA798B1259BA /* MicrophoneMonitor.swift */,
 				43AD524EBDC86F9972034E12 /* PowerMonitor.swift */,
 				0CC20A4766BF3AC9C78A92C7 /* ScreenCaptureMonitor.swift */,
 				F960E406973B4091B524FF2A /* SignalAggregator.swift */,
+				7137CA55D99F91C9D83AEA20 /* SignalInjector.swift */,
 				054FB495976AF959CEC0DECB /* SignalOverrides.swift */,
 				F3E0ED9C6E229E8F8425E5CF /* SignalProbe.swift */,
 				FC0ADA8EEC562859C440C69D /* SignalSources.swift */,
@@ -1065,7 +1068,6 @@
 				1D8A7D8F12FF4184FCEC01BC /* EffectSink.swift in Sources */,
 				76AA843627F2C9900600BFB6 /* EndRangeBreakBuilder.swift in Sources */,
 				6325C7101E9E02B9C9A49E3B /* Equipment.swift in Sources */,
-				1624923BADB114F2B86AF9FB /* FakeSignals.swift in Sources */,
 				7E4EE203AAA5BFB4E8F1C3CE /* Fonts.swift in Sources */,
 				85B8825DC779DAD33A43DA6C /* FullscreenExceptionsSheet.swift in Sources */,
 				BB494DC9794C871E5C29A73D /* FullscreenMonitor.swift in Sources */,
@@ -1156,6 +1158,7 @@
 				7BD789F4A4598BA094F7C5E9 /* SettingsViewModel.swift in Sources */,
 				AEF562D8226F2ABC5786BDAF /* SettingsWindow.swift in Sources */,
 				06E8F4E79312B75552CAED23 /* SignalAggregator.swift in Sources */,
+				B3B911F5943A25232DF89CB5 /* SignalInjector.swift in Sources */,
 				307E95F6361E60C4FBAD8C46 /* SignalOverrides.swift in Sources */,
 				21E912937CDE8EA94FF92C65 /* SignalProbe.swift in Sources */,
 				12A569A63B9D80B070A91B73 /* SignalSnapshot.swift in Sources */,
@@ -1210,6 +1213,7 @@
 				4C2BC07929F6762B5529467A /* DoseTextTests.swift in Sources */,
 				F42F9DC41970EA742AD2CA0F /* EdgeCaseTests.swift in Sources */,
 				ECE63621226C4E0632074A36 /* EndRangeBreakBuilderTests.swift in Sources */,
+				59F60955101563420F22FF89 /* FakeSignalSources.swift in Sources */,
 				77E1B1A2C7F9DA8D30EFD56E /* FakeSignalsTests.swift in Sources */,
 				B248E757587C0B032E4A0C5F /* FocusFilterTests.swift in Sources */,
 				DE81E55383C3209ECD6CD888 /* FontsTests.swift in Sources */,
