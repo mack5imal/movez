@@ -3,15 +3,21 @@
 
     python3 -I scripts/simulate_selection.py movement-library-v4.json [--keep-rotation]
 
+This is the October 2026 analysis tool, kept as the record behind docs/rule-changes-2026-10.md. It
+models the rules as of c539e73 and is not the shipped builder: it does not model families
+(DECISIONS 45), so it keys used, taken and recency on the id where RoutineBuilder and
+MicroBreakBuilder key them on the family; it ignores `requires` (DECISIONS 41) and the floor
+requirement; and it has none of the builders' fallbacks (RoutineBuilder's forgettingToday repeat,
+MicroBreakBuilder's relaxation ladder and lone-movement minute). Against today's library it serves
+two members of one family in a break, which the app never does. What the app serves is pinned by
+MovementPicksGoldenTests instead; port this script before using it to judge a library change.
+
 "current" mirrors Sources/movez/Routine/RoutineBuilder.swift and MicroBreakBuilder.swift as of
 5270fe2, before the October 2026 rules. "proposed" follows docs/rule-changes-2026-10.md (C1-C11),
-which is what the app now ships (DECISIONS.md 28-34), so it is the model to re-run. Settings match the
-user's: no equipment, difficulty cap 3, no exclusions, no focus, always-normal time of day. Every
+the rules DECISIONS.md 28-34 adopted, as they stood before families. Settings match the user's at
+the time: no equipment, difficulty cap 3, no exclusions, no focus, always-normal time of day. Every
 break served is treated as completed. --keep-rotation leaves the target-area x3 weight in the
 proposed rules, to measure what dropping it (C9) costs.
-
-Re-run it whenever the library changes: the closer and micro-break draws are pooled, so a category
-that grows takes a larger share of them.
 """
 import json
 import random
