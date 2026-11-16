@@ -518,7 +518,10 @@ of its picks, taken before any of this was built, is replayed by a test to prove
     side, so five 20-rep doses became 15 and two became 10 a side. Six slow multi-part moves keep
     their doses, because a rep of each is several movements and the count is already the right
     effort: PUL-01 ("5 of each"), HNG-17 (6 reps), COR-11 (8 each direction), COR-14 (5/side),
-    COR-15 (6/side) and COR-16 (3/side). Doses in seconds and every END dose are unchanged. The
+    COR-15 (6/side) and COR-16 (3/side). COR-05, the bird dog, keeps 12 alternating as a named
+    exception too: each rep holds 2 s at full reach, so 12 is already the effort of 16–20, and
+    COR-17, the plank pull-through, went from 12 to 16 alternating to sit in the range (*amended
+    in the November 2026 review, TST-24*). Doses in seconds and every END dose are unchanged. The
     load guidance asks for a weight that leaves 3–5 reps in reserve, about RPE 7: stopping short
     of failure costs little strength (Robinson et al. 2024), people training unsupervised rarely
     go near maximal loads (Nuzzo 2024), and a break must not leave anyone winded or sweaty in

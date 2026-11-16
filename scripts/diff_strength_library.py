@@ -21,7 +21,10 @@ anything changed outside them. The agreed edits are two rounds:
   SQT-18), the `vigorous` flag on every movement, the bucket enum and the routine and overlap
   references that follow the renames.
 
-The counts the file states may change with them. Each expected change must also be present, so
+- The November 2026 review: COR-17's dose raised to 16 alternating (TST-24).
+
+The baseline is the library before the strength-mode edits, 378386c. The counts the file states
+may change with them. Each expected change must also be present, so
 the listing it prints is exactly the agreed set.
 """
 import argparse
@@ -51,6 +54,11 @@ BODYWEIGHT_VIGOROUS_BUCKETS = {"COR"}
 ALLOWED_FIELDS = {mid: {"dose"} for mid in DOSE_EDITS}
 ALLOWED_FIELDS.update({mid: {"equipment", "instructions"} for mid in DUMBBELL_ONLY})
 ALLOWED_FIELDS.update({mid: set(RENAME_FIELDS) for mid in RENAMED})
+# The November 2026 review (TST-24): COR-17 raised from 12 to 16 alternating, into DECISIONS 60's
+# range. It is a dumbbell-only move as well, so its dose joins the fields that change.
+REVIEW_DOSE_EDITS = {"COR-17"}
+for _mid in REVIEW_DOSE_EDITS:
+    ALLOWED_FIELDS.setdefault(_mid, set()).add("dose")
 # Top-level sections compared field by field below; every other section must be identical.
 SPECIAL = {"movements", "schema", "buckets", "coverage", "overlap_with_movement_library", "routines"}
 
@@ -291,7 +299,7 @@ def main():
     schema_changes = compare_schema(base["schema"], work["schema"])
     count_changes = compare_counts(base, work)
 
-    say("dose edits: " + ", ".join(sorted(m for m in changed if m in DOSE_EDITS)))
+    say("dose edits: " + ", ".join(sorted(m for m in changed if m in DOSE_EDITS | REVIEW_DOSE_EDITS)))
     say("dumbbell-only: " + ", ".join(sorted(m for m in changed if m in DUMBBELL_ONLY)))
     say("renamed: " + ", ".join(f"{old} -> {new}" for old, new in RENAMED.items() if old in changed))
     say("new movements: " + ", ".join(added))

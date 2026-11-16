@@ -42,13 +42,14 @@ SLOW_EXCEPTIONS = {
     "COR-14": "5/side",
     "COR-15": "6/side",
     "COR-16": "3/side",
+    # DECISIONS 60's named exception: a 2 s hold on every rep makes 12 alternating the effort of
+    # the range's 16-20 (the November 2026 review, TST-24).
+    "COR-05": "12 reps, alternating, 2 s hold",
 }
 # Out of range but outside the agreed edits, so they are kept and reported for the owner to
 # decide rather than changed silently. Pinning the exact dose still catches any later drift.
-RECORDED_FINDINGS = {
-    "COR-05": "12 reps, alternating, 2 s hold",
-    "COR-17": "12 reps, alternating",
-}
+# Empty since the November 2026 review settled COR-05 and COR-17 (TST-24).
+RECORDED_FINDINGS = {}
 
 # Moves that keep the kettlebell besides the heavy tier: one heavy bell suits them.
 KETTLEBELL_KEPT = {
