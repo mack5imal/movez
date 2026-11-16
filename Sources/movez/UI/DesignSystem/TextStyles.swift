@@ -117,7 +117,7 @@ extension View {
 /// the formatter is cached because building one is among the most expensive things Foundation
 /// does and these are read on a per-second redraw path.
 enum MovezClock {
-    nonisolated(unsafe) private static let formatter: DateFormatter = {
+    private static let formatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "H:mm"
         return formatter

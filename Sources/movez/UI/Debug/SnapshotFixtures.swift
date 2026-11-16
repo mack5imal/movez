@@ -127,8 +127,9 @@ extension SnapshotFixtures {
 /// §micro-panel draws it.
 @MainActor
 extension SnapshotFixtures {
-    /// A fixed instant, so every panel PNG is byte-identical between runs.
-    static let panelInstant = Date(timeIntervalSince1970: 1_767_225_600)
+    /// A fixed instant, so every panel PNG is byte-identical between runs. It is nonisolated
+    /// because `menuDate` falls back to it from a nonisolated `??` autoclosure.
+    nonisolated static let panelInstant = Date(timeIntervalSince1970: 1_767_225_600)
 
     static let deferredSittingSeconds: TimeInterval = 5_700
     static let microCountInRemaining: TimeInterval = 21

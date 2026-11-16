@@ -48,7 +48,7 @@ final class PowerMonitor {
         observers.removeAll()
     }
 
-    private func observe(_ center: NotificationCenter, _ name: Notification.Name, action: @escaping () -> Void) {
+    private func observe(_ center: NotificationCenter, _ name: Notification.Name, action: @escaping @Sendable @MainActor () -> Void) {
         observers.append(center.addObserver(forName: name, object: nil, queue: .main) { _ in
             MainActor.assumeIsolated(action)
         })
@@ -57,7 +57,7 @@ final class PowerMonitor {
     private func observe(
         _ center: DistributedNotificationCenter,
         _ name: Notification.Name,
-        action: @escaping () -> Void
+        action: @escaping @Sendable @MainActor () -> Void
     ) {
         observers.append(center.addObserver(forName: name, object: nil, queue: .main) { _ in
             MainActor.assumeIsolated(action)

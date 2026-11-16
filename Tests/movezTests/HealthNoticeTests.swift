@@ -55,7 +55,10 @@ final class HealthNoticeTests: XCTestCase {
         let release = try XCTUnwrap(try bundled().blocks.first { text(of: $0).hasPrefix("**Release of claims.**") })
         let styled = HealthNotice.styled(text(of: release))
         XCTAssertFalse(String(styled.characters).contains("**"), "the asterisks became bold, not text")
-        let boldRuns = styled.runs.filter { $0.inlinePresentationIntent?.contains(.stronglyEmphasized) == true }
+        // Read through the attribute type, not the `\.inlinePresentationIntent` dynamic member: that
+        // forms a key path over a non-Sendable SDK type, which warns and so fails the build.
+        let intent = AttributeScopes.FoundationAttributes.InlinePresentationIntentAttribute.self
+        let boldRuns = styled.runs.filter { $0.attributes[intent]?.contains(.stronglyEmphasized) == true }
         XCTAssertEqual(boldRuns.count, 2, "the heading and the negligence clause")
     }
 
