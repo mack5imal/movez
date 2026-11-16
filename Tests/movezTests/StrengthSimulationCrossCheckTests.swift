@@ -109,7 +109,6 @@ private final class StrengthSimulationRun {
         let perDay: Int
         let recency: [String: Double]
         var served: Set<String> = []
-        var lastMicro: Set<String> = []
         var worked: Set<Region> = []
     }
 
@@ -132,6 +131,8 @@ private final class StrengthSimulationRun {
     private var records: [BreakRecord] = []
     private var plans: StrengthPlanChecker
     private var servedByDay: [Int: [String: Int]] = [:]
+    /// The last micro-break's moves. Like the coordinator's `lastMicroIds` it survives midnight.
+    private var lastMicro: Set<String> = []
 
     init(configuration: Configuration, focus: StrengthFocus, outcome: Outcome) {
         self.configuration = configuration
@@ -185,7 +186,7 @@ private final class StrengthSimulationRun {
     private func microBreak(seed: UInt64, nextFullBreakIds: Set<String>, day: inout Day) {
         var context = StrengthMicroContext()
         context.usedStrengthIdsToday = widened(day.served)
-        context.lastMicroMovementIds = day.lastMicro
+        context.lastMicroMovementIds = lastMicro
         context.nextFullBreakIds = nextFullBreakIds
         context.solidWallNearby = configuration.wall
         context.difficultyCap = configuration.cap
@@ -196,21 +197,27 @@ private final class StrengthSimulationRun {
         outcome.microBreaks += 1
         outcome.add(checker.check(micro, context: context), micro.movementIds.joined(separator: " · "))
         serve(micro.movementIds, day: &day)
-        day.lastMicro = Set(micro.movementIds)
+        lastMicro = Set(micro.movementIds)
     }
 
-    /// Records a strength break as skipped, or as completed and served.
+    /// Records a strength break as skipped, or as completed and served, the way the coordinator
+    /// does (TST-28). A break skipped from the overlay was put on screen, so its moves count as
+    /// served today though none was done; each part done is a completion, so the repeated set of
+    /// X · Y · X counts twice towards recency (TST-2); and the regions the day worked are read from
+    /// every completion that is not an END stretch, the warm-up's included.
     private func complete(_ strengthBreak: StrengthBreak, setOrder: [StrengthSetSlot], skipped: Bool, at: Date, day: inout Day) {
         let kind = strengthBreak.letter.breakKind
         guard !skipped else {
             records.append(record(at: at, kind: kind, outcome: .skipped))
+            day.served.formUnion(strengthBreak.movementIds)
             return
         }
         outcome.strengthBreaks += 1
         records.append(record(at: at, kind: kind))
         plans.recordCompleted(letter: strengthBreak.letter, setOrder: setOrder, sets: strengthBreak.sets.map(\.movement.bucket))
-        day.worked.formUnion(strengthBreak.workedRegions)
-        serve(strengthBreak.movementIds, day: &day)
+        day.worked.formUnion(strengthBreak.workedRegions.union(strengthBreak.warmUp.movement.regions))
+        let parts = [strengthBreak.warmUp.movement.id] + strengthBreak.sets.map(\.movement.id) + [strengthBreak.coolDown.movement.id]
+        serve(parts, day: &day)
     }
 
     private func buildFull(_ plan: NextFullBreak, seed: UInt64, day: Day) -> Full {

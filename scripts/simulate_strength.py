@@ -857,6 +857,8 @@ def simulate(cfg, seed, per_day_for, until=None, days=None, skip=True, tally=Non
     history = defaultdict(Counter)  # day -> id -> servings
     prior_leads = {}
     weeks = defaultdict(Counter)
+    # The coordinator's lastMicroIds is not cleared at midnight, so neither is this (TST-28).
+    last_micro = set()
     day = 0
     while True:
         if days is not None and day >= days:
@@ -869,7 +871,6 @@ def simulate(cfg, seed, per_day_for, until=None, days=None, skip=True, tally=Non
             for sid, n in history.get(day - back, {}).items():
                 recency[sid] += n * (3 - back + 1) / 3
         served = set()
-        last_micro = set()
         worked = set()
         done_today = 0
         pattern_done = 0
@@ -923,6 +924,9 @@ def simulate(cfg, seed, per_day_for, until=None, days=None, skip=True, tally=Non
                     tally.counts["skipped"] += 1
                     if event is not None:
                         event["skipped"] = True
+                    # Skipped from the overlay: the coordinator remembers a break it put on
+                    # screen, so its moves count as served today though none was done (TST-28).
+                    served |= set(ids_of(brk))
                     continue
                 tally.counts["strength"] += 1
                 tally.counts["arm"] += arm_break
@@ -936,7 +940,9 @@ def simulate(cfg, seed, per_day_for, until=None, days=None, skip=True, tally=Non
                         sets_today[m.bucket] += 1
                     for part, n in PART_SETS[m.bucket].items():
                         weeks[day // 5][part] += n
-                worked |= set().union(*(m.regions for m, _ in brk["sets"]))
+                # StrengthModeBuilder.workedRegionsToday reads every completion but END's, so the
+                # warm-up's regions count with the sets' (TST-28).
+                worked |= set().union(brk["warm"][0].regions, *(m.regions for m, _ in brk["sets"]))
                 serve(brk, served, history[day], tally, None)
             else:
                 tally.add_violations(checker.check_end_range(brk, ctx, worked), brk)
@@ -977,15 +983,22 @@ def note_relaxed(tally, brk):
 
 
 def serve(brk, served, today, tally, role):
+    """Marks a break's moves served today and counts them for the share tables once per break.
+    History, which recency is read from, gets one count per part done, as the coordinator writes
+    one completion per part: the repeated set of X · Y · X, or an arm break's arm move, counts
+    twice (TST-2)."""
     if brk["kind"] == "strength":
         roles = [("warm-up", brk["warm"][0])] + [("set", m) for m in dict.fromkeys(m for m, _ in brk["sets"])]
         roles.append(("cool-down", brk["cool"][0]))
+        parts = [brk["warm"][0]] + [m for m, _ in brk["sets"]] + [brk["cool"][0]]
     else:
         roles = [(role, m) for m, _ in brk["blocks"]]
+        parts = [m for m, _ in brk["blocks"]]
     for r, m in roles:
         served.add(m.id)
-        today[m.id] += 1
         tally.served[(r, m.bucket)][m.id] += 1
+    for m in parts:
+        today[m.id] += 1
 
 
 # ---------------------------------------------------------------- eligibility for the share tables

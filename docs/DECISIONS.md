@@ -734,3 +734,11 @@ Entries from fixing the findings in `docs/code-review-2026-11.md`.
     report; `make simulate` writes both, and `make simulate-check` fails when either committed
     file is stale, which takes about a minute and a half and so is not part of `make test`
     (TST-1).
+82. **A strength move is served once per set, in the app and in both simulations.** The app writes
+    one completion per part, so the move of X · Y · X done twice, or an arm break's arm move,
+    counts twice towards tomorrow's recency and the difficulty-3 unlock. That is kept: a move done
+    for two sets was done twice. The simulations now count it the same way, and they keep the
+    day as the coordinator does in three more respects: a break skipped from the overlay was put
+    on screen, so its moves count as served today though none was done; the last micro-break is
+    remembered across midnight; and the regions a day worked include the warm-up's. The report's
+    served-today relaxations rose accordingly, with no violation (TST-2, TST-28).
