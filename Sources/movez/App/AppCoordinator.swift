@@ -333,18 +333,6 @@ final class AppCoordinator: ObservableObject {
         menuState = makeMenuState(now: clock.now)
     }
 
-    /// The signal monitors report through here.
-    func report(inputAgeSeconds: Int) {
-        deliver(scheduler.handle(.input(lastEventAgeSeconds: inputAgeSeconds), now: clock.now))
-    }
-
-    func report(signals: SignalSnapshot) {
-        deliver(scheduler.handle(.signals(signals), now: clock.now))
-        if signals.idleSeconds > 0 {
-            deliver(scheduler.handle(.idle(seconds: signals.idleSeconds), now: clock.now))
-        }
-    }
-
     /// Sends any event straight through — the path the debug injectors use.
     func inject(_ event: SchedulerEvent) {
         deliver(scheduler.handle(event, now: clock.now))

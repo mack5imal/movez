@@ -86,7 +86,7 @@ final class DebugViewModelTests: XCTestCase {
         debug(harness).fire(.idleSeven)
         XCTAssertEqual(harness.state.name, "away")
 
-        harness.coordinator.report(inputAgeSeconds: 0)
+        harness.coordinator.inject(.input(lastEventAgeSeconds: 0))
         XCTAssertEqual(harness.state.name, "sitting")
         XCTAssertTrue(
             reasons(harness).contains { $0.contains("countdowns reset") },
@@ -99,7 +99,7 @@ final class DebugViewModelTests: XCTestCase {
     func testFourMinutesIdleIsTheSameAsSeven() {
         let harness = harness()
         debug(harness).fire(.idleFour)
-        harness.coordinator.report(inputAgeSeconds: 0)
+        harness.coordinator.inject(.input(lastEventAgeSeconds: 0))
         XCTAssertEqual(harness.coordinator.toastInfo?.behaviour, .reset)
         XCTAssertEqual(harness.coordinator.toastInfo?.awaySeconds, 240)
     }

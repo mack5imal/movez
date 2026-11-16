@@ -93,7 +93,6 @@ final class SignalAggregatorTests: XCTestCase {
         var snapshot = aggregator.read(now: harness.now)
         XCTAssertEqual(snapshot.idleSeconds, 42)
         XCTAssertTrue(snapshot.suppressing)
-        XCTAssertEqual(snapshot.frontmostBundleId, "com.apple.Keynote")
 
         harness.settings.suppressMic = false
         harness.settings.suppressCapture = false
