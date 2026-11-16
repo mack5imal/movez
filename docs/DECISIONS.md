@@ -660,3 +660,10 @@ Entries from fixing the findings in `docs/code-review-2026-11.md`.
     restart a countdown without moving the bout: re-planning from the bout start brought back the
     break the user had just skipped, cut a pause's hour off the countdown, and served a second
     micro-break minutes after the first (SCH-1).
+73. **A break the lid closed on is settled into history, and standby still credits one that
+    counted.** Back after the break was due to end, the break is judged by the completion rule as
+    before, and the verdict now reaches history as a done or skipped record written from the
+    session kept at the interruption. The scheduler judges it by the user's return, not by when
+    the quiet minute confirmed it. Away for a whole sitting interval, the break is still not
+    resumed, but one that had already met the completion rule is credited as done; one that had
+    not is let go with no skip recorded, because the user left rather than turned it down (SCH-3).

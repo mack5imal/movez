@@ -122,18 +122,24 @@ extension AppCoordinator {
 
     private func finishBreak(_ outcome: BreakOutcome) {
         defer { currentBreak = nil }
-        guard let current = currentBreak else { return }
+        // A break the lid closed on and the scheduler later settled has no session on screen:
+        // the one it ends is the session kept when it was interrupted.
+        let settling = currentBreak == nil && outcome != .interrupted
+        guard let current = currentBreak ?? (settling ? interruptedSession : nil) else { return }
+        if settling { interruptedSession = nil }
         let kind = current.planned.kind
 
         switch outcome {
         case .completed(let completed, let total, _):
+            // The scheduler judges an interruption by time alone and reports no blocks, so the
+            // session's own count is the one written down.
             history.record(
                 breakRecord: BreakRecord(
                     at: clock.now,
                     routineName: BreakRecord.movementBreakName,
                     outcome: .done,
-                    completedBlocks: completed,
-                    totalBlocks: total,
+                    completedBlocks: max(completed, current.completedBlocks),
+                    totalBlocks: total > 0 ? total : current.totalBlocks,
                     kind: kind
                 ),
                 longestBoutSeconds: scheduler.snapshot.longestBoutSeconds

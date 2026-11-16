@@ -160,7 +160,7 @@ extension Scheduler {
         return [.endFullBreak(.skipped(completedBlocks: completed)), .persist, .menuRefresh]
     }
 
-    private mutating func rescheduleAfterSkip(now: Date) {
+    mutating func rescheduleAfterSkip(now: Date) {
         snapshot.nextFullDueAt = now.addingTimeInterval(TimeInterval(config.sitSeconds))
         snapshot.nextMicroDueAt = microDue(anchoredAt: now)
         snapshot.snoozesUsedThisBreak = 0

@@ -115,36 +115,54 @@ extension Scheduler {
         }
     }
 
-    /// A break cut short by a closed lid picks up where it left off if the machine came back
-    /// before the break was due to end; otherwise it is judged by the completion rule.
-    mutating func resumeInterruptedBreak(now: Date) -> [SchedulerEffect] {
+    /// A break cut short by a closed lid picks up where it left off if the user came back before
+    /// the break was due to end; otherwise it is judged by the completion rule.
+    ///
+    /// The return is what is measured, not the moment it is noticed: a wake is only confirmed at
+    /// the end of the quiet minute, and that minute must not tip a break the user came back to in
+    /// time into one judged as over.
+    mutating func resumeInterruptedBreak(returnedAt: Date, now: Date) -> [SchedulerEffect] {
         guard let interrupted = snapshot.interruptedBreak else { return [] }
+        guard returnedAt < interrupted.plannedEnd else { return settleInterruptedBreak(now: now) }
         snapshot.interruptedBreak = nil
-
-        guard now < interrupted.plannedEnd else {
-            let counts = Scheduler.meetsCompletionRule(
-                completed: interrupted.completedBlocks,
-                total: interrupted.totalBlocks,
-                elapsed: interrupted.elapsedSeconds,
-                config: config
-            )
-            if counts {
-                snapshot.doneToday += 1
-                snapshot.lastCompletedBreakAt = now
-                recordBout(endingAt: interrupted.startedAt)
-                startFreshInterval(now: now)
-            } else {
-                snapshot.skipsToday += 1
-                snapshot.nextFullDueAt = now.addingTimeInterval(TimeInterval(config.sitSeconds))
-                snapshot.nextMicroDueAt = microDue(anchoredAt: now)
-            }
-            return [.persist, .menuRefresh]
-        }
 
         let resumedStart = now.addingTimeInterval(-Double(interrupted.elapsedSeconds))
         transition(to: .fullBreak(startedAt: resumedStart), reason: "break resumed after wake", at: now)
         let plan = BreakPlan(startedAt: resumedStart, seconds: config.breakSeconds, resumed: true)
         return [.startFullBreak(plan), .persist, .menuRefresh]
+    }
+
+    /// Judges an interrupted break that is over by the completion rule, and says so with the
+    /// same `.endFullBreak` a break on screen ends with. The coordinator, which kept the session
+    /// the lid closed on, writes the record from it: without the effect it never learnt the
+    /// break had happened, and the menu, the streak and the strength planner all read history.
+    mutating func settleInterruptedBreak(now: Date) -> [SchedulerEffect] {
+        guard let interrupted = snapshot.interruptedBreak else { return [] }
+        snapshot.interruptedBreak = nil
+        if interruptedBreakCounts(interrupted) {
+            snapshot.doneToday += 1
+            snapshot.lastCompletedBreakAt = now
+            recordBout(endingAt: interrupted.startedAt)
+            startFreshInterval(now: now)
+            let outcome = BreakOutcome.completed(
+                completedBlocks: interrupted.completedBlocks,
+                totalBlocks: interrupted.totalBlocks,
+                elapsed: interrupted.elapsedSeconds
+            )
+            return [.endFullBreak(outcome), .persist, .menuRefresh]
+        }
+        snapshot.skipsToday += 1
+        rescheduleAfterSkip(now: now)
+        return [.endFullBreak(.skipped(completedBlocks: interrupted.completedBlocks)), .persist, .menuRefresh]
+    }
+
+    func interruptedBreakCounts(_ interrupted: InterruptedBreak) -> Bool {
+        Scheduler.meetsCompletionRule(
+            completed: interrupted.completedBlocks,
+            total: interrupted.totalBlocks,
+            elapsed: interrupted.elapsedSeconds,
+            config: config
+        )
     }
 
     /// The app was not running for a while.

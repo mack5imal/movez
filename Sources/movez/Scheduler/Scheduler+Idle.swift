@@ -63,7 +63,14 @@ extension Scheduler {
         let absence = max(0, Int(returnedAt.timeIntervalSince(since)))
         snapshot.lastAbsenceEndedAt = returnedAt
         if absence >= config.sitSeconds {
-            return enterStandby(absence: absence, since: since, now: now)
+            // A break the lid closed on is not resumed after this long, but one that had already
+            // met the completion rule was done, and is credited before standby clears it. One
+            // that had not is let go without a skip: the user left, they did not turn it down.
+            var credited: [SchedulerEffect] = []
+            if let interrupted = snapshot.interruptedBreak, interruptedBreakCounts(interrupted) {
+                credited = settleInterruptedBreak(now: now)
+            }
+            return credited + enterStandby(absence: absence, since: since, now: now)
         }
         if crossedWorkingDayOpening(gapSeconds: absence, now: returnedAt) {
             return resetDay(now: now, reason: "gap crossed a working-day opening — new day")
@@ -75,7 +82,7 @@ extension Scheduler {
             snapshot.nextFullDueAt = snapshot.dueAtAway ?? snapshot.nextFullDueAt
             clearAwayMarkers()
             transition(to: .sitting, reason: "back after \(absence) s", at: now)
-            return [.persist, .menuRefresh] + resumeInterruptedBreak(now: now)
+            return [.persist, .menuRefresh] + resumeInterruptedBreak(returnedAt: returnedAt, now: now)
         }
 
         return returnFromAway(since: since, absence: absence, now: now)
