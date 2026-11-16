@@ -12,9 +12,10 @@ struct StrengthOverlayView: View {
     var state: StrengthOverlayState
     var actions = StrengthOverlayActions()
     var animated = true
-    /// The meter's reading this frame, when the live overlay animates it between ticks; nil uses
-    /// the state's own, which is what snapshots and Reduce Motion want.
-    var livePacer: RepPacerState?
+    /// Reads the meter as it stands this instant, for the live overlay, which redraws the meter
+    /// alone every frame between ticks; nil draws the state's own reading, which is what snapshots
+    /// want. The rest of the card moves only with the state, once a second.
+    var livePacer: (() -> RepPacerState?)?
 
     /// The width of a centred body, from the handoff.
     private static let centredWidth: CGFloat = 780
@@ -70,7 +71,7 @@ struct StrengthOverlayView: View {
     private var bodyContent: some View {
         if state.isRest {
             restBody
-        } else if state.showsMeter, let pacer = livePacer ?? state.pacer {
+        } else if state.showsMeter, let pacer = state.pacer {
             meterBody(pacer)
         } else {
             centredBody
@@ -82,7 +83,7 @@ struct StrengthOverlayView: View {
     /// The meter column beside a left-aligned text column.
     private func meterBody(_ pacer: RepPacerState) -> some View {
         HStack(alignment: .center, spacing: Self.columnGap) {
-            RepMeter(state: pacer, reduceMotion: state.reduceMotion)
+            meter(pacer)
             VStack(alignment: .leading, spacing: 0) {
                 MovezText(state.kicker, MovezType.setKicker, color: Tokens.text2, lineLimit: 1)
                 MovezText(state.movementName, MovezType.setName, color: Tokens.text, lineLimit: 2)
@@ -108,6 +109,19 @@ struct StrengthOverlayView: View {
             .frame(width: Self.textColumn, alignment: .leading)
         }
         .frame(maxWidth: .infinity)
+    }
+
+    /// The smooth meter is redrawn every frame from the clock; the stepped one and a paused one
+    /// move only with the tick.
+    @ViewBuilder
+    private func meter(_ pacer: RepPacerState) -> some View {
+        if let livePacer, !state.reduceMotion, !state.isPaused {
+            TimelineView(.animation) { _ in
+                RepMeter(state: livePacer() ?? pacer, reduceMotion: state.reduceMotion)
+            }
+        } else {
+            RepMeter(state: pacer, reduceMotion: state.reduceMotion)
+        }
     }
 
     // MARK: - Centred bodies
@@ -230,21 +244,12 @@ struct StrengthOverlayScreen: View {
         .ignoresSafeArea()
     }
 
-    /// The smooth meter is redrawn every frame from the clock; the stepped one, a paused one and
-    /// every other body only move with the tick.
-    @ViewBuilder
+    /// The card moves with the tick; only its meter reads the clock every frame.
     private var card: some View {
-        let state = viewModel.state
-        if state.showsMeter, !state.reduceMotion, !state.isPaused {
-            TimelineView(.animation) { _ in
-                StrengthOverlayView(
-                    state: state, actions: actions, animated: viewModel.animationsEnabled,
-                    livePacer: viewModel.livePacer()
-                )
-            }
-        } else {
-            StrengthOverlayView(state: state, actions: actions, animated: viewModel.animationsEnabled)
-        }
+        StrengthOverlayView(
+            state: viewModel.state, actions: actions, animated: viewModel.animationsEnabled,
+            livePacer: viewModel.livePacer
+        )
     }
 
     var actions: StrengthOverlayActions {
