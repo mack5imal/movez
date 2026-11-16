@@ -183,6 +183,14 @@ extension Scheduler {
     /// the countdown is moved forward by the gap rather than credited as a break. A gap as long as
     /// the sitting interval is standby, exactly as the same stretch of idle would be.
     mutating func applyLaunchGap(seconds: Int, now: Date) -> [SchedulerEffect] {
+        if snapshot.state.isBreakSurfaceVisible {
+            // Whatever was on screen died with the process, however briefly it was gone. There
+            // is nothing left to resume, and a scheduler left in `.fullBreak` would wait for an
+            // overlay that no longer exists.
+            rollDayCountersIfStale(now: now)
+            return startFreshSession(now: now, reason: "relaunched with a break on screen")
+        }
+
         guard Double(seconds) > SignalAggregator.tickGapThresholdSeconds else {
             return rollDayIfStale(now: now)
         }
@@ -198,12 +206,6 @@ extension Scheduler {
         if let ended = endAdHocSessionAfterGap(seconds: seconds, now: now) {
             rollDayCountersIfStale(now: now)
             return ended
-        }
-
-        if snapshot.state.isBreakSurfaceVisible {
-            // Whatever was on screen died with the process. There is nothing left to resume.
-            rollDayCountersIfStale(now: now)
-            return startFreshSession(now: now, reason: "relaunched with a break on screen")
         }
 
         if seconds >= config.sitSeconds {
@@ -232,16 +234,38 @@ extension Scheduler {
         snapshot.dueAtAway = snapshot.dueAtAway?.addingTimeInterval(gap)
         rollDayCountersIfStale(now: now)
 
+        snapshot.deferredFullDueAt = snapshot.deferredFullDueAt?.addingTimeInterval(gap)
+        snapshot.pendingInputWaitStartedAt = snapshot.pendingInputWaitStartedAt?.addingTimeInterval(gap)
+
         let reason = "relaunched after \(seconds) s — countdown moved on"
-        if case .away(let since) = snapshot.state {
-            // The absence moves with everything else, so it measures only the stretch movez was
-            // awake to see. `since + gap` can never overtake `now`: the user was already away
-            // when the app went down.
-            transition(to: .away(since: since.addingTimeInterval(gap)), reason: reason, at: now)
-        } else {
-            transition(to: snapshot.state, reason: reason, at: now)
-        }
+        transition(to: Self.shifted(snapshot.state, by: gap), reason: reason, at: now)
         return [.persist, .menuRefresh]
+    }
+
+    /// A state with every date it carries moved on by the time the app was not running, so a
+    /// snooze keeps the minutes it had left and an absence measures only the stretch movez was
+    /// awake to see. `since + gap` can never overtake `now`: the user was already away when the
+    /// app went down.
+    static func shifted(_ state: SchedulerState, by gap: TimeInterval) -> SchedulerState {
+        switch state {
+        case .away(let since):
+            return .away(since: since.addingTimeInterval(gap))
+        case .snoozed(let until):
+            return .snoozed(until: until.addingTimeInterval(gap))
+        case .pendingFull(let since):
+            return .pendingFull(since: since.addingTimeInterval(gap))
+        case .suppressed(let since, let deferred):
+            return .suppressed(since: since.addingTimeInterval(gap), deferredFullDue: deferred?.addingTimeInterval(gap))
+        case .postBreakGrace(let until, .returnFromAbsence(let since, let returnedAt)):
+            let resume = GraceResume.returnFromAbsence(
+                since: since.addingTimeInterval(gap), returnedAt: returnedAt.addingTimeInterval(gap)
+            )
+            return .postBreakGrace(until: until.addingTimeInterval(gap), resumeTo: resume)
+        case .postBreakGrace(let until, let resume):
+            return .postBreakGrace(until: until.addingTimeInterval(gap), resumeTo: resume)
+        default:
+            return state
+        }
     }
 
     /// Midnight, crossed while the app was running or while it was gone.

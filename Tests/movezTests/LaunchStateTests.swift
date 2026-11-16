@@ -167,6 +167,32 @@ final class LaunchStateTests: XCTestCase {
                        "the overlay died with the process; movez must not sit in `full_break` forever")
     }
 
+    /// A crash and a relaunch within seconds still lose whatever was on screen.
+    func testABreakRestoredSecondsLaterIsAlsoResolvedAtLaunch() {
+        var seed = sitting(boutStartedAt: Self.date(day: 7, hour: 10), savedAt: Self.date(day: 7, hour: 10, minute: 56))
+        seed.state = .fullBreak(startedAt: Self.date(day: 7, hour: 10, minute: 55))
+
+        let (coordinator, _) = relaunch(seed: seed, at: Self.date(day: 7, hour: 10, minute: 56).addingTimeInterval(5))
+
+        XCTAssertEqual(coordinator.scheduler.state.name, "sitting")
+    }
+
+    /// A snooze with four minutes left when the app quit has four minutes left when it comes back.
+    func testASnoozeKeepsWhatWasLeftOfItAcrossARelaunch() {
+        let quitAt = Self.date(day: 7, hour: 10, minute: 1)
+        var seed = sitting(boutStartedAt: Self.date(day: 7, hour: 9), savedAt: quitAt)
+        seed.state = .snoozed(until: Self.date(day: 7, hour: 10, minute: 5))
+        let relaunchAt = Self.date(day: 7, hour: 10, minute: 21)
+
+        let (coordinator, sink) = relaunch(seed: seed, at: relaunchAt)
+
+        XCTAssertFalse(sink.names.contains("showHeadsUp"), "the heads-up is not back the moment the app starts")
+        guard case .snoozed(let until) = coordinator.scheduler.state else {
+            return XCTFail("got \(coordinator.scheduler.state)")
+        }
+        XCTAssertDate(until, relaunchAt.addingTimeInterval(4 * 60), accuracy: 2)
+    }
+
     func testTheStateFileIsRefreshedWhileTheAppIsQuiet() {
         let harness = CoordinatorHarness(workingHours: .alwaysOn)
         let before = harness.snapshotStore.saveCount
