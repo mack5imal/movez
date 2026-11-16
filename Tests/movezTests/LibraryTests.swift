@@ -137,6 +137,72 @@ final class LibraryTests: XCTestCase {
         }
     }
 
+    /// The worked-example routines are documentation nothing serves, so editing them must not
+    /// stop the library loading; a dangling id in one still does (LIB-3).
+    func testTheWorkedExampleRoutinesAreNotCounted() throws {
+        let trimmed = try mutatedLibrary { json in
+            var routines = try XCTUnwrap(json["routines"] as? [Any])
+            routines.removeLast()
+            json["routines"] = routines
+            var micro = try XCTUnwrap(json["micro_routines"] as? [Any])
+            micro.removeLast()
+            json["micro_routines"] = micro
+            var presets = try XCTUnwrap(json["presets"] as? [[String: Any]])
+            presets.removeAll { $0["default"] as? Bool != true }
+            json["presets"] = presets
+        }
+        XCTAssertNoThrow(try LibraryLoader.validate(trimmed))
+
+        let dangling = try mutatedLibrary { json in
+            var routines = try XCTUnwrap(json["routines"] as? [[String: Any]])
+            var blocks = try XCTUnwrap(routines[0]["blocks"] as? [[String: Any]])
+            blocks[0]["movement_id"] = "XYZ-99"
+            routines[0]["blocks"] = blocks
+            json["routines"] = routines
+        }
+        XCTAssertThrowsError(try LibraryLoader.validate(dangling)) { error in
+            guard case LibraryError.validation(let reason)? = error as? LibraryError else {
+                return XCTFail("expected a validation error, got \(error)")
+            }
+            XCTAssertTrue(reason.contains("XYZ-99"), reason)
+        }
+    }
+
+    /// `micro_break.eligible_ids` lists the movements tagged Micro; the loader holds the list to
+    /// the tags, so the JSON cannot say two different things (LIB-3).
+    func testTheMicroListIsTheTaggedMovements() throws {
+        XCTAssertEqual(Set(library.microBreak.eligibleIds), Set(library.microEligible.map(\.id)))
+        XCTAssertEqual(library.microBreak.eligibleIds.count, library.microBreak.eligibleCount)
+
+        let stale = try mutatedLibrary { json in
+            var spec = try XCTUnwrap(json["micro_break"] as? [String: Any])
+            var ids = try XCTUnwrap(spec["eligible_ids"] as? [String])
+            ids.removeLast()
+            spec["eligible_ids"] = ids
+            json["micro_break"] = spec
+        }
+        XCTAssertThrowsError(try LibraryLoader.validate(stale)) { error in
+            guard case LibraryError.validation(let reason)? = error as? LibraryError else {
+                return XCTFail("expected a validation error, got \(error)")
+            }
+            XCTAssertTrue(reason.contains("eligible_ids"), reason)
+        }
+    }
+
+    /// The presets in the JSON describe the cadences `SchedulerConfig.from(preset:)` builds, which
+    /// is what the app runs; the JSON's copy is not read, so this keeps the two from drifting.
+    func testThePresetsAgreeWithTheSchedulerConfig() {
+        for preset in library.presets {
+            let config = SchedulerConfig.from(preset: preset.id, microOn: preset.microDefaultOn)
+            XCTAssertEqual(config.sitSeconds, preset.sitMinutes * 60, preset.id.rawValue)
+            XCTAssertEqual(config.microEnabled, !preset.microBreaksAtMinutes.isEmpty, preset.id.rawValue)
+            guard config.microEnabled else { continue }
+            let every = config.microEverySeconds
+            let expected = stride(from: every, to: config.sitSeconds, by: every).map { $0 / 60 }
+            XCTAssertEqual(expected, preset.microBreaksAtMinutes, preset.id.rawValue)
+        }
+    }
+
     // MARK: - Version
 
     /// A library revision bumps the JSON's `version` and keeps the major version the resource is

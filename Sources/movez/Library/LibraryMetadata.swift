@@ -63,10 +63,14 @@ struct MicroBreakSpec: Codable, Hashable {
     let eligibleCount: Int
     let eligibility: MicroEligibility
     let rules: [String]
+    /// The movements tagged Micro, listed for a reader of the JSON. The builders read the tags;
+    /// the loader holds this list to them, so the file cannot say two different things.
+    let eligibleIds: [String]
 
     enum CodingKeys: String, CodingKey {
         case seconds, structure, eligibility, rules
         case eligibleCount = "eligible_count"
+        case eligibleIds = "eligible_ids"
     }
 }
 

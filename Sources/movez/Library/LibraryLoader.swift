@@ -24,15 +24,6 @@ enum LibraryLoader {
     static let resourceName = "movement-library-v4"
     static let resourceExtension = "json"
 
-    /// Counts of the parts of the library the code depends on directly. How many movements there
-    /// are, and how many are Micro, the JSON declares for itself (per bucket, and in `micro_break`)
-    /// and is checked against, so adding movements in a library revision needs no code change.
-    enum Expected {
-        static let routines = 9
-        static let microRoutines = 8
-        static let presets = 3
-    }
-
     /// Loads and validates the library bundled with the app.
     static func loadBundled() throws -> MovementLibrary {
         guard let url = bundledURL() else {
@@ -103,6 +94,17 @@ enum LibraryLoader {
             throw LibraryError.validation("\(floored.id) needs the floor but is tagged Micro")
         }
 
+        // Checked after the tags themselves, so a wrongly tagged movement is reported as that.
+        let tagged = movements.filter(\.microEligible).map(\.id)
+        let listed = library.microBreak.eligibleIds
+        guard Set(listed) == Set(tagged), listed.count == tagged.count else {
+            let missing = Set(tagged).subtracting(listed).sorted()
+            let extra = Set(listed).subtracting(tagged).sorted()
+            throw LibraryError.validation(
+                "micro_break.eligible_ids disagrees with the Micro tags: missing \(missing), not tagged \(extra)"
+            )
+        }
+
         for info in library.buckets {
             let actual = library.movements(in: info.id).count
             guard actual == info.count else {
@@ -130,18 +132,10 @@ enum LibraryLoader {
         }
     }
 
+    /// The worked-example routines and the presets are not counted: no builder serves the
+    /// routines, and the cadences the app runs are `SchedulerConfig.from(preset:)`'s (a test holds
+    /// the JSON's presets to them), so editing either in the JSON must not stop the app loading.
     private static func validateCollections(_ library: MovementLibrary) throws {
-        guard library.routines.count == Expected.routines else {
-            throw LibraryError.validation("expected \(Expected.routines) routines, found \(library.routines.count)")
-        }
-        guard library.microRoutines.count == Expected.microRoutines else {
-            throw LibraryError.validation(
-                "expected \(Expected.microRoutines) micro-routines, found \(library.microRoutines.count)"
-            )
-        }
-        guard library.presets.count == Expected.presets else {
-            throw LibraryError.validation("expected \(Expected.presets) presets, found \(library.presets.count)")
-        }
         guard library.presets.contains(where: \.isDefault) else {
             throw LibraryError.validation("no preset is marked default")
         }
