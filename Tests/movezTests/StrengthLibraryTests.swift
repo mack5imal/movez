@@ -153,6 +153,59 @@ final class StrengthLibraryTests: XCTestCase {
         }
     }
 
+    /// Each structural check refuses its own kind of bad edit, with the reason it names (LIB-4).
+    func testTheStructuralChecksEachRefuseTheirEdit() throws {
+        try assertRefused("the strength library declares mode movement") { json in
+            json["mode"] = "movement"
+        }
+        try assertRefused("expected 151 strength movements, found 150") { json in
+            var movements = try XCTUnwrap(json["movements"] as? [[String: Any]])
+            movements.removeAll { $0["id"] as? String == "ACC-01" }
+            json["movements"] = movements
+        }
+        try assertRefused("the strength library must declare each of its 9 buckets once") { json in
+            var buckets = try XCTUnwrap(json["buckets"] as? [[String: Any]])
+            buckets.append(buckets[0])
+            json["buckets"] = buckets
+        }
+        try assertRefused("strength bucket SQT declares 19 movements, found 18") { json in
+            var buckets = try XCTUnwrap(json["buckets"] as? [[String: Any]])
+            buckets[0]["count"] = 19
+            json["buckets"] = buckets
+        }
+        try assertRefused("SQT-01 is filed under HNG") { json in
+            var movements = try XCTUnwrap(json["movements"] as? [[String: Any]])
+            let sqt = try XCTUnwrap(movements.firstIndex { $0["id"] as? String == "SQT-01" })
+            let hng = try XCTUnwrap(movements.firstIndex { $0["id"] as? String == "HNG-01" })
+            movements[sqt]["bucket"] = "HNG"
+            movements[hng]["bucket"] = "SQT"
+            json["movements"] = movements
+        }
+        try assertRefused("SQT-01 is micro-eligible outside END") { json in
+            var movements = try XCTUnwrap(json["movements"] as? [[String: Any]])
+            let index = try XCTUnwrap(movements.firstIndex { $0["id"] as? String == "SQT-01" })
+            movements[index]["micro_eligible"] = true
+            json["movements"] = movements
+        }
+        try assertRefused("expected 41 micro-eligible END movements, found 40") { json in
+            var movements = try XCTUnwrap(json["movements"] as? [[String: Any]])
+            let index = try XCTUnwrap(movements.firstIndex { $0["bucket"] as? String == "END" && $0["micro_eligible"] as? Bool == true })
+            movements[index]["micro_eligible"] = false
+            json["movements"] = movements
+        }
+    }
+
+    private func assertRefused(
+        _ reason: String,
+        line: UInt = #line,
+        _ mutate: (inout [String: Any]) throws -> Void
+    ) throws {
+        let url = try mutatedCopy(mutate)
+        XCTAssertThrowsError(try StrengthLibraryLoader.load(from: url, movementLibrary: Self.movementLibrary), line: line) { error in
+            XCTAssertEqual(error as? LibraryError, .validation(reason), line: line)
+        }
+    }
+
     func testMissingResourceSurfacesAnError() {
         let url = URL(fileURLWithPath: "/nonexistent/strength-library-v1.json")
         XCTAssertThrowsError(try StrengthLibraryLoader.load(from: url, movementLibrary: Self.movementLibrary)) { error in

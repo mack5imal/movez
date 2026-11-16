@@ -414,7 +414,8 @@ final class StrengthBreakBuilderTests: XCTestCase {
     /// doses below the library's working range.
     func testEveryOtherRepDoseHasAMeter() {
         let slow: Set<String> = ["PUL-01", "HNG-17", "COR-11", "COR-14", "COR-15", "COR-16"]
-        let working: Set<StrengthBucket> = [.sqt, .hng, .psh, .pul, .cor]
+        // The arm buckets' doses too, which the arm break (DECISIONS 70) serves as working sets.
+        let working: Set<StrengthBucket> = [.sqt, .hng, .psh, .pul, .bic, .tri, .cor]
         for movement in library.movements where working.contains(movement.bucket) && !slow.contains(movement.id) {
             let isTimed = movement.dose.replacingOccurrences(of: " s hold", with: "").contains(" s")
             XCTAssertEqual(StrengthSet(movement: movement, setNumber: 1).hasMeter, !isTimed, "\(movement.id) \(movement.dose)")
