@@ -11,7 +11,6 @@ final class ModeExtensibilityTests: XCTestCase {
         eyebrowWord: "100s",
         badgeGlyph: "mode.hundreds",
         menuBarGlyph: "mode.hundreds",
-        libraryKind: ModeLibraryKind(resourceName: "bodyweight-fixture"),
         settingsGroup: ModeSettingsGroup(id: "hundreds", title: "100S"),
         isSetUp: nil
     )

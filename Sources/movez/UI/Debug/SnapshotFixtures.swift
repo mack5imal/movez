@@ -514,7 +514,6 @@ extension SnapshotFixtures {
         eyebrowWord: "100s",
         badgeGlyph: ModeGlyph.hundreds.id,
         menuBarGlyph: ModeGlyph.hundreds.id,
-        libraryKind: ModeLibraryKind(resourceName: "hundreds-fixture"),
         settingsGroup: ModeSettingsGroup(id: "hundreds", title: "100s"),
         isSetUp: nil
     )
@@ -525,7 +524,6 @@ extension SnapshotFixtures {
         eyebrowWord: "PT",
         badgeGlyph: ModeGlyph.personalTraining.id,
         menuBarGlyph: ModeGlyph.personalTraining.id,
-        libraryKind: ModeLibraryKind(resourceName: "pt-fixture"),
         settingsGroup: ModeSettingsGroup(id: "pt", title: "PT"),
         isSetUp: nil
     )

@@ -38,7 +38,6 @@ enum Focus: String, Hashable, Codable, CaseIterable {
 /// Everything the builder needs to assemble one full break. Pure data: the same context always
 /// produces the same routine.
 struct RoutineContext: Hashable {
-    var date: Date = .init()
     /// Everything served today, in full breaks and micro-breaks alike. Nothing is served twice in
     /// a day.
     var usedMovementIdsToday: Set<String> = []
@@ -63,7 +62,6 @@ struct MicroContext: Hashable {
     var lastMicroMovementIds: Set<String> = []
     var nextFullRoutineIds: Set<String> = []
     var excluded: Set<String> = []
-    var equipment: Set<Equipment> = []
     /// What the user has said they do not have.
     var unavailable: Set<Requirement> = []
     /// The same cap and difficulty-3 unlocks a full break keeps to: a Beginner is a Beginner in a

@@ -15,7 +15,6 @@ final class ModeDesignSystemTests: XCTestCase {
         eyebrowWord: "100s",
         badgeGlyph: "mode.hundreds",
         menuBarGlyph: "mode.pt",
-        libraryKind: ModeLibraryKind(resourceName: "hundreds-test-fixture"),
         settingsGroup: ModeSettingsGroup(id: "hundreds-test", title: "100s"),
         isSetUp: nil
     )

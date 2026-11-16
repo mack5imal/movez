@@ -20,7 +20,6 @@ struct MovementModeBuilder: ModeBreakBuilding {
         context.lastMicroMovementIds = coordinator.lastMicroMovementIds()
         context.nextFullRoutineIds = nextFullBreakIds
         context.excluded = settings.excludedMovementIds
-        context.equipment = settings.equipment
         context.unavailable = settings.unavailableRequirements
         context.difficultyCap = settings.difficultyCap
         context.unlockedDiff3 = coordinator.history.unlockedDiff3(library: coordinator.library)

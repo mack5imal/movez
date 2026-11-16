@@ -53,31 +53,4 @@ struct MovementLibrary: Codable, Hashable {
         movements.filter(\.microEligible)
     }
 
-    var byRegion: [Region: [Movement]] {
-        var result: [Region: [Movement]] = [:]
-        for movement in movements {
-            for region in movement.regions {
-                result[region, default: []].append(movement)
-            }
-        }
-        return result
-    }
-
-    var byBucket: [Bucket: [Movement]] {
-        Dictionary(grouping: movements, by: \.bucket)
-    }
-
-    var defaultPreset: Preset? {
-        presets.first(where: \.isDefault) ?? presets.first
-    }
-
-    func preset(id: PresetId) -> Preset? {
-        presets.first { $0.id == id }
-    }
-
-    /// Resolves the movements of a routine template in block order; nil if any block is dangling.
-    func resolve(_ template: RoutineTemplate) -> [Movement]? {
-        let resolved = template.blocks.compactMap { movement(id: $0.movementId) }
-        return resolved.count == template.blocks.count ? resolved : nil
-    }
 }

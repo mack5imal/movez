@@ -25,9 +25,6 @@ struct DesignRules: Codable, Hashable {
         case blockSecondsRange = "block_seconds_range"
         case microBreakSeconds = "micro_break_seconds"
     }
-
-    var minBlockSeconds: Int { blockSecondsRange.first ?? 60 }
-    var maxBlockSeconds: Int { blockSecondsRange.last ?? 90 }
 }
 
 struct BlocksPerBreak: Codable, Hashable {

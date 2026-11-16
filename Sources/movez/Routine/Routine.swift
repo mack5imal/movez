@@ -83,40 +83,4 @@ struct MicroBreak: Hashable, Identifiable {
             (seconds - startsAt(block: index)) * 2 >= blocks[index].seconds
         }.map { blocks[$0] }
     }
-
-    /// "MICRO-BREAK · SHOULDERS", for the block on screen.
-    static func eyebrow(for block: RoutineBlock?) -> String {
-        "MICRO-BREAK · \(regionWord(for: block).uppercased())"
-    }
-
-    /// The plain-language region word taken from a movement's primary region.
-    static func regionWord(for block: RoutineBlock?) -> String {
-        guard let region = block?.movement.regions.first else { return "movement" }
-        return regionWord(for: region)
-    }
-
-    static func regionWord(for region: Region) -> String {
-        plainRegionWords[region] ?? region.rawValue.lowercased()
-    }
-
-    /// The plain-language name for each region, used in micro-break eyebrows.
-    static let plainRegionWords: [Region: String] = [
-        .shoulder: "shoulders",
-        .arm: "arms",
-        .neck: "neck",
-        .calfAnkle: "calves",
-        .eyes: "eyes",
-        .wristForearm: "hands",
-        .hip: "hips",
-        .thoracic: "upper back",
-        .breath: "breathing",
-        .full: "whole body",
-        .glute: "glutes",
-        .hamstring: "hamstrings",
-        .quad: "quads",
-        .adductor: "inner thighs",
-        .chest: "chest",
-        .lumbarCore: "core",
-        .footShin: "feet"
-    ]
 }

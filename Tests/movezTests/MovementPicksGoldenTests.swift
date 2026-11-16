@@ -189,7 +189,6 @@ struct GoldenContexts {
         for (name, configure) in configs {
             for index in 0..<Self.fullSeedCount {
                 var context = RoutineContext()
-                context.date = Date(timeIntervalSince1970: 1_788_771_600)
                 context.seed = SplitMix64.seed(day: Self.day, index: index)
                 configure(&context)
                 result.append(("\(name)#\(index)", context))
@@ -206,7 +205,10 @@ struct GoldenContexts {
             configs.append(("unavailable-\(requirement.rawValue)", { $0.unavailable = [requirement] }))
         }
         configs.append(("unavailable-all", { $0.unavailable = Set(Requirement.allCases) }))
-        configs.append(("equipment-all", { $0.equipment = Set(Equipment.allCases) }))
+        // A micro-break takes no equipment whatever the user owns, so the context has no equipment
+        // to set and this draws what "base" draws. The label stays: the fixture is never
+        // re-recorded.
+        configs.append(("equipment-all", { _ in }))
         let fifth = everyFifth, members = familyMembers, all = allIds, recency = recencyMap
         let micro = library.microEligible.map(\.id).sorted()
         let almostAll = Set(micro.dropLast(2))

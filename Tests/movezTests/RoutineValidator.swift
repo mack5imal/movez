@@ -1,4 +1,5 @@
 import Foundation
+@testable import movez
 
 /// Checks a routine against the rules every generated break must meet. An empty result means the
 /// routine is valid.
@@ -7,6 +8,9 @@ import Foundation
 /// in any order, then a hand, eye or breathing closer, each block exactly a minute.
 /// `allowSampleShapes` relaxes all of that to "opens on circulation, three to six blocks of 20 to
 /// 90 s" for the worked examples R1–R9 in the library document, which predate these rules.
+///
+/// It lives in the test target: the builders keep to the shape by construction, and only the
+/// tests check that they do.
 enum RoutineValidator {
     static let blockCount = 5
 

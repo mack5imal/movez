@@ -195,22 +195,6 @@ final class MicroBreakBuilderTests: XCTestCase {
         }
     }
 
-    func testEyebrowUsesThePlainRegionWordOfTheBlockOnScreen() {
-        let micro = micro(seed: 11)
-        XCTAssertTrue(MicroBreak.eyebrow(for: micro.blocks.first).hasPrefix("MICRO-BREAK · "))
-        XCTAssertEqual(MicroBreak.eyebrow(for: nil), "MICRO-BREAK · MOVEMENT")
-        XCTAssertEqual(MicroBreak.regionWord(for: .shoulder), "shoulders")
-        XCTAssertEqual(MicroBreak.regionWord(for: .calfAnkle), "calves")
-        XCTAssertEqual(MicroBreak.regionWord(for: .wristForearm), "hands")
-        XCTAssertEqual(MicroBreak.regionWord(for: .thoracic), "upper back")
-        XCTAssertEqual(MicroBreak.regionWord(for: .breath), "breathing")
-        XCTAssertEqual(MicroBreak.regionWord(for: .full), "whole body")
-        XCTAssertEqual(MicroBreak.regionWord(for: .eyes), "eyes")
-        XCTAssertEqual(MicroBreak.regionWord(for: .hip), "hips")
-        XCTAssertEqual(MicroBreak.regionWord(for: .neck), "neck")
-        XCTAssertEqual(MicroBreak.regionWord(for: .glute), "glutes")
-    }
-
     func testDeterministicForTheSameSeed() {
         let first = micro(seed: 5_150)
         let second = micro(seed: 5_150)

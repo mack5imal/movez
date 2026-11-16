@@ -37,7 +37,9 @@ final class LibraryTests: XCTestCase {
         for routine in library.routines {
             XCTAssertEqual(routine.sumOfBlocks, routine.targetSeconds, "routine \(routine.id)")
             XCTAssertEqual(routine.blocks.reduce(0) { $0 + $1.seconds }, routine.targetSeconds, "routine \(routine.id)")
-            XCTAssertNotNil(library.resolve(routine), "routine \(routine.id) has a dangling movement id")
+            for block in routine.blocks {
+                XCTAssertNotNil(library.movement(id: block.movementId), "routine \(routine.id) has a dangling movement id")
+            }
         }
         for routine in library.microRoutines {
             XCTAssertEqual(routine.sumOfBlocks, routine.targetSeconds, "micro routine \(routine.id)")
@@ -50,18 +52,19 @@ final class LibraryTests: XCTestCase {
 
     func testPresets() {
         XCTAssertEqual(library.presets.count, 3)
+        func preset(id: PresetId) -> Preset? { library.presets.first { $0.id == id } }
 
-        let fiftyFive = library.preset(id: .fiftyFiveFive)
+        let fiftyFive = preset(id: .fiftyFiveFive)
         XCTAssertEqual(fiftyFive?.isDefault, true)
         XCTAssertEqual(fiftyFive?.microBreaksAtMinutes, [30])
         XCTAssertEqual(fiftyFive?.sitMinutes, 55)
         XCTAssertEqual(fiftyFive?.breakMinutes, 5)
-        XCTAssertEqual(library.defaultPreset?.id, .fiftyFiveFive)
+        XCTAssertEqual(library.presets.filter(\.isDefault).map(\.id), [.fiftyFiveFive])
 
-        XCTAssertEqual(library.preset(id: .eightyFiveFive)?.microBreaksAtMinutes, [30, 60])
-        XCTAssertEqual(library.preset(id: .twentyFiveFive)?.microBreaksAtMinutes, [])
-        XCTAssertEqual(library.preset(id: .twentyFiveFive)?.microDefaultOn, false)
-        XCTAssertEqual(library.preset(id: .twentyFiveFive)?.isDefault, false)
+        XCTAssertEqual(preset(id: .eightyFiveFive)?.microBreaksAtMinutes, [30, 60])
+        XCTAssertEqual(preset(id: .twentyFiveFive)?.microBreaksAtMinutes, [])
+        XCTAssertEqual(preset(id: .twentyFiveFive)?.microDefaultOn, false)
+        XCTAssertEqual(preset(id: .twentyFiveFive)?.isDefault, false)
     }
 
     func testEquipmentEnum() {
@@ -366,12 +369,6 @@ final class LibraryTests: XCTestCase {
     func testTheNewMovementsThatUseBothSidesTogetherHaveNoSides() throws {
         for id in ["STR-51", "STR-52", "STR-54", "STR-57", "STR-58", "BAL-30"] {
             XCTAssertFalse(try XCTUnwrap(library.movement(id: id)).perSide, id)
-        }
-    }
-
-    func testEveryRegionHasAPlainWord() {
-        for region in Region.allCases {
-            XCTAssertNotNil(MicroBreak.plainRegionWords[region], region.rawValue)
         }
     }
 

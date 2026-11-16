@@ -338,7 +338,6 @@ extension AppCoordinator {
     func routineContext(at now: Date, breakIndex: Int) -> RoutineContext {
         rollDayIfNeeded(at: now)
         var context = RoutineContext()
-        context.date = now
         context.usedMovementIdsToday = movementIdsUsedToday(at: now)
         context.usedStrRegionsLastBreak = breaksToday.last?.routine?.strengthRegions ?? []
         context.equipment = settings.equipment

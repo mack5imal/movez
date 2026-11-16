@@ -1,16 +1,5 @@
 import Foundation
 
-/// Which bundled library a mode's breaks are drawn from, named by its resource.
-///
-/// A struct rather than an enum so a mode added later, or a test, can name a library of its own
-/// without a new case here.
-struct ModeLibraryKind: Hashable {
-    let resourceName: String
-
-    static let movement = ModeLibraryKind(resourceName: LibraryLoader.resourceName)
-    static let strength = ModeLibraryKind(resourceName: StrengthLibraryLoader.resourceName)
-}
-
 /// The Settings section that holds a mode's own settings, shown in place of the other modes'.
 struct ModeSettingsGroup: Hashable {
     let id: String
@@ -23,9 +12,10 @@ struct ModeSettingsGroup: Hashable {
 
 /// Everything that makes one mode look and behave like itself.
 ///
-/// This is the only place a mode is mapped to its parts: surfaces read the name, eyebrow and glyphs
-/// from here, and the coordinator reads the library and settings group, so serving a third mode
-/// means adding a definition rather than another branch at every call site.
+/// This is the only place a mode is mapped to its looks: surfaces read the name, eyebrow, glyphs
+/// and settings group from here, and its library and builders are wired in `ModeBuilderTable`,
+/// so serving a third mode means adding a definition and a builder rather than another branch
+/// at every call site.
 struct ModeDefinition: Hashable {
     /// Matches the `BreakMode` raw value for a real mode.
     let id: String
@@ -38,7 +28,6 @@ struct ModeDefinition: Hashable {
     /// The glyph drawn inside the menu-bar circle. The design uses the badge glyph, but it is kept
     /// separate so the two can diverge without touching the badge.
     let menuBarGlyph: String
-    let libraryKind: ModeLibraryKind
     let settingsGroup: ModeSettingsGroup
     /// Whether the mode's setup has been confirmed, so a switch to it can apply straight away. Nil
     /// for a mode with nothing to set up; while it reads false, a switch opens the setup instead.
@@ -56,7 +45,6 @@ struct ModeDefinition: Hashable {
         eyebrowWord: "MOVEMENT",
         badgeGlyph: "mode.movement",
         menuBarGlyph: "mode.movement",
-        libraryKind: .movement,
         settingsGroup: .movements,
         isSetUp: nil
     )
@@ -67,7 +55,6 @@ struct ModeDefinition: Hashable {
         eyebrowWord: "STRENGTH",
         badgeGlyph: "mode.strength",
         menuBarGlyph: "mode.strength",
-        libraryKind: .strength,
         settingsGroup: .strength,
         isSetUp: { $0.strengthSetUp }
     )
@@ -77,7 +64,7 @@ struct ModeDefinition: Hashable {
     static func == (lhs: ModeDefinition, rhs: ModeDefinition) -> Bool {
         lhs.id == rhs.id && lhs.displayName == rhs.displayName && lhs.eyebrowWord == rhs.eyebrowWord
             && lhs.badgeGlyph == rhs.badgeGlyph && lhs.menuBarGlyph == rhs.menuBarGlyph
-            && lhs.libraryKind == rhs.libraryKind && lhs.settingsGroup == rhs.settingsGroup
+            && lhs.settingsGroup == rhs.settingsGroup
     }
 
     func hash(into hasher: inout Hasher) {

@@ -38,7 +38,6 @@
 		2054288235589EAF4C2580B1 /* StrengthBreakBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143AD5F0668CBBAE3B65C50C /* StrengthBreakBuilder.swift */; };
 		21722D025788B985766969F4 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFE39FF9E9C3BE38EF525616 /* SettingsStore.swift */; };
 		21E912937CDE8EA94FF92C65 /* SignalProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3E0ED9C6E229E8F8425E5CF /* SignalProbe.swift */; };
-		24A56B2FADD5631DAF0DFD13 /* RoutineValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5BD6A2AA7A23D4AC1BABB /* RoutineValidator.swift */; };
 		25E93322972C26948D469154 /* RoutineTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B18D9238BAD43644A6B180B1 /* RoutineTemplate.swift */; };
 		28BE1D586B8D43392A258EDE /* StrengthLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76D859DE3DBD56B6D6632784 /* StrengthLibrary.swift */; };
 		2AEB596035AF78E4A520FB5B /* Scheduler+Suppression.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4880E3A5C4CA66BFA31A1C1D /* Scheduler+Suppression.swift */; };
@@ -207,6 +206,7 @@
 		CEE65BB60BDAA262F560D2A5 /* AppCoordinator+Intents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B078C8004530A358670DDA2 /* AppCoordinator+Intents.swift */; };
 		CFA086FFD3DC582124770DD7 /* Bucket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FD4162D0EEB338461E7A53C /* Bucket.swift */; };
 		D12D96BD9EC8AEAC51668577 /* StrengthOverlayViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32224F39B624B072CCD46136 /* StrengthOverlayViewModelTests.swift */; };
+		D31D162F99EB094E091239FC /* RoutineValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57B3BDF24146262B311D46BE /* RoutineValidator.swift */; };
 		D52E7039B0A6AA4B4750A8B2 /* SecurityAndCopyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1526A9966A58758C3CA5080 /* SecurityAndCopyTests.swift */; };
 		D60462131795A23088939F1F /* OverlayState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD996CAE1CAE24052BF77E3 /* OverlayState.swift */; };
 		D743EBAC3DF196459BCE30D0 /* StrengthUnlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4227A3ABA9A77EAF8F78BE2 /* StrengthUnlock.swift */; };
@@ -328,6 +328,7 @@
 		56A6BEA1E29B3BDA91DF3B33 /* LibraryLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryLoader.swift; sourceTree = "<group>"; };
 		57716DAB5FAFFC146D4EF5DC /* EndRangeBreakBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndRangeBreakBuilder.swift; sourceTree = "<group>"; };
 		5789AEACEFAA9758E0145C9A /* SchedulerSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerSnapshot.swift; sourceTree = "<group>"; };
+		57B3BDF24146262B311D46BE /* RoutineValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineValidator.swift; sourceTree = "<group>"; };
 		5829A9C4500C849FB13FEFAD /* LaunchArguments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchArguments.swift; sourceTree = "<group>"; };
 		5830AA9B69A30C1BC96F31BD /* OverlayViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayViewModel.swift; sourceTree = "<group>"; };
 		5A646C36AA0B26476DDBB2CD /* MenuBarViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarViewModelTests.swift; sourceTree = "<group>"; };
@@ -433,7 +434,6 @@
 		BBA8B020C2EDC9BF09B9B140 /* PanelHygiene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanelHygiene.swift; sourceTree = "<group>"; };
 		BD1B8BDF132345A46CF1BCAF /* PanelWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanelWindowController.swift; sourceTree = "<group>"; };
 		BE6C1EC7F64C93A00B211226 /* ReviewFixTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewFixTests.swift; sourceTree = "<group>"; };
-		BED5BD6A2AA7A23D4AC1BABB /* RoutineValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineValidator.swift; sourceTree = "<group>"; };
 		BFEB8FB3E3B2FF2195048AD6 /* GalleryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryTests.swift; sourceTree = "<group>"; };
 		C0B3CA9071BA355921152549 /* LaunchAtLogin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLogin.swift; sourceTree = "<group>"; };
 		C0B577EE28A8F593F5FF18F4 /* RoutineFixturesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineFixturesTests.swift; sourceTree = "<group>"; };
@@ -583,6 +583,7 @@
 				D2636E7E2FEA7389160E0CC2 /* RoutineBuilderTests.swift */,
 				C0B577EE28A8F593F5FF18F4 /* RoutineFixturesTests.swift */,
 				A9B9838D81524A40DB3881AB /* RoutineTestSupport.swift */,
+				57B3BDF24146262B311D46BE /* RoutineValidator.swift */,
 				1CFDF85D71146981530D4EAA /* SchedulerCoreTests.swift */,
 				13DE805FBC3C0DA9C2B42248 /* SchedulerDayBoundaryTests.swift */,
 				2DFB5669015E088A42B8B433 /* SchedulerDeferralTests.swift */,
@@ -697,7 +698,6 @@
 				52237A737E2C1AFF6A78303C /* Routine.swift */,
 				64B812A24864DC7766D2B8E2 /* RoutineBuilder.swift */,
 				C8F16E197BB8CBCF7D345DCC /* RoutineContext.swift */,
-				BED5BD6A2AA7A23D4AC1BABB /* RoutineValidator.swift */,
 				6E47EF436BDD3C23084D28F4 /* SeededRandom.swift */,
 			);
 			path = Routine;
@@ -1165,7 +1165,6 @@
 				0F074C7F41A3C8C7849C2F95 /* RoutineBuilder.swift in Sources */,
 				50D4E872D82B1BD926667F7A /* RoutineContext.swift in Sources */,
 				25E93322972C26948D469154 /* RoutineTemplate.swift in Sources */,
-				24A56B2FADD5631DAF0DFD13 /* RoutineValidator.swift in Sources */,
 				FFFA726A1E5C0A77083C6E51 /* Scheduler+Actions.swift in Sources */,
 				0866803C21557AB19497146D /* Scheduler+Hours.swift in Sources */,
 				C3FB9705D873F4D2C369CC09 /* Scheduler+Idle.swift in Sources */,
@@ -1280,6 +1279,7 @@
 				3096DA29B7430245E2D89B1A /* RoutineBuilderTests.swift in Sources */,
 				766E97E004686AB8163D46E1 /* RoutineFixturesTests.swift in Sources */,
 				A1139C1975FC8C947D0EE8B0 /* RoutineTestSupport.swift in Sources */,
+				D31D162F99EB094E091239FC /* RoutineValidator.swift in Sources */,
 				C7FD8B58088A2CD47C915509 /* SchedulerCoreTests.swift in Sources */,
 				8EA99BD28816371FF2EFBD7B /* SchedulerDayBoundaryTests.swift in Sources */,
 				9E5565886A6C31529E5FF247 /* SchedulerDeferralTests.swift in Sources */,

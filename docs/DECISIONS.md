@@ -442,8 +442,9 @@ of its picks, taken before any of this was built, is replayed by a test to prove
 
 54. **A mode is a row in a table.** Two more modes are planned, a "100s" rep mode and a physical
     therapy mode, so the mode is not a flag but an enum backed by one `ModeDefinition` per mode
-    in `Sources/movez/Modes/`: its name, the word in its eyebrows, its badge and menu-bar glyphs,
-    its library, its break builders and its settings group. The Settings mode control, the
+    in `Sources/movez/Modes/`: its name, the word in its eyebrows, its badge and menu-bar glyphs
+    and its settings group, with its library and break builders wired beside it in
+    `ModeBuilderTable`. The Settings mode control, the
     dropdown's mode row, every badge, the menu-bar icon and the coordinator's one build path all
     read the definition rather than branching on Movement or Strength, and a test that adds a
     fake third mode in the test target shows each of them serving it with no production change.
