@@ -763,7 +763,7 @@ Entries from fixing the findings in `docs/code-review-2026-11.md`.
     it. The rule list's `s6-arm-alternate` became where-possible to match. The app's defaults, and
     those defaults with dumbbells, now get the full cycle-and-skip run, so their relaxations and
     never-served moves are reported with every other configuration's (TST-3).
-85. **A line height tighter than the font's own is not drawn, so none is asked for.** SwiftUI can
+83. **A line height tighter than the font's own is not drawn, so none is asked for.** SwiftUI can
     add space between lines but not take it away, and Manrope's line box is about 1.37 times its
     size. The handoff's tighter values for the set name (1.05), the dose and rep counter (1.1),
     the panel title and dose (1.15), the kicker, dose modifier and compact side pill (1.2), and the
@@ -771,7 +771,7 @@ Entries from fixing the findings in `docs/code-review-2026-11.md`.
     natural line, which is what they were already drawn at, and a test holds every style to 1 or
     to at least the natural ratio. The difference only shows when one of them wraps to a second
     line, which a two-line set name or up-next line can (UI-14).
-86. **The dropdown offers a row only where the scheduler acts on it.** "Make due in" moves the due
+84. **The dropdown offers a row only where the scheduler acts on it.** "Make due in" moves the due
     time of a countdown that is running, so it is shown only while plainly sitting: not during a
     snooze, a waiting or deferred break, a call, the quiet minute after one, a heads-up, a
     micro-break or an absence, where its steps did nothing. "Take a break now" during a
@@ -782,7 +782,7 @@ Entries from fixing the findings in `docs/code-review-2026-11.md`.
     ignores an extension of a pause with no end. A snooze counts down to its own end, and a break
     that is due and waiting reads "Break due", or "Break waiting for your call" (or screen share,
     or fullscreen app), instead of "Next break in 0 min" (UI-4, UI-5, UI-6).
-87. **The debug time scale is scratch.** It stays in every build, because the product brief
+85. **The debug time scale is scratch.** It stays in every build, because the product brief
     specifies the Debug section, but nothing it does outlives it. The scale is held in memory
     only, so every launch starts at 1× (a scale an earlier build saved is dropped). While it is
     above 1× the coordinator writes to a copy of the history and an in-memory state store, so
@@ -793,7 +793,7 @@ Entries from fixing the findings in `docs/code-review-2026-11.md`.
     The tick timer is restarted whenever the scale changes. A state file whose save time is in
     the future is taken for clock skew at launch and the session starts fresh, where before its
     gap measured as zero and its due times stood hours away (UI-10).
-88. **A Focus request is held until the scheduler takes it** (amending 26 and 51). macOS's
+86. **A Focus request is held until the scheduler takes it** (amending 26 and 51). macOS's
     request was acted on once, as an event, and lost three ways: a Focus that turned on during a
     full break (which refuses a pause) left breaks running for the whole Focus; one performed
     before the coordinator existed (the notice not yet accepted, the login item still starting)

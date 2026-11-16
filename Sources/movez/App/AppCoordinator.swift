@@ -76,7 +76,7 @@ final class AppCoordinator: ObservableObject {
 
     /// A Focus request the scheduler has not taken yet. It is held, and offered again on every
     /// tick, because the one state that refuses a pause (a full break on screen) would otherwise
-    /// lose it for the whole Focus (APP-1, DECISIONS 88).
+    /// lose it for the whole Focus (APP-1, DECISIONS 86).
     var pendingFocusPause: Bool?
     /// Asks macOS for the Focus filter's current value. Set at launch; nil in tests, which never
     /// talk to the system.
@@ -105,7 +105,7 @@ final class AppCoordinator: ObservableObject {
     /// Where the state is written. While the debug clock runs fast this is a scratch store.
     private(set) var snapshotStore: SnapshotStore?
     /// The real history, state store and scheduler state, put aside while the debug clock runs
-    /// fast and given back when it returns to 1× (DECISIONS 87).
+    /// fast and given back when it returns to 1× (DECISIONS 85).
     private var realWorld: RealWorld?
 
     /// What a scaled debug run puts aside.
@@ -364,7 +364,7 @@ final class AppCoordinator: ObservableObject {
     /// Everything that happens while the clock runs fast is stamped in a future that never comes,
     /// so it goes to scratch: a copy of the history and an in-memory state store. Back at 1× the
     /// clock snaps to the wall, the real stores and the scheduler state from before come back,
-    /// and the countdown starts again from now (DECISIONS 87).
+    /// and the countdown starts again from now (DECISIONS 85).
     private func applyTimeScale() {
         let scale = max(1, settings.debugTimeScale)
         guard scale != appliedTimeScale else { return }

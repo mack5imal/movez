@@ -77,7 +77,7 @@ struct MenuBarState: Equatable {
     var pauseExpanded = false
     var extendExpanded = false
     /// The scheduler is plainly sitting, the one state in which it moves the due time. Anywhere
-    /// else "Make due in" did nothing when clicked, so it is not offered (DECISIONS 86).
+    /// else "Make due in" did nothing when clicked, so it is not offered (DECISIONS 84).
     var makeDueAvailable = true
     /// False while a full break is on screen: the break the row would start is already running.
     var takeBreakAvailable = true

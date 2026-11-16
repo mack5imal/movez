@@ -74,7 +74,7 @@ final class SettingsStoreTests: XCTestCase {
         XCTAssertEqual(reloaded.awayBehaviour, .pause)
         XCTAssertFalse(reloaded.soundsEnabled)
         XCTAssertTrue(reloaded.launchAtLogin)
-        XCTAssertEqual(reloaded.debugTimeScale, 1, "the debug clock is never saved (DECISIONS 87)")
+        XCTAssertEqual(reloaded.debugTimeScale, 1, "the debug clock is never saved (DECISIONS 85)")
         XCTAssertTrue(reloaded.debugExpanded)
         XCTAssertEqual(reloaded.workingHours, hours)
     }

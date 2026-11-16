@@ -21,7 +21,7 @@ final class ClockTests: XCTestCase {
     }
 
     /// Between two fast scales time is continuous. Back to 1× is the exception: that snaps to the
-    /// wall (DebugTimeScaleTests, DECISIONS 87).
+    /// wall (DebugTimeScaleTests, DECISIONS 85).
     func testChangingScaleDoesNotJumpTime() {
         let clock = SystemClock(timeScale: 60)
         Thread.sleep(forTimeInterval: 0.1)

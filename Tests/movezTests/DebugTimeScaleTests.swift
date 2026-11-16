@@ -3,7 +3,7 @@ import XCTest
 
 /// The debug time scale is a tool for watching a day go by in minutes. Whatever happens at 60× is
 /// scratch: it is never saved, never written into the real history or state file, and it ends
-/// back on wall time with a fresh countdown (UI-10, DECISIONS 87).
+/// back on wall time with a fresh countdown (UI-10, DECISIONS 85).
 @MainActor
 final class DebugTimeScaleTests: XCTestCase {
     private func harness() -> CoordinatorHarness {

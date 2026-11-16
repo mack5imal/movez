@@ -3,7 +3,7 @@ import XCTest
 
 /// The Focus filter's request is held and re-applied until the scheduler can take it, rather than
 /// fired once as an event that a full break, a missing coordinator or a relaunch could lose
-/// (APP-1, DECISIONS 88).
+/// (APP-1, DECISIONS 86).
 @MainActor
 final class FocusFilterStateTests: XCTestCase {
     override func tearDown() {

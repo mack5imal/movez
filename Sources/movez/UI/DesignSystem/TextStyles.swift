@@ -21,7 +21,7 @@ struct MovezTextStyle: Equatable {
     /// Spacing can only be added, so a line height tighter than Manrope's own line box (about
     /// 1.37) cannot be drawn. The handoff's tighter values (1.05 to 1.3) are therefore written as 1,
     /// the font's natural line, and a test holds every style to 1 or at least the natural ratio
-    /// (DECISIONS 85).
+    /// (DECISIONS 83).
     var lineSpacing: CGFloat {
         guard lineHeight > 1 else { return 0 }
         let naturalLineBox = nsFont.ascender - nsFont.descender + nsFont.leading

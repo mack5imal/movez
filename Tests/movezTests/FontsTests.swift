@@ -45,7 +45,7 @@ final class FontsTests: XCTestCase {
     /// SwiftUI can only add space between lines, never take it away, so a line height under the
     /// font's own line box is silently set at the font's. A style asks for 1 (the font's natural
     /// line) or for at least that ratio, so that every line height written down is one that is
-    /// drawn (UI-14, DECISIONS 85).
+    /// drawn (UI-14, DECISIONS 83).
     func testEveryLineHeightIsOneOrAtLeastTheFontsNaturalRatio() {
         for entry in MovezType.all {
             let style = entry.style

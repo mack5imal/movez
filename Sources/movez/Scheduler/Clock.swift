@@ -17,7 +17,7 @@ final class SystemClock: Clock {
 
     /// Going back to 1× snaps the clock to wall time rather than keeping the lead a faster scale
     /// built up: a clock left hours ahead stamped future times on everything until the app quit
-    /// (DECISIONS 87). Any other change re-bases, so a faster clock carries on from where it was.
+    /// (DECISIONS 85). Any other change re-bases, so a faster clock carries on from where it was.
     var timeScale: Double {
         didSet {
             guard timeScale != oldValue else { return }

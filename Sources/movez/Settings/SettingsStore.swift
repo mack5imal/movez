@@ -78,7 +78,7 @@ final class SettingsStore: ObservableObject {
     @Published var soundsEnabled: Bool { didSet { write(soundsEnabled, Key.soundsEnabled) } }
     @Published var launchAtLogin: Bool { didSet { write(launchAtLogin, Key.launchAtLogin) } }
     /// How fast the debug clock runs. Held in memory only, so every launch starts at 1×: a saved
-    /// 60× relaunched straight into a clock hours ahead of the wall (DECISIONS 87).
+    /// 60× relaunched straight into a clock hours ahead of the wall (DECISIONS 85).
     @Published var debugTimeScale: Double = 1
     @Published var debugExpanded: Bool { didSet { write(debugExpanded, Key.debugExpanded) } }
     /// The version of the health and safety notice the user accepted, and when. Nil until they
