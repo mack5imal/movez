@@ -254,6 +254,20 @@ final class OverlayViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.state.skipLabel, "Skip · 1 today")
     }
 
+    /// The delay is the scheduler's, so Skip never lights up before the scheduler would take it.
+    func testSkipWaitsForTheSchedulersDelay() {
+        let clock = ManualClock(now: SchedulerHarness.mondayMorning)
+        var config = SchedulerConfig()
+        config.skipDelaySeconds = 10
+        let viewModel = OverlayViewModel(routine: fixtureRoutine(), startedAt: clock.now, clock: clock, config: config)
+        clock.advance(9)
+        viewModel.refresh()
+        XCTAssertFalse(viewModel.state.skipEnabled)
+        clock.advance(1)
+        viewModel.refresh()
+        XCTAssertTrue(viewModel.state.skipEnabled)
+    }
+
     func testDoneIsRefusedUntilTheBreakCounts() {
         let clock = ManualClock(now: SchedulerHarness.mondayMorning)
         let viewModel = makeViewModel(clock: clock)

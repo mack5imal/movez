@@ -149,27 +149,25 @@ final class PanelWindowController {
     /// height — changes as the count-in becomes the movement.
     private func layoutPanel() {
         panelScreen = Self.attached(panelScreen)
-        guard let window = panelWindow, let screen = panelScreen, let hosting = window.contentView else { return }
-        let fitting = hosting.fittingSize
-        let shell = CGSize(
-            width: fitting.width - Self.shadowMargin * 2,
-            height: fitting.height - Self.shadowMargin * 2
-        )
-        guard shell.width > 0, shell.height > 0 else { return }
-        let frame = Self.windowFrame(forShell: Self.panelFrame(shell: shell, visible: screen.visibleFrame))
-        if window.frame != frame { window.setFrame(frame, display: true) }
+        Self.layout(panelWindow, on: panelScreen, place: Self.panelFrame(shell:visible:))
     }
 
     private func layoutToast() {
         toastScreen = Self.attached(toastScreen)
-        guard let window = toastWindow, let screen = toastScreen, let hosting = window.contentView else { return }
+        Self.layout(toastWindow, on: toastScreen, place: Self.toastFrame(shell:visible:))
+    }
+
+    /// Sizes a window to its content and puts its shell where `place` says on the screen's working
+    /// area, leaving it alone when it is already there.
+    private static func layout(_ window: NSPanel?, on screen: NSScreen?, place: (CGSize, NSRect) -> NSRect) {
+        guard let window, let screen, let hosting = window.contentView else { return }
         let fitting = hosting.fittingSize
         let shell = CGSize(
-            width: fitting.width - Self.shadowMargin * 2,
-            height: fitting.height - Self.shadowMargin * 2
+            width: fitting.width - shadowMargin * 2,
+            height: fitting.height - shadowMargin * 2
         )
         guard shell.width > 0, shell.height > 0 else { return }
-        let frame = Self.windowFrame(forShell: Self.toastFrame(shell: shell, visible: screen.visibleFrame))
+        let frame = windowFrame(forShell: place(shell, screen.visibleFrame))
         if window.frame != frame { window.setFrame(frame, display: true) }
     }
 

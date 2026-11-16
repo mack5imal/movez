@@ -34,9 +34,6 @@ final class PanelViewModel: ObservableObject {
         var reason: SuppressionReason = .microphone
     }
 
-    /// How long Skip stays inert, so no panel is dismissed by reflex.
-    static let skipDelaySeconds: TimeInterval = 3
-
     @Published private(set) var phase: Phase
     /// Republished on every tick; every string and ring below is a function of it.
     @Published private(set) var now: Date
@@ -63,6 +60,9 @@ final class PanelViewModel: ObservableObject {
     /// The micro-break's one snooze. A second request is a skip.
     var microSnoozeUsed = false
     var toast: ToastInfo?
+    /// How long Skip stays inert, so no panel is dismissed by reflex. The sink sets it from the
+    /// scheduler's config, which refuses a heads-up skip for the same time.
+    var skipDelaySeconds = TimeInterval(SchedulerConfig().skipDelaySeconds)
 
     var actions = PanelActions()
     /// Inside a micro-break the panel chimes its own transitions, as the overlay does in a full
@@ -287,7 +287,7 @@ final class PanelViewModel: ObservableObject {
         }
     }
 
-    var skipEnabled: Bool { elapsed >= Self.skipDelaySeconds }
+    var skipEnabled: Bool { elapsed >= skipDelaySeconds }
 
     /// The deferred variant widens to fit its badge.
     var panelWidth: CGFloat {

@@ -123,7 +123,8 @@ final class StrengthOverlayViewModel: ObservableObject {
     /// Whole seconds the break has run, pauses excluded.
     var elapsedSeconds: Int { Int(timeline.elapsed(at: clock.now)) }
 
-    var skipEnabled: Bool { timeline.elapsed(at: clock.now) >= OverlayViewModel.skipDelaySeconds }
+    /// Skip stays inert for the scheduler's skip delay, as it does in a movement break.
+    var skipEnabled: Bool { timeline.elapsed(at: clock.now) >= TimeInterval(config.skipDelaySeconds) }
 
     /// Body crossfades follow the system's Reduce Motion setting, as the movement break's do.
     var animationsEnabled: Bool { !reduceMotion }

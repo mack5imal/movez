@@ -52,6 +52,7 @@ final class PanelEffectSink: EffectSink {
         model.breakMinutes = info.breakMinutes ?? max(1, config.breakSeconds / 60)
         model.snoozesLeft = info.snoozesLeft
         model.skipsToday = info.skipsToday
+        model.skipDelaySeconds = TimeInterval(coordinator.scheduler.config.skipDelaySeconds)
         if info.showDeferredBadge {
             model.deferred = PanelViewModel.DeferredInfo(
                 sittingFor: TimeInterval(info.sittingSeconds),
@@ -75,6 +76,7 @@ final class PanelEffectSink: EffectSink {
         model.micro = MicroPanelBreak(micro)
         model.modeDefinition = (coordinator.currentMicroMode ?? coordinator.settings.mode).definition
         model.microSeconds = info.seconds
+        model.skipDelaySeconds = TimeInterval(coordinator.scheduler.config.skipDelaySeconds)
         model.chimes = chimes
         model.microSnoozeUsed = coordinator.scheduler.snapshot.microSnoozeUsed
         model.actions.microStartNow = { [weak coordinator] in coordinator?.microStartNow() }

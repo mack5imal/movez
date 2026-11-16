@@ -11,8 +11,6 @@ import Foundation
 /// through `OverlayActions`; recording what was done is the coordinator's job.
 @MainActor
 final class OverlayViewModel: ObservableObject {
-    /// How long Skip stays inert at the start of a break, so nobody dismisses it by reflex.
-    static let skipDelaySeconds: TimeInterval = 3
     /// How long one pause may last before the break ends on its own. A pause is for reading a
     /// movement, not for parking the break; after five minutes it has been abandoned.
     static let pauseLimitSeconds: TimeInterval = 300
@@ -164,8 +162,10 @@ final class OverlayViewModel: ObservableObject {
     /// Whole seconds the break has been running.
     var elapsedSeconds: Int { max(0, Int(now.timeIntervalSince(startedAt))) }
 
+    /// Skip stays inert for the scheduler's skip delay, so nobody dismisses the break by reflex.
+    /// The delay is the scheduler's own, so the button never lights up before a tap would count.
     var skipEnabled: Bool {
-        now.timeIntervalSince(startedAt) >= Self.skipDelaySeconds
+        now.timeIntervalSince(startedAt) >= TimeInterval(config.skipDelaySeconds)
     }
 
     // MARK: - The tick
