@@ -83,13 +83,28 @@ final class AppCoordinator: ObservableObject {
     let modeBuilders: ModeBuilderTable
     /// How a strength move served today rules out its movement-library counterpart (S8).
     let crossModeUsage: CrossModeUsage?
-    let history: HistoryStore
+    /// The history in use. While the debug clock runs fast this is a scratch copy, so nothing
+    /// stamped in scaled time reaches the real record.
+    private(set) var history: HistoryStore
     let settings: SettingsStore
     let builder: RoutineBuilder
     let microBuilder: MicroBreakBuilder
     var scheduler: Scheduler
 
-    let snapshotStore: SnapshotStore?
+    /// Where the state is written. While the debug clock runs fast this is a scratch store.
+    private(set) var snapshotStore: SnapshotStore?
+    /// The real history, state store and scheduler state, put aside while the debug clock runs
+    /// fast and given back when it returns to 1× (DECISIONS 87).
+    private var realWorld: RealWorld?
+
+    /// What a scaled debug run puts aside.
+    private struct RealWorld {
+        var history: HistoryStore
+        var snapshotStore: SnapshotStore?
+        var snapshot: SchedulerSnapshot
+    }
+    /// The scale the clock and the timers were last set to.
+    private var appliedTimeScale: Double = 1
     private var sink: EffectSink
     /// The real system monitors, attached at launch and absent in tests.
     var aggregator: SignalAggregator?
@@ -97,6 +112,8 @@ final class AppCoordinator: ObservableObject {
     let signalOverrides = SignalOverrides()
     var powerMonitor: PowerMonitor?
     private var tickTimer: DispatchSourceTimer?
+    /// How often the tick timer fires, while it runs; nil when it does not.
+    private(set) var tickInterval: TimeInterval?
     private var wakeCheckTimer: DispatchSourceTimer?
     /// When the state file was last written, so the heartbeat knows whether it is due.
     /// Written by `persistSnapshot()` in the effects extension.
@@ -143,6 +160,9 @@ final class AppCoordinator: ObservableObject {
     /// While paused or off-hours nothing is polled, but something still has to notice when the
     /// pause runs out or the working day opens. That is this timer, not polling.
     static let wakeCheckSeconds: TimeInterval = 30
+    /// How far in the future a state file's save time may be before it is taken for clock skew
+    /// rather than the few seconds two clock reads can disagree by.
+    static let clockSkewToleranceSeconds: TimeInterval = 60
 
     init(
         library: MovementLibrary,
@@ -175,8 +195,16 @@ final class AppCoordinator: ObservableObject {
             // ever moves the countdown outwards is the harmless direction to be wrong in.
             let aliveAt = snapshot.savedAt ?? snapshot.boutStartedAt
             snapshot.savedAt = nil
-            launchGapSeconds = max(0, Int(clock.now.timeIntervalSince(aliveAt)))
-            scheduler = Scheduler(snapshot: snapshot, config: config)
+            if aliveAt > clock.now.addingTimeInterval(Self.clockSkewToleranceSeconds) {
+                // Saved by a clock that ran ahead of this one: an earlier build's debug scale, or
+                // a clock set back by hand. Its due times are hours away and its gap measures as
+                // nothing, so nothing in it can be trusted; the session starts fresh.
+                MovezLog.store.error("state was saved in the future, starting fresh")
+                scheduler = Scheduler(config: config, now: clock.now)
+            } else {
+                launchGapSeconds = max(0, Int(clock.now.timeIntervalSince(aliveAt)))
+                scheduler = Scheduler(snapshot: snapshot, config: config)
+            }
         } else {
             scheduler = Scheduler(config: config, now: clock.now)
         }
@@ -261,6 +289,7 @@ final class AppCoordinator: ObservableObject {
         powerMonitor?.stop()
         tickTimer?.cancel()
         tickTimer = nil
+        tickInterval = nil
         wakeCheckTimer?.cancel()
         wakeCheckTimer = nil
     }
@@ -304,9 +333,47 @@ final class AppCoordinator: ObservableObject {
         deliver(scheduler.handle(.settingsChanged(config), now: clock.now))
     }
 
+    /// Sets the clock and the timers to the debug scale, and swaps the stores when it crosses 1×.
+    ///
+    /// Everything that happens while the clock runs fast is stamped in a future that never comes,
+    /// so it goes to scratch: a copy of the history and an in-memory state store. Back at 1× the
+    /// clock snaps to the wall, the real stores and the scheduler state from before come back,
+    /// and the countdown starts again from now (DECISIONS 87).
     private func applyTimeScale() {
-        (clock as? SystemClock)?.timeScale = max(1, settings.debugTimeScale)
+        let scale = max(1, settings.debugTimeScale)
+        guard scale != appliedTimeScale else { return }
+        let wasScaled = appliedTimeScale > 1
+        appliedTimeScale = scale
+        if !wasScaled, scale > 1 { enterScratch() }
+        (clock as? SystemClock)?.timeScale = scale
+        if wasScaled, scale == 1 { leaveScratch() }
         aggregator?.restartIfRunning()
+        if tickTimer != nil || wakeCheckTimer != nil { restartTimers() }
+    }
+
+    private func enterScratch() {
+        realWorld = RealWorld(history: history, snapshotStore: snapshotStore, snapshot: scheduler.snapshot)
+        history = HistoryStore(data: history.data, calendar: settings.schedulerConfig.calendar)
+        snapshotStore = InMemorySnapshotStore()
+    }
+
+    private func leaveScratch() {
+        // Whatever is on screen belongs to the scaled run; it is taken down while the scratch
+        // stores are still the ones it would write to.
+        deliver(scheduler.dismissSurfaces(now: clock.now))
+        guard let real = realWorld else { return }
+        realWorld = nil
+        history = real.history
+        snapshotStore = real.snapshotStore
+        scheduler = Scheduler(snapshot: real.snapshot, config: scheduler.config)
+        invalidatePreview()
+        switch scheduler.state {
+        // A pause or off hours ends at a time the real clock still keeps.
+        case .paused, .offHours:
+            deliver([.persist, .menuRefresh])
+        default:
+            deliver(scheduler.startFreshSession(now: clock.now, reason: "debug clock back to real time"))
+        }
     }
 
     // MARK: - Timers
@@ -320,8 +387,10 @@ final class AppCoordinator: ObservableObject {
         if scheduler.pollingRequired {
             let scale = max(1, settings.debugTimeScale)
             let interval = max(Self.minimumTickSeconds, Self.tickSeconds / scale)
+            tickInterval = interval
             tickTimer = makeTimer(interval: interval) { [weak self] in self?.tick() }
         } else {
+            tickInterval = nil
             wakeCheckTimer = makeTimer(interval: Self.wakeCheckSeconds) { [weak self] in self?.tick() }
         }
     }

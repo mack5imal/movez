@@ -15,10 +15,19 @@ final class SystemClock: Clock {
     private var scaledOrigin: Date
     private var realOrigin: Date
 
+    /// Going back to 1× snaps the clock to wall time rather than keeping the lead a faster scale
+    /// built up: a clock left hours ahead stamped future times on everything until the app quit
+    /// (DECISIONS 87). Any other change re-bases, so a faster clock carries on from where it was.
     var timeScale: Double {
         didSet {
             guard timeScale != oldValue else { return }
-            rebase(from: oldValue)
+            if timeScale == 1 {
+                let wall = Date()
+                scaledOrigin = wall
+                realOrigin = wall
+            } else {
+                rebase(from: oldValue)
+            }
         }
     }
 

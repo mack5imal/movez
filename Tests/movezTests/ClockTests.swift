@@ -20,11 +20,13 @@ final class ClockTests: XCTestCase {
         XCTAssertLessThan(elapsed, 120, "and nowhere near two scaled minutes")
     }
 
+    /// Between two fast scales time is continuous. Back to 1× is the exception: that snaps to the
+    /// wall (DebugTimeScaleTests, DECISIONS 87).
     func testChangingScaleDoesNotJumpTime() {
         let clock = SystemClock(timeScale: 60)
         Thread.sleep(forTimeInterval: 0.1)
         let before = clock.now
-        clock.timeScale = 1
+        clock.timeScale = 2
         let after = clock.now
         XCTAssertGreaterThanOrEqual(after, before)
         XCTAssertLessThan(after.timeIntervalSince(before), 1, "rebasing is continuous")

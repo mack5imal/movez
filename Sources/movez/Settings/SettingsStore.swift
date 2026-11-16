@@ -77,7 +77,9 @@ final class SettingsStore: ObservableObject {
     @Published var awayBehaviour: AwayBehaviour { didSet { write(awayBehaviour.rawValue, Key.awayBehaviour) } }
     @Published var soundsEnabled: Bool { didSet { write(soundsEnabled, Key.soundsEnabled) } }
     @Published var launchAtLogin: Bool { didSet { write(launchAtLogin, Key.launchAtLogin) } }
-    @Published var debugTimeScale: Double { didSet { write(debugTimeScale, Key.debugTimeScale) } }
+    /// How fast the debug clock runs. Held in memory only, so every launch starts at 1×: a saved
+    /// 60× relaunched straight into a clock hours ahead of the wall (DECISIONS 87).
+    @Published var debugTimeScale: Double = 1
     @Published var debugExpanded: Bool { didSet { write(debugExpanded, Key.debugExpanded) } }
     /// The version of the health and safety notice the user accepted, and when. Nil until they
     /// have; a newer notice version asks again.
@@ -128,7 +130,8 @@ final class SettingsStore: ObservableObject {
         awayBehaviour = AwayBehaviour(rawValue: defaults.string(forKey: Key.awayBehaviour) ?? "") ?? .reset
         soundsEnabled = defaults.object(forKey: Key.soundsEnabled) as? Bool ?? true
         launchAtLogin = defaults.object(forKey: Key.launchAtLogin) as? Bool ?? false
-        debugTimeScale = defaults.object(forKey: Key.debugTimeScale) as? Double ?? 1
+        // Earlier builds saved the scale. It is dropped, not read back.
+        defaults.removeObject(forKey: Key.debugTimeScale)
         debugExpanded = defaults.object(forKey: Key.debugExpanded) as? Bool ?? false
         acceptedNoticeVersion = defaults.string(forKey: Key.acceptedNoticeVersion)
         acceptedNoticeAt = defaults.object(forKey: Key.acceptedNoticeAt) as? Date

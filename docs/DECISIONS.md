@@ -782,3 +782,14 @@ Entries from fixing the findings in `docs/code-review-2026-11.md`.
     ignores an extension of a pause with no end. A snooze counts down to its own end, and a break
     that is due and waiting reads "Break due", or "Break waiting for your call" (or screen share,
     or fullscreen app), instead of "Next break in 0 min" (UI-4, UI-5, UI-6).
+87. **The debug time scale is scratch.** It stays in every build, because the product brief
+    specifies the Debug section, but nothing it does outlives it. The scale is held in memory
+    only, so every launch starts at 1× (a scale an earlier build saved is dropped). While it is
+    above 1× the coordinator writes to a copy of the history and an in-memory state store, so
+    nothing stamped in scaled time reaches the real record. Back at 1× the clock snaps to wall
+    time instead of keeping its lead, the real stores and the scheduler state from before the
+    scale went up come back, whatever is on screen is taken down, and the countdown starts again
+    from now (a pause or off hours is kept, since it ends at a time the real clock still keeps).
+    The tick timer is restarted whenever the scale changes. A state file whose save time is in
+    the future is taken for clock skew at launch and the session starts fresh, where before its
+    gap measured as zero and its due times stood hours away (UI-10).
