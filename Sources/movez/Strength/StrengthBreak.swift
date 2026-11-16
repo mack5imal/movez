@@ -38,9 +38,9 @@ enum StrengthTiming {
 /// rep meter need. A dose the meter cannot count (a time, a hold, "5 of each") has no reps.
 struct StrengthDose: Hashable {
     let text: String
-    /// Reps the meter counts, a side for a per-side dose, or nil when the set has no meter.
+    /// Reps the meter counts, a side for a per-side dose, or nil when the set has no meter. Whether
+    /// a set runs per side is the movement's `per_side`, not the dose's wording.
     let reps: Int?
-    let perSide: Bool
     /// The pause at the top of each rep, for doses such as "12 reps, alternating, 2 s hold".
     let holdSeconds: Int?
 
@@ -51,20 +51,14 @@ struct StrengthDose: Hashable {
         let hold = parts.dropFirst().lazy.compactMap { Self.number(in: $0, suffix: " s hold") }.first
 
         var reps: Int?
-        var perSide = false
         if let count = Self.number(in: head, suffix: " reps") {
             reps = count >= StrengthTiming.twoSidedRepFloor ? count : nil
         } else if let count = Self.number(in: head, suffix: "/side") {
-            perSide = true
             reps = count >= StrengthTiming.perSideRepFloor ? count : nil
         }
         self.reps = reps
-        self.perSide = perSide
         self.holdSeconds = reps == nil ? nil : hold
     }
-
-    /// True when the set is counted rep by rep rather than run on the movement's own length.
-    var hasMeter: Bool { reps != nil }
 
     /// The whole number in front of `suffix`, or nil when the text is anything else ("25 s/side"
     /// is a time, not a rep count).
@@ -126,6 +120,7 @@ struct StrengthSet: Hashable {
         self.plannedSeconds = Self.plannedSeconds(for: parsed, movement: movement)
     }
 
+    /// True when the set is counted rep by rep rather than run on the movement's own length.
     var hasMeter: Bool { reps != nil }
 
     /// Reps × (3 s + any hold) + the 5 s grace, both sides and the switch cue for a per-side set;
@@ -207,7 +202,13 @@ struct StrengthBreak: Hashable, Identifiable {
     /// The regions the working sets loaded, which the cool-down stretches and the day's end-range
     /// breaks leave alone.
     var workedRegions: Set<Region> {
-        Set(sets.flatMap(\.movement.regions))
+        Self.workedRegions(of: sets.map(\.movement))
+    }
+
+    /// The regions these working moves load: the one definition the builder draws the cool-down
+    /// by and a built break reports.
+    static func workedRegions(of working: [StrengthMovement]) -> Set<Region> {
+        Set(working.flatMap(\.regions))
     }
 }
 

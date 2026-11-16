@@ -144,7 +144,6 @@ final class StrengthTimelineTests: XCTestCase {
         // A rest's last five seconds are the next set's lead-in.
         run(&timeline, clock: clock, until: .rest(beforeSet: 2))
         clock.advance(41)
-        XCTAssertTrue(timeline.isLeadIn(at: clock.now))
         XCTAssertEqual(timeline.press(at: clock.now), [])
         XCTAssertEqual(timeline.segmentRemaining(at: clock.now), 4, accuracy: 0.001)
     }
@@ -173,7 +172,6 @@ final class StrengthTimelineTests: XCTestCase {
         XCTAssertEqual(timeline.press(at: clock.now), [])
         XCTAssertEqual(timeline.current?.kind, .rest(beforeSet: 2))
         XCTAssertEqual(timeline.segmentRemaining(at: clock.now), 5, accuracy: 0.001)
-        XCTAssertTrue(timeline.isLeadIn(at: clock.now))
         clock.advance(5)
         XCTAssertEqual(timeline.update(at: clock.now), [.started(.set(2))])
     }

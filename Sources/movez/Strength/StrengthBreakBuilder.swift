@@ -112,7 +112,7 @@ struct StrengthBreakBuilder {
             working.append(pick)
         }
 
-        let worked = isArmBreak ? Self.armCoolDownRegions : Set(working.flatMap(\.regions))
+        let worked = isArmBreak ? Self.armCoolDownRegions : StrengthBreak.workedRegions(of: working)
         let coolDownRequest = SlotRequest(
             slot: .coolDown, bucket: .end, ladder: Self.coolDownLadder,
             taken: Set(working.map(\.id)).union([warmUp.id])

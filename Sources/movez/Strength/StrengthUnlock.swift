@@ -23,10 +23,4 @@ enum StrengthUnlock {
         }
         return Set(counts.filter { $0.value >= threshold }.keys)
     }
-
-    /// The difficulty-3 move ids these completions unlock, in the shape the builders filter by.
-    static func unlockedDiff3(library: StrengthLibrary, completions: [MovementCompletion]) -> Set<String> {
-        let buckets = unlockedBuckets(library: library, completions: completions)
-        return Set(library.movements.filter { $0.difficulty >= 3 && buckets.contains($0.bucket) }.map(\.id))
-    }
 }

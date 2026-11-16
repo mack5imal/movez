@@ -36,13 +36,11 @@ final class StrengthUnlockTests: XCTestCase {
         XCTAssertFalse(hingeThree.isEmpty)
         XCTAssertFalse(pushThree.isEmpty)
 
-        let four = StrengthUnlock.unlockedDiff3(library: library, completions: completions(.hng, count: 4))
-        XCTAssertTrue(four.isDisjoint(with: hingeThree), "four is one short")
+        let four = StrengthUnlock.unlockedBuckets(library: library, completions: completions(.hng, count: 4))
+        XCTAssertFalse(four.contains(.hng), "four is one short")
 
-        let five = StrengthUnlock.unlockedDiff3(library: library, completions: completions(.hng, count: 5))
-        XCTAssertEqual(five, hingeThree, "five in total, across different moves, unlock the bucket")
-        XCTAssertTrue(five.isDisjoint(with: pushThree), "push has earned nothing")
-        XCTAssertEqual(StrengthUnlock.unlockedBuckets(library: library, completions: completions(.hng, count: 5)), [.hng])
+        let five = StrengthUnlock.unlockedBuckets(library: library, completions: completions(.hng, count: 5))
+        XCTAssertEqual(five, [.hng], "five in total, across different moves, unlock the bucket, and push has earned nothing")
     }
 
     func testOnlyDifficultyTwoCompletionsCount() {
@@ -57,6 +55,6 @@ final class StrengthUnlockTests: XCTestCase {
         let completions = (0..<10).map { _ in
             MovementCompletion(movementId: "STR-02", at: SchedulerHarness.mondayMorning, seconds: 60, routineId: nil)
         }
-        XCTAssertTrue(StrengthUnlock.unlockedDiff3(library: library, completions: completions).isEmpty)
+        XCTAssertTrue(StrengthUnlock.unlockedBuckets(library: library, completions: completions).isEmpty)
     }
 }

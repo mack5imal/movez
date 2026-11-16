@@ -197,16 +197,6 @@ struct StrengthSessionTimeline: Equatable {
         return segmentRemaining(at: now) + TimeInterval(later)
     }
 
-    /// True in a lead-in, and in a rest's last five seconds, which are the next set's lead-in.
-    func isLeadIn(at now: Date) -> Bool {
-        guard let current else { return false }
-        switch current.kind {
-        case .leadIn: return true
-        case .rest: return segmentRemaining(at: now) <= TimeInterval(StrengthTiming.leadInSeconds)
-        default: return false
-        }
-    }
-
     // MARK: - Driving
 
     /// Catches the session up to `now`. A segment that has run out hands over at its planned end,
