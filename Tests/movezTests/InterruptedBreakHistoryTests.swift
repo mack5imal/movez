@@ -82,4 +82,19 @@ final class InterruptedBreakHistoryTests: XCTestCase {
 
         XCTAssertTrue(harness.state.isFullBreak, "got \(harness.state)")
     }
+
+    /// The overlay names each block it finishes; the same block named twice is written once.
+    func testABlockRecordedTwiceIsWrittenOnce() throws {
+        let harness = CoordinatorHarness(workingHours: .alwaysOn)
+        XCTAssertTrue(harness.run(until: { $0.isHeadsUp }))
+        harness.coordinator.startNow()
+        let routine = try XCTUnwrap(harness.coordinator.currentBreak?.routine)
+        let before = harness.history.usedMovementIds(on: harness.now).count   // the morning's micro-break
+        harness.coordinator.recordOverlayBlock(routine.blocks[0], index: 0)
+        harness.coordinator.recordOverlayBlock(routine.blocks[0], index: 0)
+        harness.coordinator.recordOverlayBlock(routine.blocks[1], index: 1)
+
+        XCTAssertEqual(harness.coordinator.currentBreak?.completedBlocks, 2)
+        XCTAssertEqual(harness.history.usedMovementIds(on: harness.now).count - before, 2)
+    }
 }

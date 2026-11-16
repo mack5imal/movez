@@ -133,9 +133,11 @@ final class CoordinatorSimulatedDayTests: XCTestCase {
             "showHeadsUp", "chime(headsUp)", "hideHeadsUp", "startFullBreak",
             "chime(transition)", "chime(completion)", "endFullBreak"
         ]
-        var expected = ["showHeadsUp", "chime(headsUp)", "hideHeadsUp", "startFullBreak"]
-        expected += Array(repeating: "chime(transition)", count: blocks - 1)
-        expected += ["chime(completion)", "endFullBreak"]
+        // Block transitions are the overlay's own chimes, played inside the break; the scheduler
+        // only rings the break's start and its end.
+        let expected = [
+            "showHeadsUp", "chime(headsUp)", "hideHeadsUp", "startFullBreak", "chime(completion)", "endFullBreak"
+        ]
         XCTAssertEqual(harness.sink.order(of: interesting), expected)
         XCTAssertTrue(harness.sink.names.contains("persist"))
         XCTAssertEqual(harness.history.stats(on: harness.now).done, 1)

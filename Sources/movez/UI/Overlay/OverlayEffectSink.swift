@@ -82,10 +82,12 @@ final class OverlayEffectSink: EffectSink {
             streak: coordinator.streak,
             nextBreakAt: coordinator.scheduler.snapshot.nextFullDueAt,
             reduceMotion: reduceMotion,
-            mode: session.mode
+            mode: session.mode,
+            resumingAt: session.blockIndex,
+            completedBlocks: session.completedBlocks
         )
-        viewModel.onBlockCompleted = { [weak coordinator] block, _ in
-            coordinator?.recordOverlayBlock(block)
+        viewModel.onBlockCompleted = { [weak coordinator] block, index in
+            coordinator?.recordOverlayBlock(block, index: index)
         }
         viewModel.onSnooze = { [weak coordinator] in coordinator?.snooze() }
         viewModel.onSkip = { [weak coordinator] in coordinator?.skip() }

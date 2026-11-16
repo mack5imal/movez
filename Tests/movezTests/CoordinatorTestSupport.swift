@@ -109,3 +109,25 @@ extension RoutineTestSupport {
         }
     }()
 }
+
+extension AppCoordinator {
+    /// What the overlay does when the block on screen ends, through the same intents the overlay
+    /// calls: the block is recorded by its index, and the last one finishes the break. Production
+    /// has no "next block" intent of its own, so the tests drive the path the app actually takes.
+    func nextBlock() {
+        guard let current = currentBreak else { return }
+        let index = current.blockIndex
+        if let routine = current.routine {
+            guard routine.blocks.indices.contains(index) else { return }
+            recordOverlayBlock(routine.blocks[index], index: index)
+        } else {
+            recordOverlayPart(index: index)
+        }
+        guard let after = currentBreak, index >= after.totalBlocks - 1 else { return }
+        finishOverlayBreak(
+            completed: after.completedBlocks,
+            total: after.totalBlocks,
+            elapsed: max(0, Int(clock.now.timeIntervalSince(after.startedAt)))
+        )
+    }
+}

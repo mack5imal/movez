@@ -71,7 +71,9 @@ final class OverlayViewModel: ObservableObject {
         streak: Int = 0,
         nextBreakAt: Date? = nil,
         reduceMotion: Bool = false,
-        mode: BreakMode = .fallback
+        mode: BreakMode = .fallback,
+        resumingAt resumedBlock: Int = 0,
+        completedBlocks resumedCompleted: Int = 0
     ) {
         self.routine = routine
         self.mode = mode
@@ -85,7 +87,16 @@ final class OverlayViewModel: ObservableObject {
         self.nextBreakAt = nextBreakAt
         self.reduceMotion = reduceMotion
         blockStartedAt = startedAt
-        side = routine.blocks.first?.perSide == true ? .left : .none
+        // A break the lid closed on comes back on the block the user was on, with what they had
+        // done, and that block starts again with a fresh lead-in. Replaying the plan from the
+        // backdated start instead walked through every block whose time had passed, chiming and
+        // recording each, and put someone who had pressed Next back onto blocks they had done.
+        if resumedBlock > 0 || resumedCompleted > 0, !routine.blocks.isEmpty {
+            blockIndex = min(max(0, resumedBlock), routine.blocks.count - 1)
+            completedBlocks = min(max(0, resumedCompleted), routine.blocks.count)
+            blockStartedAt = clock.now
+        }
+        side = block?.perSide == true ? .left : .none
         rebuildStrip()
         refresh()
     }

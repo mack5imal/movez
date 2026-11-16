@@ -380,4 +380,33 @@ final class OverlayViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.state.strip[0].name, "March in place")
         XCTAssertEqual(viewModel.state.strip[1].name, "Hip flexor /side")
     }
+
+    // MARK: - Resuming after a wake
+
+    /// Two blocks done and the lid closed 140 s in; the break resumes at 230 s. It comes back on
+    /// the third block with two done, and the first tick neither chimes nor records anything.
+    func testAResumedBreakComesBackOnTheBlockItWasOn() {
+        let clock = ManualClock(now: SchedulerHarness.mondayMorning)
+        let chimes = RecordingChimePlayer()
+        var recorded: [Int] = []
+        let viewModel = OverlayViewModel(
+            routine: fixtureRoutine(),
+            startedAt: clock.now.addingTimeInterval(-230),
+            clock: clock,
+            chimes: chimes,
+            resumingAt: 2,
+            completedBlocks: 2
+        )
+        viewModel.onBlockCompleted = { _, index in recorded.append(index) }
+
+        clock.advance(1)
+        viewModel.tick()
+
+        XCTAssertEqual(viewModel.blockIndex, 2)
+        XCTAssertEqual(viewModel.completedBlocks, 2)
+        XCTAssertEqual(recorded, [], "nothing already done is recorded again")
+        XCTAssertTrue(chimes.played.isEmpty, "and no burst of chimes for blocks long over")
+        XCTAssertTrue(viewModel.isLeadIn, "the block starts again with its lead-in")
+        XCTAssertGreaterThanOrEqual(viewModel.elapsedSeconds, 230, "the break keeps the time it had run")
+    }
 }

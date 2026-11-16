@@ -23,66 +23,17 @@ extension AppCoordinator {
     /// The overlay sat paused for five minutes without the break counting: it ends as snoozed.
     func pauseExpired() { inject(.overlayPauseExpired) }
 
-    /// Advances to the next block, recording the one that just finished: a movement block, or a
-    /// strength break's warm-up, set or cool-down.
-    func nextBlock() {
-        guard var current = currentBreak, let part = current.part else { return }
-        recordPartCompletion(part, breakId: current.planned.id)
-        current.completedBlocks += 1
-
-        guard !current.isLastBlock else {
-            currentBreak = current
-            done()
-            return
-        }
-        current.blockIndex += 1
-        currentBreak = current
-        inject(.userNextBlock)
-    }
-
-    /// True once the break counts: half the movements, or half the time. Asked of the scheduler's
-    /// config, which carries the length of the break on screen rather than the Movement default.
-    var canFinishBreak: Bool {
-        guard let current = currentBreak else { return false }
-        return Scheduler.meetsCompletionRule(
-            completed: current.completedBlocks,
-            total: current.totalBlocks,
-            elapsed: elapsedInBreak,
-            config: scheduler.config
-        )
-    }
-
-    var elapsedInBreak: Int {
-        guard let current = currentBreak else { return 0 }
-        return max(0, Int(clock.now.timeIntervalSince(current.startedAt)))
-    }
-
-    func done() {
-        guard let current = currentBreak else { return }
-        inject(.userDone(
-            completedBlocks: current.completedBlocks,
-            totalBlocks: current.totalBlocks,
-            elapsed: elapsedInBreak
-        ))
-    }
-
-    /// Ends the break as it stands — the scheduler decides whether that counts or is a skip.
-    func endBreak() {
-        guard let current = currentBreak else { return }
-        inject(.breakEnded(
-            completedBlocks: current.completedBlocks,
-            totalBlocks: current.totalBlocks,
-            elapsed: elapsedInBreak
-        ))
-    }
-
     /// The overlay owns block progression while a break is on screen — it is the only thing that
     /// knows about blocks — so this records what it did without driving the scheduler.
-    func recordOverlayBlock(_ block: RoutineBlock) {
-        guard var current = currentBreak else { return }
+    ///
+    /// The block is the one the overlay names by `index`, as with `recordOverlayPart`. A block
+    /// already recorded is ignored: written twice, it counted twice in recency and toward the
+    /// difficulty-3 unlock.
+    func recordOverlayBlock(_ block: RoutineBlock, index: Int) {
+        guard var current = currentBreak, index >= current.completedBlocks, index < current.totalBlocks else { return }
         recordPartCompletion(BreakPart(movementId: block.movement.id, seconds: block.seconds), breakId: current.planned.id)
-        current.completedBlocks += 1
-        current.blockIndex = min(current.blockIndex + 1, max(0, current.totalBlocks - 1))
+        current.completedBlocks = index + 1
+        current.blockIndex = min(index + 1, max(0, current.totalBlocks - 1))
         currentBreak = current
     }
 
