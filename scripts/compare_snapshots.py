@@ -4,8 +4,8 @@
     python3 scripts/compare_snapshots.py [--baseline DIR] [--current DIR] [--agreed FILE]
                                          [--base-ref SHA] [--match NAME ...]
 
-The defaults compare build/baseline-snapshots (rendered from the tree before the strength-mode
-work) with build/snapshots (what `make snapshots` just rendered). Every image is reported on one
+The defaults compare build/baseline-snapshots (rendered from PRE_STRENGTH, 94a59ea, the last
+commit before the strength-mode work) with build/snapshots (what `make snapshots` just rendered). Every image is reported on one
 line as `identical`, `changed (agreed)`, `changed (NOT agreed)`, `new` or `removed`. The run fails
 (exit 1) when an image outside scripts/snapshot-agreed-changes.txt changed or was removed. A new
 image never fails: the strength surfaces are new by design.
@@ -13,8 +13,18 @@ image never fails: the strength surfaces are new by design.
 Pixels, not bytes, are compared: each PNG is decoded to an uncompressed BMP with `sips`, so two
 renders of the same picture match even when their encoders wrote different chunks.
 
-build/ is not committed, so when the baseline folder is missing and --base-ref is given the script
-renders the baseline itself: a temporary git worktree at that ref, a Debug build into a temporary
+How to run it, from the repo root:
+
+    make snapshots
+    rm -rf build/baseline-snapshots      # only if it was rendered from another ref
+    python3 scripts/compare_snapshots.py
+
+The strength branch is merged, so `main` is no longer a baseline before the agreed changes; the
+default --base-ref is the pinned PRE_STRENGTH commit. A later reviewed change that agrees a new set
+of snapshot changes should pass its own --base-ref and its own --agreed list.
+
+build/ is not committed, so when the baseline folder is missing the script renders the baseline
+from --base-ref itself: a temporary git worktree at that ref, a Debug build into a temporary
 DerivedData, `--snapshot all` into the baseline folder, and the worktree removed afterwards.
 
 --match prints whether each name is covered by the agreed list, using the same matcher as the
@@ -32,6 +42,8 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_BASELINE = os.path.join(REPO, "build", "baseline-snapshots")
 DEFAULT_CURRENT = os.path.join(REPO, "build", "snapshots")
 DEFAULT_AGREED = os.path.join(REPO, "scripts", "snapshot-agreed-changes.txt")
+# The last commit before the strength-mode work, which the agreed list is written against.
+PRE_STRENGTH = "94a59ea7b207abc82cf9515f065d8912db3de7ab"
 
 
 def load_agreed(path):
@@ -143,7 +155,9 @@ def main():
     parser.add_argument("--baseline", default=DEFAULT_BASELINE, help="the folder rendered before the change")
     parser.add_argument("--current", default=DEFAULT_CURRENT, help="the folder rendered after it")
     parser.add_argument("--agreed", default=DEFAULT_AGREED, help="globs of images allowed to change")
-    parser.add_argument("--base-ref", help="render the baseline from this commit when its folder is missing")
+    parser.add_argument("--base-ref", default=PRE_STRENGTH,
+                        help="render the baseline from this commit when its folder is missing "
+                             "(default: the pre-strength commit)")
     parser.add_argument("--match", nargs="+", metavar="NAME", help="only report whether each name is agreed")
     args = parser.parse_args()
 

@@ -1,7 +1,14 @@
 #!/usr/bin/env python3
 """Prove strength-library-v1.json changed only where the agreed edits allow (SPEC S4).
 
-    python3 -I scripts/diff_strength_library.py --base <git-ref>
+    python3 -I scripts/diff_strength_library.py [--base <git-ref>]
+
+Run it from the repo root. The base defaults to PRE_STRENGTH (94a59ea, "fix: the build
+number is stamped after Xcode writes the Info.plist"), the last commit before the strength-mode
+work began. The strength branch is merged now, so `main` no longer means "before the edits":
+passing `--base main` would report every agreed edit as missing. Keep the default unless a new,
+reviewed round of edits moves the baseline, and then change PRE_STRENGTH and the lists below
+together.
 
 The owner's library must not drift beyond the agreed edits, so this compares the working copy
 with the library at <git-ref> (read through `git show`, never copied to disk) and fails if
@@ -23,6 +30,8 @@ import subprocess
 import sys
 
 LIBRARY = "strength-library-v1.json"
+# The last commit before the strength-mode edits; see the module docstring.
+PRE_STRENGTH = "94a59ea7b207abc82cf9515f065d8912db3de7ab"
 DOSE_EDITS = {"SQT-01", "HNG-10", "HNG-16", "PSH-01", "ACC-05", "ACC-06", "ACC-09"}
 DUMBBELL_ONLY = {"PSH-12", "PSH-15", "HNG-13", "COR-02", "COR-11", "COR-14", "COR-16", "COR-17"}
 # Baseline movements that moved into the triceps bucket under a new id (DECISIONS 70).
@@ -256,7 +265,8 @@ def compare_counts(base, work):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--base", required=True, help="git ref holding the baseline library")
+    parser.add_argument("--base", default=PRE_STRENGTH,
+                        help="git ref holding the baseline library (default: the pre-strength commit)")
     args = parser.parse_args()
 
     base = load_base(args.base)

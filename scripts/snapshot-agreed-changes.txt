@@ -1,4 +1,5 @@
-# Snapshots the strength-mode work is allowed to change (SPEC S19), one glob per line.
+# Snapshots the strength-mode work is allowed to change (SPEC S19), one glob per line, measured
+# against the pre-strength commit 94a59ea (compare_snapshots.py's default --base-ref).
 # scripts/compare_snapshots.py matches each glob against the file name and its surface name.
 # Everything else must stay pixel-identical to the baseline: toast, notice, notice-read,
 # notice-end and gallery are deliberately absent.
