@@ -155,6 +155,7 @@ final class MenuBarViewModel: ObservableObject {
         next.mode = Self.mode(for: coordinator.menuState.mode)
         next.breakMode = coordinator.menuState.breakMode
         next.isAdHocSession = coordinator.scheduler.snapshot.adHocSession
+        next.storageWarning = coordinator.storageProblem
         let schedulerState = coordinator.scheduler.state
         next.isBreaking = schedulerState.isBreakSurfaceVisible
         next.breakLabel = Self.breakLabel(for: schedulerState)

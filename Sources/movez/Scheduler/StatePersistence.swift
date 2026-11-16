@@ -53,20 +53,22 @@ final class FileSnapshotStore: SnapshotStore {
         return directory
     }
 
-    static func stateFile() throws -> FileSnapshotStore {
-        FileSnapshotStore(url: try applicationSupportDirectory().appendingPathComponent("state.json"))
-    }
-
     func save(_ snapshot: SchedulerSnapshot) throws {
         let data = try encoder.encode(snapshot)
         let temporary = url.deletingLastPathComponent()
             .appendingPathComponent(".\(url.lastPathComponent).\(UUID().uuidString)")
-        try data.write(to: temporary, options: [.atomic])
-        try FileManager.default.setAttributes(
-            [.posixPermissions: Self.fileProtectionMode],
-            ofItemAtPath: temporary.path
-        )
-        _ = try FileManager.default.replaceItemAt(url, withItemAt: temporary)
+        do {
+            try data.write(to: temporary, options: [.atomic])
+            try FileManager.default.setAttributes(
+                [.posixPermissions: Self.fileProtectionMode],
+                ofItemAtPath: temporary.path
+            )
+            _ = try FileManager.default.replaceItemAt(url, withItemAt: temporary)
+        } catch {
+            // A failed save would otherwise leave one hidden temp file behind per attempt.
+            try? FileManager.default.removeItem(at: temporary)
+            throw error
+        }
         try? FileManager.default.setAttributes(
             [.posixPermissions: Self.fileProtectionMode],
             ofItemAtPath: url.path

@@ -29,20 +29,22 @@ final class FileHistoryStore: HistoryPersisting {
         decoder.dateDecodingStrategy = .iso8601
     }
 
-    static func historyFile() throws -> FileHistoryStore {
-        FileHistoryStore(url: try FileSnapshotStore.applicationSupportDirectory().appendingPathComponent("history.json"))
-    }
-
     func save(_ data: HistoryData) throws {
         let encoded = try encoder.encode(data)
         let temporary = url.deletingLastPathComponent()
             .appendingPathComponent(".\(url.lastPathComponent).\(UUID().uuidString)")
-        try encoded.write(to: temporary, options: [.atomic])
-        try FileManager.default.setAttributes(
-            [.posixPermissions: FileSnapshotStore.fileProtectionMode],
-            ofItemAtPath: temporary.path
-        )
-        _ = try FileManager.default.replaceItemAt(url, withItemAt: temporary)
+        do {
+            try encoded.write(to: temporary, options: [.atomic])
+            try FileManager.default.setAttributes(
+                [.posixPermissions: FileSnapshotStore.fileProtectionMode],
+                ofItemAtPath: temporary.path
+            )
+            _ = try FileManager.default.replaceItemAt(url, withItemAt: temporary)
+        } catch {
+            // A failed save would otherwise leave one hidden temp file behind per attempt.
+            try? FileManager.default.removeItem(at: temporary)
+            throw error
+        }
         try? FileManager.default.setAttributes(
             [.posixPermissions: FileSnapshotStore.fileProtectionMode],
             ofItemAtPath: url.path

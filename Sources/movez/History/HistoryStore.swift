@@ -268,6 +268,10 @@ final class HistoryStore {
     }
 
     private func save() {
-        try? store?.save(data)
+        do {
+            try store?.save(data)
+        } catch {
+            MovezLog.store.error("history could not be saved: \(error.localizedDescription, privacy: .public)")
+        }
     }
 }

@@ -192,6 +192,7 @@
 		C6B522286416744649E9835E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2621B2E4AE73BFD17E6C7DCB /* SettingsView.swift */; };
 		C73AD8FCAD62F15C149BA41C /* StrengthUnlockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2328215404A1E2C186DF9AC5 /* StrengthUnlockTests.swift */; };
 		C7FD8B58088A2CD47C915509 /* SchedulerCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CFDF85D71146981530D4EAA /* SchedulerCoreTests.swift */; };
+		C807341DEF3836E92E536FA1 /* PersistenceFailureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAE45676467395BEBB717642 /* PersistenceFailureTests.swift */; };
 		C8FB8B03C95F0DD5621084F4 /* StrengthSimulationPicksTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C26017CAB0EE4EAB8CD213CF /* StrengthSimulationPicksTests.swift */; };
 		C92EE5DA15BB0E4F1982652E /* Scheduler+Pause.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED2AB704FE14787E6C39A2A8 /* Scheduler+Pause.swift */; };
 		CA813F18AC2F8E2C7EC157E1 /* MicrophoneMonitorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0E3547757D603A01D679E5D /* MicrophoneMonitorTests.swift */; };
@@ -475,6 +476,7 @@
 		E6A988092000D19AED22C699 /* StrengthEdgeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrengthEdgeTests.swift; sourceTree = "<group>"; };
 		E6EDEE7F8CC2A8806107B9E5 /* Substitutions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Substitutions.swift; sourceTree = "<group>"; };
 		E6FDDD314F5FCB09D7D7D496 /* MicroBreakBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroBreakBuilderTests.swift; sourceTree = "<group>"; };
+		EAE45676467395BEBB717642 /* PersistenceFailureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceFailureTests.swift; sourceTree = "<group>"; };
 		ED2AB704FE14787E6C39A2A8 /* Scheduler+Pause.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Scheduler+Pause.swift"; sourceTree = "<group>"; };
 		ED4D65E0550209E008B7E89D /* CoordinatorTestSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoordinatorTestSupport.swift; sourceTree = "<group>"; };
 		EDCFB71721E4A03A63213BB0 /* StrengthOverlayViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrengthOverlayViewTests.swift; sourceTree = "<group>"; };
@@ -567,6 +569,7 @@
 				9F047B6DAC3BCCEF246181DC /* OverlayViewModelTests.swift */,
 				7D3466382DDA0245F7F6AEB8 /* PanelViewModelTests.swift */,
 				D8B2E22715B73413558FC2F6 /* PauseAcrossWorkingHoursTests.swift */,
+				EAE45676467395BEBB717642 /* PersistenceFailureTests.swift */,
 				202C50EE6CC441F2982008AB /* PersistenceTests.swift */,
 				86882DBD07E94839B946E862 /* RecencyTests.swift */,
 				5DDD5EC71C113D5D4607C8FB /* RepPacerTests.swift */,
@@ -1261,6 +1264,7 @@
 				0D8C3D387D6F2D4B80DEF4AF /* OverlayViewModelTests.swift in Sources */,
 				4545DA6B9E5893B41295022E /* PanelViewModelTests.swift in Sources */,
 				E3325871882C2BE2031CF63A /* PauseAcrossWorkingHoursTests.swift in Sources */,
+				C807341DEF3836E92E536FA1 /* PersistenceFailureTests.swift in Sources */,
 				8E2B50A1C0B30940F1637281 /* PersistenceTests.swift in Sources */,
 				52BD2118F3824F69EF5B3AD5 /* RecencyTests.swift in Sources */,
 				A9C7EFE18226EC903EBCBB5F /* RepPacerTests.swift in Sources */,

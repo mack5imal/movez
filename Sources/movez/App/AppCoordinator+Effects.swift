@@ -59,8 +59,14 @@ extension AppCoordinator {
     func persistSnapshot() {
         var snapshot = scheduler.snapshot
         snapshot.savedAt = clock.now
+        // Stamped even when the write fails, so a broken disk is retried at the heartbeat's pace
+        // rather than on every tick.
         lastPersistAt = clock.now
-        try? snapshotStore?.save(snapshot)
+        do {
+            try snapshotStore?.save(snapshot)
+        } catch {
+            MovezLog.store.error("state could not be saved: \(error.localizedDescription, privacy: .public)")
+        }
     }
 
     // MARK: - Breaks

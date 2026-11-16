@@ -160,6 +160,10 @@ struct MenuBarView: View {
         VStack(alignment: .leading, spacing: 3) {
             MovezText(state.stats, MovezType.menuSecondary, color: Tokens.text2)
             MovezText(state.longestBout, MovezType.menuSecondary, color: Tokens.text3)
+            if let warning = state.storageWarning {
+                MovezText(warning, MovezType.menuSecondary, color: Tokens.warn)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 4)

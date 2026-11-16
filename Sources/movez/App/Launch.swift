@@ -36,9 +36,41 @@ final class RecordingFatalPresenter: FatalPresenter {
     }
 }
 
+/// The stores a launch opened, and what went wrong if they could not be.
+struct LaunchStores {
+    var history: HistoryStore
+    var snapshotStore: SnapshotStore?
+    /// What the menu says when nothing can be saved; nil when the stores opened.
+    var problem: String?
+}
+
 /// The decisions made once, at launch, before anything else exists.
 @MainActor
 enum Launch {
+    /// The sentence the menu shows when the data folder cannot be opened.
+    static let storeProblem = "Movez can't save to its folder in Application Support, so nothing will be kept after quitting."
+
+    /// Opens the history and state files in Movez's folder inside `base`. A folder that cannot be
+    /// made (a plain file named `movez` in the way, or the wrong permissions) leaves the app
+    /// running from memory, and says so: before, it ran a whole session that was lost at quit and
+    /// logged nothing (APP-3).
+    static func openStores(
+        base: URL? = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+    ) -> LaunchStores {
+        do {
+            let directory = try FileSnapshotStore.applicationSupportDirectory(base: base)
+            let history = FileHistoryStore(url: directory.appendingPathComponent("history.json"))
+            return LaunchStores(
+                history: HistoryStore(store: history),
+                snapshotStore: FileSnapshotStore(url: directory.appendingPathComponent("state.json"))
+            )
+        } catch {
+            let reason = error.localizedDescription
+            MovezLog.store.error("the data folder could not be opened, running from memory: \(reason, privacy: .public)")
+            return LaunchStores(history: HistoryStore(), snapshotStore: nil, problem: storeProblem)
+        }
+    }
+
     /// The movement library is the app's content: without it there is nothing to serve, so a
     /// failure here is fatal and loud rather than an app that quietly offers no movements.
     static func loadLibrary(

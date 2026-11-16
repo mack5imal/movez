@@ -68,6 +68,8 @@ struct MenuBarState: Equatable {
     var subtitle = ""
     var stats = ""
     var longestBout = ""
+    /// Shown under the day's numbers when nothing can be saved.
+    var storageWarning: String?
     var isAdHocSession = false
     /// A break, heads-up or micro-break is on screen; the countdown label says so instead.
     var isBreaking = false

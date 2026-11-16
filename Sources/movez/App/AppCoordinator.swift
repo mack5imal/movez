@@ -70,6 +70,9 @@ final class AppCoordinator: ObservableObject {
     @Published var toastInfo: ToastInfo?
     @Published var todayStats = DailyStats.empty
     @Published var nextBreakPreview: PlannedBreak?
+    /// Why nothing is being saved, when the stores could not be opened at launch. The menu shows
+    /// it, because otherwise the app looks normal and loses the whole session at quit.
+    @Published var storageProblem: String?
 
     /// The running coordinator. App Intents are created by the system with no way to be handed
     /// dependencies, so the Focus Filter needs a way home.

@@ -112,16 +112,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
         notice: HealthNotice,
         settings: SettingsStore
     ) {
-        let historyStore = try? FileHistoryStore.historyFile()
-        let snapshotStore = try? FileSnapshotStore.stateFile()
+        let stores = Launch.openStores()
         let coordinator = AppCoordinator(
             library: library,
             strengthLibrary: strengthLibrary,
             settings: settings,
-            history: historyStore.map { HistoryStore(store: $0) } ?? HistoryStore(),
+            history: stores.history,
             clock: SystemClock(),
-            snapshotStore: snapshotStore
+            snapshotStore: stores.snapshotStore
         )
+        coordinator.storageProblem = stores.problem
         coordinator.attachSystemSignals()
         attachUI(to: coordinator, settings: settings)
         coordinator.start()
