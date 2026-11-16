@@ -75,13 +75,24 @@ extension Scheduler {
             if fromTickGap { return [] }
             return enterAbsenceGrace(since: min(since, reportedStart), returnedAt: now, now: now, reason: reason)
         case .postBreakGrace(_, .returnFromAbsence(let since, let returnedAt)):
+            // As in `.away`: a late poll inside the quiet minute must not push the minute out.
+            if fromTickGap { return [] }
             return enterAbsenceGrace(since: min(since, reportedStart), returnedAt: returnedAt, now: now, reason: reason)
         default:
             // Nothing was away, so a gap no longer than a poll is the notification for a return
             // that has already been handled. Treating it as a wake would throw away a heads-up, a
             // snooze or a deferred break for a quiet minute that protects nothing.
             guard Double(gapSeconds) > SignalAggregator.tickGapThresholdSeconds else { return [] }
-            return enterAbsenceGrace(since: reportedStart, returnedAt: now, now: now, reason: reason)
+            // A late poll with a break on screen is the process being slow, not the user leaving:
+            // they are looking at the break.
+            if fromTickGap, snapshot.state.isBreakSurfaceVisible { return [] }
+            // The sleep was never reported, so its work was never done: take the surfaces down,
+            // keep an interrupted break, and put the countdowns away, all as of when the gap
+            // began. Then the return is judged like any other.
+            var effects = handleSleepOrLock(now: reportedStart, reason: "\(reason), sleep not reported")
+            guard case .away(let since) = snapshot.state else { return effects }
+            effects += enterAbsenceGrace(since: since, returnedAt: now, now: now, reason: reason)
+            return effects
         }
     }
 

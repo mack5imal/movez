@@ -19,6 +19,9 @@ extension Scheduler {
         snapshot.remainingAtPauseSeconds = snapshot.nextFullDueAt.map { max(0, Int($0.timeIntervalSince(now))) }
         snapshot.pauseStartedAt = now
         snapshot.pauseIsFocusInitiated = focusInitiated
+        // A pause taken while away replaces the absence; its put-away countdowns would otherwise
+        // be read by the next return as if they were still current.
+        clearAwayMarkers()
         let until = pauseEnd(seconds: seconds, focusInitiated: focusInitiated, now: now)
         transition(to: .paused(until: until), reason: focusInitiated ? "focus filter" : "paused by hand", at: now)
 

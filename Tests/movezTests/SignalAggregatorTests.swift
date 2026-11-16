@@ -114,8 +114,11 @@ final class SignalAggregatorTests: XCTestCase {
         harness.clock.advance(12)
         aggregator.poll()
 
-        let gapEvents = harness.scheduler.snapshot.transitions.transitions.filter { $0.reason.contains("tick gap") }
-        XCTAssertEqual(gapEvents.count, 1, "a long gap between polls is treated as a wake")
+        // The gap is logged twice: the sleep nobody reported, then the return into the quiet minute.
+        let gapEvents = harness.scheduler.snapshot.transitions.transitions.filter {
+            $0.reason.contains("tick gap") && $0.to.name == "post_break_grace"
+        }
+        XCTAssertEqual(gapEvents.count, 1, "a long gap between polls is treated as one wake")
         XCTAssertTrue(gapEvents[0].reason.contains("12"))
     }
 
