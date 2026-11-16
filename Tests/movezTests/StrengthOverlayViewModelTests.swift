@@ -337,4 +337,50 @@ final class StrengthOverlayViewModelTests: XCTestCase {
         }
         XCTAssertTrue(viewModel.state.isClosed, "no end state: the overlay closes when the last block ends")
     }
+
+    // MARK: - A pause that runs out
+
+    /// DECISIONS 38 for strength: three of five parts done and paused for five minutes, the
+    /// break ends as done, not as snoozed.
+    func testAPauseThatRunsOutAfterTheBreakCountsEndsItAsDone() {
+        let clock = ManualClock(now: SchedulerHarness.mondayMorning)
+        let viewModel = makeViewModel(clock: clock)
+        var finishedWith: Int?
+        var expired = false
+        viewModel.onFinished = { completed, _, _ in finishedWith = completed }
+        viewModel.onPauseExpired = { expired = true }
+
+        var ticks = 0
+        while viewModel.timeline.completedWork < 3, ticks < 2_000 {
+            clock.advance(1)
+            viewModel.tick()
+            ticks += 1
+        }
+        XCTAssertTrue(viewModel.doneAvailable, "three of five parts is past the half")
+        viewModel.togglePause()
+        clock.advance(OverlayViewModel.pauseLimitSeconds)
+        viewModel.tick()
+
+        XCTAssertFalse(expired, "a break that counts is not snoozed")
+        XCTAssertEqual(finishedWith, 3)
+        XCTAssertTrue(viewModel.isClosed)
+    }
+
+    func testAPauseThatRunsOutBeforeTheBreakCountsSnoozesIt() {
+        let clock = ManualClock(now: SchedulerHarness.mondayMorning)
+        let viewModel = makeViewModel(clock: clock)
+        var finished = false
+        var expired = false
+        viewModel.onFinished = { _, _, _ in finished = true }
+        viewModel.onPauseExpired = { expired = true }
+
+        clock.advance(10)
+        viewModel.tick()
+        viewModel.togglePause()
+        clock.advance(OverlayViewModel.pauseLimitSeconds)
+        viewModel.tick()
+
+        XCTAssertTrue(expired)
+        XCTAssertFalse(finished)
+    }
 }

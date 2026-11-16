@@ -25,6 +25,11 @@ final class StrengthOverlayViewModel: ObservableObject {
     /// The work segments already reported through `onWorkCompleted`.
     private var reportedWork = 0
     private var pauseExpiredHandled = false
+    /// The scheduler's own rules, with the length of the break on screen, so a pause that runs
+    /// out ends the break the way the scheduler would judge it.
+    private let config: SchedulerConfig
+    /// The break ended before its timeline did: its pause ran out after it already counted.
+    private var endedEarly = false
 
     var snoozesLeft: Int
     var skipsToday: Int
@@ -45,6 +50,7 @@ final class StrengthOverlayViewModel: ObservableObject {
         strengthBreak: StrengthBreak,
         startedAt: Date,
         clock: Clock,
+        config: SchedulerConfig = SchedulerConfig(),
         chimes: ChimePlayer? = nil,
         snoozesLeft: Int = 2,
         skipsToday: Int = 0,
@@ -53,7 +59,7 @@ final class StrengthOverlayViewModel: ObservableObject {
     ) {
         self.init(
             timeline: StrengthSessionTimeline(strengthBreak: strengthBreak, startedAt: startedAt),
-            clock: clock, chimes: chimes, snoozesLeft: snoozesLeft, skipsToday: skipsToday,
+            clock: clock, config: config, chimes: chimes, snoozesLeft: snoozesLeft, skipsToday: skipsToday,
             reduceMotion: reduceMotion, mode: mode
         )
     }
@@ -62,6 +68,7 @@ final class StrengthOverlayViewModel: ObservableObject {
         endRangeBreak: EndRangeBreak,
         startedAt: Date,
         clock: Clock,
+        config: SchedulerConfig = SchedulerConfig(),
         chimes: ChimePlayer? = nil,
         snoozesLeft: Int = 2,
         skipsToday: Int = 0,
@@ -70,7 +77,7 @@ final class StrengthOverlayViewModel: ObservableObject {
     ) {
         self.init(
             timeline: StrengthSessionTimeline(endRangeBreak: endRangeBreak, startedAt: startedAt),
-            clock: clock, chimes: chimes, snoozesLeft: snoozesLeft, skipsToday: skipsToday,
+            clock: clock, config: config, chimes: chimes, snoozesLeft: snoozesLeft, skipsToday: skipsToday,
             reduceMotion: reduceMotion, mode: mode
         )
     }
@@ -78,6 +85,7 @@ final class StrengthOverlayViewModel: ObservableObject {
     private init(
         timeline: StrengthSessionTimeline,
         clock: Clock,
+        config: SchedulerConfig,
         chimes: ChimePlayer?,
         snoozesLeft: Int,
         skipsToday: Int,
@@ -87,6 +95,7 @@ final class StrengthOverlayViewModel: ObservableObject {
         self.timeline = timeline
         self.mode = mode
         self.clock = clock
+        self.config = config
         self.chimes = chimes
         self.snoozesLeft = snoozesLeft
         self.skipsToday = skipsToday
@@ -97,7 +106,17 @@ final class StrengthOverlayViewModel: ObservableObject {
 
     // MARK: - Derived values
 
-    var isClosed: Bool { timeline.isClosed }
+    var isClosed: Bool { timeline.isClosed || endedEarly }
+
+    /// True once the break counts, by the scheduler's rule: half the moves, or half the time.
+    var doneAvailable: Bool {
+        Scheduler.meetsCompletionRule(
+            completed: timeline.completedWork,
+            total: timeline.totalWork,
+            elapsed: elapsedSeconds,
+            config: config
+        )
+    }
     var isPaused: Bool { timeline.isPaused }
     var startedAt: Date { timeline.startedAt }
 
@@ -180,12 +199,20 @@ final class StrengthOverlayViewModel: ObservableObject {
         onSkip?()
     }
 
+    /// Five minutes paused. As on a movement break (DECISIONS 38), a break that already counts
+    /// ends as done; any other ends as snoozed.
     private func pauseExpired() {
         guard !pauseExpiredHandled else { return }
         pauseExpiredHandled = true
         timeline.resume(at: clock.now)
+        if doneAvailable {
+            endedEarly = true
+            chimes?.play(.completion)
+            onFinished?(timeline.completedWork, timeline.totalWork, elapsedSeconds)
+        } else {
+            onPauseExpired?()
+        }
         refresh()
-        onPauseExpired?()
     }
 
     private func handle(_ events: [StrengthSessionTimeline.Event]) {

@@ -285,20 +285,27 @@ final class OverlayViewModelTests: XCTestCase {
     /// they were not, a routine shorter than the configured break let the user press Done and be
     /// recorded as having skipped.
     func testDoneIsNeverOfferedBeforeTheSchedulerWouldAcceptIt() {
+        // A four-block break of 260 s, shorter than the Movement default, as the scheduler's
+        // config carries it through `.breakLength`. The overlay is handed that config.
+        var config = SchedulerConfig()
+        config.breakSeconds = 260
         let clock = ManualClock(now: SchedulerHarness.mondayMorning)
-        let viewModel = makeViewModel(clock: clock)
-        let config = SchedulerConfig()
+        let viewModel = OverlayViewModel(routine: fixtureRoutine(), startedAt: clock.now, clock: clock, config: config)
 
         for elapsed in stride(from: 0, through: config.breakSeconds, by: 10) {
             clock.set(SchedulerHarness.mondayMorning.addingTimeInterval(TimeInterval(elapsed)))
             viewModel.refresh()
-            let schedulerWouldAccept = Scheduler.meetsCompletionRule(
-                completed: viewModel.completedBlocks,
-                total: viewModel.totalBlocks,
-                elapsed: elapsed,
-                config: config
-            )
-            XCTAssertEqual(viewModel.doneAvailable, schedulerWouldAccept, "at \(elapsed) s")
+
+            // What a real scheduler on the same config does with Done pressed now.
+            let harness = SchedulerHarness(config: config)
+            harness.run(until: { $0.isPendingFull }, limit: 3600)
+            harness.send(.input(lastEventAgeSeconds: 12))
+            harness.send(.userStartNow)
+            let effects = harness.send(.breakEnded(
+                completedBlocks: viewModel.completedBlocks, totalBlocks: viewModel.totalBlocks, elapsed: elapsed
+            ))
+            let accepted = effects.contains { if case .endFullBreak(.completed) = $0 { return true } else { return false } }
+            XCTAssertEqual(viewModel.doneAvailable, accepted, "at \(elapsed) s")
         }
     }
 

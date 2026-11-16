@@ -48,13 +48,13 @@ final class OverlayEffectSink: EffectSink {
         if let strengthBreak = session.planned.strengthBreak {
             viewModel = StrengthOverlayViewModel(
                 strengthBreak: strengthBreak, startedAt: session.startedAt, clock: coordinator.clock,
-                chimes: chimes, snoozesLeft: coordinator.scheduler.snoozesLeft,
+                config: coordinator.scheduler.config, chimes: chimes, snoozesLeft: coordinator.scheduler.snoozesLeft,
                 skipsToday: coordinator.scheduler.snapshot.skipsToday, reduceMotion: reduceMotion, mode: session.mode
             )
         } else if let endRangeBreak = session.planned.endRangeBreak {
             viewModel = StrengthOverlayViewModel(
                 endRangeBreak: endRangeBreak, startedAt: session.startedAt, clock: coordinator.clock,
-                chimes: chimes, snoozesLeft: coordinator.scheduler.snoozesLeft,
+                config: coordinator.scheduler.config, chimes: chimes, snoozesLeft: coordinator.scheduler.snoozesLeft,
                 skipsToday: coordinator.scheduler.snapshot.skipsToday, reduceMotion: reduceMotion, mode: session.mode
             )
         } else {
@@ -75,7 +75,9 @@ final class OverlayEffectSink: EffectSink {
             routine: routine,
             startedAt: session.startedAt,
             clock: coordinator.clock,
-            config: coordinator.settings.schedulerConfig,
+            // The scheduler's config, not the settings': it carries the length of the break on
+            // screen, which is what "half the time" is measured against.
+            config: coordinator.scheduler.config,
             chimes: chimes,
             snoozesLeft: coordinator.scheduler.snoozesLeft,
             skipsToday: coordinator.scheduler.snapshot.skipsToday,
