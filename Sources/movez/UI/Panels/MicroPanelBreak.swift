@@ -92,13 +92,6 @@ extension MicroPanelBreak {
         switchesAtChime = true
     }
 
-    init(_ planned: PlannedMicro) {
-        switch planned {
-        case let .movement(micro): self.init(micro)
-        case let .strength(micro): self.init(micro)
-        }
-    }
-
     /// "sitting", "standing" or "sitting then standing". S7 keeps both moves in one posture, so the
     /// mixed phrase only appears if that rule is ever let go of; a move order the design never
     /// draws (standing, then sitting) reads by its first move.

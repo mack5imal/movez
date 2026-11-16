@@ -196,15 +196,19 @@ final class SchedulerDayBoundaryTests: XCTestCase {
         XCTAssertDate(harness.snapshot.nextFullDueAt, harness.start.addingTimeInterval(55 * 60), accuracy: 4)
     }
 
+    /// A split shift: Monday evening 20:00–23:00, Tuesday 00:30–08:00. A gap this long is
+    /// standby whatever else it crossed, so the day it opens into has clean counters.
     func testAGapAcrossAWorkingDayThatClosedAndReopenedStartsItFresh() {
-        // A genuine split shift: Monday evening 20:00–23:00, Tuesday 00:30–08:00.
+        // `WorkingHours.days` is indexed by weekday − 1, so Sunday is 0 and Monday is 1.
         var days = Array(repeating: DayHours.off, count: 7)
-        days[2] = DayHours(enabled: true, startMinutes: 20 * 60, endMinutes: 23 * 60)   // Monday
-        days[3] = DayHours(enabled: true, startMinutes: 30, endMinutes: 8 * 60)         // Tuesday
+        days[1] = DayHours(enabled: true, startMinutes: 20 * 60, endMinutes: 23 * 60)   // Monday
+        days[2] = DayHours(enabled: true, startMinutes: 30, endMinutes: 8 * 60)         // Tuesday
         let harness = SchedulerHarness(
             workingHours: WorkingHours(days: days),
             startAt: Self.date(hour: 22, minute: 55)
         )
+        harness.send(.tick)
+        XCTAssertTrue(harness.state.isSitting, "22:55 on a Monday is inside the evening window, got \(harness.state)")
         harness.scheduler.snapshot.skipsToday = 3
 
         harness.send(.sleep)
@@ -212,8 +216,34 @@ final class SchedulerDayBoundaryTests: XCTestCase {
         harness.send(.wake(gapSeconds: 110 * 60))   // under four hours
         harness.run(seconds: 70)
 
+        XCTAssertTrue(harness.state.isSitting, "00:45 on Tuesday is inside the night window, got \(harness.state)")
         XCTAssertEqual(harness.snapshot.skipsToday, 0,
                        "the window genuinely closed and reopened, so this is a new working day")
+    }
+
+    /// The one way a gap shorter than the sitting interval can cross the opening of a working
+    /// day: a session started by hand before the day opened. Coming back after the opening
+    /// starts the working day fresh rather than carrying the early session's counters into it.
+    func testAShortGapAcrossTheOpeningOfTheWorkingDayStartsTheDayFresh() {
+        let harness = SchedulerHarness(workingHours: .standard, startAt: Self.date(hour: 8))
+        harness.send(.tick)
+        XCTAssertEqual(harness.state.name, "off_hours")
+        harness.send(.userStartSession)
+        XCTAssertTrue(harness.state.isSitting)
+        harness.scheduler.snapshot.skipsToday = 3
+
+        harness.run(seconds: 40 * minute)            // 08:40
+        harness.send(.sleep)
+        harness.clock.set(Self.date(hour: 9, minute: 10))
+        harness.send(.wake(gapSeconds: 30 * 60))    // half an hour, well under the interval
+        harness.run(seconds: 70)
+
+        XCTAssertTrue(harness.state.isSitting, "got \(harness.state)")
+        XCTAssertEqual(harness.snapshot.skipsToday, 0)
+        XCTAssertTrue(
+            harness.snapshot.transitions.transitions.contains { $0.reason.contains("new day") },
+            "the reset comes from the gap crossing the opening, not from a midnight roll"
+        )
     }
 
     func testTheWorkingDayOpensWithCleanCountersAfterMidnightRolledThem() {

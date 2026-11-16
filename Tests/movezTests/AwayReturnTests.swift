@@ -200,7 +200,7 @@ final class AwayReturnTests: XCTestCase {
         XCTAssertEqual(harness.snapshot.longestBoutSeconds, 40 * 60, accuracy: 10)
     }
 
-    func testStandbyRollsTheCountersOnlyWhenTheAbsenceCrossedMidnight() {
+    func testAnAbsenceRollsTheCountersOnlyWhenItCrossedMidnight() {
         let afternoon = SchedulerHarness(startAt: SchedulerHarness.mondayMorning.addingTimeInterval(5 * 3600))
         afternoon.scheduler.snapshot.snoozedToday = 3
         afternoon.run(seconds: 2 * minute)

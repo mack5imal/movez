@@ -31,19 +31,40 @@ final class FullscreenMonitorTests: XCTestCase {
     }
 
     func testAnExcludedAppNeverSuppresses() {
-        let fake = FakeFullscreenSource()
-        fake.isFullscreen = true
-        fake.bundleId = "com.apple.QuickTimePlayerX"
-        XCTAssertTrue(fake.reading(exceptions: ["com.figma.Desktop"]).isFullscreen)
-        XCTAssertFalse(fake.reading(exceptions: ["com.apple.QuickTimePlayerX"]).isFullscreen)
+        func reading(_ bundleId: String, exceptions: Set<String>) -> FullscreenReading {
+            FullscreenMonitor.reading(
+                bundleId: bundleId,
+                ownBundleId: "com.kylemack.movez",
+                exceptions: exceptions,
+                windows: { [self.laptop] },
+                screens: { [self.laptop] }
+            )
+        }
+        XCTAssertTrue(reading("com.apple.QuickTimePlayerX", exceptions: ["com.figma.Desktop"]).isFullscreen)
+        XCTAssertFalse(reading("com.apple.QuickTimePlayerX", exceptions: ["com.apple.QuickTimePlayerX"]).isFullscreen)
+        XCTAssertEqual(
+            reading("com.apple.QuickTimePlayerX", exceptions: ["com.apple.QuickTimePlayerX"]).bundleId,
+            "com.apple.QuickTimePlayerX",
+            "an excepted app is still reported, so the exceptions list can show it"
+        )
     }
 
-    func testTheRealMonitorRunsWithoutCrashing() {
-        let reading = FullscreenMonitor(ownBundleId: "com.kylemack.movez").reading(exceptions: [])
-        // Whatever is frontmost on this Mac right now, which can be movez itself: then it is
-        // reported, but never as full screen.
-        if reading.bundleId == "com.kylemack.movez" {
-            XCTAssertFalse(reading.isFullscreen, "movez never suppresses itself")
-        }
+    func testMovezNeverSuppressesItself() {
+        let reading = FullscreenMonitor.reading(
+            bundleId: "com.kylemack.movez",
+            ownBundleId: "com.kylemack.movez",
+            exceptions: [],
+            windows: { [self.laptop] },
+            screens: { [self.laptop] }
+        )
+        XCTAssertFalse(reading.isFullscreen, "the overlay fills the screen, and must not suppress its own break")
+    }
+
+    func testAnUnnamedAppIsJudgedByItsWindows() {
+        let reading = FullscreenMonitor.reading(
+            bundleId: nil, ownBundleId: "com.kylemack.movez", exceptions: [],
+            windows: { [self.external] }, screens: { [self.laptop, self.external] }
+        )
+        XCTAssertTrue(reading.isFullscreen)
     }
 }

@@ -1,0 +1,62 @@
+{
+  "adHocSession" : false,
+  "boutStartedAt" : "2026-09-07T13:00:00Z",
+  "configHash" : 4120937,
+  "creditRestore" : {
+    "boutStartedAt" : "2026-09-07T12:10:00Z",
+    "doneToday" : 2,
+    "expiresAt" : "2026-09-07T13:10:00Z",
+    "lastCompletedBreakAt" : "2026-09-07T12:05:00Z",
+    "longestBoutSeconds" : 3300,
+    "nextFullDueAt" : "2026-09-07T13:05:00Z",
+    "nextMicroDueAt" : "2026-09-07T12:40:00Z"
+  },
+  "dayKey" : "2026-09-07",
+  "deferredReason" : "microphone",
+  "doneToday" : 3,
+  "lastCompletedBreakAt" : "2026-09-07T12:55:00Z",
+  "longestBoutSeconds" : 3300,
+  "microEmphasisIndex" : 4,
+  "microSnoozeUsed" : false,
+  "nextFullDueAt" : "2026-09-07T13:55:00Z",
+  "nextMicroDueAt" : "2026-09-07T13:30:00Z",
+  "pauseIsFocusInitiated" : false,
+  "postLunchPending" : true,
+  "savedAt" : "2026-09-07T13:20:00Z",
+  "skipsToday" : 1,
+  "snoozedToday" : 2,
+  "snoozesUsedThisBreak" : 0,
+  "state" : {
+    "postBreakGrace" : {
+      "resumeTo" : {
+        "applyGap" : {
+          "seconds" : 600
+        }
+      },
+      "until" : "2026-09-07T13:21:00Z"
+    }
+  },
+  "transitions" : {
+    "transitions" : [
+      {
+        "at" : "2026-09-07T13:20:00Z",
+        "from" : {
+          "sitting" : {
+
+          }
+        },
+        "reason" : "woke after 600 s",
+        "to" : {
+          "postBreakGrace" : {
+            "resumeTo" : {
+              "applyGap" : {
+                "seconds" : 600
+              }
+            },
+            "until" : "2026-09-07T13:21:00Z"
+          }
+        }
+      }
+    ]
+  }
+}

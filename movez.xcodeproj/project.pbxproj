@@ -58,6 +58,7 @@
 		3EA331D7530755F9D6B8D8A7 /* strength-library-v1.json in Resources */ = {isa = PBXBuildFile; fileRef = 7B26AB13CE4FF3555381864D /* strength-library-v1.json */; };
 		3FAF9B8973F719F0EFBE4724 /* StrengthSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7080EAB41114DB39C051849D /* StrengthSettingsSection.swift */; };
 		40012E4015330FA2011E8C8E /* ModeSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = B23480EA263910F65D6B840F /* ModeSwitch.swift */; };
+		40487390C04FDEC4AB6536C1 /* MicroPanelBreak+PlannedMicro.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C72169D95B9C42E9E78BB24 /* MicroPanelBreak+PlannedMicro.swift */; };
 		4114FAF404F96ACD8C65DE67 /* HealthNotice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C1553E63AC671BA5E530A07 /* HealthNotice.swift */; };
 		44E77D618F64C6ED22E5A664 /* IdleMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D83FC30AC8126887FB2A394 /* IdleMonitor.swift */; };
 		4545DA6B9E5893B41295022E /* PanelViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D3466382DDA0245F7F6AEB8 /* PanelViewModelTests.swift */; };
@@ -247,6 +248,7 @@
 		0976D07A8738129E67842B9A /* CoordinatorSimulatedDayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoordinatorSimulatedDayTests.swift; sourceTree = "<group>"; };
 		0AB98FAC59DD11F9F2A0C35D /* PlannedBreak.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlannedBreak.swift; sourceTree = "<group>"; };
 		0C58058242AB1A4A7DE35C95 /* HeadsUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadsUpView.swift; sourceTree = "<group>"; };
+		0C72169D95B9C42E9E78BB24 /* MicroPanelBreak+PlannedMicro.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MicroPanelBreak+PlannedMicro.swift"; sourceTree = "<group>"; };
 		0CC20A4766BF3AC9C78A92C7 /* ScreenCaptureMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenCaptureMonitor.swift; sourceTree = "<group>"; };
 		0E6B82408B7C92BD5FB70A8A /* DoseText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoseText.swift; sourceTree = "<group>"; };
 		11E064B310C5B6C0E0E2D8C9 /* SettingsViewModel+StrengthLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsViewModel+StrengthLibrary.swift"; sourceTree = "<group>"; };
@@ -661,6 +663,7 @@
 			isa = PBXGroup;
 			children = (
 				3BBCE8DA8BAB064F43E5B7D5 /* BreakMode.swift */,
+				0C72169D95B9C42E9E78BB24 /* MicroPanelBreak+PlannedMicro.swift */,
 				A5631E71BDA13C9E519DD9C6 /* ModeBuilder.swift */,
 				9BB2AC7A26B60B4E4D69DD1D /* ModeDefinition.swift */,
 				5B91E1EF2C45E3C0EB245FCC /* ModeMenuCopy.swift */,
@@ -1067,6 +1070,7 @@
 				72CD0D5FCBAD64D625D13F71 /* MenuSnapshot.swift in Sources */,
 				D82D8E877AC0EE6B93652726 /* MicroBreakBuilder.swift in Sources */,
 				A0C943B9A00D128161B3F4A6 /* MicroBreakView.swift in Sources */,
+				40487390C04FDEC4AB6536C1 /* MicroPanelBreak+PlannedMicro.swift in Sources */,
 				F188D6E3A0C60023A8192466 /* MicroPanelBreak.swift in Sources */,
 				CBD44C80766A8AA5DC6F172A /* MicrophoneMonitor.swift in Sources */,
 				3B026B4F0F4FB9EA01808AFD /* ModeBadge.swift in Sources */,

@@ -212,11 +212,17 @@ final class StrengthSettingsWindowTests: XCTestCase {
         XCTAssertFalse(viewModel.settings.strengthSetUp)
     }
 
-    func testTheSheetCarriesNoAtLeastOneGate() {
+    func testTheSheetCarriesNoAtLeastOneGate() throws {
         // The design's "Choose at least one." note goes with the disabled button the spec
         // overruled (SPEC reconciliation 12), so the sheet has neither.
         let copy = [StrengthSetupSheet.intro, StrengthSettingsSection.breaksSub]
-        XCTAssertFalse(copy.contains("Choose at least one."))
+        XCTAssertTrue(copy.allSatisfy { !$0.contains("Choose at least one") })
+        let sheet = try String(
+            contentsOf: AccessibilityTests.repositoryRoot()
+                .appendingPathComponent("Sources/movez/UI/Settings/StrengthSetupSheet.swift"),
+            encoding: .utf8
+        )
+        XCTAssertFalse(sheet.contains("Choose at least one"), "nor does the sheet draw it anywhere else")
         XCTAssertTrue(makeViewModel().strengthSetupCanConfirm)
     }
 

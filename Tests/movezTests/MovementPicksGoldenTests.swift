@@ -6,10 +6,10 @@ import XCTest
 /// the builders served for each of them on the day this fixture was recorded.
 ///
 /// The fixture is a safety net for the strength-mode work, which must leave Movement mode exactly
-/// as it was. It is recorded once and never again: the audit checks that
-/// `Fixtures/movement-picks-golden.json` is unchanged since the commit that added it, so a later
-/// change that makes this test fail has changed Movement mode, and the fix belongs in that change,
-/// not in a re-recorded fixture.
+/// as it was. It is recorded once and never again. Nothing in the repo stops a re-recording: the
+/// guard is that `Fixtures/movement-picks-golden.json` shows up in the diff, so a change that
+/// makes this test fail has changed Movement mode, and the fix belongs in that change, not in a
+/// re-recorded fixture.
 ///
 /// Every context is derived from the bundled library (sorted ids, families, difficulty) rather
 /// than from hard-coded movement ids, and built the way `AppCoordinator.routineContext(at:breakIndex:)`
@@ -17,7 +17,8 @@ import XCTest
 ///
 /// Recording: `xcodebuild` hands the test process any variable prefixed with `TEST_RUNNER_`, so
 /// `TEST_RUNNER_MOVEZ_RECORD_GOLDEN=1 xcodebuild … test -only-testing:movezTests/MovementPicksGoldenTests`
-/// writes the fixture instead of checking it.
+/// writes the fixture instead of checking it, and then fails, so a recording run can never pass for
+/// a checking one.
 final class MovementPicksGoldenTests: XCTestCase {
     struct Entry: Codable, Equatable {
         var label: String
@@ -52,7 +53,7 @@ final class MovementPicksGoldenTests: XCTestCase {
             let encoder = JSONEncoder()
             encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
             try encoder.encode(current).write(to: Self.fixtureURL, options: .atomic)
-            return
+            return XCTFail("fixture recorded; run again without TEST_RUNNER_MOVEZ_RECORD_GOLDEN to check it")
         }
 
         let data = try Data(contentsOf: Self.fixtureURL)

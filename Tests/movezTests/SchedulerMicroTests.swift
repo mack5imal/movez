@@ -112,8 +112,12 @@ final class SchedulerMicroTests: XCTestCase {
         XCTAssertEqual(harness.send(.signals(SignalSnapshot(microphoneActive: true))), [])
         XCTAssertTrue(harness.state.isMicroRunning)
 
+        harness.clearEffects()
         harness.run(until: { $0.isSitting })
-        XCTAssertNotNil(harness.snapshot.nextMicroDueAt ?? harness.snapshot.nextFullDueAt)
+        XCTAssertTrue(
+            harness.effects.contains { if case .recordMicroDone = $0 { return true } else { return false } },
+            "the micro-break on screen ran to its end and was recorded"
+        )
 
         // Only once it is over does the call take hold.
         harness.send(.signals(SignalSnapshot(microphoneActive: true)))

@@ -38,8 +38,11 @@ final class FileSnapshotStore: SnapshotStore {
     }
 
     /// `~/Library/Application Support/movez`, created if missing.
-    static func applicationSupportDirectory() throws -> URL {
-        let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+    /// Movez's folder inside `base`, created owner-only if it is missing. `base` defaults to the
+    /// user's Application Support; tests pass a temporary folder so they never create the real one.
+    static func applicationSupportDirectory(
+        base: URL? = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+    ) throws -> URL {
         guard let base else { throw PersistenceError.directoryUnavailable("no Application Support directory") }
         let directory = base.appendingPathComponent("movez", isDirectory: true)
         try FileManager.default.createDirectory(

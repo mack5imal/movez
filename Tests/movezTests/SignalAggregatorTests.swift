@@ -28,39 +28,56 @@ final class SignalAggregatorTests: XCTestCase {
         return Fakes(aggregator: aggregator, idle: idle, mic: mic, capture: capture, fullscreen: fullscreen)
     }
 
-    /// Polls by hand on the manual clock, the way the timer would.
+    /// Polls by hand on the manual clock, the way the timer would while it runs. Whether it runs
+    /// at all is the coordinator's job, asserted through `isRunning` below, not skipped here.
     private func poll(_ aggregator: SignalAggregator, harness: CoordinatorHarness, seconds: TimeInterval) {
         var elapsed: TimeInterval = 0
         while elapsed < seconds {
             harness.clock.advance(SignalAggregator.pollSeconds)
             elapsed += SignalAggregator.pollSeconds
-            guard harness.scheduler.pollingRequired else { continue }
             aggregator.poll()
         }
     }
 
+    /// At 1× the timer polls every two seconds. The cadence is a property of the timer, so it is
+    /// checked there rather than by counting a loop the test itself runs.
     func testPollsEveryTwoSecondsWhileSitting() {
-        let harness = CoordinatorHarness()
+        let harness = CoordinatorHarness(workingHours: .alwaysOn)
         let aggregator = makeAggregator(harness: harness).aggregator
-        poll(aggregator, harness: harness, seconds: 60)
-        XCTAssertEqual(aggregator.pollCount, 30)
+        harness.coordinator.aggregator = aggregator
+        aggregator.setPolling(true)
+        XCTAssertTrue(aggregator.isRunning)
+        XCTAssertEqual(aggregator.pollInterval, SignalAggregator.pollSeconds)
+        XCTAssertEqual(SignalAggregator.pollSeconds, 2)
     }
 
+    /// What keeps movez from sampling anything while paused or off hours is the coordinator
+    /// stopping the aggregator, so that is what is asserted: the timer stops when the working day
+    /// closes and starts again when the next one opens.
     func testNoPollsWhilePausedOrOffHours() {
-        let harness = CoordinatorHarness()
-        let aggregator = makeAggregator(harness: harness).aggregator
-        harness.coordinator.pause(forSeconds: 2 * 3600)
-        XCTAssertFalse(harness.scheduler.pollingRequired)
-        poll(aggregator, harness: harness, seconds: 10 * 60)
-        XCTAssertEqual(aggregator.pollCount, 0)
+        let paused = CoordinatorHarness(workingHours: .alwaysOn)
+        let pausedAggregator = makeAggregator(harness: paused).aggregator
+        paused.coordinator.aggregator = pausedAggregator
+        pausedAggregator.setPolling(true)
+        paused.coordinator.pause(forSeconds: 2 * 3600)
+        XCTAssertFalse(paused.scheduler.pollingRequired)
+        XCTAssertFalse(pausedAggregator.isRunning, "a paused movez samples nothing")
 
-        let saturday = Calendar.current.date(byAdding: .day, value: 5, to: SchedulerHarness.mondayMorning)
-        let weekend = CoordinatorHarness(startAt: saturday ?? SchedulerHarness.mondayMorning)
-        let weekendAggregator = makeAggregator(harness: weekend).aggregator
-        weekend.run(seconds: 10)
-        XCTAssertEqual(weekend.state, .offHours)
-        poll(weekendAggregator, harness: weekend, seconds: 10 * 60)
-        XCTAssertEqual(weekendAggregator.pollCount, 0)
+        let closing = Calendar.current.date(byAdding: .minute, value: 9 * 60 - 2, to: SchedulerHarness.mondayMorning)
+        let evening = CoordinatorHarness(startAt: closing ?? SchedulerHarness.mondayMorning)
+        let eveningAggregator = makeAggregator(harness: evening).aggregator
+        evening.coordinator.aggregator = eveningAggregator
+        eveningAggregator.setPolling(true)
+        evening.run(seconds: 4)
+        XCTAssertTrue(eveningAggregator.isRunning, "17:58 on a Monday is working hours")
+
+        evening.run(seconds: 4 * 60)
+        XCTAssertEqual(evening.state, .offHours)
+        XCTAssertFalse(eveningAggregator.isRunning, "the working day closing stops the polling")
+
+        evening.run(seconds: 15 * 3600)
+        XCTAssertNotEqual(evening.state, .offHours, "09:00 on Tuesday opens the next working day")
+        XCTAssertTrue(eveningAggregator.isRunning, "and the polling starts again with it")
     }
 
     func testSettingsVetoEachSignal() {

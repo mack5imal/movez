@@ -79,24 +79,50 @@ final class ModeExtensibilityTests: XCTestCase {
         XCTAssertNotNil(harness.coordinator.plannedBreak(modeId: "unknown", at: harness.now).routine)
     }
 
-    /// The same check as
-    /// `git grep -nE 'case \.strength|== \.strength|\.movement \?' Sources/ | grep -v '^Sources/movez/Modes/'`,
-    /// run over the files directly so it needs no git in the test host.
+    /// Code that tells the modes apart lives only in `Sources/movez/Modes/` (DECISIONS 54). This
+    /// greps the sources for every spelling of a branch on a mode case: `case .strength`,
+    /// `case let .movement(…)`, `== .strength`, `!= .movement` and `.movement ?`.
+    ///
+    /// The one allowed exception is `StrengthModeBuilder`, which matches the strength planner's
+    /// own `NextFullBreak.strength` plan. That is a branch inside one mode, not between modes.
     func testModeBranchingLivesOnlyInTheModesFolder() throws {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
         let sources = root.appendingPathComponent("Sources")
         let modes = sources.appendingPathComponent("movez/Modes").standardizedFileURL.path
-        let pattern = try NSRegularExpression(pattern: #"case \.strength|== \.strength|\.movement \?"#)
+        let allowed: Set<String> = ["StrengthModeBuilder.swift"]
+        let pattern = try NSRegularExpression(
+            pattern: #"case (let )?\.(strength|movement)\b|[!=]= \.(strength|movement)\b|\.movement \?"#
+        )
         let enumerator = try XCTUnwrap(FileManager.default.enumerator(at: sources, includingPropertiesForKeys: nil))
 
         var offenders: [String] = []
         for case let url as URL in enumerator where url.pathExtension == "swift" {
-            guard !url.standardizedFileURL.path.hasPrefix(modes + "/") else { continue }
+            guard !url.standardizedFileURL.path.hasPrefix(modes + "/"),
+                  !allowed.contains(url.lastPathComponent) else { continue }
             let text = try String(contentsOf: url, encoding: .utf8)
             let range = NSRange(text.startIndex..., in: text)
             if pattern.firstMatch(in: text, range: range) != nil { offenders.append(url.lastPathComponent) }
         }
         XCTAssertEqual(offenders, [], "only Sources/movez/Modes/ may branch on a mode")
+    }
+
+    /// The pattern itself has to catch the spellings it claims to, or the check above passes for
+    /// the wrong reason.
+    func testTheModeBranchPatternCatchesEverySpelling() throws {
+        let pattern = try NSRegularExpression(
+            pattern: #"case (let )?\.(strength|movement)\b|[!=]= \.(strength|movement)\b|\.movement \?"#
+        )
+        let spellings = [
+            "case .strength:", "case let .strength(x):", "case .movement:", "case let .movement(m):",
+            "if mode == .strength {", "if mode != .movement {", "mode == .movement ? a : b"
+        ]
+        for spelling in spellings {
+            let range = NSRange(spelling.startIndex..., in: spelling)
+            XCTAssertNotNil(pattern.firstMatch(in: spelling, range: range), spelling)
+        }
+        let innocent = "case .strengthA:"
+        XCTAssertNil(pattern.firstMatch(in: innocent, range: NSRange(innocent.startIndex..., in: innocent)),
+                     "a longer case name that merely starts with a mode's is not a mode branch")
     }
 }

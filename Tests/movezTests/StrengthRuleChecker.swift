@@ -61,8 +61,34 @@ struct StrengthRuleChecker {
         [
             Rule(id: "\(prefix)-served-today") { !used.contains($0.id) },
             Rule(id: "\(prefix)-excluded") { !excluded.contains($0.id) },
-            Rule(id: "\(prefix)-difficulty") { StrengthEligibility.isWithinDifficulty($0, cap: cap, unlocked: unlocked) }
+            Rule(id: "\(prefix)-difficulty") { Self.isWithinDifficulty($0, cap: cap, unlocked: unlocked) }
         ]
+    }
+
+    // MARK: - The rules' own predicates
+
+    // Written out from the rule text in strength-rules.json, not borrowed from the builders, so a
+    // bug in a builder's predicate shows up here as a violation instead of agreeing with itself.
+
+    /// s6-difficulty, s7-difficulty, s22-end-range-difficulty: "Difficulty at most the cap, and
+    /// difficulty 3 only in an unlocked pattern."
+    static func isWithinDifficulty(_ movement: StrengthMovement, cap: Int, unlocked: Set<StrengthBucket>) -> Bool {
+        movement.difficulty <= cap && (movement.difficulty < 3 || unlocked.contains(movement.bucket))
+    }
+
+    /// s6-warm-up-shape: "The warm-up is bodyweight, not on the floor, difficulty 1 and two-sided."
+    static func isWarmUpShaped(_ movement: StrengthMovement) -> Bool {
+        movement.equipment.isEmpty && !movement.onFloor && movement.difficulty == 1 && !movement.perSide
+    }
+
+    /// s7-same-posture: a move done from a chair is seated; anything else is standing.
+    static func isSeated(_ movement: StrengthMovement) -> Bool {
+        movement.settings.contains(.chair)
+    }
+
+    /// A micro-break's second move: a different move, two-sided, in the first one's posture.
+    static func isPartner(_ candidate: StrengthMovement, of first: StrengthMovement) -> Bool {
+        candidate.id != first.id && !candidate.perSide && isSeated(candidate) == isSeated(first)
     }
 
     // MARK: - Strength breaks
@@ -101,6 +127,8 @@ struct StrengthRuleChecker {
             if !movement.isBodyweight, equipment.isDisjoint(with: movement.equipment) { out.append("s6-equipment") }
             if !solidWallNearby, movement.settings.contains(.wall) { out.append("s6-wall") }
         }
+        // `StrengthSet.init` copies the library's dose, so this holds by construction and is
+        // kept as the rule list's record of S4 rather than as a check that could catch a builder.
         if strengthBreak.sets.contains(where: { $0.dose != library.movement(id: $0.movement.id)?.dose }) {
             out.append("s6-dose")
         }
@@ -137,7 +165,7 @@ struct StrengthRuleChecker {
         var out = Self.needlessBreaks(
             warmUp,
             universe: library.movements(in: warmUpBucket).filter { isPossible($0) },
-            rules: [Rule(id: "s6-warm-up-shape", keeps: StrengthBreakBuilder.isWarmUpShaped)] + shared
+            rules: [Rule(id: "s6-warm-up-shape", keeps: Self.isWarmUpShaped)] + shared
         )
         // With any kit selected a working set should be vigorous; bodyweight-only has no such rule.
         let vigorous = equipment.isEmpty ? [] : [Rule(id: "s6-vigorous-sets") { $0.vigorous }]
@@ -198,7 +226,7 @@ struct StrengthRuleChecker {
         if moves.contains(where: \.onFloor) { out.append("s7-no-floor") }
         if !solidWallNearby, moves.contains(where: { $0.settings.contains(.wall) }) { out.append("s7-wall") }
         if Set(moves.map(\.id)).count != moves.count { out.append("s7-distinct") }
-        if moves.count == 2, StrengthPosture(moves[0]) != StrengthPosture(moves[1]) { out.append("s7-same-posture") }
+        if moves.count == 2, Self.isSeated(moves[0]) != Self.isSeated(moves[1]) { out.append("s7-same-posture") }
         guard let first = moves.first else { return out + ["s7-shape"] }
 
         let pool = library.microEligible.filter { $0.bucket == .end && !$0.onFloor && isPossible($0, equipment: []) }
@@ -211,13 +239,13 @@ struct StrengthRuleChecker {
         let opener: (StrengthMovement, [Rule]) -> Bool = { candidate, need in
             let kept = need.filter { ladderIds.contains($0.id) }
             return candidate.perSide || pool.contains { partner in
-                StrengthMicroBuilder.isPartner(partner, of: candidate) && kept.allSatisfy { $0.keeps(partner) }
+                Self.isPartner(partner, of: candidate) && kept.allSatisfy { $0.keeps(partner) }
             }
         }
         out += Self.needlessBreaks(first, universe: pool, rules: rules, usable: opener)
         out += shapeViolations(micro, pool: pool, ladder: ladder)
         if moves.count == 2 {
-            let partners = pool.filter { StrengthMicroBuilder.isPartner($0, of: first) }
+            let partners = pool.filter { Self.isPartner($0, of: first) }
             out += Self.needlessBreaks(moves[1], universe: partners, rules: rules)
         }
         return out
@@ -230,7 +258,7 @@ struct StrengthRuleChecker {
             Rule(id: "s7-previous-region") { previous.isDisjoint(with: $0.regions) },
             Rule(id: "s7-excluded") { !context.excluded.contains($0.id) },
             Rule(id: "s7-difficulty") {
-                StrengthEligibility.isWithinDifficulty($0, cap: context.difficultyCap, unlocked: context.unlockedBuckets)
+                Self.isWithinDifficulty($0, cap: context.difficultyCap, unlocked: context.unlockedBuckets)
             }
         ]
     }
@@ -245,7 +273,7 @@ struct StrengthRuleChecker {
             // Alone for the minute only when nothing could have made a proper micro-break.
             let kept = ladder.filter { $0.keeps(first) }
             let better = pool.contains { candidate in
-                (candidate.perSide || StrengthMicroBuilder.isPartner(candidate, of: first)) && kept.allSatisfy { $0.keeps(candidate) }
+                (candidate.perSide || Self.isPartner(candidate, of: first)) && kept.allSatisfy { $0.keeps(candidate) }
             }
             return better ? ["s7-shape"] : []
         case 2:

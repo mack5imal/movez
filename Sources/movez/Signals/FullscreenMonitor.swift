@@ -19,15 +19,30 @@ final class FullscreenMonitor: FullscreenSource {
 
     func reading(exceptions: Set<String>) -> FullscreenReading {
         guard let frontmost = NSWorkspace.shared.frontmostApplication else { return .none }
-        let bundleId = frontmost.bundleIdentifier
+        return Self.reading(
+            bundleId: frontmost.bundleIdentifier,
+            ownBundleId: ownBundleId,
+            exceptions: exceptions,
+            windows: { Self.frontmostWindowBounds(pid: frontmost.processIdentifier) },
+            screens: Self.screenFrames
+        )
+    }
 
+    /// The decision on its own, so it can be tested without a window server. Movez itself and
+    /// the user's exceptions are answered before the window list is read, which is the expensive
+    /// part, so the window and screen lookups are passed in lazily.
+    static func reading(
+        bundleId: String?,
+        ownBundleId: String?,
+        exceptions: Set<String>,
+        windows: () -> [CGRect],
+        screens: () -> [CGRect]
+    ) -> FullscreenReading {
         if let bundleId, bundleId == ownBundleId || exceptions.contains(bundleId) {
             return FullscreenReading(isFullscreen: false, bundleId: bundleId)
         }
-
-        let windows = Self.frontmostWindowBounds(pid: frontmost.processIdentifier)
-        let screens = Self.screenFrames()
-        let fullscreen = windows.contains { Self.isFullscreen(windowBounds: $0, screenFrames: screens) }
+        let frames = screens()
+        let fullscreen = windows().contains { isFullscreen(windowBounds: $0, screenFrames: frames) }
         return FullscreenReading(isFullscreen: fullscreen, bundleId: bundleId)
     }
 

@@ -242,10 +242,9 @@ final class SchedulerInterruptionTests: XCTestCase {
 
         harness.clock.advance(20 * minute)
         harness.send(.wake(gapSeconds: 1200))
-        harness.run(until: { !$0.isBreakSurfaceVisible && $0 != .away(since: harness.now) }, limit: 5 * minute)
-        harness.run(seconds: 70)
+        harness.run(until: { $0.isSitting }, limit: 5 * minute)
 
-        XCTAssertFalse(harness.state.isFullBreak, "a break that expired while asleep is not resumed")
+        XCTAssertTrue(harness.state.isSitting, "a break that expired while asleep is not resumed, got \(harness.state)")
         XCTAssertEqual(harness.snapshot.doneToday, 1, "three minutes of it counted")
         XCTAssertNil(harness.snapshot.interruptedBreak)
     }

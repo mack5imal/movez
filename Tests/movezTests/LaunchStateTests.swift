@@ -36,7 +36,10 @@ final class LaunchStateTests: XCTestCase {
             snapshotStore: store,
             sink: sink
         )
+        // `start()` applies the gap and then starts the timers, so the first thing the restored
+        // state meets is a tick. Without it a due time left in the past would never be tested.
         coordinator.applyLaunchGap()
+        coordinator.tick()
         return (coordinator, sink)
     }
 
@@ -147,6 +150,10 @@ final class LaunchStateTests: XCTestCase {
         XCTAssertFalse(sink.names.contains("showHeadsUp"))
         XCTAssertFalse(sink.names.contains("startFullBreak"))
         XCTAssertEqual(coordinator.scheduler.state.name, "sitting")
+        XCTAssertGreaterThan(
+            coordinator.scheduler.snapshot.nextFullDueAt ?? .distantPast, Self.date(day: 7, hour: 9),
+            "a file with no saved time is treated as a new session, not as a break three hours overdue"
+        )
     }
 
     func testABreakRestoredWithNothingOnScreenIsResolvedAtLaunch() {
@@ -283,11 +290,10 @@ final class LaunchStateTests: XCTestCase {
 
     // MARK: - The font
 
-    func testTheFontRegistersAndTheAppWouldStillRunWithoutIt() {
+    func testTheFontRegistersAndResolvesToManrope() {
         XCTAssertTrue(MovezFont.register())
         XCTAssertTrue(MovezFont.isAvailable)
-        // The fallback is what keeps a missing font from being fatal.
-        XCTAssertNotNil(MovezFont.nsFont(13, weight: .semibold))
+        XCTAssertEqual(MovezFont.nsFont(13, weight: .semibold).familyName, MovezFont.familyName)
     }
 
     // MARK: - Long calls
@@ -302,17 +308,5 @@ final class LaunchStateTests: XCTestCase {
         )
         model.deferred = deferred
         XCTAssertEqual(model.deferredBadge, "Sitting for 3 h 12 m · break waited for your call")
-    }
-
-    // MARK: - Displays
-
-    func testAScreenChangeMidBreakIsSomethingTheOverlayListensFor() throws {
-        let source = try String(
-            contentsOf: AccessibilityTests.repositoryRoot()
-                .appendingPathComponent("Sources/movez/UI/Overlay/OverlayWindowController.swift"),
-            encoding: .utf8
-        )
-        XCTAssertTrue(source.contains("didChangeScreenParametersNotification"))
-        XCTAssertTrue(source.contains("rebuildForScreenChange"))
     }
 }

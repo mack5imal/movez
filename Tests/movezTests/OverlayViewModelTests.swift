@@ -17,7 +17,7 @@ final class OverlayViewModelTests: XCTestCase {
 
     private func makeViewModel(
         clock: ManualClock = ManualClock(now: SchedulerHarness.mondayMorning),
-        chimes: RecordingChimePlayer? = nil,
+        chimes: ChimePlayer? = nil,
         reduceMotion: Bool = false
     ) -> OverlayViewModel {
         OverlayViewModel(
@@ -349,13 +349,16 @@ final class OverlayViewModelTests: XCTestCase {
         XCTAssertEqual(chimes.count(of: .completion), 1)
     }
 
+    /// The overlay plays through whatever player it is given; the Sounds setting is the gate the
+    /// app wraps around the real one. Through that gate a whole break makes no sound.
     func testNoChimesWhenSoundsAreOff() {
         let clock = ManualClock(now: SchedulerHarness.mondayMorning)
-        let chimes = RecordingChimePlayer()
-        chimes.enabled = false
-        let viewModel = makeViewModel(clock: clock, chimes: chimes)
+        let recorder = RecordingChimePlayer()
+        let gated = GatedChimePlayer(wrapping: recorder, isEnabled: { false })
+        let viewModel = makeViewModel(clock: clock, chimes: gated)
         for _ in 0..<4 { viewModel.next() }
-        XCTAssertTrue(chimes.played.isEmpty)
+        XCTAssertEqual(viewModel.phase, .complete)
+        XCTAssertTrue(recorder.played.isEmpty)
     }
 
     func testTheRealPlayerLoadsAllThreeChimes() {

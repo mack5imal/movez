@@ -63,10 +63,8 @@ final class GatedChimePlayer: ChimePlayer {
 @MainActor
 final class RecordingChimePlayer: ChimePlayer {
     private(set) var played: [Chime] = []
-    var enabled = true
 
     func play(_ chime: Chime) {
-        guard enabled else { return }
         played.append(chime)
     }
 

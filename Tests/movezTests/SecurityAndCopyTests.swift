@@ -11,13 +11,17 @@ final class SecurityAndCopyTests: XCTestCase {
 
     // MARK: - Security
 
-    /// movez has no account, no sync and nothing to send. Any of these appearing in app code
-    /// would mean that had changed.
+    /// movez has no account, no sync and nothing to send. The app is unsandboxed, so no
+    /// entitlement stops it reaching the network; this scan of the source is the check. Any of
+    /// these appearing in app code would mean that had changed.
     func testTheAppCodeCannotReachTheNetworkOrRunAProcess() throws {
         // Word-boundary patterns, so SwiftUI's `.system(size:)` is not mistaken for libc's.
         let banned = [
             "URLSession", "NSURLConnection", "Process\\(\\)", "NSTask",
-            "(?<![.\\w])system\\(", "(?<![.\\w])popen\\("
+            "(?<![.\\w])system\\(", "(?<![.\\w])popen\\(", "posix_spawn",
+            "import Network", "NWConnection", "CFStreamCreatePairWithSocket", "WKWebView",
+            // Foundation fetches a remote URL as happily as a file one.
+            "contentsOf: URL\\(string:"
         ]
         var hits: [String] = []
 
@@ -55,7 +59,9 @@ final class SecurityAndCopyTests: XCTestCase {
         let url = AccessibilityTests.repositoryRoot().appendingPathComponent("Sources/movez/movez.entitlements")
         let text = try String(contentsOf: url, encoding: .utf8)
 
-        XCTAssertFalse(text.contains("com.apple.security.network"), "movez never talks to the network")
+        // The app is unsandboxed (DECISIONS 3), so this is hygiene rather than enforcement: what
+        // keeps it off the network is the source scan above.
+        XCTAssertFalse(text.contains("com.apple.security.network"), "movez claims no network entitlement")
         XCTAssertFalse(text.contains("com.apple.security.files.user-selected"), "and never opens the user's files")
     }
 

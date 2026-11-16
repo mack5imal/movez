@@ -63,19 +63,6 @@ final class PersistenceTests: XCTestCase {
         XCTAssertTrue(resumed.state.isSitting)
     }
 
-    func testInMemoryStoreRecordsEverySave() throws {
-        let store = InMemorySnapshotStore()
-        let harness = SchedulerHarness()
-        harness.run(until: { $0.isHeadsUp }, limit: 60 * minute)
-        for effect in harness.effects where effect == .persist {
-            try store.save(harness.snapshot)
-        }
-        let persists = harness.effects.filter { $0 == .persist }.count
-        XCTAssertEqual(store.saveCount, persists)
-        XCTAssertGreaterThanOrEqual(persists, 2, "every transition persists")
-        XCTAssertEqual(try store.load(), harness.snapshot)
-    }
-
     func testEveryTransitionEmitsPersist() {
         let harness = SchedulerHarness()
         harness.run(until: { $0.isPendingFull })
@@ -129,8 +116,46 @@ final class PersistenceTests: XCTestCase {
     }
 
     func testApplicationSupportDirectoryIsCreated() throws {
-        let directory = try FileSnapshotStore.applicationSupportDirectory()
+        let base = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent("movez-tests-\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: base) }
+
+        let directory = try FileSnapshotStore.applicationSupportDirectory(base: base)
         XCTAssertTrue(FileManager.default.fileExists(atPath: directory.path))
         XCTAssertEqual(directory.lastPathComponent, "movez")
+        let permissions = try FileManager.default.attributesOfItem(atPath: directory.path)[.posixPermissions] as? Int
+        XCTAssertEqual(permissions, 0o700, "the folder is owner-only")
+    }
+
+    /// A state file with the shape a September 2026 build wrote: no `lastAbsenceEndedAt`,
+    /// `awayInputAge` or `remainingMicroAtAwaySeconds`, a credit restore without its micro
+    /// anchor, a key the app no longer has, and a grace saved with the old `applyGap` resume.
+    /// The key set is taken from a real file of that build; the values are made up.
+    func testAStateFileFromASeptemberBuildStillDecodesAndResumes() throws {
+        // Read next to this file, like the golden fixture, so it needs no bundle resource.
+        let url = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .appendingPathComponent("Fixtures/state-2026-09-build.json")
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let snapshot = try decoder.decode(SchedulerSnapshot.self, from: Data(contentsOf: url))
+
+        XCTAssertEqual(snapshot.doneToday, 3)
+        XCTAssertEqual(snapshot.dayKey, "2026-09-07")
+        XCTAssertNil(snapshot.lastAbsenceEndedAt)
+        XCTAssertNil(snapshot.creditRestore?.microAnchorAt)
+        XCTAssertEqual(snapshot.transitions.count, 1)
+        guard case .postBreakGrace(let until, .applyGap(let seconds)) = snapshot.state else {
+            return XCTFail("expected a grace saved with the old resume, got \(snapshot.state)")
+        }
+        XCTAssertEqual(seconds, 600)
+
+        // The grace ends and the old resume is judged as the absence it measured.
+        var scheduler = Scheduler(snapshot: snapshot, config: SchedulerConfig())
+        _ = scheduler.handle(.tick, now: until.addingTimeInterval(2))
+        XCTAssertFalse(
+            { if case .postBreakGrace = scheduler.state { return true } else { return false } }(),
+            "the old grace resolves rather than sticking, got \(scheduler.state)"
+        )
     }
 }
