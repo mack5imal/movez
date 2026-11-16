@@ -120,6 +120,52 @@ final class MicroBreakBuilderTests: XCTestCase {
         XCTAssertFalse(micro.blocks.isEmpty)
     }
 
+    /// A user who has excluded all but two micro movements, both of them in the last micro-break,
+    /// still gets a micro-break rather than an empty panel that plays two chimes (LIB-7).
+    func testAPoolTheExclusionsAndTheLastMicroUseUpStillServesSomething() {
+        let micro = library.microEligible.map(\.id).sorted()
+        let kept = Set(micro.suffix(2))
+        let excluded = Set(micro).subtracting(kept)
+        for seed in 0..<50 {
+            let served = self.micro(seed: UInt64(seed &* 29 &+ 3)) { context in
+                context.excluded = excluded
+                context.lastMicroMovementIds = kept
+            }
+            XCTAssertFalse(served.blocks.isEmpty, "seed \(seed) served an empty micro-break")
+        }
+    }
+
+    /// Before the exclusions are let go, the last micro-break and the next full break are: a
+    /// movement the user kept beats one they turned off.
+    func testTheLastMicroIsLetGoBeforeTheExclusions() {
+        let micro = library.microEligible.filter { $0.perSide }.map(\.id).sorted()
+        let kept = Set(micro.prefix(1))
+        let excluded = Set(library.microEligible.map(\.id)).subtracting(kept)
+        for seed in 0..<50 {
+            let served = self.micro(seed: UInt64(seed &* 31 &+ 5)) { context in
+                context.excluded = excluded
+                context.lastMicroMovementIds = kept
+            }
+            XCTAssertEqual(Set(served.movementIds), kept, "seed \(seed)")
+        }
+    }
+
+    /// The difficulty cap holds in micro-breaks as it does in full breaks: a Beginner is never
+    /// served one of the harder balance poses (LIB-1).
+    func testMicroBreaksKeepToTheDifficultyCap() {
+        for seed in 0..<500 {
+            let served = micro(seed: UInt64(seed &* 41 &+ 8)) { $0.difficultyCap = 1 }
+            XCTAssertFalse(served.blocks.isEmpty)
+            for block in served.blocks {
+                XCTAssertLessThanOrEqual(block.movement.difficulty, 1, "\(block.movement.id) is above the Beginner cap")
+            }
+        }
+        var capped = MicroContext()
+        capped.difficultyCap = 1
+        XCTAssertTrue(builder.candidates(for: capped).allSatisfy { $0.difficulty <= 1 })
+        XCTAssertTrue(builder.candidates(for: MicroContext()).contains { $0.difficulty == 2 }, "the default cap keeps the moderate moves")
+    }
+
     func testConsecutiveMicrosDoNotRepeat() {
         var previous: Set<String> = []
         for index in 0..<24 {

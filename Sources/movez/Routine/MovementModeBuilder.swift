@@ -22,6 +22,8 @@ struct MovementModeBuilder: ModeBreakBuilding {
         context.excluded = settings.excludedMovementIds
         context.equipment = settings.equipment
         context.unavailable = settings.unavailableRequirements
+        context.difficultyCap = settings.difficultyCap
+        context.unlockedDiff3 = coordinator.history.unlockedDiff3(library: coordinator.library)
         context.recency = coordinator.history.recencyScores(before: now)
         context.seed = SplitMix64.seed(day: snapshot.dayKey, index: 1_000 + snapshot.microEmphasisIndex)
         return .movement(coordinator.microBuilder.build(context: context))

@@ -66,6 +66,10 @@ struct MicroContext: Hashable {
     var equipment: Set<Equipment> = []
     /// What the user has said they do not have.
     var unavailable: Set<Requirement> = []
+    /// The same cap and difficulty-3 unlocks a full break keeps to: a Beginner is a Beginner in a
+    /// micro-break too.
+    var difficultyCap: Int = 2
+    var unlockedDiff3: Set<String> = []
     /// How recently each movement was served, as `Recency` scores it.
     var recency: [String: Double] = [:]
     var seed: UInt64 = 0
