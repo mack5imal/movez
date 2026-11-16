@@ -74,6 +74,14 @@ final class AppCoordinator: ObservableObject {
     /// it, because otherwise the app looks normal and loses the whole session at quit.
     @Published var storageProblem: String?
 
+    /// A Focus request the scheduler has not taken yet. It is held, and offered again on every
+    /// tick, because the one state that refuses a pause (a full break on screen) would otherwise
+    /// lose it for the whole Focus (APP-1, DECISIONS 88).
+    var pendingFocusPause: Bool?
+    /// Asks macOS for the Focus filter's current value. Set at launch; nil in tests, which never
+    /// talk to the system.
+    var readCurrentFocus: (@MainActor () async -> Bool?)?
+
     /// The running coordinator. App Intents are created by the system with no way to be handed
     /// dependencies, so the Focus Filter needs a way home.
     @MainActor private(set) static weak var shared: AppCoordinator?
@@ -247,8 +255,22 @@ final class AppCoordinator: ObservableObject {
         // Before the timers: a tick that ran first could fire a break off a due time that belongs
         // to a session which ended whenever the app went down.
         applyLaunchGap()
+        reconcileFocus()
         restartTimers()
         refreshPublished()
+    }
+
+    /// Brings the scheduler in line with the Focus as it is now, not as it was when the state was
+    /// saved: a request that arrived before this coordinator existed is applied, and macOS is
+    /// asked for the filter's value, so a Focus pause restored after the Focus ended is lifted
+    /// instead of lasting until Resume is pressed.
+    private func reconcileFocus() {
+        if let latest = FocusFilterRequest.latest { focusFilter(paused: latest) }
+        guard let readCurrentFocus else { return }
+        Task { @MainActor [weak self] in
+            guard let paused = await readCurrentFocus() else { return }
+            self?.focusFilter(paused: paused)
+        }
     }
 
     /// Hands the scheduler the stretch the app was not running for. Spent once, at launch.
@@ -299,6 +321,7 @@ final class AppCoordinator: ObservableObject {
 
     /// One pass of the clock. Exposed so the tests can drive a whole day in milliseconds.
     func tick() {
+        if pendingFocusPause != nil { applyPendingFocus() }
         deliver(scheduler.handle(.tick, now: clock.now))
         // Nothing is written while paused or off hours: there is no session to be alive in, and a
         // gap in those states is ignored anyway.

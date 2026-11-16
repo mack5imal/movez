@@ -71,8 +71,22 @@ extension AppCoordinator {
     /// owns the break's, so it is the panel that says when the minute is done.
     func microEnded() { inject(.microEnded) }
 
-    /// A Focus turning on or off.
-    func focusFilter(paused: Bool) { inject(.focusFilter(paused: paused)) }
+    /// A Focus turning on or off. The request is held until the scheduler can take it.
+    func focusFilter(paused: Bool) {
+        pendingFocusPause = paused
+        applyPendingFocus()
+    }
+
+    /// Offers the held Focus request to the scheduler. A pause waits out a full break on screen,
+    /// the one state that refuses it; anything else settles the request, including a pause set by
+    /// hand, which a Focus never overrides. Once settled it is not offered again, so "Resume now"
+    /// during a Focus is not undone on the next tick.
+    func applyPendingFocus() {
+        guard let paused = pendingFocusPause else { return }
+        if paused, case .fullBreak = scheduler.state { return }
+        pendingFocusPause = nil
+        inject(.focusFilter(paused: paused))
+    }
 
     // MARK: - Toast
 

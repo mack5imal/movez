@@ -83,6 +83,7 @@
 		55074040540FC506FB3D1593 /* movezApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E025EF728AA5019AE530696 /* movezApp.swift */; };
 		555117DC1840EC0AF6BA9596 /* SettingsStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F65D6A682E17691E341C551D /* SettingsStoreTests.swift */; };
 		56964AB17B0D050C2FD63B8D /* Recency.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4954FDF028687ECBDC44740 /* Recency.swift */; };
+		578FFDDDB27225DBFB326343 /* FocusFilterStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D70D8D2962DD76ABBD794DDD /* FocusFilterStateTests.swift */; };
 		58809FEBA39684F0D89A6FC7 /* Gallery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C72D952CD33F4E122997B90 /* Gallery.swift */; };
 		5987DDB5C15A06E93AD17AE8 /* SchedulerEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD7E4757BE6870716B20B25A /* SchedulerEvent.swift */; };
 		59F60955101563420F22FF89 /* FakeSignalSources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BC2DA2DB7050A2083A2C262 /* FakeSignalSources.swift */; };
@@ -458,6 +459,7 @@
 		D5C9F83FD1E155F26FB0FE78 /* DebugTimeScaleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugTimeScaleTests.swift; sourceTree = "<group>"; };
 		D65BCEE3360CD0487BC0CAEF /* StrengthLibraryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrengthLibraryTests.swift; sourceTree = "<group>"; };
 		D6877312585626AB8ACCAAF8 /* MicroPanelBreak.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicroPanelBreak.swift; sourceTree = "<group>"; };
+		D70D8D2962DD76ABBD794DDD /* FocusFilterStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusFilterStateTests.swift; sourceTree = "<group>"; };
 		D8B2E22715B73413558FC2F6 /* PauseAcrossWorkingHoursTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PauseAcrossWorkingHoursTests.swift; sourceTree = "<group>"; };
 		DA1294BDDEA0FCB1E7D17C92 /* SnapshotFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotFixtures.swift; sourceTree = "<group>"; };
 		DB130F89D1F33DE620263DDC /* EdgeCaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EdgeCaseTests.swift; sourceTree = "<group>"; };
@@ -545,6 +547,7 @@
 				87C3FC9D5B4CF03225E398D0 /* EndRangeBreakBuilderTests.swift */,
 				4BC2DA2DB7050A2083A2C262 /* FakeSignalSources.swift */,
 				27F7A41D0D2F936D62D9033D /* FakeSignalsTests.swift */,
+				D70D8D2962DD76ABBD794DDD /* FocusFilterStateTests.swift */,
 				BB27B820F5A8AB61582F2B98 /* FocusFilterTests.swift */,
 				A79454DFD8FB5D5C68D4F0AD /* FontsTests.swift */,
 				9A354462EB741E234CC0F3FF /* FullscreenMonitorTests.swift */,
@@ -1240,6 +1243,7 @@
 				ECE63621226C4E0632074A36 /* EndRangeBreakBuilderTests.swift in Sources */,
 				59F60955101563420F22FF89 /* FakeSignalSources.swift in Sources */,
 				77E1B1A2C7F9DA8D30EFD56E /* FakeSignalsTests.swift in Sources */,
+				578FFDDDB27225DBFB326343 /* FocusFilterStateTests.swift in Sources */,
 				B248E757587C0B032E4A0C5F /* FocusFilterTests.swift in Sources */,
 				DE81E55383C3209ECD6CD888 /* FontsTests.swift in Sources */,
 				C0CC2D4A1800386C9DB49D32 /* FullscreenMonitorTests.swift in Sources */,

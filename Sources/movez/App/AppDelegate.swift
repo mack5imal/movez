@@ -122,6 +122,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
             snapshotStore: stores.snapshotStore
         )
         coordinator.storageProblem = stores.problem
+        coordinator.readCurrentFocus = { try? await MovezFocusFilterIntent.current.pauseBreaks }
         coordinator.attachSystemSignals()
         attachUI(to: coordinator, settings: settings)
         coordinator.start()

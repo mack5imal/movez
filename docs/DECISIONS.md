@@ -793,3 +793,13 @@ Entries from fixing the findings in `docs/code-review-2026-11.md`.
     The tick timer is restarted whenever the scale changes. A state file whose save time is in
     the future is taken for clock skew at launch and the session starts fresh, where before its
     gap measured as zero and its due times stood hours away (UI-10).
+88. **A Focus request is held until the scheduler takes it** (amending 26 and 51). macOS's
+    request was acted on once, as an event, and lost three ways: a Focus that turned on during a
+    full break (which refuses a pause) left breaks running for the whole Focus; one performed
+    before the coordinator existed (the notice not yet accepted, the login item still starting)
+    went nowhere; and a Focus pause restored after the Focus ended while Movez was not running
+    lasted until Resume was pressed. The request is now kept, offered again on every tick until
+    a full break is no longer in the way, applied when a coordinator starts after it, and at
+    launch macOS is asked for the filter's current value. Held is not stubborn: once taken, the
+    request is settled, so "Resume now" during a Focus stands until the Focus changes again, and
+    a pause set by hand still outranks the Focus (APP-1).
