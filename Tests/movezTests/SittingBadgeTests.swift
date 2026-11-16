@@ -12,7 +12,7 @@ final class SittingBadgeTests: XCTestCase {
         harness.send(.userTakeBreakNow)
         XCTAssertTrue(harness.run(until: { $0.isFullBreak }, limit: 2 * minute), "got \(harness.state)")
         harness.run(seconds: 325)
-        harness.send(.userDone(completedBlocks: 5, totalBlocks: 5, elapsed: 325))
+        harness.send(.breakEnded(completedBlocks: 5, totalBlocks: 5, elapsed: 325))
         XCTAssertTrue(harness.state.isSitting, "got \(harness.state)")
     }
 

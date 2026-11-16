@@ -19,8 +19,8 @@ enum SchedulerEvent: Equatable {
     case userStartNow
     case userSnooze
     case userSkip
-    case userNextBlock
-    case userDone(completedBlocks: Int, totalBlocks: Int, elapsed: Int)
+    /// The break left the overlay: its last block ran out, or Done was pressed. The overlay
+    /// offers Done only once the break counts, so the scheduler judges every end the same way.
     case breakEnded(completedBlocks: Int, totalBlocks: Int, elapsed: Int)
     /// The overlay was left paused for its limit. A snooze, even with none left.
     case overlayPauseExpired

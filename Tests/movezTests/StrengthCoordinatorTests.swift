@@ -424,18 +424,22 @@ final class StrengthCoordinatorTests: XCTestCase {
 
     // MARK: - The scheduler's planned length
 
-    private func completionAt(plannedSeconds: Int) -> (refusedAt: Int, acceptedAt: Int) {
+    /// Ends a break after `elapsed` seconds with no part done; true when it counted as done.
+    private func endsAsDone(plannedSeconds: Int, elapsed: Int) -> Bool {
         let harness = SchedulerHarness()
         harness.send(.breakLength(seconds: plannedSeconds))
         harness.run(until: { $0.isHeadsUp }, limit: 60 * minute)
         harness.send(.userStartNow)
+        harness.send(.breakEnded(completedBlocks: 0, totalBlocks: 5, elapsed: elapsed))
+        XCTAssertTrue(harness.state.isSitting)
+        XCTAssertEqual(harness.snapshot.doneToday + harness.snapshot.skipsToday, 1, "the break is one or the other")
+        return harness.snapshot.doneToday == 1
+    }
+
+    private func completionAt(plannedSeconds: Int) -> (refusedAt: Int, acceptedAt: Int) {
         let half = plannedSeconds / 2
-        let refused = harness.send(.userDone(completedBlocks: 0, totalBlocks: 5, elapsed: half - 1))
-        XCTAssertEqual(refused, [], "Done is refused before half of \(plannedSeconds) s")
-        XCTAssertTrue(harness.state.isFullBreak)
-        harness.send(.userDone(completedBlocks: 0, totalBlocks: 5, elapsed: half))
-        XCTAssertTrue(harness.state.isSitting, "Done is accepted at half of \(plannedSeconds) s")
-        XCTAssertEqual(harness.snapshot.doneToday, 1)
+        XCTAssertFalse(endsAsDone(plannedSeconds: plannedSeconds, elapsed: half - 1), "a skip before half of \(plannedSeconds) s")
+        XCTAssertTrue(endsAsDone(plannedSeconds: plannedSeconds, elapsed: half), "done at half of \(plannedSeconds) s")
         return (half - 1, half)
     }
 

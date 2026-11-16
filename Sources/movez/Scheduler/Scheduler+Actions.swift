@@ -87,11 +87,6 @@ extension Scheduler {
         return [.persist, .menuRefresh]
     }
 
-    mutating func nextBlock() -> [SchedulerEffect] {
-        guard case .fullBreak = snapshot.state else { return [] }
-        return [.chime(.transition)]
-    }
-
     /// A snooze is a deferral, never a skip: it costs one of the two allowances and comes back
     /// through the heads-up rather than straight to the overlay.
     ///
@@ -134,17 +129,11 @@ extension Scheduler {
         return dismissal + [.persist, .menuRefresh]
     }
 
-    mutating func finishBreak(
-        completed: Int,
-        total: Int,
-        elapsed: Int,
-        now: Date,
-        userInitiated: Bool
-    ) -> [SchedulerEffect] {
+    /// A break that ends counts as done by the completion rule; one that ends short of it is a
+    /// skip.
+    mutating func finishBreak(completed: Int, total: Int, elapsed: Int, now: Date) -> [SchedulerEffect] {
         guard case .fullBreak(let startedAt) = snapshot.state else { return [] }
         let counts = Scheduler.meetsCompletionRule(completed: completed, total: total, elapsed: elapsed, config: config)
-        // "Done" is only offered once the break has actually been done; an early exit is a skip.
-        if userInitiated, !counts { return [] }
 
         if counts {
             snapshot.doneToday += 1

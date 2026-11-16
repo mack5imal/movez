@@ -37,7 +37,7 @@ final class CoordinatorSimulatedDayTests: XCTestCase {
                 harness.coordinator.skip()
             } else {
                 harness.clock.advance(5 * minute)
-                harness.coordinator.inject(.userDone(
+                harness.coordinator.inject(.breakEnded(
                     completedBlocks: session.totalBlocks,
                     totalBlocks: session.totalBlocks,
                     elapsed: 300

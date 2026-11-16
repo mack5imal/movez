@@ -98,11 +98,8 @@ struct Scheduler {
         case .userSnooze: return snooze(now: now)
         case .overlayPauseExpired: return snooze(now: now, beyondAllowance: true)
         case .userSkip: return skip(now: now)
-        case .userNextBlock: return nextBlock()
-        case .userDone(let completed, let total, let elapsed):
-            return finishBreak(completed: completed, total: total, elapsed: elapsed, now: now, userInitiated: true)
         case .breakEnded(let completed, let total, let elapsed):
-            return finishBreak(completed: completed, total: total, elapsed: elapsed, now: now, userInitiated: false)
+            return finishBreak(completed: completed, total: total, elapsed: elapsed, now: now)
         default: return nil
         }
     }

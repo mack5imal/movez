@@ -160,7 +160,9 @@ final class SchedulerCoreTests: XCTestCase {
 
     // MARK: - Completion rule
 
-    func testDoneIsOnlyAcceptedOnceTheBreakCounts() {
+    /// The overlay offers Done only once this rule holds (OverlayViewModelTests), so a break that
+    /// ends short of it ran out or was left, and is a skip.
+    func testABreakCountsOnlyOnceItMeetsTheCompletionRule() {
         let config = SchedulerConfig()
         XCTAssertFalse(Scheduler.meetsCompletionRule(completed: 1, total: 4, elapsed: 40, config: config))
         XCTAssertTrue(Scheduler.meetsCompletionRule(completed: 2, total: 4, elapsed: 40, config: config))
@@ -174,20 +176,17 @@ final class SchedulerCoreTests: XCTestCase {
         harness.run(until: { $0.isHeadsUp }, limit: 60 * minute)
         harness.send(.userStartNow)
 
-        XCTAssertEqual(harness.send(.userDone(completedBlocks: 1, totalBlocks: 4, elapsed: 40)), [])
-        XCTAssertTrue(harness.state.isFullBreak, "Done is refused before the break counts")
-
         harness.send(.breakEnded(completedBlocks: 1, totalBlocks: 4, elapsed: 40))
         XCTAssertTrue(harness.state.isSitting)
         XCTAssertEqual(harness.snapshot.skipsToday, 1, "an early exit is recorded as a skip")
         XCTAssertEqual(harness.snapshot.doneToday, 0)
     }
 
-    func testDoneIsAcceptedAtHalfTheBlocks() {
+    func testABreakCountsAtHalfTheBlocks() {
         let harness = SchedulerHarness()
         harness.run(until: { $0.isHeadsUp }, limit: 60 * minute)
         harness.send(.userStartNow)
-        harness.send(.userDone(completedBlocks: 2, totalBlocks: 4, elapsed: 130))
+        harness.send(.breakEnded(completedBlocks: 2, totalBlocks: 4, elapsed: 130))
         XCTAssertTrue(harness.state.isSitting)
         XCTAssertEqual(harness.snapshot.doneToday, 1)
         XCTAssertEqual(harness.snapshot.skipsToday, 0)

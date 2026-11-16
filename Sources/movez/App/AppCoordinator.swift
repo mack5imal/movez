@@ -52,9 +52,9 @@ struct MenuState: Equatable {
 ///
 /// The split with `Scheduler` is deliberate. The scheduler knows about time and state; it does
 /// not know what a movement is. The coordinator knows about movements and history; it never
-/// decides when a break happens. Block transitions are the clearest case: the scheduler is told
-/// `.userNextBlock` and answers with a chime, while the coordinator is what actually knows which
-/// block just finished and writes it to history.
+/// decides when a break happens. Block transitions are the clearest case: the overlay records each
+/// block through the coordinator, which writes it to history, and the scheduler hears only
+/// `.breakEnded` when the break is over.
 @MainActor
 final class AppCoordinator: ObservableObject {
     // Published view state. Written only by the coordinator's own extensions; the UI reads it.
