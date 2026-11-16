@@ -685,3 +685,14 @@ Entries from fixing the findings in `docs/code-review-2026-11.md`.
     was shown nowhere else, so it is gone with the card: the chip, its text styles, the end dim,
     the coordinator's published count and the history's calculation. This supersedes entry 4 and
     the end-screen part of 33 (UI-7).
+77. **The microphone signal asks which processes are recording, not whether the default input
+    device is running.** Reading `kAudioDevicePropertyDeviceIsRunningSomewhere` on the default
+    input missed a call on any other microphone (Zoom on a USB headset while the default is the
+    built-in mic, or AirPods connecting mid-call), and it read music through a headset as a call,
+    because that property is device-wide and says nothing about direction. On macOS 14.2 and later
+    the signal is now any process other than Movez with `kAudioProcessPropertyIsRunningInput` set,
+    from `kAudioHardwarePropertyProcessObjectList`: per direction, on every device. Before 14.2 it
+    falls back to every device that has input streams and is running, which no longer misses a
+    non-default mic but still cannot tell direction on a duplex device. This is the next step 23h
+    named. The minute's sustain stays, since a dictation burst is still a process recording
+    (SIG-2).

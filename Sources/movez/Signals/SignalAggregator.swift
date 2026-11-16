@@ -133,10 +133,10 @@ final class SignalAggregator {
 
     /// Holds the microphone to a minute of continuous use before it means a call.
     ///
-    /// `kAudioDevicePropertyDeviceIsRunningSomewhere` cannot say which process is listening, and a
-    /// dictation tool holds the mic for a few seconds at a time. Each of those bursts used to defer
-    /// every break for the burst plus a two-minute grace, and one of them landed on a micro-break
-    /// and took it off screen. A call outlasts a minute; a dictated sentence does not.
+    /// A mic reading says that something is recording, not what it is, and a dictation tool holds
+    /// the mic for a few seconds at a time. Each of those bursts used to defer every break for the
+    /// burst plus a two-minute grace, and one of them landed on a micro-break and took it off
+    /// screen. A call outlasts a minute; a dictated sentence does not.
     ///
     /// Only the mic is held this way. A screen share and a fullscreen app are steady states that
     /// mean what they say from the first reading.

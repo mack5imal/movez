@@ -8,7 +8,7 @@ protocol IdleSource: AnyObject {
 }
 
 protocol MicSource: AnyObject {
-    /// True when the default input device is running somewhere — a call, a recording, anything.
+    /// True when another process is recording from a microphone — a call, a recording, dictation.
     func isInUse() -> Bool
 }
 
