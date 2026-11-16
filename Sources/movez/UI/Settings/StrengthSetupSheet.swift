@@ -29,7 +29,7 @@ struct StrengthSetupSheet: View {
                     StrengthEquipmentChips(selected: draft.equipment, toggle: viewModel.toggleSetupEquipment)
                 }
                 SettingsRow(label: "Solid wall nearby") {
-                    MovezToggle(isOn: $viewModel.strengthSetupDraft.solidWallNearby)
+                    MovezToggle(label: "Solid wall nearby", isOn: $viewModel.strengthSetupDraft.solidWallNearby)
                 }
                 SettingsRow(label: "Strength breaks a day") {
                     SegmentedControl(

@@ -146,7 +146,10 @@ struct SettingsView: View {
 
             if settings.microToggleAvailable {
                 SettingsRow(label: viewModel.microRowLabel, detail: viewModel.microRowDetail) {
-                    MovezToggle(isOn: Binding(get: { settings.microEnabled }, set: viewModel.setMicroEnabled))
+                    MovezToggle(
+                        label: viewModel.microRowLabel,
+                        isOn: Binding(get: { settings.microEnabled }, set: viewModel.setMicroEnabled)
+                    )
                 }
             }
 
@@ -175,13 +178,22 @@ struct SettingsView: View {
             }
 
             SettingsRow(label: "A wall I can lean on") {
-                MovezToggle(isOn: Binding(get: { settings.wallAvailable }, set: viewModel.setWallAvailable))
+                MovezToggle(
+                    label: "A wall I can lean on",
+                    isOn: Binding(get: { settings.wallAvailable }, set: viewModel.setWallAvailable)
+                )
             }
             SettingsRow(label: "Floor space I'm willing to use") {
-                MovezToggle(isOn: Binding(get: { settings.floorAvailable }, set: viewModel.setFloorAvailable))
+                MovezToggle(
+                    label: "Floor space I'm willing to use",
+                    isOn: Binding(get: { settings.floorAvailable }, set: viewModel.setFloorAvailable)
+                )
             }
             SettingsRow(label: "Stairs nearby") {
-                MovezToggle(isOn: Binding(get: { settings.stairsAvailable }, set: viewModel.setStairsAvailable))
+                MovezToggle(
+                    label: "Stairs nearby",
+                    isOn: Binding(get: { settings.stairsAvailable }, set: viewModel.setStairsAvailable)
+                )
             }
 
             SettingsRow(label: "Difficulty cap") {
@@ -213,16 +225,25 @@ struct SettingsView: View {
     private var stayOutOfTheWay: some View {
         SettingsSection(label: "Stay out of the way") {
             SettingsRow(label: "Wait while the microphone is in use") {
-                MovezToggle(isOn: Binding(get: { settings.suppressMic }, set: viewModel.setSuppressMic))
+                MovezToggle(
+                    label: "Wait while the microphone is in use",
+                    isOn: Binding(get: { settings.suppressMic }, set: viewModel.setSuppressMic)
+                )
             }
             SettingsRow(label: "Wait while the screen is shared or recorded") {
-                MovezToggle(isOn: Binding(get: { settings.suppressCapture }, set: viewModel.setSuppressCapture))
+                MovezToggle(
+                    label: "Wait while the screen is shared or recorded",
+                    isOn: Binding(get: { settings.suppressCapture }, set: viewModel.setSuppressCapture)
+                )
             }
             SettingsRow(
                 label: "Wait while a fullscreen app is in front",
                 link: SettingsLink(title: viewModel.exceptionsLine) { viewModel.openSheet = .exceptions }
             ) {
-                MovezToggle(isOn: Binding(get: { settings.suppressFullscreen }, set: viewModel.setSuppressFullscreen))
+                MovezToggle(
+                    label: "Wait while a fullscreen app is in front",
+                    isOn: Binding(get: { settings.suppressFullscreen }, set: viewModel.setSuppressFullscreen)
+                )
             }
             SettingsRow(label: "Count me away after") {
                 SelectField(
@@ -246,10 +267,16 @@ struct SettingsView: View {
     private var general: some View {
         SettingsSection(label: "General") {
             SettingsRow(label: "Sounds") {
-                MovezToggle(isOn: Binding(get: { settings.soundsEnabled }, set: viewModel.setSounds))
+                MovezToggle(
+                    label: "Sounds",
+                    isOn: Binding(get: { settings.soundsEnabled }, set: viewModel.setSounds)
+                )
             }
             SettingsRow(label: "Launch at login") {
-                MovezToggle(isOn: Binding(get: { settings.launchAtLogin }, set: viewModel.setLaunchAtLogin))
+                MovezToggle(
+                    label: "Launch at login",
+                    isOn: Binding(get: { settings.launchAtLogin }, set: viewModel.setLaunchAtLogin)
+                )
             }
             if let error = viewModel.launchAtLoginError {
                 MovezText(error, MovezType.version, color: Tokens.text3)

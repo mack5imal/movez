@@ -1,7 +1,14 @@
 import SwiftUI
 
 /// The 38×22 switch used on every settings row.
+///
+/// It is a button drawn as a switch, so it has to say by itself what a real `Toggle` would: the
+/// setting it changes as its name, the state as its value, and that it is a switch. The name is
+/// required because the row's text sits in a separate element, and a switch named only "On"
+/// leaves VoiceOver nothing to say about which setting it is.
 struct MovezToggle: View {
+    /// What VoiceOver calls the switch: the row's label, or the movement it includes.
+    var label: String
     @Binding var isOn: Bool
     var enabled = true
 
@@ -20,8 +27,9 @@ struct MovezToggle: View {
         .buttonStyle(.plain)
         .opacity(enabled ? 1 : 0.4)
         .disabled(!enabled)
-        .accessibilityLabel(isOn ? "On" : "Off")
-        .accessibilityAddTraits(.isButton)
+        .accessibilityLabel(label)
+        .accessibilityValue(isOn ? "On" : "Off")
+        .accessibilityAddTraits(.isToggle)
     }
 }
 

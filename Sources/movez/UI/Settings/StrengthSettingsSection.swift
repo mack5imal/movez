@@ -15,7 +15,7 @@ struct StrengthSettingsSection: View {
                 StrengthEquipmentChips(selected: settings.strengthEquipment, toggle: viewModel.toggleStrengthEquipment)
             }
             SettingsRow(label: "Solid wall nearby") {
-                MovezToggle(isOn: Binding(
+                MovezToggle(label: "Solid wall nearby", isOn: Binding(
                     get: { settings.strengthSolidWallNearby },
                     set: viewModel.setStrengthSolidWallNearby
                 ))
@@ -122,7 +122,7 @@ struct StrengthLibraryBrowserSheet: View {
                             MovezText(viewModel.strengthMeta(for: movement), MovezType.version, color: Tokens.text3)
                         }
                         Spacer(minLength: 12)
-                        MovezToggle(isOn: Binding(
+                        MovezToggle(label: "Include \(movement.name)", isOn: Binding(
                             get: { !excluded },
                             set: { viewModel.setStrengthExcluded(movement.id, !$0) }
                         ))

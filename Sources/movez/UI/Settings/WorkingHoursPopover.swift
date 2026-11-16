@@ -85,7 +85,7 @@ struct WorkingHoursPopover: View {
     private func row(index: Int) -> some View {
         let day = viewModel.hoursDraft.days[index]
         return HStack(spacing: 12) {
-            MovezToggle(isOn: $viewModel.hoursDraft.days[index].enabled)
+            MovezToggle(label: WorkingHours.shortNames[index], isOn: $viewModel.hoursDraft.days[index].enabled)
             MovezText(WorkingHours.shortNames[index], MovezType.settingsRow, color: day.enabled ? Tokens.text : Tokens.text3)
                 .frame(width: 40, alignment: .leading)
             Spacer(minLength: 8)

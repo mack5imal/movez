@@ -177,9 +177,9 @@ struct GalleryView: View {
         section("Controls") {
             VStack(alignment: .leading, spacing: 20) {
                 HStack(spacing: 26) {
-                    MovezToggle(isOn: $toggleOn)
-                    MovezToggle(isOn: $toggleOff)
-                    MovezToggle(isOn: $toggleOff, enabled: false)
+                    MovezToggle(label: "On", isOn: $toggleOn)
+                    MovezToggle(label: "Off", isOn: $toggleOff)
+                    MovezToggle(label: "Disabled", isOn: $toggleOff, enabled: false)
                     SegmentedControl(
                         options: [("25/5", "25/5"), ("55/5", "55/5"), ("85/5", "85/5"), ("Custom", "Custom")],
                         selection: $preset

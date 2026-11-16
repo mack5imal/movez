@@ -87,7 +87,7 @@ struct LibraryRow: View {
                 MovezText(subtitle, MovezType.version, color: Tokens.text3)
             }
             Spacer(minLength: 12)
-            MovezToggle(isOn: Binding(get: { !excluded }, set: { setExcluded(!$0) }))
+            MovezToggle(label: "Include \(movement.name)", isOn: Binding(get: { !excluded }, set: { setExcluded(!$0) }))
         }
         .padding(.vertical, 9)
         .opacity(excluded || outOfReach ? 0.75 : 1)

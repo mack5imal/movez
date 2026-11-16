@@ -32,6 +32,30 @@ final class AccessibilityTests: XCTestCase {
         XCTAssertTrue(silent.isEmpty, "controls with nothing to announce: \(silent.joined(separator: ", "))")
     }
 
+    /// A switch is named by the setting it changes and says its state as a value, with the toggle
+    /// trait, so VoiceOver reads "Sounds, on, switch" rather than "On, button" (UI-3). The name is
+    /// required at every call site, so none can fall back to the state word.
+    func testEverySwitchIsNamedBySettingAndSpeaksItsStateAsAValue() throws {
+        let declaration = try XCTUnwrap(try Self.declaration(of: "MovezToggle"))
+        XCTAssertTrue(declaration.contains(".accessibilityLabel(label)"), "the switch is named by its setting")
+        XCTAssertTrue(declaration.contains(".accessibilityValue("), "the state is a value, not the name")
+        XCTAssertTrue(declaration.contains(".isToggle"), "VoiceOver hears a switch, not a button")
+        XCTAssertFalse(declaration.contains(".accessibilityLabel(isOn"), "a state word is not a name")
+
+        var unnamed: [String] = []
+        for url in try Self.sourceFiles() {
+            let lines = try String(contentsOf: url, encoding: .utf8).components(separatedBy: .newlines)
+            for (index, line) in lines.enumerated() where line.contains("MovezToggle(") {
+                // The arguments may start on the next line.
+                let call = (line + (index + 1 < lines.count ? lines[index + 1] : ""))
+                    .replacingOccurrences(of: " ", with: "")
+                guard !call.contains("MovezToggle(label:") else { continue }
+                unnamed.append("\(url.lastPathComponent):\(index + 1)")
+            }
+        }
+        XCTAssertTrue(unnamed.isEmpty, "switches with no name: \(unnamed.joined(separator: ", "))")
+    }
+
     /// A button whose label draws no text has to carry an `accessibilityLabel`, because there is
     /// nothing for VoiceOver to fall back on.
     func testEveryIconOnlyControlCarriesALabelInSource() throws {
