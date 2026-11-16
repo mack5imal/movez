@@ -97,9 +97,19 @@ keyboard, nothing holds the display awake, and display sleep is treated like clo
 
 Use the `SCH-n`, `APP-n`, `SIG-n`, `LIB-n`, `UI-n` and `TST-n` ids below to refer to findings.
 
+## Status, 2026-11-16
+
+Every finding has been dealt with on `fix/code-review-2026-11`; each one below carries an
+**Outcome** line with the commits that fixed it. Two were settled as won't fix by the owner
+(LIB-14, APP-6) and one needs checking by hand (UI-19). The decisions the fixes needed are
+DECISIONS 72 to 86. The test suite went from 702 to 835 tests. One ruling changed the plan: there
+is no Movement end screen and no streak (UI-7, DECISIONS 76).
+
 ## 1. Scheduler
 
 ### SCH-1 · high · A settings change re-plans from the bout start, which re-serves a skipped or paused break and fires a second micro-break
+
+**Outcome:** fixed in `d339878`.
 
 **Where:** `Sources/movez/Scheduler/Scheduler.swift:257` · **Category:** correctness · **DECISIONS checked:** 24, 48 (skip keeps the bout), memory: defer-never-reset
 
@@ -125,6 +135,8 @@ Traced: apply() sets nextFullDueAt = boutStartedAt + sitSeconds whenever countdo
 
 ### SCH-2 · high · An absence after a deferred break leaves `deferredFullDueAt` behind: the next break is mislabelled and a later call triggers an early break
 
+**Outcome:** fixed in `b7aa561`.
+
 **Where:** `Sources/movez/Scheduler/Scheduler+Idle.swift:127` · **Category:** correctness · **DECISIONS checked:** 8, 20, 43
 
 **What goes wrong.** `deferredFullDueAt` is the snapshot's note that a break came due during a call. Only `enterFullBreak`, `rescheduleAfterSkip` and `startFreshSession` clear it. The reset path of a returning absence (`returnFromAway`, then `resetCountdowns`, then `startFreshInterval`) clears neither it nor `deferredReason`.
@@ -145,6 +157,8 @@ Traced. tickSuppressed sets snapshot.deferredFullDueAt. Only enterFullBreak, res
 
 ### SCH-3 · high · A break the lid or display sleep interrupted is settled without telling the coordinator, so it never reaches history
 
+**Outcome:** fixed in `9f156b0`.
+
 **Where:** `Sources/movez/Scheduler/Scheduler+Sleep.swift:141` · **Category:** persistence · **DECISIONS checked:** 20, 22, 23c, 38, 59
 
 *Found independently by the App + History + Notice + Settings + FocusFilter + Audio, Strength reviews as well.*
@@ -161,6 +175,8 @@ Core claim holds. The settle branch of resumeInterruptedBreak returns only [.per
 
 ### SCH-4 · medium · Ad-hoc sessions: midnight takes down a running break without recording it, and the four-hour-gap end in DECISIONS 16 is missing
 
+**Outcome:** fixed in `51360f4`.
+
 **Where:** `Sources/movez/Scheduler/Scheduler+Hours.swift:10` · **Category:** correctness · **DECISIONS checked:** 16, 20a
 
 **What goes wrong.** Two problems with ad-hoc sessions. (1) At midnight, endAdHocSessionIfStale runs before the exemption that lets a running break finish, so a break on screen at 23:59 in an ad-hoc session is taken down via .endFullBreak(.interrupted) with no InterruptedBreak stored, and the coordinator drops it without writing history. (2) DECISIONS 16's four-hour-gap ending is not implemented: standby, resetDay and the launch gap never clear adHocSession, so a weekend session survives a long lid-closed gap and keeps serving breaks. The session continuing through the normal working-hours close is consistent with DECISIONS 16 and is not a defect.
@@ -174,6 +190,8 @@ Midnight: with adHocSession set, applyWorkingHours returns endAdHocSessionIfStal
 </details>
 
 ### SCH-5 · medium · A Focus pause that starts off hours, or runs past the start of a working day, resumes with yesterday's bout and countdown
+
+**Outcome:** fixed in `380a11b`.
 
 **Where:** `Sources/movez/Scheduler/Scheduler+Pause.swift:74` · **Category:** correctness · **DECISIONS checked:** 23c, 26, 51
 
@@ -197,6 +215,8 @@ pause() refuses only .fullBreak, so .focusFilter(paused:true) from .offHours sto
 </details>
 
 ### SCH-6 · medium · A wake or tick gap with nothing away skips the sleep path's bookkeeping, and at the 60× debug scale the scheduler never leaves the quiet minute
+
+**Outcome:** fixed in `4b704cb`.
 
 **Where:** `Sources/movez/Scheduler/Scheduler+Sleep.swift:77` · **Category:** macos-edge · **DECISIONS checked:** 19a, 23b, 43
 
@@ -224,6 +244,8 @@ The default branch (79-84) calls enterAbsenceGrace without dismissSurfaces or ca
 
 ### SCH-7 · medium · A call, share or fullscreen app that comes back during the 2-minute post-call grace is ignored, so the heads-up chimes in the call
 
+**Outcome:** fixed in `1d2f526`.
+
 **Where:** `Sources/movez/Scheduler/Scheduler+Suppression.swift:25` · **Category:** correctness · **DECISIONS checked:** 20, 23h
 
 **What goes wrong.** `beginSuppression` acts only from `.sitting`, `.pendingFull`, `.snoozed` and `.headsUp`. `.postBreakGrace(_, .afterSuppression)` falls into `default` and returns []. So a signal that returns inside the grace is dropped: a back-to-back meeting, a call rejoined, or the presenter leaving Keynote fullscreen for a moment and going back.
@@ -241,6 +263,8 @@ beginSuppression's switch covers only .sitting, .pendingFull/.snoozed and .heads
 </details>
 
 ### SCH-8 · medium · A snoozed micro-break's anchor survives a pause or a call, so a later micro-break fires again two seconds after it closes
+
+**Outcome:** fixed in `a0aea17`.
 
 **Where:** `Sources/movez/Scheduler/Scheduler+Suppression.swift:67` · **Category:** correctness · **DECISIONS checked:** 9, 10, 30
 
@@ -260,6 +284,8 @@ Traced the 85/5 example. snoozeMicro keeps microAnchorAt (09:30) and sets microS
 
 ### SCH-9 · medium · The scheduler's calendar is fixed when the config is built, so a time-zone change shifts working hours and midnight
 
+**Outcome:** fixed in `f24d85c`.
+
 **Where:** `Sources/movez/Scheduler/SchedulerConfig.swift:45` · **Category:** macos-edge · **DECISIONS checked:** 14, 20a, 20c
 
 **What goes wrong.** `SchedulerConfig.calendar` defaults to `.current`, and so does `from(preset:)` at line 61. That value captures the time zone at the moment it is created, and it is only rebuilt at launch or in `settingsChanged()`. Nothing observes `NSSystemTimeZoneDidChange` (a grep of Sources finds no observer).
@@ -276,6 +302,8 @@ SchedulerConfig.calendar and from(preset:) default to Calendar.current, a snapsh
 
 ### SCH-10 · low · A short lock or display sleep during a snooze cuts the snooze short
 
+**Outcome:** fixed in `ee88408`.
+
 **Where:** `Sources/movez/Scheduler/Scheduler+Idle.swift:100` · **Category:** correctness · **DECISIONS checked:** 20, 43
 
 **What goes wrong.** `handleSleepOrLock` puts `.snoozed(until:)` into `.away` after `captureCountdowns(at: now)`, which records the original due time (already in the past) as `dueAtAway`. On a return shorter than the away threshold, `returnFromAway` restores that due time and goes to `.sitting`, losing `until`.
@@ -291,6 +319,8 @@ handleSleepOrLock from .snoozed reaches captureCountdowns(at: now), and dueAtAwa
 </details>
 
 ### SCH-11 · low · Two handlers change state without checking it, which breaks `handle`'s promise to be total
+
+**Outcome:** fixed in `e5bf14e`.
 
 **Where:** `Sources/movez/Scheduler/Scheduler+Idle.swift:165` · **Category:** correctness · **DECISIONS checked:** 16, 43
 
@@ -310,6 +340,8 @@ reverseCredit guards only on creditRestore and its 15 s expiry, then transitions
 
 ### SCH-12 · low · A relaunch within 10 s of the last save leaves the scheduler in `.fullBreak` with nothing on screen
 
+**Outcome:** fixed in `2b50b3f`.
+
 **Where:** `Sources/movez/Scheduler/Scheduler+Sleep.swift:157` · **Category:** lifecycle · **DECISIONS checked:** 20b
 
 **What goes wrong.** applyLaunchGap's short-gap early return (≤10 s since the last persist) skips the isBreakSurfaceVisible reset, so a .fullBreak restored from a file written seconds before the process died stays in .fullBreak with no overlay until the next sleep or lock. This needs a crash and a relaunch within 10 s of the last write, which nothing in the app does automatically, so it is an unlikely edge rather than a common path.
@@ -324,6 +356,8 @@ The mechanism is real: a gap ≤10 s returns rollDayIfStale before the isBreakSu
 
 ### SCH-13 · low · After a relaunch, a snooze or pending break keeps its wall-clock deadline while the countdown is moved on
 
+**Outcome:** fixed in `2b50b3f`.
+
 **Where:** `Sources/movez/Scheduler/Scheduler+Sleep.swift:207` · **Category:** correctness · **DECISIONS checked:** 20b
 
 **What goes wrong.** When the app relaunches after a gap of more than 10 s but less than one sitting interval, shiftInterval moves boutStartedAt, both due times, the micro anchor and an absence's `since` forward by the gap, then re-enters the same state. Only `.away` has the date inside its state shifted. `.snoozed(until:)`, `.pendingFull(since:)` and `.postBreakGrace(until:)` keep their original deadlines. Example: the user snoozes at 10:00 (until 10:05), quits at 10:01 and relaunches at 10:21. The snooze had four minutes left, but the first tick sees now ≥ until and puts the heads-up up the moment the app starts. Decision 20b says time Movez was not running is moved past; the countdown follows that, the snooze does not. LaunchStateTests only seed .sitting and .fullBreak, so these states are not covered.
@@ -337,6 +371,8 @@ Confirmed. shiftInterval (192-211) shifts boutStartedAt, both due times, microAn
 </details>
 
 ### SCH-14 · low · Dead state and dead branches in the scheduler
+
+**Outcome:** fixed in `812159b`.
 
 **Where:** `Sources/movez/Scheduler/SchedulerSnapshot.swift:59` · **Category:** dead-code
 
@@ -362,6 +398,8 @@ Verified each item by grep. snapshot.configHash is written at Scheduler.swift:15
 
 ### SCH-15 · low · Dead SignalSnapshot fields and an unused report path
 
+**Outcome:** fixed in `be544e7`.
+
 **Where:** `Sources/movez/Scheduler/SignalSnapshot.swift:12` · **Category:** dead-code
 
 **What goes wrong.** `screenLocked` and `displaySleeping` (lines 12-13) are never written or read; lock and display sleep reach the scheduler as their own PowerMonitor events.
@@ -382,6 +420,8 @@ Neither screenLocked nor displaySleeping is referenced anywhere in Sources or Te
 ## 2. App, History, Notice, Settings, FocusFilter, Audio
 
 ### APP-1 · medium · The Focus filter is applied as a one-shot event, and the event can be lost
+
+**Outcome:** fixed in `57f0eed`.
 
 **Where:** `Sources/movez/FocusFilter/MovezFocusFilterIntent.swift:37` · **Category:** lifecycle · **DECISIONS checked:** 26, 51
 
@@ -405,6 +445,8 @@ perform() calls AppCoordinator.shared?.focusFilter, a static weak reference set 
 
 ### APP-2 · low · A relaunch with an interrupted break still in state.json serves a different, backdated break
 
+**Outcome:** fixed in `1077269`.
+
 **Where:** `Sources/movez/App/AppCoordinator+Effects.swift:111` · **Category:** lifecycle · **DECISIONS checked:** 20b
 
 **What goes wrong.** InterruptedBreak is saved in the snapshot, but the session it belongs to (interruptedSession) lives only in memory. applyLaunchGap clears it only for standby (Scheduler+Sleep.swift:175-181). A short gap while away keeps it, through shiftInterval or the ≤10 s early return.
@@ -420,6 +462,8 @@ interruptedSession is in-memory only. interruptedBreak is in the snapshot with a
 </details>
 
 ### APP-3 · low · Persistence failures are silent, and a failed store setup runs a whole session with nothing saved
+
+**Outcome:** fixed in `8381d02`.
 
 **Where:** `Sources/movez/App/AppDelegate.swift:115` · **Category:** persistence · **DECISIONS checked:** 3
 
@@ -437,6 +481,8 @@ AppDelegate.swift:115-121 builds both stores with try? and falls back to History
 
 ### APP-4 · low · An unreadable history file is overwritten by the next save, so the record cannot be recovered
 
+**Outcome:** fixed in `a098459`.
+
 **Where:** `Sources/movez/History/HistoryStore.swift:118` · **Category:** persistence · **DECISIONS checked:** 43
 
 **What goes wrong.** A history file that fails to decode is replaced by an empty record, and the next save overwrites it. DECISIONS 43 accepts starting fresh on a downgrade, but because the original file is overwritten rather than set aside, upgrading back (or recovering from a one-off read error) cannot bring the record back.
@@ -451,6 +497,8 @@ The mechanism is confirmed. restore() returns an empty HistoryData on any decode
 
 ### APP-5 · low · "Longest sitting bout" ignores bouts that only skips touched; recordLongestBout is never called
 
+**Outcome:** fixed in `a06345e`.
+
 **Where:** `Sources/movez/History/HistoryStore.swift:159` · **Category:** dead-code
 
 **What goes wrong.** The menu line reads DailyStats.longestBoutSeconds. That field is written only when a completed break or an absence record passes in the scheduler's longestBoutSeconds (AppCoordinator+Effects.swift:139, 243). The scheduler measures a bout only when the bout ends (recordBout, Scheduler.swift:236), and a skip deliberately doesn't end it. So someone who sits from 09:00 to 12:00 skipping every break sees "Longest sitting bout 0 m", on exactly the day the number matters most. HistoryStore.recordLongestBout looks as if it was meant for this, but nothing calls it.
@@ -464,6 +512,8 @@ recordLongestBout is called only from HistoryStoreTests (grep). DailyStats.longe
 </details>
 
 ### APP-6 · low · History grows without limit, is re-encoded on the main thread on every change, and is scanned in full on every delivery
+
+**Outcome:** Won't fix: the real history.json was 172 KB after two and a half months.
 
 **Where:** `Sources/movez/History/HistoryStore.swift:280` · **Category:** complexity · **DECISIONS checked:** 20c
 
@@ -481,6 +531,8 @@ Confirmed: save() re-encodes and atomically rewrites the whole HistoryData on ev
 ## 3. Signals
 
 ### SIG-1 · high · Fullscreen detection never fires for native fullscreen apps on a notched MacBook display
+
+**Outcome:** fixed in `4857ac0`.
 
 **Where:** `Sources/movez/Signals/FullscreenMonitor.swift:35` · **Category:** macos-edge · **DECISIONS checked:** none (20 and 23h say fullscreen suppresses; README's known limitation covers maximised editors, not this)
 
@@ -506,6 +558,8 @@ isFullscreen (35-42) requires all four edges to be within tolerance = 1 pt of a 
 
 ### SIG-2 · medium · The mic signal reads only the default input device, and that property can't tell input from output
 
+**Outcome:** fixed in `5d90194`.
+
 **Where:** `Sources/movez/Signals/MicrophoneMonitor.swift:10` · **Category:** macos-edge · **DECISIONS checked:** 23h
 
 **What goes wrong.** `isInUse()` looks up `kAudioHardwarePropertyDefaultInputDevice` and reads `kAudioDevicePropertyDeviceIsRunningSomewhere` on that one device (lines 9-19). This goes wrong in two ways.
@@ -530,6 +584,8 @@ isInUse reads kAudioDevicePropertyDeviceIsRunningSomewhere with global scope on 
 
 ### SIG-3 · medium · A display that sleeps from inactivity dates the absence from the sleep, not from the last input
 
+**Outcome:** fixed in `b8e3de9`.
+
 **Where:** `Sources/movez/Signals/PowerMonitor.swift:30` · **Category:** correctness · **DECISIONS checked:** 23b (an absence is measured from when it began), 43
 
 **What goes wrong.** PowerMonitor turns `NSWorkspace.screensDidSleepNotification` into the same `.sleep` event a closed lid sends. `Scheduler.handleSleepOrLock` has no input age to go on, so it starts the absence at the notification: `captureCountdowns(at: now)` and `.away(since: now)` (Scheduler+Sleep.swift:45-48).
@@ -551,6 +607,8 @@ Line 30 maps screensDidSleepNotification to .sleep. handleSleepOrLock (Scheduler
 </details>
 
 ### SIG-4 · medium · Input before signals in each poll plays a heads-up chime in back-to-back calls
+
+**Outcome:** fixed in `1d2f526`.
 
 **Where:** `Sources/movez/Signals/SignalAggregator.swift:107` · **Category:** correctness · **DECISIONS checked:** 20 (defer, never reset), 23h
 
@@ -576,6 +634,8 @@ poll() sends .input, then .idle, then .signals (107-109). beginSuppression retur
 
 ### SIG-5 · medium · At the 60x debug scale every poll is a synthesised wake, and no break ever fires
 
+**Outcome:** fixed in `d6b9b10`.
+
 **Where:** `Sources/movez/Signals/SignalAggregator.swift:159` · **Category:** correctness · **DECISIONS checked:** none (21 and 23b set the quiet minute; the time scale is not in DECISIONS)
 
 *Found independently by the Tests: scheduler, coordinator, signals, persistence, settings, UI: MenuBar + Settings reviews as well.*
@@ -600,6 +660,8 @@ pollInterval = max(0.25, 2/60) = 0.25 s real (59-61), while SystemClock.now scal
 
 ### SIG-6 · low · Test-only fake sources ship in the app target, and the header comment says otherwise
 
+**Outcome:** fixed in `ca153a6`.
+
 **Where:** `Sources/movez/Signals/FakeSignals.swift:5` · **Category:** dead-code
 
 **What goes wrong.** The four Fake*Source classes (lines 5-30) are used only by six test files, yet they sit in Sources/movez/Signals and are compiled into the shipped app.
@@ -615,6 +677,8 @@ A grep of Sources/movez finds no use of FakeIdleSource, FakeMicSource, FakeCaptu
 </details>
 
 ### SIG-7 · low · The debug 'Mic on' hold is undone by the 60 s sustain, and 'off' clears every held signal
+
+**Outcome:** fixed in `3e2fe61`.
 
 **Where:** `Sources/movez/Signals/FakeSignals.swift:125` · **Category:** test-gap · **DECISIONS checked:** 23h
 
@@ -643,6 +707,8 @@ fire(.micOn) applies the hold and then injects .signals(SignalSnapshot(microphon
 
 ### SIG-8 · low · Capture-matcher comments contradict the code, and the QuickTime row is redundant
 
+**Outcome:** fixed in `72f646f`.
+
 **Where:** `Sources/movez/Signals/ScreenCaptureMonitor.swift:62` · **Category:** dead-code · **DECISIONS checked:** 25
 
 **What goes wrong.** Three places in the capture matcher say something the code doesn't do.
@@ -660,6 +726,8 @@ fire(.micOn) applies the hold and then injects .signals(SignalSnapshot(microphon
 </details>
 
 ### SIG-9 · low · A malformed capture-signatures.json silently turns off screen-share detection
+
+**Outcome:** fixed in `f574b07`.
 
 **Where:** `Sources/movez/Signals/ScreenCaptureMonitor.swift:74` · **Category:** persistence · **DECISIONS checked:** 25
 
@@ -682,6 +750,8 @@ Swift's synthesized Decodable decodes non-optional properties with decode, not d
 
 ### LIB-1 · medium · Movement micro-breaks ignore the difficulty cap
 
+**Outcome:** fixed in `52a4d56`.
+
 **Where:** `Sources/movez/Routine/MicroBreakBuilder.swift:57` · **Category:** correctness · **DECISIONS checked:** none (product brief §Settings difficulty cap; 41 refers to the default cap)
 
 **What goes wrong.** The Difficulty cap setting (Beginner 1 / Moderate 2 / Advanced 3, SettingsViewModel.swift:104-106) is enforced for full breaks in RoutineBuilder.usable (RoutineBuilder.swift:109-110: `difficulty > cap` and the difficulty-3 unlock) and for Strength micro-breaks (StrengthMicroBuilder.swift:87). Movement micro-breaks never apply it. MicroContext (RoutineContext.swift:60-72) has no cap field, MovementModeBuilder.microBreak (MovementModeBuilder.swift:15-28) never passes one, and MicroBreakBuilder.candidates filters only on equipment, floor, requirements, exclusions and families. The shipped library tags 10 difficulty-2 movements as micro-eligible: FLX-05, STR-34, BAL-14 Tree pose, BAL-17 Eagle pose, BAL-18, BAL-20, BAL-23, BAL-26 Tandem stance with eyes closed, BAL-28 and HWF-10. Trigger: set the cap to Beginner. Then about one micro-break in six contains a difficulty-2 movement, usually one of the harder balance poses: 10 of the 79-movement pool can be the first pick, and more can be the second. A future difficulty-3 micro tag would also be served without its unlock.
@@ -695,6 +765,8 @@ MicroBreakBuilder.candidates (57-70) filters only on needsEquipment, requiresFlo
 </details>
 
 ### LIB-2 · medium · With kit at the default Beginner cap, every squat/lunge set (and every push set for a kettlebell-only user) is a light bodyweight move
+
+**Outcome:** fixed in `1b329cf`.
 
 **Where:** `Sources/movez/Strength/StrengthBreakBuilder.swift:27` · **Category:** correctness · **DECISIONS checked:** 71, 56, 69
 
@@ -710,6 +782,8 @@ Mechanism confirmed. I dumped strength-library-v1.json: every vigorous SQT move 
 
 ### LIB-3 · low · The loader is strict about data the app never reads and does not check a stale list
 
+**Outcome:** fixed in `488a375`.
+
 **Where:** `Sources/movez/Library/LibraryLoader.swift:30` · **Category:** dead-code · **DECISIONS checked:** 41, 50
 
 **What goes wrong.** The loader demands exact counts (9 routines, 8 micro routines, 3 presets) for collections no production code reads. So any edit to those worked examples in the JSON fails LibraryTests, and would fail launch if shipped untested. The presets duplicate SchedulerConfig.from(preset:), so editing them in the JSON has no effect. micro_break.eligible_ids is never decoded and is stale: it is missing 14 movements tagged micro_eligible. The JSON contradicts itself and nothing checks it.
@@ -723,6 +797,8 @@ The facts check out. Expected 9/8/3 is checked at :133-148. Nothing outside the 
 </details>
 
 ### LIB-4 · low · The strength loader's structural checks are untested, and the meter-dose test skips the arm buckets
+
+**Outcome:** fixed in `3e54d2d`.
 
 **Where:** `Sources/movez/Library/StrengthLibrary.swift:93` · **Category:** test-gap · **DECISIONS checked:** 41, 70
 
@@ -738,6 +814,8 @@ validate and validateMovements check mode, the total of 151, buckets declared on
 
 ### LIB-5 · low · The micro-break timeline is written four times with two lead-in constants
 
+**Outcome:** fixed in `f286ba7`.
+
 **Where:** `Sources/movez/Modes/ModeBuilder.swift:96` · **Category:** duplication · **DECISIONS checked:** 30, 39, 67
 
 **What goes wrong.** The rule is: a block appears after the earlier blocks' lead-ins and seconds, and starts moving 5 s later. That rule is written out in four places. (1) MicroBreak.totalSeconds/appearsAt/startsAt/blocksRun (Routine.swift:62-85). (2) Again by hand in PlannedMicro.partsRun's strength branch (ModeBuilder.swift:96-106), using StrengthTiming.leadInSeconds. (3) StrengthMicroBreak.totalSeconds (StrengthBreak.swift:224). (4) The panel's MicroPanelBreak (MicroPanelBreak.swift:36-48), which uses Routine.leadInSeconds even for strength moves. Both constants are 5 today. But StrengthTiming says its values live 'in one place so that they can be tuned together'. If StrengthTiming.leadInSeconds became 8, the panel would run a two-move strength micro for 70 s while StrengthMicroBreak and partsRun count 76 s. History would then credit the moves against a timeline the user never saw. The strength branch of partsRun also has no test: CoordinatorSimulatedDayTests.swift:298-309 runs in Movement mode and compares the recorded completions with partsRun itself.
@@ -751,6 +829,8 @@ The timeline appears in Routine.swift:62-85, ModeBuilder.swift:96-106 (StrengthT
 </details>
 
 ### LIB-6 · low · Strength heads-up tells bodyweight-only users to have their weights nearby
+
+**Outcome:** fixed in `aaea40f`.
 
 **Where:** `Sources/movez/Modes/PlannedBreak.swift:70` · **Category:** correctness · **DECISIONS checked:** 56
 
@@ -766,6 +846,8 @@ fixedBody returns the same sentence for every strength break. It is the design's
 
 ### LIB-7 · low · MicroBreakBuilder can return a micro-break with no movements
 
+**Outcome:** fixed in `52a4d56`.
+
 **Where:** `Sources/movez/Routine/MicroBreakBuilder.swift:38` · **Category:** correctness · **DECISIONS checked:** 32, 45
 
 **What goes wrong.** When the pool is empty, the builder relaxes only `usedMovementIdsToday` (lines 31-36). The last micro, the next full break, the exclusions and the requirements all stay. If those still cover every micro-eligible movement, `choose` returns nil and the builder returns `MicroBreak(blocks: [])`. The coordinator shows it anyway, because beginMicro runs on `.showMicroCountIn`. The count-in title becomes ' in a moment', since movementName is empty. Then beginMicroRunning sets totalSeconds to 0, the next tick calls microEnded, and the scheduler's endMicro from `.microRunning` plays the completion chime. So the user hears two chimes around an empty panel. Trigger: the user excludes all but a few micro-eligible movements in Browse library, and those few are in the last micro-break or the next full break. RoutineBuilder has a last-resort ladder for the same situation (relaxedCandidates, and LaunchStateTests covers excluding everything), but the micro builder has none.
@@ -780,6 +862,8 @@ Only usedMovementIdsToday is relaxed (31-36). If choose() returns nil, the build
 
 ### LIB-8 · low · After a relaunch, Movement mode forgets skipped breaks and can rebuild the identical routine
 
+**Outcome:** fixed in `d4f556d`.
+
 **Where:** `Sources/movez/Routine/MovementModeBuilder.swift:11` · **Category:** persistence · **DECISIONS checked:** 32
 
 **What goes wrong.** The full-break seed is `seed(dayKey, breakIndexToday)`, and breakIndexToday is `breaksToday.count`. `breaksToday` (AppCoordinator.swift:114-116) is an in-memory array. Only rememberBreak appends to it, and nothing restores it at launch. Two other inputs depend on it too. idsServedToday (AppCoordinator+Effects.swift:317-320) uses it to remember breaks that were put on screen but not completed, and routineContext reads usedStrRegionsLastBreak from its last element. After any relaunch (an update, a crash, a login), the index starts again at 0, a skipped break's movements no longer count as served, and the consecutive-strength-region rule loses its memory. Concrete case: on the 25/5 preset (no micro-breaks), the 10:00 break is skipped at its first movement, so history has no completions. The app is relaunched at 10:10. The 10:30 break is then built from exactly the 10:00 context (same dayKey, index 0, same history, same recency), so it is the identical five movements the user just skipped. That breaks DECISIONS 32. SeededRandom.swift:5-7 claims 'a relaunch mid-day regenerates exactly the same routine', but that holds only for the first break of the day. StrengthModeBuilder.seedIndex (StrengthModeBuilder.swift:101-106) reads its index from history specifically to avoid this.
@@ -793,6 +877,8 @@ breakIndexToday (AppCoordinator+Effects.swift:333-336) returns breaksToday.count
 </details>
 
 ### LIB-9 · low · Production code that only tests reach
+
+**Outcome:** fixed in `1f758d5`.
 
 **Where:** `Sources/movez/Routine/Routine.swift:88` · **Category:** dead-code · **DECISIONS checked:** 54, 55
 
@@ -810,6 +896,8 @@ Mostly confirmed. eyebrow/regionWord/plainRegionWords (Routine.swift:88-121), by
 
 ### LIB-10 · low · Substitutions only reorders the candidate pool; it never changes what can be drawn
 
+**Outcome:** fixed in `ffffaa9`.
+
 **Where:** `Sources/movez/Routine/RoutineBuilder.swift:76` · **Category:** complexity · **DECISIONS checked:** 23e, 28
 
 *Found independently by the Tests: library, routine, strength, modes, UI review as well.*
@@ -826,6 +914,8 @@ Substitutions.resolve returns the original movement, or a peer from bodyweightPe
 
 ### LIB-11 · low · relaxedCandidates' last rung can never run, and it tightens the pool
 
+**Outcome:** fixed in `ffffaa9`.
+
 **Where:** `Sources/movez/Routine/RoutineBuilder.swift:100` · **Category:** dead-code
 
 **What goes wrong.** Rung 3 runs only if rung 2 (exclusions cleared, today forgotten) is still empty. At that point the only filters left are owned equipment, floor/wall/stairs and difficulty. 75 movements pass even the strictest combination (cap 1, all three requirements off, no equipment), so with the shipped library rung 3 is unreachable. The golden context `used-all-excluded-all` returns at rung 2. If rung 3 ever did run, `relaxed.equipment = []` would remove the user's owned-equipment movements instead of adding any. That is the opposite of the 'Everything off' its comment promises.
@@ -839,6 +929,8 @@ I checked the JSON: 75 movements have no equipment, no requires, and difficulty 
 </details>
 
 ### LIB-12 · low · The warm-up shape is let go as one block, so a floor warm-up is served even when a standing one is left
+
+**Outcome:** fixed in `9c78576`.
 
 **Where:** `Sources/movez/Strength/StrengthBreakBuilder.swift:71` · **Category:** correctness · **DECISIONS checked:** 58
 
@@ -854,6 +946,8 @@ Mechanism confirmed. Once .warmUpShape is let go, the slot rule is just isBodywe
 
 ### LIB-13 · low · The strength focus ×3 weights the warm-up and cool-down too, though DECISIONS 63 and the code comment say working sets only
 
+**Outcome:** fixed in `654fb6c`.
+
 **Where:** `Sources/movez/Strength/StrengthBreakBuilder.swift:192` · **Category:** correctness · **DECISIONS checked:** 63
 
 **What goes wrong.** The focus ×3 weight applies to the warm-up and the END cool-down as well as the working sets. That matches the builder's header comment and the body of DECISIONS 63, but contradicts that entry's title and the StrengthContext.boostedRegions comment ('in a working set's draw'). In practice the legs, back-and-shoulders and core foci tilt which END stretch closes a break. More arms barely does, since only one END move is Wrist/Forearm.
@@ -867,6 +961,8 @@ Confirmed that the single weight closure (188-194) feeds the warm-up, set and co
 </details>
 
 ### LIB-14 · low · A strength break that crosses midnight is filed under the next day, which then repeats the previous day's letter and has no core set
+
+**Outcome:** Won't fix: working hours cannot cross midnight (DECISIONS 14), so only an ad-hoc session at midnight could reach it.
 
 **Where:** `Sources/movez/Strength/StrengthDayPlanner.swift:231` · **Category:** correctness · **DECISIONS checked:** 57, 20a, 20c
 
@@ -883,6 +979,8 @@ Mechanism confirmed. strengthDays keys each record by DayKey.key(for: record.at)
 </details>
 
 ### LIB-15 · low · After a mode switch, a strength micro-break ignores the previous micro-break's regions
+
+**Outcome:** fixed in `7f8f497`.
 
 **Where:** `Sources/movez/Strength/StrengthMicroBuilder.swift:103` · **Category:** correctness · **DECISIONS checked:** 67
 
@@ -901,6 +999,8 @@ regions(of:) resolves ids only through library.movement(id:) (line 103-105). coo
 </details>
 
 ### LIB-16 · low · Cool-down, end-range and lone micro-break blocks show a dose that contradicts their timer
+
+**Outcome:** fixed in `95c5cff`.
 
 **Where:** `Sources/movez/Strength/StrengthSessionTimeline.swift:112` · **Category:** correctness · **DECISIONS checked:** 58, 59
 
@@ -929,6 +1029,8 @@ The cool-down segment uses dose: coolDown.movement.dose (line 112) and end-range
 
 ### LIB-17 · low · Strength APIs that only tests use, or nothing uses
 
+**Outcome:** fixed in `d63f6fb`.
+
 **Where:** `Sources/movez/Strength/StrengthUnlock.swift:28` · **Category:** dead-code
 
 **What goes wrong.** Several pieces of the Strength code have no production caller:
@@ -952,6 +1054,8 @@ Grep confirms each one. StrengthUnlock.unlockedDiff3 is called only from Strengt
 
 ### UI-1 · high · A resumed Movement break replays its finished blocks and writes them to history a second time
 
+**Outcome:** fixed in `7b90d9d`.
+
 **Where:** `Sources/movez/UI/Overlay/OverlayEffectSink.swift:87` · **Category:** correctness
 
 *Found independently by the App + History + Notice + Settings + FocusFilter + Audio review as well.*
@@ -967,6 +1071,8 @@ beginBreak rebuilds the resumed session with the old blockIndex and completedBlo
 </details>
 
 ### UI-2 · high · Idle display sleep takes the overlay down mid-break, because nothing keeps the display awake during a break
+
+**Outcome:** fixed in `d620c45`.
 
 **Where:** `Sources/movez/UI/Overlay/OverlayWindowController.swift:52` · **Category:** macos-edge · **DECISIONS checked:** 38 (lid close and lock interrupting a break is intended; idle display sleep during a break is not covered by any entry)
 
@@ -984,6 +1090,8 @@ grep for IOPMAssertion/beginActivity/idleDisplaySleep in Sources finds nothing. 
 
 ### UI-3 · medium · VoiceOver reads every Settings switch as just "On" or "Off", with no name
 
+**Outcome:** fixed in `7e3424f`.
+
 **Where:** `Sources/movez/UI/DesignSystem/Controls.swift:23` · **Category:** correctness
 
 **What goes wrong.** MovezToggle is a Button drawn to look like a switch. Its only accessibility is `.accessibilityLabel(isOn ? "On" : "Off")` plus `.isButton`. The label is what VoiceOver uses as the control's name, so it says "On, button", and nothing says which setting it is. SettingsRow (SettingsView.swift:303-333) puts the row's text in a separate element and does not combine it with the control. None of the call sites adds a label either: SettingsView.swift:149, 178-184, 216-219 and the rest, including the library browser's per-move switches. The switch also has no toggle meaning for VoiceOver: there is no .isToggle trait and no accessibilityValue, so flipping it sounds like a button being renamed. SelectField already solves the same problem with `accessibilityName` (Controls.swift:91, 121). AccessibilityTests.testEveryDesignSystemControlSaysWhatItIs only checks that the word "accessibility" appears in the declaration, which this control passes.
@@ -997,6 +1105,8 @@ MovezToggle (Controls.swift:4-26) is a plain Button with .accessibilityLabel(isO
 </details>
 
 ### UI-4 · medium · The dropdown shows "Take a break now" and "Make due in" in states where the scheduler ignores them
+
+**Outcome:** fixed in `378cf91`.
 
 **Where:** `Sources/movez/UI/MenuBar/MenuBarView.swift:104` · **Category:** correctness · **DECISIONS checked:** 17
 
@@ -1016,6 +1126,8 @@ MenuBarViewModel.mode maps .sitting and .breaking to the sitting menu, and makeM
 
 ### UI-5 · medium · An indefinite Focus pause shows "‖ 0m", and "Extend pause" turns it into a 15-minute pause
 
+**Outcome:** fixed in `378cf91`.
+
 **Where:** `Sources/movez/UI/MenuBar/MenuBarView.swift:120` · **Category:** correctness · **DECISIONS checked:** 26, 51
 
 **What goes wrong.** A pause set by a Focus filter has `until == nil` (Scheduler+Pause.swift:30). The view model knows this: it passes `indefinite: until == nil` to the title (MenuBarViewModel.swift:217). But it does not keep the flag in the state, so `pauseLeft` and `minutesRemaining` become 0 (lines 210 and 213). `labelText` then shows "‖ 0m" in the menu bar for as long as the Focus lasts (MenuBarState.swift:86), which reads as "about to resume".
@@ -1033,6 +1145,8 @@ A Focus pause is pause(seconds: nil, focusInitiated: true) (Scheduler.swift:71-7
 </details>
 
 ### UI-6 · medium · During a snooze the menu says "Next break in 0 min" and the menu bar shows "0m"
+
+**Outcome:** fixed in `378cf91`.
 
 **Where:** `Sources/movez/UI/MenuBar/MenuBarViewModel.swift:175` · **Category:** correctness · **DECISIONS checked:** 19a, 20
 
@@ -1059,6 +1173,8 @@ snooze (Scheduler+Actions.swift:103-110) transitions to .snoozed(until:) and lea
 
 ### UI-7 · medium · The Movement end screen is visible only during the 0.3 s fade, and its Back to work button does nothing
 
+**Outcome:** fixed in `18e9d0a`, `8017f99`.
+
 **Where:** `Sources/movez/UI/Overlay/OverlayViewModel.swift:286` · **Category:** correctness · **DECISIONS checked:** 4, 33, 58
 
 **What goes wrong.** `finish()` sets `phase = .complete` and calls `onFinished` straight away. The coordinator injects `.breakEnded`, and the scheduler answers in the same call with `[.chime(.completion), .endFullBreak(.completed…)]` (Scheduler+Actions.swift:154). `OverlayEffectSink` then fades the overlay out over `dismissFade` (0.3 s). So the 'Break done' card, its streak chip, the 'Next break at …' line and the end dim (`Tokens.dimEnd`) appear only while the window is fading. The handoff draws this screen staying up until 'Back to work', and entries 4 and 33 keep it. `StrengthOverlayView.swift:213-214` even says a movement break 'leaves after Back to work'. The button is wired to `viewModel.done` (OverlayWindowController.swift:335), and `done()` returns at once unless `phase == .running` (OverlayViewModel.swift:222-223), so it could never close the screen anyway. Even if the screen were shown, its numbers are stale. `streak` is `coordinator.streak` captured when the break began, so it leaves out this break. `nextBreakAt` is `scheduler.snapshot.nextFullDueAt` at that moment (OverlayEffectSink.swift:82-83), which is the due time of the break now running. Example: a break due at 10:55 that starts at 10:56 would say 'Next break at 10:55' instead of 11:51.
@@ -1072,6 +1188,8 @@ finish() sets .complete and calls onFinished in the same pass. That reaches fini
 </details>
 
 ### UI-8 · medium · A strength break whose pause runs out is always recorded as snoozed, even when it already counts as done
+
+**Outcome:** fixed in `6f781f7`.
 
 **Where:** `Sources/movez/UI/Overlay/StrengthOverlayViewModel.swift:183` · **Category:** correctness · **DECISIONS checked:** 38, 59
 
@@ -1089,6 +1207,8 @@ pauseExpired (183-189) always calls onPauseExpired. The sink wires that to coord
 
 ### UI-9 · medium · activeScreen() crashes when no display is attached, and a break shown with no windows is never rebuilt
 
+**Outcome:** fixed in `4bdd6f2`.
+
 **Where:** `Sources/movez/UI/Panels/PanelWindowController.swift:97` · **Category:** macos-edge
 
 **What goes wrong.** `activeScreen()` falls back to `NSScreen.main ?? NSScreen.screens[0]`. With no screen attached, `main` is nil and `screens` is empty, so the subscript traps. It is called every time a panel or toast is presented (lines 43, 58). It is also called on every overlay build (OverlayWindowController.swift:73), including `rebuildForScreenChange`, which runs on `didChangeScreenParametersNotification`, the notification posted when a display goes away. Trigger: a Mac mini or Mac Studio, or a closed-lid MacBook, whose only monitor is switched off or unplugged while awake (many DisplayPort and USB-C monitors drop off the bus when powered down), either during a break or as a heads-up comes due. Result: the app crashes. On relaunch `applyLaunchGap` throws away the break that was on screen ('relaunched with a break on screen'). A related bug: if `build()` ever creates zero windows, `isPresenting` is false. `rebuildForScreenChange`'s `guard isPresenting` (line 182) then never rebuilds when a screen returns, and the scheduler sits in `.fullBreak` with nothing visible.
@@ -1102,6 +1222,8 @@ activeScreen() falls back to NSScreen.screens[0], which traps on an empty array.
 </details>
 
 ### UI-10 · medium · The debug time scale is saved across relaunches, and while it runs it writes future timestamps into the real history and state files
+
+**Outcome:** fixed in `7cedabc`.
 
 **Where:** `Sources/movez/UI/Settings/DebugViewModel.swift:35` · **Category:** persistence
 
@@ -1128,6 +1250,8 @@ setTimeScale writes settings.debugTimeScale. SettingsStore persists it (Settings
 
 ### UI-11 · low · The gallery's strip and disc samples no longer match the app
 
+**Outcome:** fixed in `f8f75ec`.
+
 **Where:** `Sources/movez/UI/Debug/Gallery.swift:131` · **Category:** correctness · **DECISIONS checked:** 28, 6
 
 **What goes wrong.** SnapshotFixtures.stripNames grew to five names when every break moved to the five-block shape (entry 28), but the gallery still builds its rows as if there were four:
@@ -1146,6 +1270,8 @@ SnapshotFixtures.stripNames has 5 entries (SnapshotFixtures.swift:23), and 'Hip 
 </details>
 
 ### UI-12 · low · Snapshot fixtures fail silently, and nothing checks them
+
+**Outcome:** fixed in `856d6f1`.
 
 **Where:** `Sources/movez/UI/Debug/SnapshotRenderer.swift:327` · **Category:** test-gap · **DECISIONS checked:** 70
 
@@ -1166,6 +1292,8 @@ view(for:) (:143-147) chains optional lookups that end in overlayView, which has
 
 ### UI-13 · low · The strength micro-break long-text snapshot draws the wrong instruction
 
+**Outcome:** fixed in `856d6f1`.
+
 **Where:** `Sources/movez/UI/Debug/StrengthPanelFixtures.swift:65` · **Category:** correctness · **DECISIONS checked:** 67
 
 **What goes wrong.** strengthMicroLong() is meant to show the longest standing END name over the longest END instruction: the name from END-06 and the instruction from END-32. I checked the library: END-32's 433 characters is the longest END instruction. But it calls `renamed(texted, after: named)`, and renamed (StrengthSnapshotFixtures.swift:231-240) takes the name *and the instructions* from `named` (line 237). Only the dose and timing fields come from the first argument. That is right for the long-dose overlay fixture, where it is also used, but wrong here. So micro-strength-long-text.png shows END-06's 281-character Cossack-squat instruction plus the appended "Switch at the chime" (about 300 characters), not the 433-character neck isometric. The tallest micro panel the app can actually show is never rendered. Also, the doc comment at :43-44 says "first side", but microSideElapsed = 43 s puts a 60 s per-side move on its second side.
@@ -1179,6 +1307,8 @@ renamed(_:after:) (StrengthSnapshotFixtures.swift:231-240) takes name, equipment
 </details>
 
 ### UI-14 · low · Line heights tighter than Manrope's natural 1.37 are silently ignored (10 of 44 styles)
+
+**Outcome:** fixed in `fc5177b`.
 
 **Where:** `Sources/movez/UI/DesignSystem/TextStyles.swift:23` · **Category:** correctness
 
@@ -1194,6 +1324,8 @@ I measured the bundled Manrope[wght].ttf with a small swiftc program: ascender -
 
 ### UI-15 · low · Two unused tokens, and three components that re-implement a neighbouring one
 
+**Outcome:** fixed in `44c2e32`.
+
 **Where:** `Sources/movez/UI/DesignSystem/Tokens.swift:109` · **Category:** duplication
 
 **What goes wrong.** Two tokens are dead code: leadinRingTrack is never read, because TimerDisc draws the lead-in track with accentTint, and overlayRingStroke is never read, because TimerDisc derives the ring width from ringRatio. OverlaySnapshot.desktop also writes two raw colour literals, although Tokens.Backdrop exists so that colour values are written nowhere else.
@@ -1207,6 +1339,8 @@ Confirmed by grep: leadinRingTrack (Tokens.swift:109) and overlayRingStroke (:17
 </details>
 
 ### UI-16 · low · The menu-bar item redraws every 2 s because the elapsed fraction changes every tick
+
+**Outcome:** fixed in `378cf91`.
 
 **Where:** `Sources/movez/UI/MenuBar/MenuBarViewModel.swift:177` · **Category:** complexity
 
@@ -1222,6 +1356,8 @@ The coordinator republishes menuState on every tick (AppCoordinator.swift:278), 
 
 ### UI-17 · low · Fixed-size break card and notice window do not fit small displays
 
+**Outcome:** fixed in `81aaec8`.
+
 **Where:** `Sources/movez/UI/Overlay/OverlayView.swift:124` · **Category:** macos-edge · **DECISIONS checked:** 49, 53
 
 **What goes wrong.** `OverlayCard` is a fixed 1000×660 pt. The 300 pt disc is centred on the card's right edge and 80 pt below its top, so it overhangs 150 pt to the right and 70 pt above (lines 120-139). The card is centred in a window that leaves out the menu bar, so the whole break needs at least about 1300×800 pt of dim. Entry 49 puts the full card on every display. On a smaller one (an iPad over Sidecar at 1194×834, a 1280×800 'larger text' scaling, a 1024×768 projector), the disc, which is the Next/Done control, and the card edges are clipped. The notice is a fixed, non-resizable 720×760 window (NoticeView.swift:8, 25; NoticeWindowController.swift:48-52). On a display with less than about 784 pt of visible height (1024×640 or 1280×720 scaling), AppKit keeps the title bar below the menu bar and pushes the footer with Quit and 'I understand and agree' off the bottom. That happens at the one moment the app does nothing else until the notice is accepted.
@@ -1235,6 +1371,8 @@ Tokens.Metric.overlayCard is 1000×660 and overlayDisc is 300 (Tokens.swift:167-
 </details>
 
 ### UI-18 · low · The skip delay is stated three times, and the panel layout code is duplicated
+
+**Outcome:** fixed in `baf77bb`.
 
 **Where:** `Sources/movez/UI/Overlay/OverlayViewModel.swift:15` · **Category:** duplication
 
@@ -1250,6 +1388,8 @@ The delay is defined in OverlayViewModel.skipDelaySeconds (15), PanelViewModel.s
 
 ### UI-19 · low · The menu bar is left uncovered so the icon stays reachable, but its dropdown opens underneath the shielding-level overlay
 
+**Outcome:** Pending: needs checking by hand during a break.
+
 **Where:** `Sources/movez/UI/Overlay/OverlayWindowController.swift:138` · **Category:** macos-edge
 
 **What goes wrong.** `dimFrame` stops the overlay window below the menu bar 'so the movez icon stays reachable during a break' (lines 136-142). The overlay windows sit at `CGShieldingWindowLevel()` (line 117), which is far above the levels AppKit uses for status-item and pop-up windows. The `MenuBarExtra` dropdown hangs below the menu bar, inside the dimmed area. So clicking the icon during a break opens the menu underneath the overlay, where it is blurred and can't be clicked. Pause, Quit and the rest of the menu are unreachable during a break, and the carve-out does not do what its comment says. The user is not trapped, because Skip works after 3 s. Clicking the icon also takes key away from the overlay window. This comes from reasoning about window levels, so confirm it once by hand during a break.
@@ -1263,6 +1403,8 @@ The overlay is at CGShieldingWindowLevel (117), which is above every standard Ap
 </details>
 
 ### UI-20 · low · Movement overlay keys act from the first instant, with no repeat filter or press guard, so stray typing pauses or advances the break
+
+**Outcome:** fixed in `f4161d0`.
 
 **Where:** `Sources/movez/UI/Overlay/OverlayWindowController.swift:150` · **Category:** correctness · **DECISIONS checked:** 5, 29
 
@@ -1280,6 +1422,8 @@ Confirmed mechanically. The local monitor never checks event.isARepeat (150-165)
 
 ### UI-21 · low · The strength overlay redraws the whole card every display frame during a set
 
+**Outcome:** fixed in `f7c65bd`.
+
 **Where:** `Sources/movez/UI/Overlay/StrengthOverlayView.swift:238` · **Category:** complexity · **DECISIONS checked:** 66
 
 **What goes wrong.** During every rep-counted set (Reduce Motion off, not paused), `StrengthOverlayScreen.card` wraps the entire `StrengthOverlayView` in `TimelineView(.animation)` (lines 235-243). On every frame (60-120 Hz on ProMotion), on every attached display, SwiftUI re-evaluates the header, body text, strip, action row and disc, and calls `viewModel.livePacer()`, for the 30-60 s of each set. Only `RepMeter`'s fill needs per-frame updates. Everything else changes once a second with the tick.
@@ -1293,6 +1437,8 @@ Lines 235-243 wrap the entire StrengthOverlayView in TimelineView(.animation) wh
 </details>
 
 ### UI-22 · low · Panels and the toast stay pinned to the screen they opened on, even after that display is gone
+
+**Outcome:** fixed in `4bdd6f2`.
 
 **Where:** `Sources/movez/UI/Panels/PanelWindowController.swift:147` · **Category:** macos-edge
 
@@ -1308,6 +1454,8 @@ panelScreen and toastScreen are set once (43-44, 58-59). layoutPanel and layoutT
 
 ### UI-23 · low · Dead accessors and stale comments in the window controllers
 
+**Outcome:** fixed in `8017f99`.
+
 **Where:** `Sources/movez/UI/Panels/PanelWindowController.swift:207` · **Category:** dead-code · **DECISIONS checked:** 49
 
 **What goes wrong.** Several members have no callers in Sources or Tests: `PanelWindowController.hideAll` (lines 207-210), `isShowingPanel` and `isShowingToast` (32-33), `OverlayWindowController.viewModel` (OverlayWindowController.swift:31-34) and `NoticeWindowController.isOpen` (NoticeWindowController.swift:13). `OverlayScreen`'s doc comment says each screen gets 'the card if this is the screen the user is on' (OverlayWindowController.swift:311), which entry 49 replaced. Every display gets the card. `OverlayActions.backToWork` is wired to a no-op (see the end-screen finding). Next door in App/, `AppCoordinator.nextBlock()`, `done()`, `endBreak()`, `canFinishBreak` and `elapsedInBreak` are used only by tests, since the overlay owns progression. That is how the Movement resume test ended up exercising a path production never takes.
@@ -1321,6 +1469,8 @@ A grep across Sources and Tests finds no callers for hideAll, isShowingPanel, is
 </details>
 
 ### UI-24 · low · After Settings has been opened once, the debug inspector republishes the whole Settings view model every poll until quit
+
+**Outcome:** fixed in `f75d567`.
 
 **Where:** `Sources/movez/UI/Settings/SettingsWindow.swift:44` · **Category:** lifecycle
 
@@ -1343,6 +1493,8 @@ show() builds the DebugViewModel once and attaches it (lines 44-48), and nothing
 
 ### UI-25 · low · Closing the Settings window leaves an open sheet and its draft for next time
 
+**Outcome:** fixed in `f75d567`.
+
 **Where:** `Sources/movez/UI/Settings/SettingsWindow.swift:63` · **Category:** lifecycle · **DECISIONS checked:** 15, 56
 
 **What goes wrong.** Sheets are overlays inside the window, driven by `viewModel.openSheet` (SettingsView.swift:27-30). Nothing resets it when the window closes: the controller sets no window delegate, and `close()` only calls `orderOut`.
@@ -1362,6 +1514,8 @@ The window has no delegate, and close() only calls orderOut. The red close butto
 
 ### TST-1 · medium · Nothing checks that simulate_strength.py draws what the Swift builders draw, so its proofs and weekly-volume targets are unchecked against the app
 
+**Outcome:** fixed in `5dfa8ce`, `3cf447f`.
+
 **Where:** `Tests/movezTests/StrengthSimulationCrossCheckTests.swift:30` · **Category:** test-gap · **DECISIONS checked:** 69
 
 *Found independently by the Strength, scripts/ + project.yml + Makefile reviews as well.*
@@ -1378,6 +1532,8 @@ The test file reads only scripts/strength-rules.json (testTheRuleListMatchesTheS
 
 ### TST-2 · medium · In the app a move done for two sets carries twice the recency; both simulations count it once
 
+**Outcome:** fixed in `a5021f4`.
+
 **Where:** `scripts/simulate_strength.py:936` · **Category:** correctness · **DECISIONS checked:** 23e, 65, 69
 
 **What goes wrong.** How it works: in the app every set is a part (PlannedBreak.parts, ModeBuilder.swift:27). Each finished part writes its own MovementCompletion (recordOverlayPart). HistoryStore.recencyScores (HistoryStore.swift:210-215) adds Recency.weight once per completion. So the lead move of an X · Y · X break, and the A move of an arm break's A · A · B, gets a score of 2 for yesterday: multiplier 1/(1+2·2) = 0.20. The unlock count also gets +2. StrengthCoordinatorTests:207-210 confirms one completion per set. The Python serve() dedups with `dict.fromkeys` (line 936) and adds 1 per distinct move, giving multiplier 0.33. The Swift cross-check does the same through `serve(strengthBreak.movementIds)` (StrengthSimulationCrossCheckTests.swift:213, 239-242), because movementIds is deduplicated. Concrete effect: at the default of 3 breaks a day, two lead moves a day are weighted down about 40% more in the app than in the simulation. The share tables, the 'above three times their even share' list and the never-served check in docs/strength-simulation.md therefore describe a different distribution from the one users get.
@@ -1391,6 +1547,8 @@ In Swift, recordOverlayPart writes one MovementCompletion per part (AppCoordinat
 </details>
 
 ### TST-3 · medium · The simulation never reports the app defaults' relaxations, which hides that every Beginner bodyweight triceps arm break serves a difficulty-2 move
+
+**Outcome:** fixed in `1b329cf`.
 
 **Where:** `scripts/simulate_strength.py:1205` · **Category:** test-gap · **DECISIONS checked:** 56, 58, 65, 69, 70
 
@@ -1406,6 +1564,8 @@ Read main() (1086-1125) and report() (1131-1240). The Relaxations table (1203-12
 
 ### TST-4 · low · `make test` hides compiler warnings, and nothing fails on a new concurrency warning
 
+**Outcome:** fixed in `6b96999`.
+
 **Where:** `Makefile:33` · **Category:** test-gap · **DECISIONS checked:** 1
 
 **What goes wrong.** `make test` filters compiler warnings out of its output, and with SWIFT_TREAT_WARNINGS_AS_ERRORS: NO nothing fails on a new Sendable or actor-isolation warning. Such a warning is visible only on a fresh `make build` (-quiet still prints warnings) or in build/test.log. The tree builds with zero warnings today, so a strict gate would be cheap to keep.
@@ -1419,6 +1579,8 @@ Confirmed that `make test` greps for 'Test Suite|Executed|error:|failed|** TEST'
 </details>
 
 ### TST-5 · low · NSMicrophoneUsageDescription is never shown, and its text says 'movez'
+
+**Outcome:** fixed in `587a1c7`.
 
 **Where:** `Sources/movez/Resources/Info.plist:32` · **Category:** dead-code · **DECISIONS checked:** 52
 
@@ -1434,6 +1596,8 @@ Confirmed that nothing in Sources calls AVCaptureDevice or requestAccess, and th
 
 ### TST-6 · low · 'Transitions are identical whatever the scale' compares one run with itself
 
+**Outcome:** fixed in `8ba7640`.
+
 **Where:** `Tests/movezTests/ClockTests.swift:52` · **Category:** test-gap
 
 **What goes wrong.** `XCTAssertEqual(transitions(tickSeconds: 2), transitions(tickSeconds: 2))` runs the same deterministic simulation twice, so it cannot fail and says nothing about scale. Line 21 is likewise arithmetic on constants. EdgeCaseTests.swift:129-150 read SystemClock and flip the scale with no time passing between the reads. The known rebase bug (re-anchoring with the new scale instead of the old one) would only shift time by microseconds there, less than the time between the reads, so both tests would still pass. ClockTests.testChangingScaleDoesNotJumpTime does catch that bug, but only because it sleeps 0.1 s at 60× first. This is how the 60× poll-gap bug above went unnoticed.
@@ -1447,6 +1611,8 @@ Confirmed. Line 52 compares transitions(tickSeconds: 2) with itself, and line 21
 </details>
 
 ### TST-7 · low · Coordinator tests finish breaks through intents production never calls
+
+**Outcome:** fixed in `7b90d9d`, `5ffdf0b`, `8017f99`.
 
 **Where:** `Tests/movezTests/CoordinatorTestSupport.swift:92` · **Category:** test-gap · **DECISIONS checked:** 38
 
@@ -1462,6 +1628,8 @@ Confirmed: the coordinator's nextBlock(), done(), endBreak(), canFinishBreak and
 
 ### TST-8 · low · FullscreenMonitorTests tests the fake's exception list, not the monitor's
 
+**Outcome:** fixed in `8ba7640`.
+
 **Where:** `Tests/movezTests/FullscreenMonitorTests.swift:33` · **Category:** duplication
 
 **What goes wrong.** testAnExcludedAppNeverSuppresses builds a FakeFullscreenSource and checks the fake's own exception logic. That duplicates FakeSignalsTests.testFakeSourcesHonourTheExceptionList. The real monitor's early return for the user's exceptions and for Movez itself (FullscreenMonitor.swift:24) is untested, and testTheRealMonitorRunsWithoutCrashing only asserts anything when Movez happens to be the frontmost app.
@@ -1475,6 +1643,8 @@ Confirmed. Lines 33-39 test FakeFullscreenSource, duplicating FakeSignalsTests.s
 </details>
 
 ### TST-9 · low · The 'does not fire a break at launch' checks cannot fail, because the relaunch helper never ticks
+
+**Outcome:** fixed in `8ba7640`.
 
 **Where:** `Tests/movezTests/LaunchStateTests.swift:140` · **Category:** test-gap · **DECISIONS checked:** 20b
 
@@ -1490,6 +1660,8 @@ The mechanism is correct. relaunch() (lines 22-41) only calls applyLaunchGap(). 
 
 ### TST-10 · low · The font fallback check passes a non-optional value to XCTAssertNotNil
 
+**Outcome:** fixed in `8ba7640`.
+
 **Where:** `Tests/movezTests/LaunchStateTests.swift:290` · **Category:** test-gap
 
 **What goes wrong.** MovezFont.nsFont returns a non-optional NSFont. Passing it to XCTAssertNotNil wraps it in an Optional, so the assertion always passes. The test registers the font first, so the `?? .systemFont` fallback at Fonts.swift:82, which is what "would still run without it" refers to, never runs. Lines 309-317 are similar: they grep OverlayWindowController.swift for two strings, which a comment would also satisfy.
@@ -1503,6 +1675,8 @@ Confirmed. MovezFont.nsFont returns a non-optional NSFont (Fonts.swift:70), so X
 </details>
 
 ### TST-11 · low · The mode-branching test misses `case let .strength(`, and a switch already lives in UI/Panels
+
+**Outcome:** fixed in `8ba7640`.
 
 **Where:** `Tests/movezTests/ModeExtensibilityTests.swift:90` · **Category:** test-gap · **DECISIONS checked:** 54
 
@@ -1520,6 +1694,8 @@ The regex at :90 is `case \.strength|== \.strength|\.movement \?`. MicroPanelBre
 
 ### TST-12 · low · The Movement golden fixture overwrites itself and passes whenever the record flag is set; its only guard is an audit outside the repo
 
+**Outcome:** fixed in `8ba7640`.
+
 **Where:** `Tests/movezTests/MovementPicksGoldenTests.swift:47` · **Category:** test-gap · **DECISIONS checked:** Strength mode preamble, 64
 
 **What goes wrong.** A recording run passes rather than failing, and the comment claims an external audit guards the fixture when no check in the repo does. The guard that does exist is the committed fixture's git diff.
@@ -1533,6 +1709,8 @@ Confirmed. The record branch (lines 47-56) writes the fixture and returns, so th
 </details>
 
 ### TST-13 · low · testDoneIsNeverOfferedBeforeTheSchedulerWouldAcceptIt compares a function with itself and misses that the overlay reads the wrong config
+
+**Outcome:** fixed in `6f781f7`.
 
 **Where:** `Tests/movezTests/OverlayViewModelTests.swift:287` · **Category:** test-gap · **DECISIONS checked:** 22, 29
 
@@ -1548,6 +1726,8 @@ doneAvailable (OverlayViewModel.swift:148-155) is Scheduler.meetsCompletionRule 
 
 ### TST-14 · low · testNoChimesWhenSoundsAreOff only tests the fake player's own switch
 
+**Outcome:** fixed in `8ba7640`.
+
 **Where:** `Tests/movezTests/OverlayViewModelTests.swift:352` · **Category:** test-gap · **DECISIONS checked:** 23a
 
 **What goes wrong.** How it works: it sets `chimes.enabled = false` on RecordingChimePlayer and asserts nothing was recorded. RecordingChimePlayer.play starts with `guard enabled else { return }` (Sources/movez/Audio/Chimes.swift:66-70). The test therefore proves the fake drops sounds when told to, whatever the overlay does. The app's real Sounds gate is GatedChimePlayer, tested in SettingsWindowTests and AwayReturnTests. This test adds nothing, and RecordingChimePlayer.enabled exists only to serve it.
@@ -1561,6 +1741,8 @@ The test sets chimes.enabled = false, and RecordingChimePlayer.play begins with 
 </details>
 
 ### TST-15 · low · Old state files are only tested by removing one key from a freshly encoded snapshot
+
+**Outcome:** fixed in `8ba7640`.
 
 **Where:** `Tests/movezTests/PersistenceTests.swift:24` · **Category:** persistence
 
@@ -1576,6 +1758,8 @@ Confirmed. SchedulerSnapshot has no custom init(from:), and its own comment at l
 
 ### TST-16 · low · testInMemoryStoreRecordsEverySave only tests its own loop
 
+**Outcome:** fixed in `8ba7640`.
+
 **Where:** `Tests/movezTests/PersistenceTests.swift:70` · **Category:** test-gap
 
 **What goes wrong.** The test calls store.save() once for each .persist effect, then asserts that saveCount equals the number of .persist effects. It is counting its own loop, on a test-only store. Production code never runs in it. The real claim (the coordinator writes the state file once per persist) is already tested in CoordinatorSimulatedDayTests.testStateAndHistoryAreWrittenOnEveryChange.
@@ -1590,6 +1774,8 @@ Confirmed. Lines 66-77 save once per .persist effect and then assert saveCount e
 
 ### TST-17 · low · testApplicationSupportDirectoryIsCreated creates a folder in the real ~/Library/Application Support
 
+**Outcome:** fixed in `8ba7640`.
+
 **Where:** `Tests/movezTests/PersistenceTests.swift:132` · **Category:** test-gap
 
 **What goes wrong.** The test calls the production FileSnapshotStore.applicationSupportDirectory(). That function runs createDirectory on ~/Library/Application Support/movez, so on any machine without Movez installed (a fresh Mac, CI) the test suite creates the app's real data folder. CLAUDE.md says tests must never read or write the user's real Application Support. Today the only harm is an empty folder, but the test exercises the one code path that leads to the real state.json and history.json, so a later change there would make it touch real data.
@@ -1603,6 +1789,8 @@ Confirmed. The test calls the production FileSnapshotStore.applicationSupportDir
 </details>
 
 ### TST-18 · low · The "split shift" test uses the wrong weekdays and passes for another reason, so the working-day-opening reset is untested
+
+**Outcome:** fixed in `8ba7640`.
 
 **Where:** `Tests/movezTests/SchedulerDayBoundaryTests.swift:202` · **Category:** test-gap · **DECISIONS checked:** 14, 23c
 
@@ -1625,6 +1813,8 @@ WorkingHours.days is indexed weekday-1 (WorkingHours.swift:35,74), so days[2] an
 
 ### TST-19 · low · The check that the micro-break is not lost cannot fail
 
+**Outcome:** fixed in `8ba7640`.
+
 **Where:** `Tests/movezTests/SchedulerMicroTests.swift:116` · **Category:** test-gap · **DECISIONS checked:** 23h
 
 **What goes wrong.** `XCTAssertNotNil(nextMicroDueAt ?? nextFullDueAt)` can never fail in the sitting state, because nextFullDueAt is always set there. With 55/5 the micro-break's re-anchor falls inside the quiet zone, so nextMicroDueAt is nil whatever happens, and the line checks nothing. Decision 23h is about the micro-break that is on screen being allowed to finish, which the earlier state checks already cover. This line adds no protection.
@@ -1638,6 +1828,8 @@ Confirmed. In sitting after a micro-break, nextFullDueAt is always set, so `next
 </details>
 
 ### TST-20 · low · The 'never talks to the network' entitlement check proves nothing for an unsandboxed app
+
+**Outcome:** fixed in `8ba7640`.
 
 **Where:** `Tests/movezTests/SecurityAndCopyTests.swift:18` · **Category:** test-gap · **DECISIONS checked:** 3
 
@@ -1653,6 +1845,8 @@ Partly refuted. testTheEntitlementsClaimNothingBeyondWhatIsUsed (55-61) does wha
 
 ### TST-21 · low · The signal-polling tests count their own loop, so the pollCount assertions cannot fail
 
+**Outcome:** fixed in `8ba7640`.
+
 **Where:** `Tests/movezTests/SignalAggregatorTests.swift:37` · **Category:** test-gap · **DECISIONS checked:** 21
 
 **What goes wrong.** The poll(_:harness:seconds:) helper skips aggregator.poll() whenever the scheduler says polling isn't needed. The aggregator is also never attached to the coordinator, so nothing in the app could stop it. Both `pollCount == 0` assertions in testNoPollsWhilePausedOrOffHours are therefore guaranteed by the helper's own guard. testPollsEveryTwoSecondsWhileSitting counts the helper's 30 loop iterations, not the 2 s timer. EdgeCaseTests.swift:175-177 has the same shape: its real DispatchSourceTimer cannot fire during a synchronous ManualClock loop, so pollCount can't change. What actually matters is the coordinator calling aggregator.setPolling(false) when the scheduler goes paused or off hours. That is covered for pause (the EdgeCaseTests isRunning checks) but not for off hours.
@@ -1666,6 +1860,8 @@ Confirmed. The helper at lines 32-40 skips poll() when !pollingRequired, and the
 </details>
 
 ### TST-22 · low · StrengthRuleChecker borrows the builders' own predicates for several rules, and its s6-dose check cannot fail
+
+**Outcome:** fixed in `8ba7640`.
 
 **Where:** `Tests/movezTests/StrengthRuleChecker.swift:140` · **Category:** test-gap · **DECISIONS checked:** 69
 
@@ -1681,6 +1877,8 @@ The checker reuses StrengthBreakBuilder.isWarmUpShaped (line 140), StrengthEligi
 
 ### TST-23 · low · testTheSheetCarriesNoAtLeastOneGate checks whole-string equality, so it can never find the phrase
 
+**Outcome:** fixed in `8ba7640`.
+
 **Where:** `Tests/movezTests/StrengthSettingsWindowTests.swift:218` · **Category:** test-gap · **DECISIONS checked:** 56
 
 **What goes wrong.** How it works: `[StrengthSetupSheet.intro, StrengthSettingsSection.breaksSub].contains("Choose at least one.")` is Array.contains, which asks whether an element equals that exact string. Both copy strings are long sentences (StrengthSetupSheet.swift:18, StrengthSettingsSection.swift:53), so the assertion passes even if "Choose at least one." were added to either. It also never looks at the sheet's view, where such a note would actually be drawn.
@@ -1694,6 +1892,8 @@ The checker reuses StrengthBreakBuilder.isWarmUpShaped (line 140), StrengthEligi
 </details>
 
 ### TST-24 · low · check_strength_library.py allows doses that DECISIONS 60 rules out, with no decision recorded
+
+**Outcome:** fixed in `a15f5eb`.
 
 **Where:** `scripts/check_strength_library.py:48` · **Category:** correctness · **DECISIONS checked:** 60, 70
 
@@ -1709,6 +1909,8 @@ COR-05 '12 reps, alternating, 2 s hold' and COR-17 '12 reps, alternating' really
 
 ### TST-25 · low · diff_strength_library.py and the snapshot-baseline tools only work until this branch merges
 
+**Outcome:** fixed in `b19fe67`.
+
 **Where:** `scripts/diff_strength_library.py:26` · **Category:** dead-code · **DECISIONS checked:** 50, 62, 70, 71
 
 **What goes wrong.** diff_strength_library.py, compare_snapshots.py's default baseline and snapshot-agreed-changes.txt are tied to one migration, the strength-mode edits. They work only against the pre-strength baseline, and no doc or script names that commit. After the merge, the obvious choice, `--base main`, would report every agreed edit as missing.
@@ -1722,6 +1924,8 @@ diff_strength_library.py hard-codes one migration (lines 26-35) and requires eve
 </details>
 
 ### TST-26 · low · fetch_font.sh deletes the committed Manrope font when both downloads fail, and fetches an unpinned upstream
+
+**Outcome:** fixed in `899d543`.
 
 **Where:** `scripts/fetch_font.sh:35` · **Category:** correctness
 
@@ -1737,6 +1941,8 @@ download() has curl write directly to the final path, `--output "$out"`. When bo
 
 ### TST-27 · low · simulate_selection.py claims to be 'the model to re-run' but no longer models RoutineBuilder or MicroBreakBuilder
 
+**Outcome:** fixed in `0eacc61`.
+
 **Where:** `scripts/simulate_selection.py:62` · **Category:** correctness · **DECISIONS checked:** 28, 32, 41, 45
 
 **What goes wrong.** The docstring (lines 6-9, 13-14) says the 'proposed' rules are 'what the app now ships ... so it is the model to re-run' and asks to be re-run whenever the library changes. Since then the builders gained families (DECISIONS 45), and the Python has none: full_pool (lines 62-73), the taken check (line 204), proposed_micro (lines 218-228) and recency_weight (lines 40-46) all key on the id, whereas RoutineBuilder uses familyKey and FamilyIndex.scores. Run against today's library, the Python serves two members of one family in 2.7% of full breaks and on 91.7% of 5-full/6-micro days. RoutineBuilder can never do either. It also ignores `requires` (DECISIONS 41). Its micro floor filter `m["settings"] != ["floor"]` (line 77) can never match, because the library writes `Floor` and the requirement lives in `requires`. It has no forgettingToday fallback (RoutineBuilder.swift:46-51), so where Swift repeats a movement, the Python serves a short break. And proposed_micro crashes on an empty pool (`first["per_side"]` on None) or returns `[first, None]`, where MicroBreakBuilder relaxes or runs one movement for the full minute.
@@ -1750,6 +1956,8 @@ The docstring (6-14) calls 'proposed' what the app ships and the model to re-run
 </details>
 
 ### TST-28 · low · The simulated day keeps its records differently from the coordinator, so the report understates the servedToday relaxations about threefold
+
+**Outcome:** fixed in `a5021f4`.
 
 **Where:** `scripts/simulate_strength.py:879` · **Category:** correctness · **DECISIONS checked:** 59, 64, 67, 69
 
