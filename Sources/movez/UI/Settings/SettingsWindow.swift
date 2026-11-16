@@ -41,8 +41,6 @@ final class SettingsWindowController {
         if let closeObserver { NotificationCenter.default.removeObserver(closeObserver) }
     }
 
-    var isOpen: Bool { window?.isVisible ?? false }
-
     func show() {
         if debug == nil, let makeDebug {
             let viewModel = makeDebug()

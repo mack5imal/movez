@@ -29,9 +29,6 @@ final class PanelWindowController {
     private var toastScreen: NSScreen?
     private var timer: DispatchSourceTimer?
 
-    var isShowingPanel: Bool { panelWindow != nil }
-    var isShowingToast: Bool { toastWindow != nil }
-
     // MARK: - Presenting
 
     /// The heads-up panel, or the micro-break in either of its moments.
@@ -213,11 +210,6 @@ final class PanelWindowController {
         toastScreen = nil
         close(window, animated: animated)
         if panelModel == nil { stopTicking() }
-    }
-
-    func hideAll(animated: Bool = false) {
-        hidePanel(animated: animated)
-        hideToast(animated: animated)
     }
 
     private func fadeIn(_ window: NSPanel) {

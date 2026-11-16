@@ -33,11 +33,6 @@ final class OverlayWindowController {
     /// How long the dim takes to fade when a break ends well.
     static let dismissFade: TimeInterval = 0.3
 
-    var viewModel: OverlayViewModel? {
-        if case let .routine(viewModel) = session { return viewModel }
-        return nil
-    }
-
     var isPresenting: Bool { !windows.isEmpty }
     var windowCount: Int { windows.count }
     var hasKeyMonitor: Bool { keyMonitor != nil }
@@ -336,7 +331,7 @@ enum OverlayKeyMap {
     }
 }
 
-/// One screen's worth of overlay: the dim, and the card if this is the screen the user is on.
+/// One screen's worth of overlay: the dim and the card, which every display shows (DECISIONS 49).
 struct OverlayScreen: View {
     @ObservedObject var viewModel: OverlayViewModel
 

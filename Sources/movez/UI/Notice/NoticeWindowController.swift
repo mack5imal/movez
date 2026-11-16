@@ -10,8 +10,6 @@ final class NoticeWindowController: NSObject, NSWindowDelegate {
     private(set) var window: NSWindow?
     private var viewModel: NoticeViewModel?
 
-    var isOpen: Bool { window?.isVisible ?? false }
-
     func show(_ viewModel: NoticeViewModel) {
         self.viewModel = viewModel
         let window = self.window ?? makeWindow()

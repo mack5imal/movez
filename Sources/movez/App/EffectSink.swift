@@ -16,14 +16,10 @@ final class NoopEffectSink: EffectSink {
 
 /// Fans one effect out to several sinks, in registration order.
 final class CompositeEffectSink: EffectSink {
-    private var sinks: [EffectSink]
+    private let sinks: [EffectSink]
 
-    init(_ sinks: [EffectSink] = []) {
+    init(_ sinks: [EffectSink]) {
         self.sinks = sinks
-    }
-
-    func add(_ sink: EffectSink) {
-        sinks.append(sink)
     }
 
     func apply(_ effect: SchedulerEffect, coordinator: AppCoordinator) {
