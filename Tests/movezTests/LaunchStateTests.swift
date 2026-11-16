@@ -280,6 +280,23 @@ final class LaunchStateTests: XCTestCase {
         XCTAssertEqual(store.stats(on: SchedulerHarness.mondayMorning), .empty)
     }
 
+    /// The unreadable file is moved aside before anything is saved over it, so a downgrade
+    /// undone, or a one-off read error, can still get the record back (APP-4).
+    func testAnUnreadableHistoryFileIsMovedAsideNotOverwritten() throws {
+        let directory = try temporaryDirectory()
+        let url = directory.appendingPathComponent("history.json")
+        let unreadable = "]]not json[["
+        try unreadable.write(to: url, atomically: true, encoding: .utf8)
+
+        let store = HistoryStore(store: FileHistoryStore(url: url))
+        store.recordLongestBout(600, on: SchedulerHarness.mondayMorning)
+
+        let names = try FileManager.default.contentsOfDirectory(atPath: directory.path)
+        let aside = try XCTUnwrap(names.first { $0.hasPrefix("history.json.unreadable-") }, "\(names)")
+        XCTAssertEqual(try String(contentsOf: directory.appendingPathComponent(aside), encoding: .utf8), unreadable)
+        XCTAssertNotNil(try FileHistoryStore(url: url).load(), "the new history is readable")
+    }
+
     // MARK: - A library that will not load
 
     func testAMissingLibraryIsFatalAndSaysSo() {

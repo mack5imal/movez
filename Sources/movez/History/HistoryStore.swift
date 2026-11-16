@@ -110,13 +110,17 @@ final class HistoryStore {
     /// How many times a Diff-2 movement must be completed before its Diff-3 counterpart unlocks.
     static let difficultyUnlockThreshold = 5
 
-    /// A history file that will not parse costs the user their record, which is bad — but losing
-    /// the app to a crash on every launch afterwards would be worse.
+    /// A history file that will not parse is not worth crashing over: the record starts fresh.
+    /// The file is moved aside first rather than saved over, so a downgrade undone, or a one-off
+    /// read error, can still bring the record back (APP-4).
     static func restore(from store: HistoryPersisting) -> HistoryData {
         do {
             return try store.load() ?? HistoryData()
         } catch {
             MovezLog.store.error("history could not be read, starting fresh: \(error.localizedDescription, privacy: .public)")
+            if let aside = store.setAsideUnreadable() {
+                MovezLog.store.error("the unreadable history was kept at \(aside.path, privacy: .public)")
+            }
             return HistoryData()
         }
     }

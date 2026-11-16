@@ -3,6 +3,13 @@ import Foundation
 protocol HistoryPersisting: AnyObject {
     func save(_ data: HistoryData) throws
     func load() throws -> HistoryData?
+    /// Moves a history that could not be read out of the way of the next save, and says where it
+    /// went. Nil where there is nothing to move, as in memory.
+    func setAsideUnreadable() -> URL?
+}
+
+extension HistoryPersisting {
+    func setAsideUnreadable() -> URL? { nil }
 }
 
 /// `~/Library/Application Support/movez/history.json`, written atomically and owner-only for the
@@ -46,6 +53,22 @@ final class FileHistoryStore: HistoryPersisting {
     func load() throws -> HistoryData? {
         guard FileManager.default.fileExists(atPath: url.path) else { return nil }
         return try decoder.decode(HistoryData.self, from: Data(contentsOf: url))
+    }
+
+    /// `history.json.unreadable-20261116T093000Z`, beside the file it was. The next save would
+    /// otherwise replace the only copy of a record a newer build, or a second try, could read.
+    func setAsideUnreadable() -> URL? {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withYear, .withMonth, .withDay, .withTime, .withTimeZone]
+        let stamp = formatter.string(from: Date()).replacingOccurrences(of: ":", with: "")
+        let aside = url.deletingLastPathComponent()
+            .appendingPathComponent("\(url.lastPathComponent).unreadable-\(stamp)")
+        do {
+            try FileManager.default.moveItem(at: url, to: aside)
+            return aside
+        } catch {
+            return nil
+        }
     }
 }
 
