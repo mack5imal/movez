@@ -414,8 +414,8 @@ class Planner:
 
 WORKING_LADDER = ["breakLimits", "servedToday", "vigorous", "excluded", "difficulty", "anything"]
 # StrengthBreakBuilder.armAlternateLadder: the arm move may come back for the third set before the
-# exclusions or the cap go (DECISIONS 82).
-ARM_ALTERNATE_LADDER = ["breakLimits", "servedToday", "vigorous", "armAlternate", "excluded", "difficulty",
+# vigorous rule, the exclusions or the cap go (DECISIONS 82).
+ARM_ALTERNATE_LADDER = ["breakLimits", "servedToday", "armAlternate", "vigorous", "excluded", "difficulty",
                         "anything"]
 WARM_UP_LADDER = ["warmUpShape", "servedToday", "excluded", "difficulty", "anything"]
 COOL_DOWN_LADDER = ["coolDownRegion", "servedToday", "excluded", "difficulty", "anything"]

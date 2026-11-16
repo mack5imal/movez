@@ -759,9 +759,10 @@ Entries from fixing the findings in `docs/code-review-2026-11.md`.
     every A-day arm break let the difficulty cap go and served a difficulty-2 move. The simulation
     never showed it, because it ran the app's defaults only through the week tables, which its
     relaxation and never-served sections did not read. The third set's ladder now has an
-    `armAlternate` rung after "served today" and the vigorous rule and before the exclusions and
+    `armAlternate` rung straight after "served today", before the vigorous rule, the exclusions and
     the cap: when nothing else is left the arm move is served a third time, and the break records
-    it. The rule list's `s6-arm-alternate` became where-possible to match. The app's defaults, and
+    it. With kit that means a third set of the loaded move rather than a light bodyweight one, as
+    71's "repeating a vigorous move beats serving a light one" already says for every other set. The rule list's `s6-arm-alternate` became where-possible to match. The app's defaults, and
     those defaults with dumbbells, now get the full cycle-and-skip run, so their relaxations and
     never-served moves are reported with every other configuration's (TST-3).
 83. **A line height tighter than the font's own is not drawn, so none is asked for.** SwiftUI can

@@ -27,11 +27,13 @@ struct StrengthBreakBuilder {
     static let workingLadder: [StrengthRelaxation.Rule] = [
         .breakLimits, .servedToday, .vigorous, .excluded, .difficulty, .anything
     ]
-    /// An arm break's third set may repeat the arm move before the exclusions or the cap go: the
-    /// Beginner bodyweight triceps bucket has one difficulty-1 move, and a third set of it beats a
-    /// move above the user's cap (DECISIONS 82).
+    /// An arm break's third set may repeat the arm move before the vigorous rule, the exclusions
+    /// or the cap go. With kit, a third set of the loaded move beats a light bodyweight one, for the
+    /// same reason the working ladder keeps the vigorous rule past "served today"; and the Beginner
+    /// bodyweight triceps bucket has one difficulty-1 move, a third set of which beats a move above
+    /// the user's cap (DECISIONS 82).
     static let armAlternateLadder: [StrengthRelaxation.Rule] = [
-        .breakLimits, .servedToday, .vigorous, .armAlternate, .excluded, .difficulty, .anything
+        .breakLimits, .servedToday, .armAlternate, .vigorous, .excluded, .difficulty, .anything
     ]
     static let warmUpLadder: [StrengthRelaxation.Rule] = [.warmUpShape, .servedToday, .excluded, .difficulty, .anything]
     static let coolDownLadder: [StrengthRelaxation.Rule] = [.coolDownRegion, .servedToday, .excluded, .difficulty, .anything]

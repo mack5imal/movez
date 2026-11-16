@@ -71,4 +71,20 @@ final class StrengthBeginnerCapTests: XCTestCase {
             XCTAssertFalse(built.relaxed.contains { $0.rule == .armAlternate })
         }
     }
+
+    /// With kit, an arm break whose only different move left is a light bodyweight one repeats
+    /// its loaded move instead: repeating a vigorous move does more good than serving a light one
+    /// (DECISIONS 71, 82). A Beginner with dumbbells who has excluded the kickback has the
+    /// overhead extension and the light press-down left in the triceps bucket.
+    func testWithKitAnArmBreakRepeatsItsLoadedMoveRatherThanServingALightOne() {
+        for seed in 0..<50 {
+            var context = StrengthContext()
+            context.equipment = [.dumbbells]
+            context.excluded = ["TRI-04"]
+            context.seed = UInt64(seed)
+            let built = builder.build(letter: .dayA, setOrder: StrengthTestSupport.armOrder(.dayA), context: context)
+            XCTAssertEqual(built.sets.map(\.movement.id), ["TRI-01", "TRI-01", "TRI-01"], "seed \(seed)")
+            XCTAssertEqual(built.relaxed.filter { $0.slot == .set(3) }.map(\.rule), [.armAlternate])
+        }
+    }
 }
