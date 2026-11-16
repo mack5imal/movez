@@ -220,6 +220,22 @@ def narrow_break_limits(pool, let_go, chosen):
     return pool
 
 
+# StrengthBreakBuilder.warmUpShapeParts: with the shape let go, the parts kept where possible.
+WARM_UP_SHAPE_PARTS = [
+    lambda m: m.difficulty == 1,
+    lambda m: not m.per_side,
+    lambda m: not m.floor,
+]
+
+
+def narrow_warm_up(pool, let_go):
+    if "warmUpShape" not in let_go:
+        return pool
+    for part in WARM_UP_SHAPE_PARTS:
+        pool = preferring(pool, part)
+    return pool
+
+
 class Context:
     """StrengthContext and StrengthMicroContext in one."""
 
@@ -444,7 +460,8 @@ def build_strength(letter, order, ctx):
 
     warm_bucket = PATTERNS[letter][1] if is_arm(order[0]) else slot_bucket(order[0])
     warm = draw_slot("warmUp", warm_bucket, WARM_UP_LADDER, set(), ctx, state,
-                     lambda m, g: m.bodyweight if "warmUpShape" in g else warm_up_shaped(m), weight=weight)
+                     lambda m, g: m.bodyweight if "warmUpShape" in g else warm_up_shaped(m),
+                     narrow_warm_up, weight=weight)
     drawn = []  # (slot, move) in draw order: repeats are keyed by slot, not by bucket
     working = []
     for index, slot in enumerate(order):

@@ -72,12 +72,7 @@ struct StrengthBreakBuilder {
     func build(letter: StrengthDayLetter, setOrder: [StrengthSetSlot], context: StrengthContext) -> StrengthBreak {
         var state = StrengthDrawState(seed: context.seed)
         let isArmBreak = setOrder.contains(where: \.isArm)
-        let warmUpBucket = Self.warmUpBucket(letter: letter, setOrder: setOrder)
-
-        let warmUpRequest = SlotRequest(slot: .warmUp, bucket: warmUpBucket, ladder: Self.warmUpLadder, taken: [])
-        let warmUp = draw(warmUpRequest, context: context, state: &state) { movement, letGo in
-            letGo.contains(.warmUpShape) ? movement.isBodyweight : Self.isWarmUpShaped(movement)
-        }
+        let warmUp = drawWarmUp(from: Self.warmUpBucket(letter: letter, setOrder: setOrder), context: context, state: &state)
 
         // Keyed by slot, in draw order, so the moves already in the break are a stable list.
         var drawn: [(slot: StrengthSetSlot, movement: StrengthMovement)] = []
@@ -136,7 +131,33 @@ struct StrengthBreakBuilder {
         )
     }
 
+    /// The warm-up, from `bucket`. Let go of as a whole, the shape is still kept part by part
+    /// wherever the pool allows, so a pattern with no shaped move left serves the nearest one
+    /// rather than a floor, per-side, difficulty-2 move as readily as a floor one (DECISIONS 58).
+    private func drawWarmUp(
+        from bucket: StrengthBucket, context: StrengthContext, state: inout StrengthDrawState
+    ) -> StrengthMovement {
+        let request = SlotRequest(slot: .warmUp, bucket: bucket, ladder: Self.warmUpLadder, taken: [])
+        return draw(
+            request, context: context, state: &state,
+            narrow: { pool, letGo in
+                guard letGo.contains(.warmUpShape) else { return pool }
+                return Self.warmUpShapeParts.reduce(pool) { kept, part in StrengthDraw.preferring(kept, part) }
+            },
+            slotRule: { movement, letGo in
+                letGo.contains(.warmUpShape) ? movement.isBodyweight : Self.isWarmUpShaped(movement)
+            }
+        )
+    }
+
     // MARK: - Rules
+
+    /// The parts of the warm-up shape after bodyweight, in the order a short pool keeps them:
+    /// difficulty 1 first, since a warm-up is started cold, then two-sided, which keeps it to its
+    /// 30 s, then off the floor.
+    static let warmUpShapeParts: [(StrengthMovement) -> Bool] = [
+        { $0.difficulty == 1 }, { !$0.perSide }, { !$0.onFloor }
+    ]
 
     /// One bodyweight, non-floor, difficulty-1, two-sided move: something anyone can start cold.
     static func isWarmUpShaped(_ movement: StrengthMovement) -> Bool {

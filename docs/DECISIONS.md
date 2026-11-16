@@ -500,7 +500,12 @@ of its picks, taken before any of this was built, is replayed by a test to prove
     one per-side, one floor and one grip working move, never a wall move with the wall off, and
     only moves that are bodyweight or use what the user owns. When the pool runs short, the draw
     lets rules go one at a time and then takes back every rule it can, so a break is never empty
-    and never relaxed further than it has to be.
+    and never relaxed further than it has to be. A rule made of parts is kept part by part once
+    it is let go: the break limits as before, and the warm-up shape in the order difficulty 1,
+    then two-sided, then off the floor, since a warm-up is started cold and has 30 s, and the
+    floor matters least of the three; let go as one block, a floor, per-side, difficulty-2 hinge
+    was as likely as a floor one that kept the rest (*amended in the November 2026 review,
+    LIB-12*).
 59. **The first three strength breaks of a day are strength, and the rest are end-range.**
     "Strength breaks a day" is 1, 2, 3 or 4, default 3. The first that many full breaks completed
     in Strength mode are strength breaks; a skipped or snoozed one does not count, so the next is a

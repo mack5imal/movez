@@ -1,11 +1,34 @@
 import XCTest
 @testable import movez
 
-/// What the strength builder does where the default Beginner cap leaves a pattern short: the cap
-/// is kept, and the rule that has to give is recorded on the break (DECISIONS 71, 83).
+/// What the strength builder does where a pool runs short: the default Beginner cap is kept, and
+/// a rule that has to give is recorded on the break and kept part by part (DECISIONS 58, 71, 83).
 final class StrengthBeginnerCapTests: XCTestCase {
     private var library: StrengthLibrary { StrengthTestSupport.library }
     private var builder: StrengthBreakBuilder { StrengthBreakBuilder(library: library) }
+
+    /// With the one shaped hinge served, the warm-up shape is let go, but the parts of it are
+    /// still kept where the pool allows: a difficulty-1, two-sided hinge, never one that is also
+    /// difficulty 2 or per-side (DECISIONS 58, LIB-12).
+    func testALetGoWarmUpShapeIsStillKeptPartByPart() {
+        let shaped = library.movements(in: .hng).filter(StrengthBreakBuilder.isWarmUpShaped)
+        XCTAssertEqual(shaped.map(\.id), ["HNG-07"])
+        let order = StrengthTestSupport.plans.first { $0.letter == .dayB }?.order ?? []
+        XCTAssertEqual(order.first, .pattern(.hng))
+        var warmUps = Set<String>()
+        for seed in 0..<200 {
+            var context = StrengthContext()
+            context.difficultyCap = 3
+            context.unlockedBuckets = Set(StrengthBucket.allCases)
+            context.usedStrengthIdsToday = ["HNG-07"]
+            context.seed = UInt64(seed)
+            let warmUp = builder.build(letter: .dayB, setOrder: order, context: context).warmUp.movement
+            XCTAssertEqual(warmUp.difficulty, 1, warmUp.id)
+            XCTAssertFalse(warmUp.perSide, warmUp.id)
+            warmUps.insert(warmUp.id)
+        }
+        XCTAssertEqual(warmUps, ["HNG-01", "HNG-15", "HNG-16"])
+    }
 
     /// At the default Beginner cap no squat or lunge is vigorous, so with kit the vigorous rule is
     /// let go for those sets and the cap is kept: a light bodyweight squat, never a loaded one
