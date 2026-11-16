@@ -43,7 +43,15 @@ extension Scheduler {
         return [.persist, .menuRefresh]
     }
 
+    /// The grace after a call is over. A deferred break is served only while it is still owed: a
+    /// countdown that has since been moved on (an absence the user took during the grace, say)
+    /// owes nothing yet, and its deferral is dropped rather than served early.
     mutating func resumeAfterSuppression(now: Date) -> [SchedulerEffect] {
+        let owed = snapshot.nextFullDueAt.map { now >= $0 } ?? false
+        if !owed {
+            snapshot.deferredFullDueAt = nil
+            snapshot.deferredReason = nil
+        }
         guard snapshot.deferredFullDueAt != nil else {
             transition(to: .sitting, reason: "back from a call, nothing was due", at: now)
             return [.persist, .menuRefresh]

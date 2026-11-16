@@ -220,6 +220,11 @@ struct Scheduler {
         snapshot.snoozesUsedThisBreak = 0
         snapshot.snoozeAllowanceThisBreak = nil
         snapshot.pendingInputWaitStartedAt = nil
+        // A deferral belongs to the countdown it was deferred from. Left behind, it would label
+        // the next break as having waited for a call, and send a later call's end straight to a
+        // break nobody owed.
+        snapshot.deferredFullDueAt = nil
+        snapshot.deferredReason = nil
         snapshot.nextMicroDueAt = microDue(anchoredAt: now)
     }
 

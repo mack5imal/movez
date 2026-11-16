@@ -145,6 +145,7 @@
 		95151584117600B60B5FE3DD /* SnapshotFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1294BDDEA0FCB1E7D17C92 /* SnapshotFixtures.swift */; };
 		98DE7999C2C09A0317A37B16 /* WorkingHours.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E8D6FE10268C25790DA8F2 /* WorkingHours.swift */; };
 		99924998A6AE2EAA80BA61AA /* StrengthOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B519ED2C90060A692EF5B2C /* StrengthOverlayView.swift */; };
+		9E5565886A6C31529E5FF247 /* SchedulerDeferralTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DFB5669015E088A42B8B433 /* SchedulerDeferralTests.swift */; };
 		A024AF87CB6A62489E5E6B75 /* CrossModeUsage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AC113AF3B5464AE53FB743C /* CrossModeUsage.swift */; };
 		A0C943B9A00D128161B3F4A6 /* MicroBreakView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 341AD3B767AA81AF85AB74AE /* MicroBreakView.swift */; };
 		A1139C1975FC8C947D0EE8B0 /* RoutineTestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9B9838D81524A40DB3881AB /* RoutineTestSupport.swift */; };
@@ -283,6 +284,7 @@
 		2A84A3D099F9C2A57C9E8E21 /* StrengthPanelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrengthPanelTests.swift; sourceTree = "<group>"; };
 		2AC113AF3B5464AE53FB743C /* CrossModeUsage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrossModeUsage.swift; sourceTree = "<group>"; };
 		2C72D952CD33F4E122997B90 /* Gallery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gallery.swift; sourceTree = "<group>"; };
+		2DFB5669015E088A42B8B433 /* SchedulerDeferralTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerDeferralTests.swift; sourceTree = "<group>"; };
 		2E2882E51DF64842E055AB23 /* ModeBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeBadge.swift; sourceTree = "<group>"; };
 		32224F39B624B072CCD46136 /* StrengthOverlayViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrengthOverlayViewModelTests.swift; sourceTree = "<group>"; };
 		32B4F080B42B840756A36DBF /* LibraryBrowserSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryBrowserSheet.swift; sourceTree = "<group>"; };
@@ -542,6 +544,7 @@
 				A9B9838D81524A40DB3881AB /* RoutineTestSupport.swift */,
 				1CFDF85D71146981530D4EAA /* SchedulerCoreTests.swift */,
 				13DE805FBC3C0DA9C2B42248 /* SchedulerDayBoundaryTests.swift */,
+				2DFB5669015E088A42B8B433 /* SchedulerDeferralTests.swift */,
 				DCB939E301141030A259C591 /* SchedulerInterruptionTests.swift */,
 				62B4AC6C3F66A7E5ABB97CFF /* SchedulerMicroTests.swift */,
 				CF441CBFBB593060B3D99F44 /* SchedulerSettingsReplanTests.swift */,
@@ -1224,6 +1227,7 @@
 				A1139C1975FC8C947D0EE8B0 /* RoutineTestSupport.swift in Sources */,
 				C7FD8B58088A2CD47C915509 /* SchedulerCoreTests.swift in Sources */,
 				8EA99BD28816371FF2EFBD7B /* SchedulerDayBoundaryTests.swift in Sources */,
+				9E5565886A6C31529E5FF247 /* SchedulerDeferralTests.swift in Sources */,
 				7001EDB68E7070C58A31F3A9 /* SchedulerInterruptionTests.swift in Sources */,
 				4C0067EE2D2F0D172E5BAFC7 /* SchedulerMicroTests.swift in Sources */,
 				F4EB6A9EBA29535D75433BC6 /* SchedulerSettingsReplanTests.swift in Sources */,
