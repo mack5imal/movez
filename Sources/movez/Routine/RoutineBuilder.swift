@@ -66,8 +66,15 @@ struct RoutineBuilder {
     // MARK: - Candidate pool
 
     /// Every movement the user may be served right now: excludes applied, anything from a family
-    /// already used today removed, difficulty capped, and equipment movements swapped for a
-    /// bodyweight peer when the user does not own the kit.
+    /// already used today removed, difficulty capped, and equipment movements the user does not
+    /// own left out.
+    ///
+    /// An unowned equipment movement is resolved to its bodyweight peer, but that changes nothing
+    /// about what can be drawn: every peer is a bodyweight movement of the library, so it reaches
+    /// the pool on its own iteration with the same verdict, and `seen` drops the duplicate. The
+    /// only effect is that the peer can take the earlier position of the movement it stands in
+    /// for. The draw's odds do not depend on position, but which movement a given seed lands on
+    /// does, so the call is kept only so that seeded picks stay as recorded in the golden fixture.
     func candidates(for context: RoutineContext) -> [Movement] {
         let usedFamilies = families.keys(of: context.usedMovementIdsToday)
         var seen = Set<String>()
@@ -84,20 +91,16 @@ struct RoutineBuilder {
     /// The last resort, when the filters between them leave nothing at all: a day that has
     /// already served every movement, or a user who has excluded the entire library. A repeat is
     /// always better than a break with nothing in it.
+    ///
+    /// Once today and the exclusions are gone, only owned equipment, what the user lacks and the
+    /// difficulty cap are left, and 75 movements pass even the strictest of those (cap 1, no
+    /// equipment, no floor, wall or stairs), so there is no further rung to reach for.
     func relaxedCandidates(for context: RoutineContext) -> [Movement] {
         var relaxed = context.forgettingToday
-        var pool = candidates(for: relaxed)
+        let pool = candidates(for: relaxed)
         if !pool.isEmpty { return pool }
 
         relaxed.excluded = []
-        pool = candidates(for: relaxed)
-        if !pool.isEmpty { return pool }
-
-        // Everything off: the cap raised *and* the difficulty-3 gate opened with it, or the last
-        // rung would filter out exactly what it was reaching for.
-        relaxed.difficultyCap = 3
-        relaxed.unlockedDiff3 = Set(library.movements.map(\.id))
-        relaxed.equipment = []
         return candidates(for: relaxed)
     }
 

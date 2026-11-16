@@ -2,6 +2,12 @@ import Foundation
 
 /// Bodyweight replacements for the 18 movements that list optional equipment.
 ///
+/// The brief has equipment movements substituted with their bodyweight peers, which mattered when
+/// a break was a template of slots. Since breaks became pooled draws (DECISIONS 23e and 28) a swap
+/// changes nothing about what can be drawn: every peer is itself in the pool, so an unowned
+/// equipment movement is in effect left out. `RoutineBuilder.candidates` still resolves through
+/// here only so that the order of its pool, and so the movement a seed lands on, stays as recorded.
+///
 /// Chaining rule 6 in the library document names three explicit swaps; everything else falls back
 /// to "the bodyweight peer with the same Counteracts value". The ladder below adds the two tiers
 /// the document leaves implicit so that every equipment movement resolves to something:
