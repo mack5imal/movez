@@ -3,11 +3,36 @@ import XCTest
 
 final class CaptureSignaturesTests: XCTestCase {
     private var signatures: CaptureSignatures {
-        guard let bundled = CaptureSignatures.bundled() else {
-            XCTFail("capture-signatures.json is missing from the bundle")
+        do {
+            return try CaptureSignatures.loadBundled()
+        } catch {
+            XCTFail("capture-signatures.json did not load: \(error)")
             return CaptureSignatures(note: "", signatures: [])
         }
-        return bundled
+    }
+
+    // MARK: - A bad file is loud
+
+    /// A file that will not load turns screen-share detection off for good, so the shipped one
+    /// must load, and say why when it does not.
+    func testTheBundledFileLoadsWithoutError() {
+        XCTAssertNoThrow(try CaptureSignatures.loadBundled())
+    }
+
+    func testAMalformedFileThrowsRatherThanLoadingNothing() {
+        let broken = Data(#"{"note": "x", "signatures": [{"name": "No ids"}]}"#.utf8)
+        XCTAssertThrowsError(try CaptureSignatures.decode(broken))
+        XCTAssertThrowsError(try CaptureSignatures.decode(Data("not json".utf8)))
+    }
+
+    /// The two flags read as optional, and now are: an entry that leaves them out is an enabled
+    /// signature that matches on its bundle alone, instead of a decoding error for the whole file.
+    func testTheFlagsDefaultWhenLeftOut() throws {
+        let json = #"{"note": "x", "signatures": [{"name": "Tool", "bundleIds": ["a.b"], "processNames": []}]}"#
+        let decoded = try CaptureSignatures.decode(Data(json.utf8))
+        XCTAssertEqual(decoded.signatures.first?.enabled, true)
+        XCTAssertEqual(decoded.signatures.first?.requireProcessName, false)
+        XCTAssertEqual(decoded.firstMatch(bundleIds: ["a.b"], processNames: [])?.name, "Tool")
     }
 
     func testTheFileLoadsWithEnoughSignatures() {

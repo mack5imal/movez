@@ -89,4 +89,6 @@ enum MovezLog {
     static let store = Logger(subsystem: "com.kylemack.movez", category: "store")
     /// Every scheduler transition, so an overnight sleep bug can be read back days later.
     static let scheduler = Logger(subsystem: "com.kylemack.movez", category: "scheduler")
+    /// A signal source that could not be set up, so it reads nothing.
+    static let signals = Logger(subsystem: "com.kylemack.movez", category: "signals")
 }

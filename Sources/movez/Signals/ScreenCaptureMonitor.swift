@@ -53,6 +53,26 @@ struct CaptureSignature: Codable, Equatable {
     }
 }
 
+extension CaptureSignature {
+    private enum CodingKeys: String, CodingKey {
+        case name, bundleIds, processNames, requireProcessName, enabled, disabledReason
+    }
+
+    /// Written out because Swift's synthesised decoding ignores property defaults: an entry that
+    /// left out `enabled` or `requireProcessName` threw for the whole file, and that turned
+    /// screen-share detection off. Both now default, to enabled and to matching on the bundle
+    /// alone.
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        name = try container.decode(String.self, forKey: .name)
+        bundleIds = try container.decode([String].self, forKey: .bundleIds)
+        processNames = try container.decode([String].self, forKey: .processNames)
+        requireProcessName = try container.decodeIfPresent(Bool.self, forKey: .requireProcessName) ?? false
+        enabled = try container.decodeIfPresent(Bool.self, forKey: .enabled) ?? true
+        disabledReason = try container.decodeIfPresent(String.self, forKey: .disabledReason)
+    }
+}
+
 struct CaptureSignatures: Codable, Equatable {
     var note: String
     var signatures: [CaptureSignature]
@@ -68,10 +88,36 @@ struct CaptureSignatures: Codable, Equatable {
         }
     }
 
+    enum LoadError: Error {
+        case resourceMissing
+    }
+
+    /// The shipped file, or the reason it would not load.
+    static func loadBundled() throws -> CaptureSignatures {
+        guard let url = MovezBundle.resources.url(forResource: "capture-signatures", withExtension: "json") else {
+            throw LoadError.resourceMissing
+        }
+        return try decode(Data(contentsOf: url))
+    }
+
+    static func decode(_ data: Data) throws -> CaptureSignatures {
+        try JSONDecoder().decode(CaptureSignatures.self, from: data)
+    }
+
+    /// The shipped file, or nil with the reason logged.
+    ///
+    /// A file that will not load leaves screen-share detection off while everything else keeps
+    /// working, which nobody would notice. Unlike the movement library it is not worth refusing
+    /// to launch over, so it is logged here and `CaptureSignaturesTests` fails on it.
     static func bundled() -> CaptureSignatures? {
-        guard let url = MovezBundle.resources.url(forResource: "capture-signatures", withExtension: "json"),
-              let data = try? Data(contentsOf: url) else { return nil }
-        return try? JSONDecoder().decode(CaptureSignatures.self, from: data)
+        do {
+            return try loadBundled()
+        } catch {
+            MovezLog.signals.error(
+                "capture-signatures.json did not load, screen-share detection is off: \(String(describing: error), privacy: .public)"
+            )
+            return nil
+        }
     }
 
     /// Which signature, if any, is currently satisfied.
