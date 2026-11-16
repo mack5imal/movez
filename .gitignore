@@ -11,3 +11,4 @@ xcuserdata/
 
 # Python bytecode from the scripts
 __pycache__/
+.claude/worktrees/
