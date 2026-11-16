@@ -763,3 +763,11 @@ Entries from fixing the findings in `docs/code-review-2026-11.md`.
     it. The rule list's `s6-arm-alternate` became where-possible to match. The app's defaults, and
     those defaults with dumbbells, now get the full cycle-and-skip run, so their relaxations and
     never-served moves are reported with every other configuration's (TST-3).
+85. **A line height tighter than the font's own is not drawn, so none is asked for.** SwiftUI can
+    add space between lines but not take it away, and Manrope's line box is about 1.37 times its
+    size. The handoff's tighter values for the set name (1.05), the dose and rep counter (1.1),
+    the panel title and dose (1.15), the kicker, dose modifier and compact side pill (1.2), and the
+    up-next line and menu rows (1.3) were silently set at 1.37. Those styles now say 1, the font's
+    natural line, which is what they were already drawn at, and a test holds every style to 1 or
+    to at least the natural ratio. The difference only shows when one of them wraps to a second
+    line, which a two-line set name or up-next line can (UI-14).

@@ -17,6 +17,11 @@ struct MovezTextStyle: Equatable {
     /// The handoff writes line height as a multiple of the font size, but SwiftUI's `lineSpacing`
     /// is the gap *between* line boxes. Subtracting the font's own line box is what makes a
     /// 28 px / 1.45 paragraph actually set at 1.45.
+    ///
+    /// Spacing can only be added, so a line height tighter than Manrope's own line box (about
+    /// 1.37) cannot be drawn. The handoff's tighter values (1.05 to 1.3) are therefore written as 1,
+    /// the font's natural line, and a test holds every style to 1 or at least the natural ratio
+    /// (DECISIONS 85).
     var lineSpacing: CGFloat {
         guard lineHeight > 1 else { return 0 }
         let naturalLineBox = nsFont.ascender - nsFont.descender + nsFont.leading
@@ -42,24 +47,24 @@ enum MovezType {
     static let backToWork = MovezTextStyle(size: 22, weight: .bold)
     static let sideToggle = MovezTextStyle(size: 30, weight: .bold)
     /// The movement name on a rep-based set, smaller than `overlayName` to make room for the meter.
-    static let setName = MovezTextStyle(size: 56, weight: .bold, trackingEm: -0.03, lineHeight: 1.05)
-    static let setKicker = MovezTextStyle(size: 20, weight: .semibold, lineHeight: 1.2)
-    static let dose = MovezTextStyle(size: 28, weight: .bold, trackingEm: -0.015, lineHeight: 1.1)
-    static let doseModifier = MovezTextStyle(size: 20, weight: .semibold, lineHeight: 1.2)
-    static let repCounter = MovezTextStyle(size: 28, weight: .bold, trackingEm: -0.015, lineHeight: 1.1)
-    static let upNext = MovezTextStyle(size: 28, weight: .semibold, lineHeight: 1.3)
+    static let setName = MovezTextStyle(size: 56, weight: .bold, trackingEm: -0.03)
+    static let setKicker = MovezTextStyle(size: 20, weight: .semibold)
+    static let dose = MovezTextStyle(size: 28, weight: .bold, trackingEm: -0.015)
+    static let doseModifier = MovezTextStyle(size: 20, weight: .semibold)
+    static let repCounter = MovezTextStyle(size: 28, weight: .bold, trackingEm: -0.015)
+    static let upNext = MovezTextStyle(size: 28, weight: .semibold)
     /// The compact SideToggle that sits at the end of the dose line.
-    static let sidePillCompact = MovezTextStyle(size: 22, weight: .bold, lineHeight: 1.2)
+    static let sidePillCompact = MovezTextStyle(size: 22, weight: .bold)
 
     // Panels
     static let eyebrowPanel = MovezTextStyle(size: 11, weight: .semibold, trackingEm: 0.1, uppercase: true)
-    static let panelTitle = MovezTextStyle(size: 20, weight: .bold, trackingEm: -0.015, lineHeight: 1.15)
+    static let panelTitle = MovezTextStyle(size: 20, weight: .bold, trackingEm: -0.015)
     static let panelBody = MovezTextStyle(size: 13, weight: .regular, lineHeight: 1.45)
     static let panelDisc = MovezTextStyle(size: 17, weight: .bold)
     static let panelButton = MovezTextStyle(size: 13, weight: .semibold)
     static let badge = MovezTextStyle(size: 12.5, weight: .regular)
     /// The dose line in a micro panel, drawn in accent.
-    static let panelDose = MovezTextStyle(size: 20, weight: .bold, trackingEm: -0.015, lineHeight: 1.15)
+    static let panelDose = MovezTextStyle(size: 20, weight: .bold, trackingEm: -0.015)
     /// Weight guidance is an info badge that runs to several lines, so it sets a real line height,
     /// with its lead sentence in the heavier weight.
     static let guidance = MovezTextStyle(size: 12.5, weight: .regular, lineHeight: 1.45)
@@ -68,7 +73,7 @@ enum MovezType {
     static let toastBody = MovezTextStyle(size: 12, weight: .regular)
 
     // Menu
-    static let menuRow = MovezTextStyle(size: 13, weight: .medium, lineHeight: 1.3)
+    static let menuRow = MovezTextStyle(size: 13, weight: .medium)
     static let menuTitle = MovezTextStyle(size: 14, weight: .bold)
     static let menuSecondary = MovezTextStyle(size: 12, weight: .regular)
     static let menuDisc = MovezTextStyle(size: 14, weight: .bold)

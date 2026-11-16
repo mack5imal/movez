@@ -42,6 +42,23 @@ final class FontsTests: XCTestCase {
         XCTAssertEqual(MovezType.overlayName.lineSpacing, 0, accuracy: 0.001)
     }
 
+    /// SwiftUI can only add space between lines, never take it away, so a line height under the
+    /// font's own line box is silently set at the font's. A style asks for 1 (the font's natural
+    /// line) or for at least that ratio, so that every line height written down is one that is
+    /// drawn (UI-14, DECISIONS 85).
+    func testEveryLineHeightIsOneOrAtLeastTheFontsNaturalRatio() {
+        for entry in MovezType.all {
+            let style = entry.style
+            let font = style.nsFont
+            let natural = (font.ascender - font.descender + font.leading) / style.size
+            guard style.lineHeight != 1 else { continue }
+            XCTAssertGreaterThanOrEqual(
+                style.lineHeight, natural,
+                "\(entry.name) asks for \(style.lineHeight), tighter than Manrope's \(natural)"
+            )
+        }
+    }
+
     func testTheDisplayStylesMatchTheHandoffSizes() {
         XCTAssertEqual(MovezType.overlayName.size, 80)
         XCTAssertEqual(MovezType.overlayNameSide.size, 56)
