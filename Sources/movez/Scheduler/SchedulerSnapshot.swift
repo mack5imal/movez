@@ -35,6 +35,9 @@ struct SchedulerSnapshot: Codable, Equatable {
     /// files still decode.
     var awayInputAge: Int?
     var remainingAtPauseSeconds: Int?
+    /// When the pause began, so its end can tell whether a working day opened during it. Optional
+    /// so older state files still decode; a pause saved without it resumes as before.
+    var pauseStartedAt: Date?
     var pauseIsFocusInitiated: Bool = false
     var interruptedBreak: InterruptedBreak?
     var deferredFullDueAt: Date?

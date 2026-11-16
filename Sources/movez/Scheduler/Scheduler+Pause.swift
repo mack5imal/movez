@@ -17,6 +17,7 @@ extension Scheduler {
         var effects = dismissSurfaces(now: now)
 
         snapshot.remainingAtPauseSeconds = snapshot.nextFullDueAt.map { max(0, Int($0.timeIntervalSince(now))) }
+        snapshot.pauseStartedAt = now
         snapshot.pauseIsFocusInitiated = focusInitiated
         let until = pauseEnd(seconds: seconds, focusInitiated: focusInitiated, now: now)
         transition(to: .paused(until: until), reason: focusInitiated ? "focus filter" : "paused by hand", at: now)
@@ -63,10 +64,36 @@ extension Scheduler {
         // A Focus filter switching off must not cancel a pause the user set deliberately.
         if focusInitiated, !snapshot.pauseIsFocusInitiated { return [] }
 
+        // A pause can outlast the working day (a Focus left on overnight, say). Ending outside
+        // working hours goes straight to off hours, and ending after a working day opened starts
+        // that day fresh, as the opening itself would have: the countdown the pause put away
+        // belongs to yesterday.
+        if !snapshot.adHocSession, !config.workingHours.isWithin(now, calendar: config.calendar) {
+            clearPauseBookkeeping()
+            return enterOffHours(now: now, reason: "\(reason), outside working hours")
+        }
+        if let started = snapshot.pauseStartedAt,
+           crossedWorkingDayOpening(gapSeconds: max(0, Int(now.timeIntervalSince(started))), now: now) {
+            clearPauseBookkeeping()
+            rollDayCountersIfStale(now: now)
+            return [.pollingChanged(true)] + startFreshSession(now: now, reason: "\(reason), a working day opened during it")
+        }
+
+        // The bout moves on with the countdown the pause hands back, as it does for an absence,
+        // so the time spent paused is never counted as time sat.
+        if let started = snapshot.pauseStartedAt {
+            snapshot.boutStartedAt = snapshot.boutStartedAt.addingTimeInterval(now.timeIntervalSince(started))
+        }
         var effects = endPauseBookkeeping(now: now)
         transition(to: .sitting, reason: reason, at: now)
         effects += [.persist, .menuRefresh]
         return effects
+    }
+
+    private mutating func clearPauseBookkeeping() {
+        snapshot.remainingAtPauseSeconds = nil
+        snapshot.pauseStartedAt = nil
+        snapshot.pauseIsFocusInitiated = false
     }
 
     /// Restores the countdown a pause was holding and turns polling back on.
@@ -74,8 +101,7 @@ extension Scheduler {
         let remaining = snapshot.remainingAtPauseSeconds ?? config.sitSeconds
         snapshot.nextFullDueAt = now.addingTimeInterval(TimeInterval(remaining))
         snapshot.nextMicroDueAt = microDue(anchoredAt: now)
-        snapshot.remainingAtPauseSeconds = nil
-        snapshot.pauseIsFocusInitiated = false
+        clearPauseBookkeeping()
         return [.pollingChanged(true)]
     }
 
