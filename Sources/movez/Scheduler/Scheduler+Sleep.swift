@@ -184,6 +184,11 @@ extension Scheduler {
             break
         }
 
+        if let ended = endAdHocSessionAfterGap(seconds: seconds, now: now) {
+            rollDayCountersIfStale(now: now)
+            return ended
+        }
+
         if snapshot.state.isBreakSurfaceVisible {
             // Whatever was on screen died with the process. There is nothing left to resume.
             rollDayCountersIfStale(now: now)

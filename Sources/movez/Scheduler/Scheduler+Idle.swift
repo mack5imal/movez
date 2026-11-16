@@ -70,7 +70,8 @@ extension Scheduler {
             if let interrupted = snapshot.interruptedBreak, interruptedBreakCounts(interrupted) {
                 credited = settleInterruptedBreak(now: now)
             }
-            return credited + enterStandby(absence: absence, since: since, now: now)
+            let standby = enterStandby(absence: absence, since: since, now: now)
+            return credited + standby + (endAdHocSessionAfterGap(seconds: absence, now: now) ?? [])
         }
         if crossedWorkingDayOpening(gapSeconds: absence, now: returnedAt) {
             return resetDay(now: now, reason: "gap crossed a working-day opening — new day")

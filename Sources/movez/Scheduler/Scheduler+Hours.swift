@@ -61,12 +61,23 @@ extension Scheduler {
         return enterOffHours(now: now, reason: "session ended")
     }
 
-    /// An ad-hoc session does not survive midnight.
+    /// An ad-hoc session does not survive midnight, though a break already running when the
+    /// clock strikes twelve is allowed to finish: the next tick after it ends the session.
     private mutating func endAdHocSessionIfStale(now: Date) -> [SchedulerEffect] {
         guard let started = snapshot.adHocSessionStartedAt else { return [] }
         guard !config.calendar.isDate(now, inSameDayAs: started) else { return [] }
+        if case .fullBreak = snapshot.state { return [] }
         return enterOffHours(now: now, reason: "session ended at midnight")
     }
+
+    /// DECISIONS 16: an ad-hoc session also ends at a four-hour gap, a lid closed or the app quit
+    /// for that long. Nil when the gap leaves the session running.
+    mutating func endAdHocSessionAfterGap(seconds: Int, now: Date) -> [SchedulerEffect]? {
+        guard snapshot.adHocSession, seconds >= Self.adHocGapSeconds else { return nil }
+        return enterOffHours(now: now, reason: "session ended after \(seconds / 3600) h away")
+    }
+
+    static let adHocGapSeconds = 4 * 3600
 
     /// The next time the working day opens, for the off-hours menu.
     func nextWorkingStart(after now: Date) -> Date? {
