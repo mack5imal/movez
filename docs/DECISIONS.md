@@ -707,3 +707,8 @@ Entries from fixing the findings in `docs/code-review-2026-11.md`.
     than the one announced, as in Strength mode. And a break put on screen but not done still
     counts as served only until the app quits; storing its movements in history was left out,
     since a new seed already makes the same break again unlikely, though not impossible (LIB-8).
+80. **A bodyweight strength break's heads-up does not ask for weights.** The design's heads-up
+    reads "About 5 minutes, three sets. Have your weights nearby." for every strength break, but
+    a setup confirmed with nothing ticked is bodyweight only (56), and that user read the request
+    before every break. A break with no loaded set now reads "About 5 minutes, three sets.", and
+    one with any loaded set keeps the design's sentence (LIB-6).

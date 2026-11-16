@@ -9,7 +9,7 @@ import Foundation
 extension SnapshotFixtures {
     /// The heads-up before a strength break, or an end-range break, or the deferred variant.
     static func strengthHeadsUp(
-        announced: HeadsUpAnnouncement = .strength,
+        announced: HeadsUpAnnouncement = .strength(loaded: true),
         deferred: Bool = false
     ) -> PanelViewModel {
         let model = headsUp(deferred: deferred)

@@ -43,13 +43,16 @@ enum PlannedBreak: Hashable {
 /// a title and, unless the break counts its own, a body from here.
 enum HeadsUpAnnouncement: Equatable {
     case movement
-    case strength
+    /// `loaded` when any set holds equipment. Bodyweight only is a valid setup (DECISIONS 56), and
+    /// its breaks hold no weights to have nearby.
+    case strength(loaded: Bool)
     case endRange
 
     init(_ planned: PlannedBreak) {
         switch planned {
         case .movement: self = .movement
-        case .strength: self = .strength
+        case let .strength(strengthBreak):
+            self = .strength(loaded: strengthBreak.sets.contains { !$0.movement.isBodyweight })
         case .endRange: self = .endRange
         }
     }
@@ -67,7 +70,8 @@ enum HeadsUpAnnouncement: Equatable {
     var fixedBody: String? {
         switch self {
         case .movement: return nil
-        case .strength: return "About 5 minutes, three sets. Have your weights nearby."
+        case .strength(loaded: true): return "About 5 minutes, three sets. Have your weights nearby."
+        case .strength(loaded: false): return "About 5 minutes, three sets."
         case .endRange: return "Four minutes, four stretches. No weights needed."
         }
     }

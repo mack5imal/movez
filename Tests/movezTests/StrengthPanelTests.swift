@@ -53,7 +53,7 @@ final class StrengthPanelTests: XCTestCase {
     // MARK: - Heads-up
 
     func testTheStrengthHeadsUpNamesItsModeAndHasTheDesignsWords() {
-        let model = headsUp(mode: .strength, announced: .strength)
+        let model = headsUp(mode: .strength, announced: .strength(loaded: true))
         XCTAssertEqual(model.eyebrowLabel, .breakEyebrow)
         XCTAssertEqual(model.eyebrow, "STRENGTH BREAK")
         XCTAssertEqual(model.title, "Strength break in a minute")
@@ -77,11 +77,30 @@ final class StrengthPanelTests: XCTestCase {
     }
 
     func testTheDeferredStrengthHeadsUpWidensAndDropsASpentSnooze() {
-        let model = headsUp(mode: .strength, announced: .strength, snoozesLeft: 0, deferred: true)
+        let model = headsUp(mode: .strength, announced: .strength(loaded: true), snoozesLeft: 0, deferred: true)
         XCTAssertEqual(model.panelWidth, Tokens.Metric.panelWidthDeferred)
         XCTAssertEqual(model.panelWidth, 420)
         XCTAssertEqual(model.deferredBadge, "Sitting for 1 h 35 m · break waited for your call")
         XCTAssertFalse(model.showSnooze)
+    }
+
+    /// Bodyweight only is a valid setup (DECISIONS 56), and its breaks hold no weights, so its
+    /// heads-up does not ask for them (LIB-6).
+    func testABodyweightStrengthBreakIsNotToldToHaveWeightsNearby() {
+        let builder = StrengthBreakBuilder(library: StrengthTestSupport.library)
+        let order = StrengthTestSupport.plans[0].order
+        var bodyweight = StrengthContext()
+        bodyweight.seed = 7
+        let unloaded = builder.build(letter: .dayA, setOrder: order, context: bodyweight)
+        XCTAssertEqual(HeadsUpAnnouncement(.strength(unloaded)), .strength(loaded: false))
+        XCTAssertEqual(HeadsUpAnnouncement.strength(loaded: false).fixedBody, "About 5 minutes, three sets.")
+
+        let loaded = builder.build(letter: .dayA, setOrder: order, context: StrengthTestSupport.everythingContext(seed: 7))
+        XCTAssertTrue(loaded.sets.contains { !$0.movement.isBodyweight })
+        XCTAssertEqual(HeadsUpAnnouncement(.strength(loaded)), .strength(loaded: true))
+
+        let model = headsUp(mode: .strength, announced: .strength(loaded: false))
+        XCTAssertEqual(model.body, "About 5 minutes, three sets.")
     }
 
     func testAHeadsUpAnnouncesTheKindOfBreakItWasBuiltFor() throws {
