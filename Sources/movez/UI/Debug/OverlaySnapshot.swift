@@ -21,7 +21,7 @@ struct OverlaySnapshot: View {
     /// A stand-in for whatever the user was looking at.
     static var desktop: some View {
         LinearGradient(
-            colors: [Color(red: 0.29, green: 0.36, blue: 0.40), Color(red: 0.17, green: 0.23, blue: 0.28)],
+            colors: [Tokens.Backdrop.overlayDesktopTop.color, Tokens.Backdrop.overlayDesktopBottom.color],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )

@@ -104,8 +104,6 @@ enum Tokens {
     static let ringTrack = ink.opacity(0.15)
     static let toggleOffTrack = MovezColor(red: 1, green: 1, blue: 1, alpha: 0.2)
     static let emptyRing = accent.opacity(0.25)
-    /// The unfilled part of the timer ring in the lead-in and rest looks, drawn on the panel fill.
-    static let leadinRingTrack = accent.opacity(0.15)
 
     /// The menu-bar icon is a template image: macOS keeps only each pixel's alpha and tints it, so
     /// its tokens are opacities of one template colour rather than colours of their own.
@@ -133,6 +131,9 @@ enum Tokens {
         static let lightBarInk = MovezColor(hex: 0x2A30_35)
         static let darkBar = MovezColor(hex: 0x1F1F_1F)
         static let darkBarInk = MovezColor(hex: 0xEDED_ED)
+        /// The gradient the overlay snapshots put behind the dim, top-leading to bottom-trailing.
+        static let overlayDesktopTop = MovezColor(red: 0.29, green: 0.36, blue: 0.40)
+        static let overlayDesktopBottom = MovezColor(red: 0.17, green: 0.23, blue: 0.28)
     }
 
     // MARK: - Radii
@@ -178,7 +179,6 @@ enum Tokens {
         static let togglesize = CGSize(width: 38, height: 22)
         static let stripGap: CGFloat = 16
         static let stripRule: CGFloat = 3
-        static let overlayRingStroke: CGFloat = 6
         static let panelRingStroke: CGFloat = 2.5
         static let repMeter = CGSize(width: 64, height: 264)
         /// The fill never drops below one pill's worth, so the meter is never read as empty.
