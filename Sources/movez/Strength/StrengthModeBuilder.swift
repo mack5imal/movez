@@ -13,9 +13,12 @@ struct StrengthModeBuilder: ModeBreakBuilding {
     let usage: CrossModeUsage
 
     func plan(for coordinator: AppCoordinator, at now: Date) -> NextFullBreak {
-        StrengthDayPlanner(calendar: coordinator.settings.schedulerConfig.calendar).next(
+        let settings = coordinator.settings
+        return StrengthDayPlanner(calendar: settings.schedulerConfig.calendar).next(
             records: coordinator.history.data.breakRecords,
-            strengthBreaksPerDay: coordinator.settings.strengthBreaksPerDay,
+            strengthBreaksPerDay: settings.strengthBreaksPerDay,
+            focus: settings.strengthFocus,
+            armBreakPossible: StrengthDayPlanner.armBreakPossible(equipment: settings.strengthEquipment),
             today: now
         )
     }
@@ -109,7 +112,7 @@ struct StrengthModeBuilder: ModeBreakBuilding {
     /// The regions today's completed strength work loaded, which an end-range break leaves alone
     /// where it can. Read from history's completions rather than from the breaks served, so a
     /// skipped strength break, which loaded nothing, adds nothing; the warm-ups are counted with
-    /// the sets, which is harmless because each warm-up is drawn from its first set's pattern.
+    /// the sets, which is harmless because each warm-up is drawn from a pattern the day trains.
     private func workedRegionsToday(for coordinator: AppCoordinator, at now: Date) -> Set<Region> {
         var regions = Set<Region>()
         for id in coordinator.history.usedMovementIds(on: now) {

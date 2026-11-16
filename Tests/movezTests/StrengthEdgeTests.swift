@@ -3,7 +3,7 @@ import XCTest
 
 /// The edges of a Strength day the polish pass checks end to end through the coordinator: a
 /// bodyweight-only setup, a mode switch during the session kinds the other tests do not cover, a
-/// relaunch part-way through the day and the four-strength-break day.
+/// relaunch part-way through the day, the four-strength-break day and the arm break.
 @MainActor
 final class StrengthEdgeTests: XCTestCase {
     private let minute: TimeInterval = 60
@@ -160,9 +160,40 @@ final class StrengthEdgeTests: XCTestCase {
         XCTAssertEqual(kinds(harness), [.strengthA, .strengthA, .strengthA, .strengthA, .endRange])
         XCTAssertEqual(progress, [1, 2, 3, 4, nil])
         XCTAssertEqual(shapes.first, [.sqt, .psh, .cor], "the first break ends on core")
-        for shape in shapes.dropFirst() {
+        XCTAssertEqual(shapes.last, [.tri, .tri, .tri], "the fourth is the push day's arm break")
+        for shape in shapes.dropFirst().dropLast() {
             XCTAssertEqual(shape.first, shape.last, "a later break repeats its lead pattern: \(shape)")
             XCTAssertEqual(Set(shape), [.sqt, .psh])
         }
+    }
+
+    // MARK: - Arm break
+
+    /// At four a day the fourth break is the arm break, recorded like any other A-day break.
+    func testAFourBreakDaysFourthBreakIsTheTricepsArmBreak() throws {
+        let harness = strengthHarness(perDay: 4)
+        var sessions: [BreakSession] = []
+        for _ in 0..<4 { sessions.append(try XCTUnwrap(takeBreak(harness))) }
+        XCTAssertEqual(kinds(harness), Array(repeating: .strengthA, count: 4))
+
+        let sets = try XCTUnwrap(sessions[3].planned.strengthBreak?.sets).map(\.movement)
+        XCTAssertEqual(sets.map(\.bucket), [.tri, .tri, .tri])
+        XCTAssertEqual(sets[0].id, sets[1].id)
+        XCTAssertNotEqual(sets[0].id, sets[2].id)
+        XCTAssertEqual(sessions[3].planned.strengthBreak?.warmUp.movement.bucket, .psh)
+        for session in sessions.prefix(3) {
+            let buckets = try XCTUnwrap(session.planned.strengthBreak?.sets).map(\.movement.bucket)
+            XCTAssertTrue(Set(buckets).isSubset(of: [.sqt, .psh, .cor]), "\(buckets)")
+        }
+    }
+
+    func testMoreArmsMakesAThreeBreakDaysThirdBreakTheArmBreak() throws {
+        let harness = strengthHarness(perDay: 3) { $0.strengthFocus = .moreArms }
+        var sessions: [BreakSession] = []
+        for _ in 0..<3 { sessions.append(try XCTUnwrap(takeBreak(harness))) }
+        XCTAssertEqual(kinds(harness), Array(repeating: .strengthA, count: 3))
+        let buckets = try XCTUnwrap(sessions[2].planned.strengthBreak?.sets).map(\.movement.bucket)
+        XCTAssertEqual(buckets, [.tri, .tri, .tri])
+        XCTAssertEqual(harness.coordinator.menuState.dayProgress?.breakNumber, nil, "the day's strength breaks are done")
     }
 }

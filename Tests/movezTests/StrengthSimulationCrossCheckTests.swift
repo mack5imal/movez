@@ -8,7 +8,9 @@ import XCTest
 ///
 /// Each seed is one day of six full breaks with a micro-break before each, the strength breaks a
 /// day cycling 1–4 and one strength break in ten skipped; seeds run as 5-day weeks from a fresh
-/// history, so the letters, the set orders and the no-repeat rules all meet their edge cases.
+/// history, so the letters, the set orders and the no-repeat rules all meet their edge cases. The
+/// weeks alternate between no focus and More arms, so every kit meets the arm break at the fourth
+/// break and at the third (or, kettlebell-only, never), with the focus weighting in its draws.
 final class StrengthSimulationCrossCheckTests: XCTestCase {
     private static let seeds = 200
     private static let daysPerWeek = 5
@@ -30,13 +32,21 @@ final class StrengthSimulationCrossCheckTests: XCTestCase {
         for configuration in StrengthSimulationRun.Configuration.all + [.appDefaults] {
             var outcome = StrengthSimulationRun.Outcome()
             for weekStart in stride(from: 0, to: Self.seeds, by: Self.daysPerWeek) {
-                let run = StrengthSimulationRun(configuration: configuration, outcome: outcome)
+                let focus: StrengthFocus = (weekStart / Self.daysPerWeek).isMultiple(of: 2) ? .none : .moreArms
+                let run = StrengthSimulationRun(configuration: configuration, focus: focus, outcome: outcome)
                 run.week(seeds: weekStart..<min(weekStart + Self.daysPerWeek, Self.seeds))
                 outcome = run.outcome
             }
             XCTAssertEqual(outcome.violations, [:], "\(configuration): \(outcome.firstExample)")
             XCTAssertGreaterThan(outcome.strengthBreaks, Self.seeds, "\(configuration)")
             XCTAssertGreaterThan(outcome.endRangeBreaks, Self.seeds, "\(configuration)")
+            // Both arm-break positions are reached wherever the kit allows one, and none without.
+            if StrengthDayPlanner.armBreakPossible(equipment: configuration.equipment) {
+                XCTAssertGreaterThan(outcome.armBreaks[.none] ?? 0, 0, "\(configuration)")
+                XCTAssertGreaterThan(outcome.armBreaks[.moreArms] ?? 0, 0, "\(configuration)")
+            } else {
+                XCTAssertEqual(outcome.armBreaks, [:], "\(configuration)")
+            }
             XCTAssertEqual(outcome.microBreaks, Self.seeds * StrengthSimulationRun.fullBreaksPerDay, "\(configuration)")
         }
     }
@@ -80,6 +90,8 @@ private final class StrengthSimulationRun {
         var violations: [String: Int] = [:]
         var firstExample: [String: String] = [:]
         var strengthBreaks = 0
+        /// Arm breaks built, by the focus of the week they fell in.
+        var armBreaks: [StrengthFocus: Int] = [:]
         var endRangeBreaks = 0
         var microBreaks = 0
 
@@ -111,18 +123,21 @@ private final class StrengthSimulationRun {
     }
 
     let configuration: Configuration
+    let focus: StrengthFocus
     private(set) var outcome: Outcome
     private let library = StrengthTestSupport.library
     private let calendar = Calendar.current
     private let usage: CrossModeUsage
     private let checker: StrengthRuleChecker
     private var records: [BreakRecord] = []
-    private var plans = StrengthPlanChecker()
+    private var plans: StrengthPlanChecker
     private var servedByDay: [Int: [String: Int]] = [:]
 
-    init(configuration: Configuration, outcome: Outcome) {
+    init(configuration: Configuration, focus: StrengthFocus, outcome: Outcome) {
         self.configuration = configuration
+        self.focus = focus
         self.outcome = outcome
+        plans = StrengthPlanChecker(focus: focus, equipment: configuration.equipment)
         usage = CrossModeUsage(movementLibrary: RoutineTestSupport.library, strengthLibrary: library)
         checker = StrengthRuleChecker(library: library, equipment: configuration.equipment, solidWallNearby: configuration.wall)
     }
@@ -141,18 +156,26 @@ private final class StrengthSimulationRun {
 
     /// A micro-break that avoids a preview of the next full break, then that full break.
     private func fullBreakSlot(seed: UInt64, at: Date, day: inout Day) {
-        let plan = StrengthDayPlanner(calendar: calendar).next(records: records, strengthBreaksPerDay: day.perDay, today: at)
+        let plan = StrengthDayPlanner(calendar: calendar).next(
+            records: records,
+            strengthBreaksPerDay: day.perDay,
+            focus: focus,
+            armBreakPossible: StrengthDayPlanner.armBreakPossible(equipment: configuration.equipment),
+            today: at
+        )
         let preview = buildFull(plan, seed: seed, day: day)
         microBreak(seed: seed &+ 1, nextFullBreakIds: Set(preview.ids), day: &day)
 
         let full = buildFull(plan, seed: seed, day: day)
         let sets = full.strength?.sets.map(\.movement.bucket) ?? []
-        outcome.add(plans.check(plan, sets: sets), full.ids.joined(separator: " · "))
-        if let strengthBreak = full.strength {
-            outcome.add(checker.check(strengthBreak, context: full.context), full.ids.joined(separator: " · "))
-            complete(strengthBreak, skipped: (seed >> 3) % 10 == 0, at: at, day: &day)
+        let example = "\(focus): " + full.ids.joined(separator: " · ")
+        outcome.add(plans.check(plan, sets: sets), example)
+        if let strengthBreak = full.strength, case let .strength(_, _, _, setOrder) = plan {
+            outcome.add(checker.check(strengthBreak, setOrder: setOrder, context: full.context), example)
+            if setOrder.contains(where: \.isArm) { outcome.armBreaks[focus, default: 0] += 1 }
+            complete(strengthBreak, setOrder: setOrder, skipped: (seed >> 3) % 10 == 0, at: at, day: &day)
         } else if let endRange = full.endRange {
-            outcome.add(checker.check(endRange, context: full.context, workedToday: day.worked), full.ids.joined(separator: " · "))
+            outcome.add(checker.check(endRange, context: full.context, workedToday: day.worked), example)
             outcome.endRangeBreaks += 1
             serve(endRange.movementIds, day: &day)
             records.append(record(at: at, kind: .endRange))
@@ -177,7 +200,7 @@ private final class StrengthSimulationRun {
     }
 
     /// Records a strength break as skipped, or as completed and served.
-    private func complete(_ strengthBreak: StrengthBreak, skipped: Bool, at: Date, day: inout Day) {
+    private func complete(_ strengthBreak: StrengthBreak, setOrder: [StrengthSetSlot], skipped: Bool, at: Date, day: inout Day) {
         let kind = strengthBreak.letter.breakKind
         guard !skipped else {
             records.append(record(at: at, kind: kind, outcome: .skipped))
@@ -185,7 +208,7 @@ private final class StrengthSimulationRun {
         }
         outcome.strengthBreaks += 1
         records.append(record(at: at, kind: kind))
-        plans.recordCompleted(letter: strengthBreak.letter, sets: strengthBreak.sets.map(\.movement.bucket))
+        plans.recordCompleted(letter: strengthBreak.letter, setOrder: setOrder, sets: strengthBreak.sets.map(\.movement.bucket))
         day.worked.formUnion(strengthBreak.workedRegions)
         serve(strengthBreak.movementIds, day: &day)
     }
@@ -197,6 +220,7 @@ private final class StrengthSimulationRun {
         context.solidWallNearby = configuration.wall
         context.difficultyCap = configuration.cap
         context.unlockedBuckets = configuration.unlocked
+        context.focus = focus
         context.recency = day.recency
         context.seed = seed
         var full = Full(context: context)

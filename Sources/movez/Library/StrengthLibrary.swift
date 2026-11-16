@@ -38,7 +38,7 @@ enum StrengthLibraryLoader {
     /// for itself, but the total and the micro pool are fixed here so that a file which silently
     /// lost movements, while keeping its own declarations consistent, still fails to load.
     enum Expected {
-        static let movements = 145
+        static let movements = 151
         static let microEligible = 41
         static let mode = "strength"
     }
@@ -106,7 +106,7 @@ enum StrengthLibraryLoader {
 
         let declaredBuckets = library.buckets.map(\.id)
         guard Set(declaredBuckets) == Set(StrengthBucket.allCases), declaredBuckets.count == StrengthBucket.allCases.count else {
-            throw LibraryError.validation("the strength library must declare each of its seven buckets once")
+            throw LibraryError.validation("the strength library must declare each of its \(StrengthBucket.allCases.count) buckets once")
         }
         for info in library.buckets {
             let actual = library.movements(in: info.id).count
@@ -115,6 +115,12 @@ enum StrengthLibraryLoader {
                     "strength bucket \(info.id.rawValue) declares \(info.count) movements, found \(actual)"
                 )
             }
+        }
+
+        // A loaded movement is always a working set once the user owns its equipment, so a file that
+        // marks one as warm-up only disagrees with the vigorous rule the builders apply.
+        if let light = movements.first(where: { !$0.isBodyweight && !$0.vigorous }) {
+            throw LibraryError.validation("\(light.id) lists equipment but is not vigorous")
         }
 
         // The id prefix is what keeps the two libraries apart when both are loaded, so a movement

@@ -154,7 +154,8 @@ final class StrengthOverlayViewTests: XCTestCase {
         let movement = StrengthMovement(
             id: base.id, name: base.name, bucket: base.bucket, regions: base.regions, dose: base.dose,
             perSide: base.perSide, blockSeconds: base.blockSeconds, difficulty: base.difficulty,
-            settings: base.settings, onFloor: base.onFloor, equipment: base.equipment, load: base.load,
+            settings: base.settings, onFloor: base.onFloor, equipment: base.equipment,
+            vigorous: base.vigorous, load: base.load,
             gripDemand: base.gripDemand, microEligible: base.microEligible, instructions: sample,
             v4Overlap: base.v4Overlap
         )

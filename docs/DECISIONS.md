@@ -602,3 +602,46 @@ of its picks, taken before any of this was built, is replayed by a test to prove
     the reasons in entry 59. The ½ helper mapping and the claim that loaded moves cover most core
     work are training knowledge, not findings. Re-run the script after any change to a strength
     builder or the strength library.
+70. **Biceps and Triceps are their own categories, trained in an arm break.** Counted directly,
+    the curls in PUL and the overhead extension in PSH took sets that back and chest need: the
+    default week has only 8 pull sets, so a curl drawn there left back short. BIC (six moves) and
+    TRI (six) became their own buckets, with new ids for the moved moves (PUL-19–23 to BIC-01–05,
+    PSH-18, PSH-06 and PSH-09 to TRI-01–03) and four new arm moves; with two new loaded lunges
+    (entry 71) the library has 151 movements.
+    An arm break is a warm-up, three sets and a cool-down like any strength break: two sets of one
+    arm move and a third of a different one from the same bucket (A · A · B, no core set),
+    triceps on an A day and biceps on a B day, so the arm lands on the day whose pattern already
+    uses it as a helper. Its warm-up is the usual warm-up of the day's push (A) or pull (B), and
+    since no END move stretches the arm, its cool-down only has to stretch the shoulder, chest,
+    arm or wrist and forearm. The arm break is the fourth strength break of a day, or the third
+    with More arms (where a fourth is then an ordinary push-pull break), and only when the day
+    has more strength breaks than its position, so 1 or 2 a day never get one. The pattern breaks
+    step over it: its sets count toward neither pattern and it leads with neither, so a day's
+    pattern breaks are exactly the ones it would have had without it. History records it as an
+    ordinary `strengthA`/`strengthB` break, so when the planner replays earlier days for the last
+    lead it puts the arm break at today's position, whatever that day's setting was; only a
+    change of focus or kit since can misplace it, which moves at most one tie. A kit with a
+    kettlebell but no dumbbells has no vigorous arm move (the arm buckets have no kettlebell
+    moves, entry 71), so its arm break stays an ordinary push-pull break. This supersedes, for
+    arms only, entry 62's "arm work is not a guaranteed slot" and entry 63's "focus never
+    changes which patterns a day works": More arms moves the arm break earlier. A biceps or
+    triceps set counts 1 toward its muscle in the simulation's weekly sets; at 4 a day an arm
+    break adds 9 direct sets a week to one arm and 6 to the other, and with More arms at 3 a day
+    it takes the third break from the patterns. Arm targets are not set yet, so those tables are
+    reported, not checked.
+71. **With kit selected, a working set must be vigorous.** Every strength move has a `vigorous`
+    flag: whether it is hard enough to be a working set beside a loaded move. Every equipment
+    move is (the loader refuses a file where one is not). Of the bodyweight moves, the push-up,
+    tempo, decline and pike push-ups (PSH-04, 05, 07, 08), the single-leg glute bridge and the
+    single-leg chair-edge hip thrust (HNG-02, HNG-06), all eleven bodyweight core moves and the
+    chair dip (TRI-03) are; every other one is not. No squat or lunge is, because each now has a
+    weighted counterpart (SQT-17 and SQT-18 were added for the curtsy and forward lunges), and
+    the single-leg RDL is not, because its loaded version is difficulty 3 and the kickstand RDL
+    is its difficulty-2 step. Core is all vigorous because that is simpler than leaving core out
+    of the rule, and the loaded core moves are there for anyone who wants them. With any kit
+    selected, a working set (core and arm sets included) draws only vigorous moves, so the light
+    bodyweight moves are warm-ups only; bodyweight-only users have no such rule. The rule is a
+    rung in the working ladder after "served today", so repeating a vigorous move beats serving a
+    light one, and it goes before the exclusions and the difficulty cap. In the simulation it has
+    never had to let go: every pattern a kit can reach has a vigorous move, and a kettlebell
+    alone at cap 2, with the push-up as its only vigorous push, repeats the push-up instead.

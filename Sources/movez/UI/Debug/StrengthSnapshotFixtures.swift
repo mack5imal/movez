@@ -232,7 +232,8 @@ extension SnapshotFixtures {
         StrengthMovement(
             id: dosed.id, name: named.name, bucket: dosed.bucket, regions: dosed.regions, dose: dosed.dose,
             perSide: dosed.perSide, blockSeconds: dosed.blockSeconds, difficulty: dosed.difficulty,
-            settings: dosed.settings, onFloor: dosed.onFloor, equipment: named.equipment, load: named.load,
+            settings: dosed.settings, onFloor: dosed.onFloor, equipment: named.equipment,
+            vigorous: named.vigorous, load: named.load,
             gripDemand: dosed.gripDemand, microEligible: dosed.microEligible, instructions: named.instructions,
             v4Overlap: dosed.v4Overlap
         )

@@ -16,15 +16,21 @@ rule only when another move that keeps it, and keeps every other rule the served
 there for the same slot. Tests/movezTests/StrengthRuleChecker.swift implements the same list, so
 the script and the Swift cross-check agree on what a violation is.
 
+The planner's arm break (the fourth break, the third under More arms, none for a kettlebell-only
+kit), the builder's slot-keyed repeats, its arm warm-up and cool-down, the vigorous rung and the
+focus weighting are mirrored as well.
+
 The sixteen configurations are dumbbells x kettlebell x wall at difficulty caps 2 and 3 with every
-difficulty-3 pattern unlocked. Each simulates whole days of six full breaks and six micro-breaks,
-the strength breaks a day cycling through 1-4 so every setting is exercised, one strength break in
-ten skipped so the planner has to offer it again, until each kind reaches 5,000. The weekly tables
-come from 5-day weeks at the app's default settings with every break taken.
+difficulty-3 pattern unlocked, then each kit again with the More arms focus (wall, cap 2). Each
+simulates whole days of six full breaks and six micro-breaks, the strength breaks a day cycling
+through 1-4 so every setting is exercised, one strength break in ten skipped so the planner has to
+offer it again, until each kind reaches 5,000. The weekly tables come from 5-day weeks at the app's
+default settings, and at those defaults with dumbbells, with and without More arms, with every
+break taken.
 
 Writes docs/strength-simulation.md and prints a summary. Exits 1 on any violation, any eligible
-move never served, or when the default week (3 a day, 5 days) leaves the research targets; exits 2
-when this script and strength-rules.json disagree on the rule list.
+move never served, or when the default week (3 a day, no focus, 5 days) leaves the research
+targets; exits 2 when this script and strength-rules.json disagree on the rule list.
 """
 import json
 import os
@@ -50,6 +56,8 @@ PART_SETS = {
     "HNG": {"hamstrings": 1, "glutes": 1},
     "PSH": {"chest": 1, "triceps": 0.5},
     "PUL": {"back": 1, "biceps": 0.5},
+    "BIC": {"biceps": 1},
+    "TRI": {"triceps": 1},
     "COR": {"core": 1},
 }
 PARTS = ["quads", "glutes", "hamstrings", "chest", "back", "biceps", "triceps", "core"]
@@ -63,7 +71,7 @@ RANGES = {"quads": (8, 12), "chest": (8, 12), "back": (8, 12), "hamstrings": (8,
 
 class Move:
     __slots__ = ("id", "name", "bucket", "regions", "dose", "per_side", "difficulty", "settings",
-                 "floor", "equipment", "bodyweight", "grip", "micro", "seated", "same")
+                 "floor", "equipment", "bodyweight", "vigorous", "grip", "micro", "seated", "same")
 
     def __init__(self, raw):
         self.id = raw["id"]
@@ -77,6 +85,7 @@ class Move:
         self.floor = raw["on_floor"]
         self.equipment = frozenset(raw["equipment"])
         self.bodyweight = not raw["equipment"]
+        self.vigorous = raw["vigorous"]
         self.grip = raw["grip_demand"]
         self.micro = raw["micro_eligible"]
         self.seated = "Chair" in self.settings
@@ -91,6 +100,14 @@ for _m in LIB:
     BUCKET[_m.bucket].append(_m)
 MICRO_POOL = [m for m in LIB if m.micro]
 PATTERNS = {"A": ("SQT", "PSH"), "B": ("HNG", "PUL")}
+# StrengthDayLetter.armBucket: triceps on a push day, biceps on a pull day.
+ARM = {"A": "TRI", "B": "BIC"}
+# StrengthFocus.boostedRegions, weighted x3 in every strength-break draw.
+BOOSTED = {"none": frozenset(), "moreLegsAndGlutes": frozenset({"Quad", "Glute", "Ham", "Adductor"}),
+           "moreBackAndShoulders": frozenset({"T-spine", "Shoulder"}), "moreCore": frozenset({"L-spine/Core"}),
+           "moreArms": frozenset({"Arm", "Wrist/Forearm"})}
+# StrengthBreakBuilder.armCoolDownRegions: no END move stretches the arm, so the joints around it.
+ARM_COOL_DOWN_REGIONS = frozenset({"Shoulder", "Chest", "Arm", "Wrist/Forearm"})
 
 FAMILY = {m["id"]: m.get("family") or m["id"] for m in MOVEMENT["movements"]}
 # Each strength id with a `same` overlap, keyed by its twin's movement-library family.
@@ -204,6 +221,7 @@ class Context:
         self.wall = cfg["wall"]
         self.cap = cfg["cap"]
         self.unlocked = cfg["unlocked"]
+        self.boosted = BOOSTED[cfg["focus"]]
         self.excluded = frozenset()
         self.recency = recency
         self.seed = seed & MASK
@@ -270,33 +288,73 @@ def choose_lead(first, second, sets, led_at, prior_lead):
     return first
 
 
-def replay(letter, breaks, prior_lead):
+def arm_break_possible(equipment):
+    """StrengthDayPlanner.armBreakPossible: the arm buckets have no kettlebell moves, so a
+    kettlebell-only user has no vigorous arm move and no arm break."""
+    return not equipment or "dumbbells" in equipment
+
+
+def arm_position(focus, possible):
+    """StrengthDayPlanner.armBreakPosition: 0-based, the fourth break or the third under More arms."""
+    if not possible:
+        return None
+    return 2 if focus == "moreArms" else 3
+
+
+def arm_index(per_day, focus, possible):
+    """StrengthDayPlanner.armBreakIndex: the position, only when the day has more breaks than it."""
+    position = arm_position(focus, possible)
+    return position if position is not None and per_day > position else None
+
+
+def is_arm(slot):
+    return slot[0] in ("arm", "armAlternate")
+
+
+def slot_bucket(slot):
+    """StrengthBreakBuilder.bucket(for:)."""
+    return "COR" if slot[0] == "core" else slot[1]
+
+
+def replay(letter, breaks, prior_lead, arm_at=None):
+    """StrengthDayPlanner.replay. A set order is a list of slots: ("pattern", b), ("core",),
+    ("arm", b) and ("armAlternate", b). The pattern breaks step over the arm break: it counts no
+    sets, leads with nothing and leaves the pattern-break counter where it was."""
     first, second = PATTERNS[letter]
+    arm = ARM[letter]
     sets = {first: 0, second: 0}
     led_at = {}
     last_lead = None
     orders = []
+    pattern_break = 0
     for index in range(max(0, breaks)):
-        if index == 0:
-            orders.append([first, second, "COR"])
+        if index == arm_at:
+            orders.append([("arm", arm), ("arm", arm), ("armAlternate", arm)])
+            continue
+        if pattern_break == 0:
+            orders.append([("pattern", first), ("pattern", second), ("core",)])
             sets[first] += 1
             sets[second] += 1
+            pattern_break += 1
             continue
         lead = choose_lead(first, second, sets, led_at, prior_lead)
         other = second if lead == first else first
-        orders.append([lead, other, lead])
+        orders.append([("pattern", lead), ("pattern", other), ("pattern", lead)])
         sets[lead] += 2
         sets[other] += 1
-        led_at[lead] = index
+        led_at[lead] = pattern_break
         last_lead = lead
+        pattern_break += 1
     return orders, last_lead
 
 
 class Planner:
     """StrengthDayPlanner.next over the completed strength breaks, one list of letters per day."""
 
-    def __init__(self):
+    def __init__(self, focus, arm_possible):
         self.days = {}
+        self.focus = focus
+        self.arm_possible = arm_possible
 
     def letter(self, day):
         if self.days.get(day):
@@ -306,23 +364,21 @@ class Planner:
             return "A"
         return "B" if self.days[max(earlier)][0] == "A" else "A"
 
-    def last_lead(self, day, letter):
-        lead = None
-        for key in sorted(k for k in self.days if k < day):
-            breaks = self.days[key]
-            if breaks[0] != letter:
-                continue
-            day_lead = replay(letter, len(breaks), lead)[1]
-            if day_lead:
-                lead = day_lead
-        return lead
+    def day_lead(self, day, prior_lead):
+        """The lead a finished day leaves for the next day with its letter. As in
+        StrengthDayPlanner.lastLead, an earlier day is replayed with the arm break at the
+        position, without the breaks-a-day gate."""
+        breaks = self.days[day]
+        position = arm_position(self.focus, self.arm_possible)
+        return replay(breaks[0], len(breaks), prior_lead, position)[1]
 
     def next(self, per_day, day, prior_leads):
         letter = self.letter(day)
         completed = len(self.days.get(day, []))
         if completed >= per_day:
             return ("endRange", None, None)
-        orders = replay(letter, completed + 1, prior_leads.get(letter))[0]
+        arm_at = arm_index(per_day, self.focus, self.arm_possible)
+        orders = replay(letter, completed + 1, prior_leads.get(letter), arm_at)[0]
         return ("strength", letter, orders[completed])
 
     def complete(self, day, letter):
@@ -332,14 +388,14 @@ class Planner:
 # ---------------------------------------------------------------- builders
 
 
-WORKING_LADDER = ["breakLimits", "servedToday", "excluded", "difficulty", "anything"]
+WORKING_LADDER = ["breakLimits", "servedToday", "vigorous", "excluded", "difficulty", "anything"]
 WARM_UP_LADDER = ["warmUpShape", "servedToday", "excluded", "difficulty", "anything"]
 COOL_DOWN_LADDER = ["coolDownRegion", "servedToday", "excluded", "difficulty", "anything"]
 END_RANGE_LADDER = ["servedToday", "excluded", "difficulty", "anything"]
 MICRO_LADDER = ["servedToday", "previousMicroRegion", "excluded", "difficulty", "anything"]
 
 
-def draw_slot(slot, bucket, ladder, taken, ctx, state, slot_rule, narrow=None):
+def draw_slot(slot, bucket, ladder, taken, ctx, state, slot_rule, narrow=None, weight=None):
     in_bucket = BUCKET[bucket]
 
     def candidates(let_go):
@@ -355,32 +411,48 @@ def draw_slot(slot, bucket, ladder, taken, ctx, state, slot_rule, narrow=None):
                 out.append(m)
         return narrow(out, let_go) if narrow else out
 
-    pick = ladder_pick(slot, ladder, state, lambda m: recency_multiplier(m, ctx.recency), candidates)
+    weight = weight or (lambda m: recency_multiplier(m, ctx.recency))
+    pick = ladder_pick(slot, ladder, state, weight, candidates)
     return pick or (in_bucket[0] if in_bucket else LIB[0])
+
+
+def vigorous_enough(m, equipment):
+    """StrengthBreakBuilder.isVigorousEnough: with any kit selected only a vigorous move is a set."""
+    return not equipment or m.vigorous
 
 
 def build_strength(letter, order, ctx):
     state = DrawState(ctx.seed)
-    warm = draw_slot("warmUp", order[0], WARM_UP_LADDER, set(), ctx, state,
-                     lambda m, g: m.bodyweight if "warmUpShape" in g else warm_up_shaped(m))
-    drawn = {}
+    arm_break = any(is_arm(slot) for slot in order)
+
+    def weight(m):
+        # Every draw of a strength break is weighted x3 for a move in a focus region.
+        focus = 3.0 if ctx.boosted & m.regions else 1.0
+        return focus * recency_multiplier(m, ctx.recency)
+
+    warm_bucket = PATTERNS[letter][1] if is_arm(order[0]) else slot_bucket(order[0])
+    warm = draw_slot("warmUp", warm_bucket, WARM_UP_LADDER, set(), ctx, state,
+                     lambda m, g: m.bodyweight if "warmUpShape" in g else warm_up_shaped(m), weight=weight)
+    drawn = []  # (slot, move) in draw order: repeats are keyed by slot, not by bucket
     working = []
-    for index, bucket in enumerate(order):
-        if bucket in drawn:
-            working.append(drawn[bucket])
+    for index, slot in enumerate(order):
+        repeated = next((m for s, m in drawn if s == slot), None)
+        if repeated is not None:
+            working.append(repeated)
             continue
-        distinct = list(drawn.values())
+        distinct = [m for _, m in drawn]
         taken = {m.id for m in distinct} | {warm.id}
-        pick = draw_slot(f"set{index + 1}", bucket, WORKING_LADDER, taken, ctx, state,
-                         lambda m, g, d=distinct: "breakLimits" in g or fits_break_limits(m, d),
-                         lambda pool, g, d=distinct: narrow_break_limits(pool, g, d))
-        drawn[bucket] = pick
+        pick = draw_slot(f"set{index + 1}", slot_bucket(slot), WORKING_LADDER, taken, ctx, state,
+                         lambda m, g, d=distinct: ("breakLimits" in g or fits_break_limits(m, d))
+                         and ("vigorous" in g or vigorous_enough(m, ctx.equipment)),
+                         lambda pool, g, d=distinct: narrow_break_limits(pool, g, d), weight=weight)
+        drawn.append((slot, pick))
         working.append(pick)
-    worked = set().union(*(m.regions for m in working))
+    worked = ARM_COOL_DOWN_REGIONS if arm_break else set().union(*(m.regions for m in working))
     taken = {m.id for m in working} | {warm.id}
     cool = draw_slot("coolDown", "END", COOL_DOWN_LADDER, taken, ctx, state,
-                     lambda m, g: "coolDownRegion" in g or bool(worked & m.regions))
-    return {"kind": "strength", "letter": letter, "warm": (warm, 30),
+                     lambda m, g: "coolDownRegion" in g or bool(worked & m.regions), weight=weight)
+    return {"kind": "strength", "letter": letter, "order": order, "warm": (warm, 30),
             "sets": [(m, m.dose) for m in working], "cool": (cool, 30), "relaxed": state.relaxed}
 
 
@@ -505,11 +577,12 @@ class Checker:
         "s6-warm-up-pattern", "s6-warm-up-shape", "s6-warm-up-timing", "s6-cool-down-end",
         "s6-cool-down-region", "s6-per-side-limit", "s6-floor-limit", "s6-grip-limit", "s6-equipment",
         "s6-wall", "s6-served-today", "s6-excluded", "s6-difficulty", "s6-dose",
+        "s6-arm-break", "s6-arm-alternate", "s6-vigorous-sets",
         "s7-end-only", "s7-no-floor", "s7-wall", "s7-distinct", "s7-shape", "s7-same-posture",
         "s7-previous-region", "s7-next-break-region", "s7-served-today", "s7-excluded", "s7-difficulty",
         "s22-letter", "s22-count", "s22-end-range-shape", "s22-end-range-distinct", "s22-end-range-wall",
         "s22-end-range-served-today", "s22-end-range-worked-regions", "s22-end-range-excluded",
-        "s22-end-range-difficulty",
+        "s22-end-range-difficulty", "s22-arm-break-position",
     )
 
     def __init__(self, cfg):
@@ -537,7 +610,16 @@ class Checker:
             return "A"
         return "B" if self.letters[max(earlier)] == "A" else "A"
 
-    def check_plan(self, brk, day, per_day, done_today, sets_today):
+    def arm_index(self, per_day):
+        """Where today's arm break must fall, from the rules alone: the fourth break, the third
+        under More arms, only with no kit or with dumbbells, and only when the day reaches it."""
+        if self.cfg["equipment"] and "dumbbells" not in self.cfg["equipment"]:
+            return None
+        position = 2 if self.cfg["focus"] == "moreArms" else 3
+        return position if per_day > position else None
+
+    def check_plan(self, brk, day, per_day, done_today, pattern_done, sets_today):
+        """`pattern_done` counts today's completed pattern breaks, `sets_today` their sets."""
         out = []
         should_be_strength = done_today < per_day
         if (brk["kind"] == "strength") != should_be_strength:
@@ -547,9 +629,17 @@ class Checker:
         letter = self.expected_letter(day)
         if brk["letter"] != letter:
             out.append("s22-letter")
-        first, second = PATTERNS[letter]
+        arm_break = any(is_arm(slot) for slot in brk["order"])
+        if arm_break != (done_today == self.arm_index(per_day)):
+            out.append("s22-arm-break-position")
         buckets = [m.bucket for m, _ in brk["sets"]]
-        if done_today == 0:
+        if arm_break:
+            arm = ARM[letter]
+            if brk["order"] != [("arm", arm), ("arm", arm), ("armAlternate", arm)] or buckets != [arm] * 3:
+                out.append("s6-arm-break")
+            return out
+        first, second = PATTERNS[letter]
+        if pattern_done == 0:
             if buckets != [first, second, "COR"]:
                 out.append("s6-day-patterns")
             return out
@@ -565,9 +655,11 @@ class Checker:
                 out.append("s6-lead")
         return out
 
-    def record_completed(self, brk, day, done_today):
+    def record_completed(self, brk, day, pattern_done):
+        """An arm break leads with nothing, so only a later pattern break moves a lead."""
         self.letters.setdefault(day, brk["letter"])
-        if done_today > 0:
+        arm_break = any(is_arm(slot) for slot in brk["order"])
+        if pattern_done > 0 and not arm_break:
             self.last_led[brk["sets"][0][0].bucket] = self.completed
         self.completed += 1
 
@@ -576,19 +668,23 @@ class Checker:
         warm, warm_seconds = brk["warm"]
         cool, cool_seconds = brk["cool"]
         sets = brk["sets"]
+        order = brk["order"]
         moves = [m for m, _ in sets]
+        arm_break = any(is_arm(slot) for slot in order)
         if len(sets) != 3 or warm is None or cool is None:
             out.append("s6-shape")
-        by_bucket = defaultdict(set)
-        for m in moves:
-            by_bucket[m.bucket].add(m.id)
-        if any(len(ids) > 1 for ids in by_bucket.values()):
+        # The same slot twice is the same move; two different slots are two different moves.
+        pairs = [(i, j) for i in range(len(moves)) for j in range(i + 1, len(moves))]
+        if len(order) != len(moves) or any((order[i] == order[j]) != (moves[i].id == moves[j].id) for i, j in pairs):
             out.append("s6-same-move-twice")
+        if arm_break and (len(moves) != 3 or moves[2].bucket != moves[0].bucket or moves[2].id == moves[0].id):
+            out.append("s6-arm-alternate")
         distinct = list(dict.fromkeys(moves))
         ids = [warm.id] + [m.id for m in distinct] + [cool.id]
         if len(set(ids)) != len(ids):
             out.append("s6-distinct")
-        if warm.bucket != moves[0].bucket:
+        warm_bucket = PATTERNS[brk["letter"]][1] if arm_break else moves[0].bucket
+        if warm.bucket != warm_bucket:
             out.append("s6-warm-up-pattern")
         if warm_seconds != 30:
             out.append("s6-warm-up-timing")
@@ -603,8 +699,9 @@ class Checker:
             out.append("s6-dose")
 
         shared = self._shared("s6", ctx)
-        universe = [m for m in BUCKET[moves[0].bucket] if self._possible(m)]
+        universe = [m for m in BUCKET[warm_bucket] if self._possible(m)]
         out += soft_breaks(warm, universe, [("s6-warm-up-shape", warm_up_shaped)] + shared)
+        vigorous = [("s6-vigorous-sets", lambda c: c.vigorous)] if self.cfg["equipment"] else []
         earlier = []
         for m in distinct:
             taken = {warm.id} | {e.id for e in earlier}
@@ -614,9 +711,9 @@ class Checker:
                 ("s6-floor-limit", lambda c, e=earlier: not (c.floor and any(x.floor for x in e))),
                 ("s6-grip-limit", lambda c, e=earlier: not (c.grip and any(x.grip for x in e))),
             ]
-            out += soft_breaks(m, universe, limits + shared)
+            out += soft_breaks(m, universe, limits + vigorous + shared)
             earlier.append(m)
-        worked = set().union(*(m.regions for m in moves))
+        worked = ARM_COOL_DOWN_REGIONS if arm_break else set().union(*(m.regions for m in moves))
         taken = {warm.id} | {m.id for m in moves}
         universe = [c for c in BUCKET["END"] if self._possible(c) and c.id not in taken]
         out += soft_breaks(cool, universe, [("s6-cool-down-region", lambda c: bool(worked & c.regions))] + shared)
@@ -729,7 +826,7 @@ def simulate(cfg, seed, per_day_for, until=None, days=None, skip=True, tally=Non
     """Runs whole days with `cfg` until each kind of break reaches `until`, or for `days` days."""
     tally = tally or Tally()
     rng = SplitMix64(seed)
-    planner = Planner()
+    planner = Planner(cfg["focus"], arm_break_possible(cfg["equipment"]))
     checker = Checker(cfg)
     history = defaultdict(Counter)  # day -> id -> servings
     prior_leads = {}
@@ -749,6 +846,7 @@ def simulate(cfg, seed, per_day_for, until=None, days=None, skip=True, tally=Non
         last_micro = set()
         worked = set()
         done_today = 0
+        pattern_done = 0
         sets_today = Counter()
         for _ in range(FULL_PER_DAY):
             full_seed = rng.next()
@@ -772,19 +870,25 @@ def simulate(cfg, seed, per_day_for, until=None, days=None, skip=True, tally=Non
             last_micro = set(ids_of(micro))
 
             brk, ctx = build_full(widen(served))
-            tally.add_violations(checker.check_plan(brk, day, per_day, done_today, sets_today), brk)
+            tally.add_violations(checker.check_plan(brk, day, per_day, done_today, pattern_done, sets_today), brk)
             note_relaxed(tally, brk)
             if brk["kind"] == "strength":
+                arm_break = any(is_arm(slot) for slot in brk["order"])
+                tally.counts["armBuilt"] += arm_break
                 tally.add_violations(checker.check_strength(brk, ctx), brk)
                 if skip and rng.next() % SKIP_ONE_IN == 0:
                     tally.counts["skipped"] += 1
                     continue
                 tally.counts["strength"] += 1
-                checker.record_completed(brk, day, done_today)
+                tally.counts["arm"] += arm_break
+                checker.record_completed(brk, day, pattern_done)
                 planner.complete(day, brk["letter"])
                 done_today += 1
+                if not arm_break:
+                    pattern_done += 1
                 for m, _ in brk["sets"]:
-                    sets_today[m.bucket] += 1
+                    if not arm_break:
+                        sets_today[m.bucket] += 1
                     for part, n in PART_SETS[m.bucket].items():
                         weeks[day // 5][part] += n
                 worked |= set().union(*(m.regions for m, _ in brk["sets"]))
@@ -795,7 +899,7 @@ def simulate(cfg, seed, per_day_for, until=None, days=None, skip=True, tally=Non
                 serve(brk, served, history[day], tally, "endRange")
         if day in planner.days:
             letter = planner.days[day][0]
-            lead = replay(letter, len(planner.days[day]), prior_leads.get(letter))[1]
+            lead = planner.day_lead(day, prior_leads.get(letter))
             if lead:
                 prior_leads[letter] = lead
         history.pop(day - 3, None)
@@ -820,8 +924,11 @@ def micro_shape(brk):
 
 
 def note_relaxed(tally, brk):
+    arm_break = brk["kind"] == "strength" and any(is_arm(slot) for slot in brk["order"])
     for slot, rule in brk["relaxed"]:
         tally.relaxed[(brk["kind"], rule)] += 1
+        if arm_break:
+            tally.relaxed[("arm break", rule)] += 1
 
 
 def serve(brk, served, today, tally, role):
@@ -843,9 +950,15 @@ def eligible(cfg, role, m):
     if not possible(m, cfg["equipment"], cfg["wall"]) or not within_difficulty(m, cfg["cap"], cfg["unlocked"]):
         return False
     if role == "set":
+        # With kit selected a light bodyweight move is a warm-up only (DECISIONS 71), and the arm
+        # buckets are drawn only by the arm break, which a kettlebell-only user never gets.
+        if cfg["equipment"] and not m.vigorous:
+            return False
+        if m.bucket in ARM.values():
+            return arm_break_possible(cfg["equipment"])
         return m.bucket in PART_SETS
     if role == "warm-up":
-        return m.bucket in ("SQT", "PSH", "HNG", "PUL") and warm_up_shaped(m)
+        return m.bucket in ("SQT", "PSH", "HNG", "PUL") and warm_up_shaped(m) and not shadowed_warm_up(cfg, m)
     if role in ("cool-down", "end-range", "endRange"):
         return m.bucket == "END"
     if role == "micro":
@@ -853,7 +966,24 @@ def eligible(cfg, role, m):
     return False
 
 
-ROLES = [("set", b) for b in ("SQT", "HNG", "PSH", "PUL", "COR")] + [
+def same_family(m):
+    return FAMILY.get(m.same, m.same) if m.same else None
+
+
+def shadowed_warm_up(cfg, m):
+    """A warm-up-only move whose pattern's every working move shares its `same` family. The day's
+    first break serves one of those as its set before the pattern ever leads, and S8 then counts
+    the warm-up as served for the rest of the day, so it can only come back by letting go of a rule.
+    With a kettlebell alone at cap 2 the push-up is the only vigorous push, and the desk incline
+    push-up is its family."""
+    family = same_family(m)
+    if not cfg["equipment"] or m.vigorous or family is None:
+        return False
+    sets = [c for c in BUCKET[m.bucket] if eligible(cfg, "set", c)]
+    return bool(sets) and all(same_family(c) == family for c in sets)
+
+
+ROLES = [("set", b) for b in ("SQT", "HNG", "PSH", "PUL", "BIC", "TRI", "COR")] + [
     ("warm-up", b) for b in ("SQT", "HNG", "PSH", "PUL")] + [
     ("cool-down", "END"), ("endRange", "END"), ("micro", "END")]
 ROLE_NAMES = {"set": "working sets", "warm-up": "warm-ups", "cool-down": "cool-downs",
@@ -892,27 +1022,49 @@ def cause(cfg, role, bucket, move):
     return f"S8 no repeats in a day: {len(pool)} eligible {bucket} moves share the day's breaks"
 
 
+def per_day_cycle(day):
+    """1, 2, 3, 4, shifted by one every four days. A plain 1-4 cycle would keep each setting on one
+    letter, since the letters alternate daily, and the arm break of a 4-a-day day would only ever
+    be biceps."""
+    return 1 + (day + day // 4) % 4
+
+
+def configuration(kit, wall, cap, focus="none"):
+    name = (" + ".join(sorted(kit)) or "bodyweight") + (", wall" if wall else ", no wall") + f", cap {cap}"
+    if focus == "moreArms":
+        name += ", More arms"
+    return {"name": name, "short": short_name(kit, wall, cap, focus), "equipment": frozenset(kit),
+            "wall": wall, "cap": cap, "unlocked": frozenset(BUCKET), "focus": focus}
+
+
 def configurations():
+    """The sixteen kit x wall x cap configurations, then every kit with More arms at cap 2, so the
+    arm break at the third break and the kettlebell-only path without one are both covered."""
     out = []
     for cap in (2, 3):
         for dumbbells in (False, True):
             for kettlebell in (False, True):
                 for wall in (True, False):
                     kit = {e for e, has in (("dumbbells", dumbbells), ("kettlebell", kettlebell)) if has}
-                    name = (" + ".join(sorted(kit)) or "bodyweight") + (", wall" if wall else ", no wall")
-                    out.append({"name": f"{name}, cap {cap}", "short": short_name(kit, wall, cap),
-                                "equipment": frozenset(kit), "wall": wall, "cap": cap,
-                                "unlocked": frozenset(BUCKET)})
+                    out.append(configuration(kit, wall, cap))
+    for kit in (set(), {"dumbbells"}, {"kettlebell"}, {"dumbbells", "kettlebell"}):
+        out.append(configuration(kit, True, 2, "moreArms"))
     return out
 
 
-def short_name(kit, wall, cap):
+def short_name(kit, wall, cap, focus="none"):
     return ("D" if "dumbbells" in kit else "-") + ("K" if "kettlebell" in kit else "-") + \
-        ("W" if wall else "-") + str(cap)
+        ("W" if wall else "-") + str(cap) + ("a" if focus == "moreArms" else "")
 
 
 DEFAULT = {"name": "app defaults: bodyweight, wall, cap 1", "short": "def", "equipment": frozenset(),
-           "wall": True, "cap": 1, "unlocked": frozenset()}
+           "wall": True, "cap": 1, "unlocked": frozenset(), "focus": "none"}
+# The defaults with dumbbells, so the weekly tables show arm work drawn under the vigorous rule.
+DUMBBELLS = dict(DEFAULT, name="app defaults with dumbbells: dumbbells, wall, cap 1", short="dbl",
+                 equipment=frozenset({"dumbbells"}))
+WEEK_CONFIGS = [DEFAULT, DUMBBELLS]
+FOCI = ("none", "moreArms")
+FOCUS_NAMES = {"none": "no focus", "moreArms": "More arms"}
 
 
 # ---------------------------------------------------------------- report
@@ -935,16 +1087,22 @@ def main():
     configs = configurations()
     tallies = []
     for index, cfg in enumerate(configs):
-        tally = simulate(cfg, 0x5EED_0000 + index, lambda day: 1 + day % 4, until=TARGET)
+        tally = simulate(cfg, 0x5EED_0000 + index, per_day_cycle, until=TARGET)
         tallies.append(tally)
 
+    # Keyed (configuration code, focus, strength breaks a day); the default week keeps its seeds.
     week_tallies = {}
-    for per_day in (1, 2, 3, 4):
-        tally = Tally()
-        for run in range(WEEK_RUNS):
-            simulate(DEFAULT, 0x7EE4_0000 + 100 * per_day + run, lambda day, n=per_day: n,
-                     days=10, skip=False, tally=tally)
-        week_tallies[per_day] = tally
+    for base in WEEK_CONFIGS:
+        for focus in FOCI:
+            cfg = dict(base, focus=focus)
+            salt = 0 if base is DEFAULT and focus == "none" else 0x1000 * (1 + WEEK_CONFIGS.index(base)) + \
+                (0x100 if focus == "moreArms" else 0)
+            for per_day in (1, 2, 3, 4):
+                tally = Tally()
+                for run in range(WEEK_RUNS):
+                    simulate(cfg, 0x7EE4_0000 + salt + 100 * per_day + run, lambda day, n=per_day: n,
+                             days=10, skip=False, tally=tally)
+                week_tallies[(base["short"], focus, per_day)] = tally
 
     problems = []
     lines = report(configs, tallies, week_tallies, problems)
@@ -955,9 +1113,9 @@ def main():
     say(f"configurations: {len(configs)} + default weeks; elapsed {time.time() - started:.0f} s")
     for cfg, tally in zip(configs, tallies):
         c = tally.counts
-        say(f"  {cfg['name']:<38} strength {c['strength']:>5} (skipped {c['skipped']:>4})  "
+        say(f"  {cfg['name']:<50} strength {c['strength']:>5} (skipped {c['skipped']:>4})  "
               f"end-range {c['endRange']:>5}  micro {c['micro']:>5}  violations {sum(tally.violations.values())}")
-    week = week_tallies[3].weekly
+    week = week_tallies[("def", "none", 3)].weekly
     say("default week (3 a day, 5 days), weekly hard sets: " + ", ".join(
         f"{p} {week[0][0][p]:g}/{week[0][1][p]:g}" for p in PARTS) + " (week 1/week 2)")
     say(f"violations: {total_v}; problems: {len(problems)}")
@@ -965,6 +1123,10 @@ def main():
         say(f"  {problem}")
     say(f"report: {os.path.relpath(REPORT, ROOT)}")
     return 1 if problems else 0
+
+
+def week_code(short, focus, per_day):
+    return f"{short}{per_day}" + ("a" if focus == "moreArms" else "")
 
 
 def report(configs, tallies, week_tallies, problems):
@@ -985,7 +1147,8 @@ def report(configs, tallies, week_tallies, problems):
         "and are covered by the builders' unit tests.",
         "",
         f"Each configuration owns every difficulty-3 pattern, simulates days of {FULL_PER_DAY} full breaks and",
-        f"{FULL_PER_DAY} micro-breaks with the strength breaks a day cycling 1, 2, 3, 4, skips one strength",
+        f"{FULL_PER_DAY} micro-breaks with the strength breaks a day cycling 1, 2, 3, 4 (shifted a day every four",
+        "days, so each setting meets both letters), skips one strength",
         f"break in {SKIP_ONE_IN} so the planner has to offer it again, and runs until each kind of break reaches",
         f"{TARGET:,}. A micro-break comes before each full break and avoids a preview of it.",
         "",
@@ -1004,18 +1167,22 @@ def report(configs, tallies, week_tallies, problems):
         for kind in ("strength", "endRange", "micro"):
             if c[kind] < TARGET:
                 problems.append(f"{cfg['name']}: only {c[kind]} {kind} breaks")
-    for n, t in week_tallies.items():
+    for (short, focus, n), t in week_tallies.items():
         c = t.counts
         v = sum(t.violations.values())
-        out.append(f"| {DEFAULT['name']}, {n} a day, {WEEK_RUNS} × 2 weeks | `def{n}` | {c['strength']:,} | 0 | "
+        base = next(w for w in WEEK_CONFIGS if w["short"] == short)
+        out.append(f"| {base['name']}, {FOCUS_NAMES[focus]}, {n} a day, {WEEK_RUNS} × 2 weeks | "
+                   f"`{week_code(short, focus, n)}` | {c['strength']:,} | 0 | "
                    f"{c['endRange']:,} | {c['micro']:,} | {v} |")
         if v:
-            problems.append(f"default weeks at {n} a day: {v} violations")
+            problems.append(f"{base['name']} weeks, {FOCUS_NAMES[focus]}, {n} a day: {v} violations")
 
-    out += ["", "The codes read dumbbells, kettlebell, wall, then the difficulty cap.", "",
+    out += ["", "The codes read dumbbells, kettlebell, wall, then the difficulty cap; a trailing `a` is the",
+            "More arms focus. `def` is the app's defaults and `dbl` the defaults with dumbbells, followed",
+            "by the strength breaks a day.", "",
             "## Violations by rule", "",
             "Every rule in `scripts/strength-rules.json`, per configuration. Every cell must be 0.", ""]
-    codes = [c["short"] for c in configs] + [f"def{n}" for n in week_tallies]
+    codes = [c["short"] for c in configs] + [week_code(*key) for key in week_tallies]
     all_tallies = tallies + list(week_tallies.values())
     out.append("| Rule | Kind | " + " | ".join(f"`{c}`" for c in codes) + " |")
     out.append("|---|---|" + "---:|" * len(codes))
@@ -1029,8 +1196,9 @@ def report(configs, tallies, week_tallies, problems):
 
     out += ["", "## Relaxations", "",
             "How often a builder had to let a rule go because nothing was left that kept it, per break kind",
-            "and rule, summed over the sixteen configurations. These are the ladders doing their job, not",
-            "violations: each one was checked above and no move that kept the rule was available.", "",
+            f"and rule, summed over the {len(configs)} configurations; the `arm break` rows are the part of the",
+            "strength rows drawn for arm breaks. These are the ladders doing their job, not violations: each",
+            "one was checked above and no move that kept the rule was available.", "",
             "| Break | Rule let go | Times | Per 1,000 breaks of that kind |", "|---|---|---:|---:|"]
     relaxed = Counter()
     totals = Counter()
@@ -1039,12 +1207,14 @@ def report(configs, tallies, week_tallies, problems):
         totals["strength"] += t.counts["strength"] + t.counts["skipped"]
         totals["endRange"] += t.counts["endRange"]
         totals["micro"] += t.counts["micro"]
+        totals["arm break"] += t.counts["armBuilt"]
     for (kind, rule), n in sorted(relaxed.items()):
         out.append(f"| {kind} | `{rule}` | {n:,} | {1000 * n / totals[kind]:.1f} |")
+    out += per_config_relaxations(configs, tallies)
     shapes = Counter()
     for t in tallies:
         shapes.update(t.micro_shapes)
-    out += ["", "Micro-break shapes over the sixteen configurations: " + ", ".join(
+    out += ["", f"Micro-break shapes over the {len(configs)} configurations: " + ", ".join(
         f"{k} {percent(n, sum(shapes.values()))}%" for k, n in shapes.most_common()) + "."]
 
     out += ["", "## Eligible moves never served", "",
@@ -1061,8 +1231,10 @@ def report(configs, tallies, week_tallies, problems):
         if never:
             problems.append(f"{cfg['name']}: never served {', '.join(never)}")
     acc = ", ".join(m.id for m in BUCKET["ACC"])
-    out += ["", f"Not drawn by any strength-mode break: {acc}. S6 gives a strength break the day's two patterns",
-            "and one core set, so the arm accessories wait for a later mode; their weekly sets below are 0."]
+    out += ["", f"Not drawn by any strength-mode break: {acc}. The arm moves (BIC, TRI) are drawn only by the",
+            "arm break (DECISIONS 70), which a kettlebell-only kit never gets, so they are eligible only where",
+            "that break can happen. With any kit selected a working set must be vigorous (DECISIONS 71), so a",
+            "light bodyweight move is eligible there only as a warm-up, and only when it has the warm-up shape."]
 
     out += over_share(configs, tallies)
     out += share_tables(configs, tallies)
@@ -1117,34 +1289,67 @@ def share_tables(configs, tallies):
     return out
 
 
+def per_config_relaxations(configs, tallies):
+    """Strength-break relaxations per configuration, per 1,000 strength breaks built, so a kit whose
+    pools run short (kettlebell-only, above all, under the vigorous rule) stands out."""
+    rules = [r for r in WORKING_LADDER + WARM_UP_LADDER + COOL_DOWN_LADDER if r != "anything"]
+    rules = list(dict.fromkeys(rules)) + ["anything"]
+    # The vigorous rung is always shown, so that a column of zeros says it never had to let go.
+    used = [r for r in rules if r == "vigorous" or any(t.relaxed[("strength", r)] for t in tallies)]
+    out = ["", "Strength-break relaxations per configuration, per 1,000 strength breaks built (skipped ones",
+           "included), with the arm-break share of the `vigorous` count in brackets. `vigorous` is the rung",
+           "that lets a light bodyweight move be a working set when nothing vigorous is left.", ""]
+    out.append("| Config | " + " | ".join(f"`{r}`" for r in used) + " |")
+    out.append("|---|" + "---:|" * len(used))
+    for cfg, t in zip(configs, tallies):
+        built = t.counts["strength"] + t.counts["skipped"]
+        cells = []
+        for r in used:
+            n = t.relaxed[("strength", r)]
+            cell = f"{1000 * n / built:.1f}" if n else "0"
+            if r == "vigorous" and n:
+                cell += f" ({1000 * t.relaxed[('arm break', r)] / built:.1f})"
+            cells.append(cell)
+        out.append(f"| `{cfg['short']}` | " + " | ".join(cells) + " |")
+    return out
+
+
 def weekly(week_tallies, problems):
     out = ["## Weekly hard sets per body part", "",
-           "From 5-day weeks at the app's default settings with every break taken. A direct set counts 1",
-           "and a helper set ½: squat/lunge gives quads 1 and glutes ½, hinge hamstrings 1 and glutes 1,",
-           "push chest 1 and triceps ½, pull back 1 and biceps ½, core 1; an arm move would give its own",
-           "muscle 1, but no strength break draws one. Letters alternate across weeks, so week 1 starts on",
-           "an A day (A B A B A) and week 2 on a B day (B A B A B); the plan is a function of the letters",
-           "alone, so every run gives the same counts. The target row is the S10 range.", ""]
-    for per_day in (3, 1, 2, 4):
-        runs = week_tallies[per_day].weekly
-        weeks = runs[0]
-        varied = any(r != runs[0] for r in runs)
-        title = f"### {per_day} strength break{'s' if per_day > 1 else ''} a day"
-        out += [title + (" (the default)" if per_day == 3 else ""), ""]
-        out.append("| Week | " + " | ".join(PARTS) + " |")
-        out.append("|---|" + "---:|" * len(PARTS))
-        for index, week in enumerate(weeks):
-            out.append(f"| {index + 1} | " + " | ".join(f"{week[p]:g}" for p in PARTS) + " |")
-        if per_day == 3:
-            out.append("| target | " + " | ".join(f"{RANGES[p][0]}–{RANGES[p][1]}" for p in PARTS) + " |")
-            for index, week in enumerate(weeks):
-                for p in PARTS:
-                    low, high = RANGES[p]
-                    if not low <= week[p] <= high:
-                        problems.append(f"default week {index + 1}: {p} {week[p]:g} outside {low}–{high}")
-        if varied:
-            problems.append(f"weekly sets at {per_day} a day differ between runs")
-        out.append("")
+           "From 5-day weeks with every break taken, at the app's default settings and at those defaults",
+           "with dumbbells, each with no focus and with More arms. A direct set counts 1 and a helper set ½:",
+           "squat/lunge gives quads 1 and glutes ½, hinge hamstrings 1 and glutes 1, push chest 1 and",
+           "triceps ½, pull back 1 and biceps ½, core 1, and an arm break's biceps or triceps sets 1 each.",
+           "The arm break is the fourth break of a day (the third under More arms), so it adds three biceps",
+           "or triceps sets a day at 4 a day, and at 3 or 4 a day under More arms. Letters alternate across",
+           "weeks, so week 1 starts on an A day (A B A B A) and week 2 on a B day (B A B A B); the plan is a",
+           "function of the letters alone, so every run gives the same counts.", "",
+           "Only the default week (3 a day, no focus, app defaults) is held to the S10 target row; the",
+           "other tables are reported so that arm targets can be set from them.", ""]
+    for base in WEEK_CONFIGS:
+        out += [f"### {base['name']}", ""]
+        for focus in FOCI:
+            for per_day in (3, 1, 2, 4):
+                runs = week_tallies[(base["short"], focus, per_day)].weekly
+                weeks = runs[0]
+                varied = any(r != runs[0] for r in runs)
+                default = base is DEFAULT and focus == "none" and per_day == 3
+                title = f"#### {per_day} strength break{'s' if per_day > 1 else ''} a day, {FOCUS_NAMES[focus]}"
+                out += [title + (" (the default)" if default else ""), ""]
+                out.append("| Week | " + " | ".join(PARTS) + " |")
+                out.append("|---|" + "---:|" * len(PARTS))
+                for index, week in enumerate(weeks):
+                    out.append(f"| {index + 1} | " + " | ".join(f"{week[p]:g}" for p in PARTS) + " |")
+                if default:
+                    out.append("| target | " + " | ".join(f"{RANGES[p][0]}–{RANGES[p][1]}" for p in PARTS) + " |")
+                    for index, week in enumerate(weeks):
+                        for p in PARTS:
+                            low, high = RANGES[p]
+                            if not low <= week[p] <= high:
+                                problems.append(f"default week {index + 1}: {p} {week[p]:g} outside {low}–{high}")
+                if varied:
+                    problems.append(f"weekly sets for {week_code(base['short'], focus, per_day)} differ between runs")
+                out.append("")
     return out
 
 

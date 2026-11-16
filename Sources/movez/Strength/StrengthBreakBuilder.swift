@@ -3,10 +3,15 @@ import Foundation
 /// Assembles one strength break from the strength library (S6).
 ///
 /// `StrengthDayPlanner` decides the day's letter and the order of the three working sets; this
-/// decides which move fills each. The warm-up is drawn first, from the first set's pattern, then
-/// each pattern's move, then the cool-down from END against the regions the sets worked. A pattern
-/// that appears twice (X · Y · X) is drawn once and served both times, so the second set repeats
-/// the first one's move rather than spending another from a pool that has to last the day.
+/// decides which move fills each. The warm-up is drawn first, from the first set's pattern (an arm
+/// break's from the day's push or pull), then each slot's move, then the cool-down from END against
+/// the regions the sets worked. A slot that appears twice (X · Y · X, or an arm break's arm · arm)
+/// is drawn once and served both times, so the second set repeats the first one's move rather than
+/// spending another from a pool that has to last the day; an arm break's alternate slot is a
+/// different slot, so it draws a different move from the same arm bucket.
+///
+/// With any kit selected, every working set must be a vigorous move, so the kit does the work and
+/// the light bodyweight moves are left to the warm-ups. Bodyweight-only users have no such rule.
 ///
 /// Within a pattern the draw is weighted by recency and by the user's focus, ×3 for a move in a
 /// focus region. When the rules leave a slot with nothing, they are let go of one rung at a time,
@@ -17,8 +22,11 @@ struct StrengthBreakBuilder {
     let library: StrengthLibrary
 
     /// The order each slot lets its rules go. The per-break limits are planner judgement, so they
-    /// go before anything already served today is allowed back.
-    static let workingLadder: [StrengthRelaxation.Rule] = [.breakLimits, .servedToday, .excluded, .difficulty, .anything]
+    /// go before anything already served today is allowed back. The vigorous rule goes after that,
+    /// because repeating a vigorous move does the user more good than serving a light one.
+    static let workingLadder: [StrengthRelaxation.Rule] = [
+        .breakLimits, .servedToday, .vigorous, .excluded, .difficulty, .anything
+    ]
     static let warmUpLadder: [StrengthRelaxation.Rule] = [.warmUpShape, .servedToday, .excluded, .difficulty, .anything]
     static let coolDownLadder: [StrengthRelaxation.Rule] = [.coolDownRegion, .servedToday, .excluded, .difficulty, .anything]
 
@@ -34,34 +42,46 @@ struct StrengthBreakBuilder {
         let taken: Set<String>
     }
 
-    /// The pattern a slot draws from; the day's first break carries a core set in its third slot.
+    /// The regions an arm break's cool-down may stretch. No END move stretches the arm itself, so
+    /// the cool-down takes the joints around it that the arm sets load.
+    static let armCoolDownRegions: Set<Region> = [.shoulder, .chest, .arm, .wristForearm]
+
+    /// The bucket a slot draws from; the day's first break carries a core set in its third slot.
     static func bucket(for slot: StrengthSetSlot) -> StrengthBucket {
         switch slot {
-        case let .pattern(bucket): return bucket
+        case let .pattern(bucket), let .arm(bucket), let .armAlternate(bucket): return bucket
         case .core: return .cor
         }
     }
 
+    /// The bucket a break's warm-up draws from: the first set's pattern, or for an arm break the
+    /// day's push or pull, since the arm buckets keep their moves for the sets.
+    static func warmUpBucket(letter: StrengthDayLetter, setOrder: [StrengthSetSlot]) -> StrengthBucket {
+        guard let first = setOrder.first else { return letter.patterns.first }
+        return first.isArm ? letter.armWarmUpPattern : bucket(for: first)
+    }
+
     func build(letter: StrengthDayLetter, setOrder: [StrengthSetSlot], context: StrengthContext) -> StrengthBreak {
         var state = StrengthDrawState(seed: context.seed)
-        let buckets = setOrder.map(Self.bucket(for:))
-        let firstBucket = buckets.first ?? letter.patterns.first
+        let isArmBreak = setOrder.contains(where: \.isArm)
+        let warmUpBucket = Self.warmUpBucket(letter: letter, setOrder: setOrder)
 
-        let warmUpRequest = SlotRequest(slot: .warmUp, bucket: firstBucket, ladder: Self.warmUpLadder, taken: [])
+        let warmUpRequest = SlotRequest(slot: .warmUp, bucket: warmUpBucket, ladder: Self.warmUpLadder, taken: [])
         let warmUp = draw(warmUpRequest, context: context, state: &state) { movement, letGo in
             letGo.contains(.warmUpShape) ? movement.isBodyweight : Self.isWarmUpShaped(movement)
         }
 
-        var drawn: [StrengthBucket: StrengthMovement] = [:]
+        // Keyed by slot, in draw order, so the moves already in the break are a stable list.
+        var drawn: [(slot: StrengthSetSlot, movement: StrengthMovement)] = []
         var working: [StrengthMovement] = []
-        for (index, bucket) in buckets.enumerated() {
-            if let repeated = drawn[bucket] {
-                working.append(repeated)
+        for (index, setSlot) in setOrder.enumerated() {
+            if let repeated = drawn.first(where: { $0.slot == setSlot }) {
+                working.append(repeated.movement)
                 continue
             }
-            let distinct = Array(drawn.values)
+            let distinct = drawn.map(\.movement)
             let request = SlotRequest(
-                slot: .set(index + 1), bucket: bucket, ladder: Self.workingLadder,
+                slot: .set(index + 1), bucket: Self.bucket(for: setSlot), ladder: Self.workingLadder,
                 taken: Set(distinct.map(\.id)).union([warmUp.id])
             )
             let pick = draw(
@@ -75,14 +95,15 @@ struct StrengthBreakBuilder {
                     }
                 },
                 slotRule: { movement, letGo in
-                    letGo.contains(.breakLimits) || Self.fitsBreakLimits(movement, alongside: distinct)
+                    (letGo.contains(.breakLimits) || Self.fitsBreakLimits(movement, alongside: distinct))
+                        && (letGo.contains(.vigorous) || Self.isVigorousEnough(movement, equipment: context.equipment))
                 }
             )
-            drawn[bucket] = pick
+            drawn.append((setSlot, pick))
             working.append(pick)
         }
 
-        let worked = Set(working.flatMap(\.regions))
+        let worked = isArmBreak ? Self.armCoolDownRegions : Set(working.flatMap(\.regions))
         let coolDownRequest = SlotRequest(
             slot: .coolDown, bucket: .end, ladder: Self.coolDownLadder,
             taken: Set(working.map(\.id)).union([warmUp.id])
@@ -106,6 +127,12 @@ struct StrengthBreakBuilder {
     /// One bodyweight, non-floor, difficulty-1, two-sided move: something anyone can start cold.
     static func isWarmUpShaped(_ movement: StrengthMovement) -> Bool {
         movement.isBodyweight && !movement.onFloor && movement.difficulty == 1 && !movement.perSide
+    }
+
+    /// Whether a move may be a working set for a user with this kit: with any kit selected only a
+    /// vigorous move may, so the light bodyweight moves don't take sets the kit could load.
+    static func isVigorousEnough(_ movement: StrengthMovement, equipment: Set<StrengthEquipment>) -> Bool {
+        equipment.isEmpty || movement.vigorous
     }
 
     /// At most one per-side, one floor and one grip move among a break's distinct working moves:

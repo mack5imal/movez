@@ -11,6 +11,14 @@ enum StrengthDayLetter: String, Codable, CaseIterable, Hashable {
         self == .dayA ? (.sqt, .psh) : (.hng, .pul)
     }
 
+    /// The arm the day's arm break trains: triceps on a push day, biceps on a pull day, so the
+    /// arm work lands on the day whose pattern already uses it as a helper.
+    var armBucket: StrengthBucket { self == .dayA ? .tri : .bic }
+
+    /// The pattern an arm break's warm-up is drawn from: the day's push or pull, which warms the
+    /// joints the arm sets load without spending an arm move on the warm-up.
+    var armWarmUpPattern: StrengthBucket { patterns.second }
+
     var other: StrengthDayLetter { self == .dayA ? .dayB : .dayA }
 
     /// How a completed break on this day is recorded in history.
@@ -24,11 +32,26 @@ enum StrengthDayLetter: String, Codable, CaseIterable, Hashable {
     }
 }
 
-/// One working set's place in a strength break: one of the day's two patterns, or the core set
-/// the day's first break carries in place of its third set.
+/// One working set's place in a strength break: one of the day's two patterns, the core set the
+/// day's first break carries in place of its third set, or one of an arm break's sets.
+///
+/// The builder keys repeats by slot, not by bucket: the same slot twice is the same move twice,
+/// which is how an arm break serves one move for two sets and a different one for the third.
 enum StrengthSetSlot: Hashable {
     case pattern(StrengthBucket)
     case core
+    /// An arm break's main move, served for its first two sets.
+    case arm(StrengthBucket)
+    /// An arm break's third set: a different move from the same arm bucket.
+    case armAlternate(StrengthBucket)
+
+    /// Whether this slot belongs to an arm break.
+    var isArm: Bool {
+        switch self {
+        case .arm, .armAlternate: return true
+        case .pattern, .core: return false
+        }
+    }
 }
 
 /// What the next full break should be.
@@ -55,16 +78,56 @@ struct StrengthDayPlanner {
         self.calendar = calendar
     }
 
-    /// The next full break, given every break record so far and the strength breaks a day setting.
-    func next(records: [BreakRecord], strengthBreaksPerDay: Int, today: Date) -> NextFullBreak {
+    /// Whether the user's kit allows an arm break. The arm buckets have bodyweight and dumbbell
+    /// moves but no kettlebell ones, and with any kit selected working sets must be vigorous, so a
+    /// kettlebell-only user would have only light arm moves left; their arm break stays a normal
+    /// push-pull break.
+    static func armBreakPossible(equipment: Set<StrengthEquipment>) -> Bool {
+        equipment.isEmpty || equipment.contains(.dumbbells)
+    }
+
+    /// Where an arm break falls in a day that is long enough to reach it: the fourth break, or the
+    /// third under "More arms" (0-based 3 or 2); nil when the kit allows none.
+    static func armBreakPosition(focus: StrengthFocus, armBreakPossible: Bool) -> Int? {
+        guard armBreakPossible else { return nil }
+        return focus == .moreArms ? 2 : 3
+    }
+
+    /// The 0-based index of today's arm break, or nil when the day has none: its position, and
+    /// only when the day has more strength breaks than that. One or two a day never get one, since
+    /// those breaks are all the day's pattern work.
+    static func armBreakIndex(strengthBreaksPerDay: Int, focus: StrengthFocus, armBreakPossible: Bool) -> Int? {
+        guard let position = armBreakPosition(focus: focus, armBreakPossible: armBreakPossible) else { return nil }
+        return strengthBreaksPerDay > position ? position : nil
+    }
+
+    /// The next full break, given every break record so far, the strength breaks a day setting,
+    /// the focus and whether the user's kit allows an arm break (`armBreakPossible(equipment:)`).
+    func next(
+        records: [BreakRecord],
+        strengthBreaksPerDay: Int,
+        focus: StrengthFocus,
+        armBreakPossible: Bool,
+        today: Date
+    ) -> NextFullBreak {
         let days = strengthDays(in: records)
         let todayKey = DayKey.key(for: today, calendar: calendar)
         let letter = letter(for: todayKey, in: days)
         let completedToday = days.byKey[todayKey]?.count ?? 0
         guard completedToday < strengthBreaksPerDay else { return .endRange }
 
-        let priorLead = lastLead(before: todayKey, letter: letter, in: days)
-        let orders = Self.replay(letter: letter, breaks: completedToday + 1, priorLead: priorLead).orders
+        let armIndex = Self.armBreakIndex(
+            strengthBreaksPerDay: strengthBreaksPerDay, focus: focus, armBreakPossible: armBreakPossible
+        )
+        let priorLead = lastLead(
+            before: todayKey,
+            letter: letter,
+            armPosition: Self.armBreakPosition(focus: focus, armBreakPossible: armBreakPossible),
+            in: days
+        )
+        let orders = Self.replay(
+            letter: letter, breaks: completedToday + 1, priorLead: priorLead, armIndex: armIndex
+        ).orders
         return .strength(
             letter: letter,
             index: completedToday + 1,
@@ -89,19 +152,33 @@ struct StrengthDayPlanner {
     /// goes to the pattern that led less recently today; when neither has led today, to the one
     /// that did not lead last on an earlier day with this letter (`priorLead`), else the first
     /// pattern. The first break does not count as a lead: its shape is fixed, not chosen.
+    ///
+    /// The break at `armIndex`, when there is one, is the day's arm break, arm · arm · alternate
+    /// from the letter's arm bucket. The pattern breaks step over it: its sets count toward
+    /// neither pattern and it leads with neither, so the pattern breaks after it are exactly the
+    /// ones the day would have had in its place, and the arm break moves no lead across days.
     static func replay(
         letter: StrengthDayLetter,
         breaks: Int,
-        priorLead: StrengthBucket?
+        priorLead: StrengthBucket?,
+        armIndex: Int? = nil
     ) -> (orders: [[StrengthSetSlot]], lastLead: StrengthBucket?) {
         let (first, second) = letter.patterns
+        let arm = letter.armBucket
         var sets: [StrengthBucket: Int] = [first: 0, second: 0]
         var ledAt: [StrengthBucket: Int] = [:]
         var lastLead: StrengthBucket?
         var orders: [[StrengthSetSlot]] = []
+        // Counts pattern breaks only, so an arm break leaves the lead's recency where it was.
+        var patternBreak = 0
 
         for index in 0..<max(0, breaks) {
-            if index == 0 {
+            if index == armIndex {
+                orders.append([.arm(arm), .arm(arm), .armAlternate(arm)])
+                continue
+            }
+            defer { patternBreak += 1 }
+            if patternBreak == 0 {
                 orders.append([.pattern(first), .pattern(second), .core])
                 sets[first, default: 0] += 1
                 sets[second, default: 0] += 1
@@ -112,7 +189,7 @@ struct StrengthDayPlanner {
             orders.append([.pattern(lead), .pattern(other), .pattern(lead)])
             sets[lead, default: 0] += 2
             sets[other, default: 0] += 1
-            ledAt[lead] = index
+            ledAt[lead] = patternBreak
             lastLead = lead
         }
         return (orders, lastLead)
@@ -166,11 +243,23 @@ struct StrengthDayPlanner {
 
     /// The pattern that led most recently on an earlier day with `letter`, found by replaying every
     /// such day in order, since each day's ties depend on the day before it.
-    private func lastLead(before key: String, letter: StrengthDayLetter, in days: StrengthDays) -> StrengthBucket? {
+    ///
+    /// History records an arm break as an ordinary strength break, so an earlier day is replayed
+    /// with the arm break at today's `armPosition`, whatever that day's breaks-a-day setting was:
+    /// a day with a break at that position had more breaks than it, so it had its arm break there,
+    /// and a shorter day never reaches it. Only a change of focus or kit since can misplace it,
+    /// which moves at most one lead, and a lead only decides a tie.
+    private func lastLead(
+        before key: String,
+        letter: StrengthDayLetter,
+        armPosition: Int?,
+        in days: StrengthDays
+    ) -> StrengthBucket? {
         var lead: StrengthBucket?
         for dayKey in days.keys where dayKey < key {
             guard let breaks = days.byKey[dayKey], breaks.first == letter else { continue }
-            if let dayLead = Self.replay(letter: letter, breaks: breaks.count, priorLead: lead).lastLead {
+            let replay = Self.replay(letter: letter, breaks: breaks.count, priorLead: lead, armIndex: armPosition)
+            if let dayLead = replay.lastLead {
                 lead = dayLead
             }
         }

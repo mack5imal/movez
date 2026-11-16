@@ -7,11 +7,17 @@ final class StrengthDayPlannerTests: XCTestCase {
     private let calendar = Calendar.current
     private lazy var planner = StrengthDayPlanner(calendar: calendar)
     private var records: [BreakRecord] = []
+    /// The focus and kit every `serve` plans with; no focus and bodyweight only unless a test
+    /// changes them.
+    private var focus: StrengthFocus = .none
+    private var equipment: Set<StrengthEquipment> = []
 
     private let squat = StrengthSetSlot.pattern(.sqt)
     private let push = StrengthSetSlot.pattern(.psh)
     private let hinge = StrengthSetSlot.pattern(.hng)
     private let pull = StrengthSetSlot.pattern(.pul)
+    private let tricepsBreak: [StrengthSetSlot] = [.arm(.tri), .arm(.tri), .armAlternate(.tri)]
+    private let bicepsBreak: [StrengthSetSlot] = [.arm(.bic), .arm(.bic), .armAlternate(.bic)]
 
     private func day(_ offset: Int) -> Date {
         calendar.date(byAdding: .day, value: offset, to: SchedulerHarness.mondayMorning) ?? SchedulerHarness.mondayMorning
@@ -22,11 +28,21 @@ final class StrengthDayPlannerTests: XCTestCase {
     @discardableResult
     private func serve(on dayOffset: Int, perDay: Int, outcome: BreakResult = .done) -> NextFullBreak {
         let at = day(dayOffset).addingTimeInterval(Double(records.filter { sameDay($0.at, day(dayOffset)) }.count) * 3600)
-        let plan = planner.next(records: records, strengthBreaksPerDay: perDay, today: at)
+        let plan = next(perDay: perDay, today: at)
         let kind: BreakKind
         if case let .strength(letter, _, _, _) = plan { kind = letter.breakKind } else { kind = .endRange }
         records.append(record(at: at, kind: kind, outcome: outcome))
         return plan
+    }
+
+    private func next(perDay: Int, today: Date) -> NextFullBreak {
+        planner.next(
+            records: records,
+            strengthBreaksPerDay: perDay,
+            focus: focus,
+            armBreakPossible: StrengthDayPlanner.armBreakPossible(equipment: equipment),
+            today: today
+        )
     }
 
     @discardableResult
@@ -82,7 +98,7 @@ final class StrengthDayPlannerTests: XCTestCase {
         XCTAssertEqual(orders(plans), [[squat, push, .core]])
     }
 
-    func testFourStrengthBreaksADayComeBeforeEndRange() {
+    func testFourStrengthBreaksADayComeBeforeEndRangeTheFourthAnArmBreak() {
         let plans = serveDay(0, perDay: 4, breaks: 5)
         XCTAssertEqual(plans.prefix(4).compactMap(letter).count, 4)
         XCTAssertEqual(plans.last, .endRange)
@@ -90,8 +106,85 @@ final class StrengthDayPlannerTests: XCTestCase {
             [squat, push, .core],
             [squat, push, squat],
             [push, squat, push],
-            [squat, push, squat]
+            tricepsBreak
         ])
+    }
+
+    // MARK: - Arm break
+
+    func testAtFourADayTheFourthBreakIsTricepsOnAnADayAndBicepsOnABDay() {
+        let monday = serveDay(0, perDay: 4, breaks: 4)
+        let tuesday = serveDay(1, perDay: 4, breaks: 4)
+        XCTAssertEqual(orders(monday)[3], tricepsBreak)
+        XCTAssertEqual(orders(tuesday), [
+            [hinge, pull, .core],
+            [hinge, pull, hinge],
+            [pull, hinge, pull],
+            bicepsBreak
+        ])
+        XCTAssertEqual(tuesday.compactMap(letter), Array(repeating: .dayB, count: 4), "an arm break keeps the day's letter")
+        XCTAssertEqual(records.map(\.breakKind), Array(repeating: .strengthA, count: 4) + Array(repeating: .strengthB, count: 4))
+    }
+
+    func testMoreArmsMovesTheArmBreakToTheThirdAndTheFourthIsTheThirdWithoutIt() {
+        focus = .moreArms
+        let atThree = serveDay(0, perDay: 3, breaks: 3)
+        XCTAssertEqual(orders(atThree), [[squat, push, .core], [squat, push, squat], tricepsBreak])
+
+        records = []
+        let atFour = serveDay(0, perDay: 4, breaks: 4)
+        XCTAssertEqual(orders(atFour), [[squat, push, .core], [squat, push, squat], tricepsBreak, [push, squat, push]])
+
+        records = []
+        focus = .none
+        let withoutFocus = serveDay(0, perDay: 3, breaks: 3)
+        XCTAssertEqual(orders(atFour)[3], orders(withoutFocus)[2], "the arm break steps over the pattern breaks")
+    }
+
+    func testOneOrTwoBreaksADayNeverGetAnArmBreak() {
+        for focus in [StrengthFocus.none, .moreArms] {
+            for perDay in 1...2 {
+                records = []
+                self.focus = focus
+                let plans = serveDay(0, perDay: perDay, breaks: perDay)
+                XCTAssertFalse(orders(plans).joined().contains(where: \.isArm), "\(perDay) a day, \(focus)")
+            }
+        }
+    }
+
+    func testAKettlebellOnlyUserGetsNoArmBreak() {
+        XCTAssertFalse(StrengthDayPlanner.armBreakPossible(equipment: [.kettlebell]))
+        XCTAssertTrue(StrengthDayPlanner.armBreakPossible(equipment: []))
+        XCTAssertTrue(StrengthDayPlanner.armBreakPossible(equipment: [.dumbbells]))
+        XCTAssertTrue(StrengthDayPlanner.armBreakPossible(equipment: [.dumbbells, .kettlebell]))
+
+        equipment = [.kettlebell]
+        XCTAssertEqual(orders(serveDay(0, perDay: 4, breaks: 4))[3], [squat, push, squat])
+        records = []
+        focus = .moreArms
+        XCTAssertEqual(orders(serveDay(0, perDay: 3, breaks: 3))[2], [push, squat, push])
+    }
+
+    /// The arm break counts toward neither pattern and leads with neither, so the next A day's
+    /// tie goes the way it would have after a three-break day.
+    func testTheArmBreakLeavesTheLeadAcrossDaysAlone() {
+        let replay = StrengthDayPlanner.replay(letter: .dayA, breaks: 4, priorLead: nil, armIndex: 3)
+        XCTAssertEqual(replay.lastLead, .psh)
+        XCTAssertEqual(replay.lastLead, StrengthDayPlanner.replay(letter: .dayA, breaks: 3, priorLead: nil).lastLead)
+
+        serveDay(0, perDay: 4, breaks: 4)
+        serveDay(1, perDay: 4, breaks: 4)
+        let wednesday = serveDay(2, perDay: 4, breaks: 2)
+        XCTAssertEqual(orders(wednesday), [[squat, push, .core], [squat, push, squat]])
+    }
+
+    /// An earlier day's arm break is found from where it falls, not from today's breaks a day: a
+    /// day that reached the fourth break had it there, however many breaks today has.
+    func testAnEarlierDaysArmBreakIsSteppedOverWhateverTodaysBreaksADay() {
+        serveDay(0, perDay: 4, breaks: 4)
+        serveDay(1, perDay: 4, breaks: 4)
+        let wednesday = serveDay(2, perDay: 3, breaks: 2)
+        XCTAssertEqual(orders(wednesday)[1], [squat, push, squat], "Monday's last lead was push, at its third break")
     }
 
     func testASkippedOrSnoozedFirstBreakLeavesTheNextOneTheFirstBreak() {
@@ -113,16 +206,16 @@ final class StrengthDayPlannerTests: XCTestCase {
             record(at: day(0).addingTimeInterval(600), kind: nil),
             record(at: day(0).addingTimeInterval(1200), kind: .movement)
         ]
-        let next = planner.next(records: records, strengthBreaksPerDay: 1, today: day(0).addingTimeInterval(1800))
-        XCTAssertEqual(next, .strength(letter: .dayA, index: 1, of: 1, setOrder: [squat, push, .core]))
+        let plan = next(perDay: 1, today: day(0).addingTimeInterval(1800))
+        XCTAssertEqual(plan, .strength(letter: .dayA, index: 1, of: 1, setOrder: [squat, push, .core]))
     }
 
     // MARK: - Day letter
 
     func testTheFirstEverStrengthDayIsA() {
         XCTAssertEqual(planner.letter(records: [], today: day(0)), .dayA)
-        let next = planner.next(records: [], strengthBreaksPerDay: 3, today: day(0))
-        XCTAssertEqual(letter(next), .dayA)
+        let plan = next(perDay: 3, today: day(0))
+        XCTAssertEqual(letter(plan), .dayA)
     }
 
     func testTheDayAfterAnADayIsBAndTheDayAfterThatIsA() {
@@ -162,8 +255,10 @@ final class StrengthDayPlannerTests: XCTestCase {
     // MARK: - Lead pattern
 
     func testATieGoesToThePatternThatLedLessRecentlyToday() {
-        // Fourth break of a four-break day: squat led the second, push the third, both stand at
-        // four sets, so squat, which led less recently, leads again.
+        // Fourth pattern break of a day whose arm break is out of reach (kettlebell only): squat
+        // led the second, push the third, both stand at four sets, so squat, which led less
+        // recently, leads again.
+        equipment = [.kettlebell]
         let plans = serveDay(0, perDay: 4, breaks: 4)
         XCTAssertEqual(orders(plans)[3], [squat, push, squat])
     }
@@ -171,6 +266,7 @@ final class StrengthDayPlannerTests: XCTestCase {
     func testATieWithNoLeadTodayGoesToThePatternThatDidNotLeadLastOnTheLastDayWithThisLetter() {
         // Monday's A day ends with squat leading. Wednesday's second break is a tie with no lead
         // yet today, so push, which led less recently on Monday, leads.
+        equipment = [.kettlebell]
         serveDay(0, perDay: 4, breaks: 4)
         serveDay(1, perDay: 4, breaks: 4)
         let wednesday = serveDay(2, perDay: 4, breaks: 2)

@@ -2,15 +2,15 @@
   "about": "The strength-mode rules a built break is checked against. scripts/simulate_strength.py and Tests/movezTests/StrengthRuleChecker.swift each implement every id here and refuse to run when their own list differs, so the script and the Swift cross-check agree on what a violation is. A 'hard' rule is broken whenever a break breaks it. A 'where-possible' rule is broken only when the break breaks it while another move that keeps it, and keeps every other rule the served move keeps, was available for the same slot.",
   "rules": [
     {"id": "s6-shape", "criterion": "S6", "kind": "hard", "text": "A strength break is a warm-up, three working sets and a cool-down."},
-    {"id": "s6-day-patterns", "criterion": "S6", "kind": "hard", "text": "The sets are the day's two patterns (A: squat/lunge and push, B: hinge and pull); the day's first break is X · Y · Core and every later one X · Y · X."},
-    {"id": "s6-lead", "criterion": "S6", "kind": "hard", "text": "A later break leads with the pattern that has fewer sets so far today; a tie goes to the one that led less recently."},
-    {"id": "s6-same-move-twice", "criterion": "S6", "kind": "hard", "text": "The pattern done twice uses the same move both times."},
+    {"id": "s6-day-patterns", "criterion": "S6", "kind": "hard", "text": "A pattern break's sets are the day's two patterns (A: squat/lunge and push, B: hinge and pull); the day's first pattern break is X · Y · Core and every later one X · Y · X."},
+    {"id": "s6-lead", "criterion": "S6", "kind": "hard", "text": "A later pattern break leads with the pattern that has fewer sets so far today, an arm break's sets counting for neither; a tie goes to the one that led less recently."},
+    {"id": "s6-same-move-twice", "criterion": "S6", "kind": "hard", "text": "The same slot twice is the same move both times (the pattern done twice, an arm break's first two sets), and two different slots are two different moves."},
     {"id": "s6-distinct", "criterion": "S6", "kind": "hard", "text": "No move appears twice in a break other than that repeat."},
-    {"id": "s6-warm-up-pattern", "criterion": "S6", "kind": "hard", "text": "The warm-up is drawn from the first set's pattern."},
+    {"id": "s6-warm-up-pattern", "criterion": "S6", "kind": "hard", "text": "The warm-up is drawn from the first set's pattern; an arm break's from the day's push (A) or pull (B)."},
     {"id": "s6-warm-up-shape", "criterion": "S6", "kind": "where-possible", "text": "The warm-up is bodyweight, not on the floor, difficulty 1 and two-sided."},
     {"id": "s6-warm-up-timing", "criterion": "S6", "kind": "hard", "text": "The warm-up runs 30 s with no rep target."},
     {"id": "s6-cool-down-end", "criterion": "S6", "kind": "hard", "text": "The cool-down is one END move for 30 s (15 s a side on a per-side move)."},
-    {"id": "s6-cool-down-region", "criterion": "S6", "kind": "where-possible", "text": "The cool-down stretches a region the sets worked."},
+    {"id": "s6-cool-down-region", "criterion": "S6", "kind": "where-possible", "text": "The cool-down stretches a region the sets worked; for an arm break, the shoulder, chest, arm or wrist/forearm."},
     {"id": "s6-per-side-limit", "criterion": "S6", "kind": "where-possible", "text": "At most one per-side move among the working moves."},
     {"id": "s6-floor-limit", "criterion": "S6", "kind": "where-possible", "text": "At most one floor move among the working moves."},
     {"id": "s6-grip-limit", "criterion": "S6", "kind": "where-possible", "text": "At most one grip move among the working moves."},
@@ -20,6 +20,9 @@
     {"id": "s6-excluded", "criterion": "S6", "kind": "where-possible", "text": "No excluded move."},
     {"id": "s6-difficulty", "criterion": "S6", "kind": "where-possible", "text": "Difficulty at most the cap, and difficulty 3 only in an unlocked pattern (S9)."},
     {"id": "s6-dose", "criterion": "S6", "kind": "hard", "text": "Each set's dose is the library's dose for its move (S4)."},
+    {"id": "s6-arm-break", "criterion": "S6", "kind": "hard", "text": "An arm break is three sets of the day's arm, triceps on an A day and biceps on a B day, in the slots arm · arm · alternate, with no core set."},
+    {"id": "s6-arm-alternate", "criterion": "S6", "kind": "hard", "text": "An arm break's third set is a different move from the same arm pattern as its first two."},
+    {"id": "s6-vigorous-sets", "criterion": "S6", "kind": "where-possible", "text": "With any equipment selected, every working set (core and arm sets included) is a vigorous move."},
     {"id": "s7-end-only", "criterion": "S7", "kind": "hard", "text": "A micro-break draws only from END."},
     {"id": "s7-no-floor", "criterion": "S7", "kind": "hard", "text": "A micro-break never serves a floor move."},
     {"id": "s7-wall", "criterion": "S7", "kind": "hard", "text": "No Wall-setting move with the wall off."},
@@ -39,6 +42,7 @@
     {"id": "s22-end-range-served-today", "criterion": "S22", "kind": "where-possible", "text": "No move served earlier today in either mode (S8)."},
     {"id": "s22-end-range-worked-regions", "criterion": "S22", "kind": "where-possible", "text": "The regions the day's strength breaks worked are avoided."},
     {"id": "s22-end-range-excluded", "criterion": "S22", "kind": "where-possible", "text": "No excluded move."},
-    {"id": "s22-end-range-difficulty", "criterion": "S22", "kind": "where-possible", "text": "Difficulty at most the cap, and difficulty 3 only when END is unlocked."}
+    {"id": "s22-end-range-difficulty", "criterion": "S22", "kind": "where-possible", "text": "Difficulty at most the cap, and difficulty 3 only when END is unlocked."},
+    {"id": "s22-arm-break-position", "criterion": "S22", "kind": "hard", "text": "A day's arm break is its fourth strength break (its third under More arms), only when the day has more strength breaks than that and the kit is none or includes dumbbells; no other break is one."}
   ]
 }

@@ -27,11 +27,17 @@ enum StrengthTestSupport {
         return context
     }
 
-    /// The set orders a day can produce: the first break and the two later shapes for each letter.
+    /// The set orders a day can produce: the first break, the two later shapes and the arm break
+    /// for each letter.
     static var plans: [(letter: StrengthDayLetter, order: [StrengthSetSlot])] {
         StrengthDayLetter.allCases.flatMap { letter in
-            StrengthDayPlanner.replay(letter: letter, breaks: 4, priorLead: nil).orders.map { (letter, $0) }
+            StrengthDayPlanner.replay(letter: letter, breaks: 4, priorLead: nil, armIndex: 3).orders.map { (letter, $0) }
         }
+    }
+
+    /// A day's arm break, as the planner orders it.
+    static func armOrder(_ letter: StrengthDayLetter) -> [StrengthSetSlot] {
+        StrengthDayPlanner.replay(letter: letter, breaks: 4, priorLead: nil, armIndex: 3).orders[3]
     }
 }
 
@@ -58,6 +64,10 @@ final class StrengthBreakBuilderTests: XCTestCase {
                 build(letter: plan.letter, order: plan.order, seed: UInt64(seed &* 7_919 &+ 3), configure: configure)
             }
         }
+    }
+
+    private func isArmBreak(_ strengthBreak: StrengthBreak) -> Bool {
+        strengthBreak.sets.allSatisfy { $0.movement.bucket == strengthBreak.letter.armBucket }
     }
 
     private func workingMoves(_ strengthBreak: StrengthBreak) -> [StrengthMovement] {
@@ -97,12 +107,107 @@ final class StrengthBreakBuilderTests: XCTestCase {
         }
     }
 
+    // MARK: - Arm break
+
+    /// Two sets of one arm move and a third of a different one, all from the day's arm bucket.
+    func testTheArmBreakIsOneArmMoveTwiceThenADifferentOne() {
+        for letter in StrengthDayLetter.allCases {
+            let order = StrengthTestSupport.armOrder(letter)
+            XCTAssertEqual(order, [.arm(letter.armBucket), .arm(letter.armBucket), .armAlternate(letter.armBucket)])
+            for kit in [Set<StrengthEquipment>(), [.dumbbells], [.dumbbells, .kettlebell]] {
+                for seed in 0..<80 {
+                    let strengthBreak = build(letter: letter, order: order, seed: UInt64(seed &* 13 &+ 5)) { $0.equipment = kit }
+                    let sets = strengthBreak.sets.map(\.movement)
+                    XCTAssertEqual(sets.map(\.bucket), Array(repeating: letter.armBucket, count: 3))
+                    XCTAssertEqual(sets[0].id, sets[1].id)
+                    XCTAssertNotEqual(sets[0].id, sets[2].id, "\(letter) \(kit): \(sets.map(\.id))")
+                    XCTAssertFalse(strengthBreak.relaxed.contains { $0.rule == .vigorous }, "\(sets.map(\.id))")
+                }
+            }
+        }
+        XCTAssertEqual(StrengthDayLetter.dayA.armBucket, .tri)
+        XCTAssertEqual(StrengthDayLetter.dayB.armBucket, .bic)
+    }
+
+    /// A bodyweight-only user still has two different biceps moves for a pull day's arm break.
+    func testABodyweightOnlyArmBreakHasTwoDifferentBicepsMoves() {
+        var seen = Set<String>()
+        for seed in 0..<80 {
+            let strengthBreak = build(letter: .dayB, order: StrengthTestSupport.armOrder(.dayB), seed: UInt64(seed)) {
+                $0.equipment = []
+            }
+            let ids = strengthBreak.sets.map(\.movement.id)
+            XCTAssertEqual(Set(ids).count, 2, "\(ids)")
+            XCTAssertTrue(strengthBreak.sets.allSatisfy { $0.movement.isBodyweight }, "\(ids)")
+            XCTAssertEqual(strengthBreak.relaxed, [], "\(ids)")
+            seen.formUnion(ids)
+        }
+        XCTAssertEqual(seen, ["BIC-03", "BIC-06"])
+    }
+
+    func testTheArmBreaksWarmUpIsFromThePushOrPullPatternAndItsCoolDownFromTheArmRegions() {
+        for letter in StrengthDayLetter.allCases {
+            for seed in 0..<80 {
+                let strengthBreak = build(letter: letter, order: StrengthTestSupport.armOrder(letter), seed: UInt64(seed))
+                XCTAssertEqual(strengthBreak.warmUp.movement.bucket, letter == .dayA ? .psh : .pul)
+                XCTAssertTrue(StrengthBreakBuilder.isWarmUpShaped(strengthBreak.warmUp.movement), strengthBreak.warmUp.movement.id)
+                XCTAssertFalse(
+                    StrengthBreakBuilder.armCoolDownRegions.isDisjoint(with: strengthBreak.coolDown.movement.regions),
+                    "\(strengthBreak.coolDown.movement.id) stretches none of the arm break's regions"
+                )
+                XCTAssertFalse(strengthBreak.relaxed.contains { $0.slot == .coolDown || $0.slot == .warmUp })
+            }
+        }
+        XCTAssertEqual(StrengthBreakBuilder.armCoolDownRegions, [.shoulder, .chest, .arm, .wristForearm])
+    }
+
+    // MARK: - Vigorous sets
+
+    /// With any kit, no working set is a light bodyweight move; the warm-ups still are.
+    func testWithKitEveryWorkingSetIsVigorous() {
+        var lightWarmUps = 0
+        for kit in [Set<StrengthEquipment>([.dumbbells]), [.dumbbells, .kettlebell], [.kettlebell]] {
+            for strengthBreak in everyPlan(configure: { $0.equipment = kit }) {
+                // A kettlebell-only user never gets an arm break, whose buckets have no kettlebell
+                // move; the planner keeps them on pattern breaks.
+                if kit == [.kettlebell], isArmBreak(strengthBreak) { continue }
+                XCTAssertFalse(strengthBreak.relaxed.contains { $0.rule == .vigorous }, "\(kit): \(strengthBreak.movementIds)")
+                for set in strengthBreak.sets {
+                    XCTAssertTrue(set.movement.vigorous, "\(kit): \(set.movement.id) is a light working set")
+                }
+                if !strengthBreak.warmUp.movement.vigorous { lightWarmUps += 1 }
+            }
+        }
+        XCTAssertGreaterThan(lightWarmUps, 0, "light bodyweight moves are still warm-ups")
+    }
+
+    func testBodyweightOnlyUsersStillDrawLightMovesForWorkingSets() {
+        let breaks = everyPlan { $0.equipment = [] }
+        XCTAssertTrue(breaks.contains { $0.sets.contains { !$0.movement.vigorous } })
+        XCTAssertFalse(breaks.contains { $0.relaxed.contains { $0.rule == .vigorous } })
+    }
+
+    /// With only light moves left in a pattern, the rule is let go of and the break says so.
+    func testTheVigorousRuleIsLetGoOfWhenNothingVigorousIsLeft() {
+        let vigorousTriceps = Set(library.movements(in: .tri).filter(\.vigorous).map(\.id))
+        let strengthBreak = build(letter: .dayA, order: StrengthTestSupport.armOrder(.dayA), seed: 3) {
+            $0.equipment = [.dumbbells]
+            $0.excluded = vigorousTriceps
+            $0.usedStrengthIdsToday = vigorousTriceps
+        }
+        XCTAssertTrue(strengthBreak.relaxed.contains { $0.rule == .vigorous && $0.slot == .set(1) })
+        XCTAssertFalse(strengthBreak.relaxed.contains { $0.rule == .excluded }, "light moves come before excluded ones")
+        XCTAssertTrue(strengthBreak.sets.allSatisfy { !$0.movement.vigorous })
+    }
+
     // MARK: - Warm-up and cool-down
 
     func testTheWarmUpIsABodyweightStandingEasyTwoSidedMoveFromTheFirstPattern() {
         for strengthBreak in everyPlan() {
             let warmUp = strengthBreak.warmUp
-            XCTAssertEqual(warmUp.movement.bucket, strengthBreak.sets[0].movement.bucket)
+            let expected = isArmBreak(strengthBreak)
+                ? strengthBreak.letter.armWarmUpPattern : strengthBreak.sets[0].movement.bucket
+            XCTAssertEqual(warmUp.movement.bucket, expected)
             XCTAssertTrue(warmUp.movement.isBodyweight, "\(warmUp.movement.id) needs kit")
             XCTAssertFalse(warmUp.movement.onFloor, "\(warmUp.movement.id) is on the floor")
             XCTAssertEqual(warmUp.movement.difficulty, 1, "\(warmUp.movement.id)")
@@ -116,8 +221,9 @@ final class StrengthBreakBuilderTests: XCTestCase {
         for strengthBreak in everyPlan() {
             let coolDown = strengthBreak.coolDown
             XCTAssertEqual(coolDown.movement.bucket, .end)
+            let worked = isArmBreak(strengthBreak) ? StrengthBreakBuilder.armCoolDownRegions : strengthBreak.workedRegions
             XCTAssertFalse(
-                strengthBreak.workedRegions.isDisjoint(with: coolDown.movement.regions),
+                worked.isDisjoint(with: coolDown.movement.regions),
                 "\(coolDown.movement.id) stretches nothing the sets worked"
             )
             XCTAssertEqual(coolDown.seconds, 30)
@@ -205,9 +311,9 @@ final class StrengthBreakBuilderTests: XCTestCase {
                 + strengthBreak.sets.map { (.set($0.setNumber), $0.movement.id) }
                 + [(.coolDown, strengthBreak.coolDown.movement.id)]
             for (slot, id) in slots where !relaxedSlots.contains(slot) {
-                // The repeated set reuses the first set's move, so it is judged by that set's slot.
-                let repeatsFirst = slot == .set(3) && id == strengthBreak.sets[0].movement.id
-                if repeatsFirst, relaxedSlots.contains(.set(1)) { continue }
+                // A repeated set reuses an earlier set's move, so it is judged by that set's slot.
+                let drawnAt = strengthBreak.sets.first { $0.movement.id == id }.map { StrengthRelaxation.Slot.set($0.setNumber) }
+                if let drawnAt, drawnAt != slot, relaxedSlots.contains(drawnAt) { continue }
                 XCTAssertFalse(served.contains(id), "\(id) in \(slot) was already served today")
             }
         }
@@ -243,9 +349,11 @@ final class StrengthBreakBuilderTests: XCTestCase {
 
     // MARK: - Weighting
 
+    /// Measured on the pattern breaks: the arm break's sets are arm moves under any focus, and
+    /// where it falls is the planner's part of "More arms".
     func testAFocusRegionIsWeightedUp() {
         func armShare(_ focus: StrengthFocus) -> Double {
-            let breaks = everyPlan(seeds: 150) { $0.focus = focus }
+            let breaks = everyPlan(seeds: 150) { $0.focus = focus }.filter { !isArmBreak($0) }
             let moves = breaks.flatMap(workingMoves)
             return Double(moves.filter { $0.regions.contains(.arm) }.count) / Double(moves.count)
         }
@@ -392,6 +500,10 @@ final class StrengthBreakBuilderTests: XCTestCase {
     /// A short pool lets the per-break limits go before anything served today comes back.
     func testTheFallbackLetsTheBreakLimitsGoFirst() {
         XCTAssertEqual(StrengthBreakBuilder.workingLadder.first, .breakLimits)
+        XCTAssertEqual(
+            StrengthBreakBuilder.workingLadder.prefix(3), [.breakLimits, .servedToday, .vigorous],
+            "repeating a vigorous move comes before serving a light one"
+        )
         XCTAssertEqual(StrengthBreakBuilder.warmUpLadder.first, .warmUpShape)
         XCTAssertEqual(StrengthBreakBuilder.coolDownLadder.first, .coolDownRegion)
         XCTAssertEqual(StrengthBreakBuilder.workingLadder.last, .anything)

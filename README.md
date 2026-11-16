@@ -69,7 +69,7 @@ keeping strong through long desk days with your own weights: short sets, not a g
   its name, as in "STRENGTH BREAK" on a break, and from the glyph inside the menu-bar circle: a wave
   for Movement, a dumbbell for Strength. The colors are the same in both modes.
 
-The strength moves come from their own library of 145 movements,
+The strength moves come from their own library of 151 movements,
 [`strength-library-v1.json`](strength-library-v1.json). The reasoning behind the sets, reps and
 weekly volume is in [docs/DECISIONS.md](docs/DECISIONS.md), entries 54 onward.
 

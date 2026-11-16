@@ -95,10 +95,10 @@ final class StrengthSettingsWindowTests: XCTestCase {
         viewModel.openStrengthLibrary()
 
         XCTAssertEqual(viewModel.openSheet, .modeLibrary)
-        XCTAssertEqual(viewModel.matchingStrengthMovements().count, 145)
-        XCTAssertEqual(viewModel.strengthShownLine, "145 shown")
+        XCTAssertEqual(viewModel.matchingStrengthMovements().count, 151)
+        XCTAssertEqual(viewModel.strengthShownLine, "151 shown")
         let chips = ["All"] + viewModel.strengthBucketChips.map(\.bucket.rawValue)
-        XCTAssertEqual(chips, ["All", "SQT", "HNG", "PSH", "PUL", "COR", "ACC", "END"])
+        XCTAssertEqual(chips, ["All", "SQT", "HNG", "PSH", "PUL", "BIC", "TRI", "COR", "ACC", "END"])
         // The design drew WRM and LEG; the library has no such buckets (SPEC reconciliation 10).
         XCTAssertFalse(chips.contains("WRM"))
         XCTAssertFalse(chips.contains("LEG"))

@@ -17,11 +17,12 @@ struct StrengthRuleChecker {
         "s6-warm-up-pattern", "s6-warm-up-shape", "s6-warm-up-timing", "s6-cool-down-end",
         "s6-cool-down-region", "s6-per-side-limit", "s6-floor-limit", "s6-grip-limit", "s6-equipment",
         "s6-wall", "s6-served-today", "s6-excluded", "s6-difficulty", "s6-dose",
+        "s6-arm-break", "s6-arm-alternate", "s6-vigorous-sets",
         "s7-end-only", "s7-no-floor", "s7-wall", "s7-distinct", "s7-shape", "s7-same-posture",
         "s7-previous-region", "s7-next-break-region", "s7-served-today", "s7-excluded", "s7-difficulty",
         "s22-letter", "s22-count", "s22-end-range-shape", "s22-end-range-distinct", "s22-end-range-wall",
         "s22-end-range-served-today", "s22-end-range-worked-regions", "s22-end-range-excluded",
-        "s22-end-range-difficulty"
+        "s22-end-range-difficulty", "s22-arm-break-position"
     ]
 
     /// One where-possible rule: its id and whether a move keeps it.
@@ -66,21 +67,34 @@ struct StrengthRuleChecker {
 
     // MARK: - Strength breaks
 
-    func check(_ strengthBreak: StrengthBreak, context: StrengthContext) -> [String] {
-        hardViolations(strengthBreak) + softViolations(strengthBreak, context: context)
+    /// The regions an arm break's cool-down may stretch, written out from the rule rather than
+    /// read from the builder.
+    static let armCoolDownRegions: Set<Region> = [.shoulder, .chest, .arm, .wristForearm]
+
+    /// The pattern a break's warm-up must come from: the first set's, or for an arm break the
+    /// day's push (A) or pull (B).
+    private static func warmUpBucket(_ strengthBreak: StrengthBreak, isArmBreak: Bool) -> StrengthBucket? {
+        isArmBreak ? (strengthBreak.letter == .dayA ? .psh : .pul) : strengthBreak.sets.first?.movement.bucket
     }
 
-    private func hardViolations(_ strengthBreak: StrengthBreak) -> [String] {
+    /// `setOrder` is the plan's slots the break was built from; an arm break is told by them.
+    func check(_ strengthBreak: StrengthBreak, setOrder: [StrengthSetSlot], context: StrengthContext) -> [String] {
+        hardViolations(strengthBreak, setOrder: setOrder) + softViolations(strengthBreak, setOrder: setOrder, context: context)
+    }
+
+    private func hardViolations(_ strengthBreak: StrengthBreak, setOrder: [StrengthSetSlot]) -> [String] {
         var out: [String] = []
         let warmUp = strengthBreak.warmUp
         let coolDown = strengthBreak.coolDown
         let moves = strengthBreak.sets.map(\.movement)
+        let isArmBreak = setOrder.contains(where: \.isArm)
         if moves.count != 3 { out.append("s6-shape") }
-        let idsByBucket = Dictionary(grouping: moves, by: \.bucket).mapValues { Set($0.map(\.id)) }
-        if idsByBucket.values.contains(where: { $0.count > 1 }) { out.append("s6-same-move-twice") }
+        out += slotViolations(moves, setOrder: setOrder)
         let ids = [warmUp.movement.id] + distinct(moves).map(\.id) + [coolDown.movement.id]
         if Set(ids).count != ids.count { out.append("s6-distinct") }
-        if warmUp.movement.bucket != moves.first?.bucket { out.append("s6-warm-up-pattern") }
+        if warmUp.movement.bucket != Self.warmUpBucket(strengthBreak, isArmBreak: isArmBreak) {
+            out.append("s6-warm-up-pattern")
+        }
         if warmUp.seconds != 30 { out.append("s6-warm-up-timing") }
         if coolDown.movement.bucket != .end || coolDown.seconds != 30 { out.append("s6-cool-down-end") }
         for movement in [warmUp.movement, coolDown.movement] + moves {
@@ -93,19 +107,40 @@ struct StrengthRuleChecker {
         return out
     }
 
-    private func softViolations(_ strengthBreak: StrengthBreak, context: StrengthContext) -> [String] {
+    /// The same slot twice is the same move and two different slots are two different moves; an
+    /// arm break's third set is a different move from its first two's bucket.
+    private func slotViolations(_ moves: [StrengthMovement], setOrder: [StrengthSetSlot]) -> [String] {
+        var out: [String] = []
+        let pairs = moves.indices.flatMap { first in moves.indices.filter { $0 > first }.map { (first, $0) } }
+        if setOrder.count != moves.count
+            || pairs.contains(where: { (setOrder[$0.0] == setOrder[$0.1]) != (moves[$0.0].id == moves[$0.1].id) }) {
+            out.append("s6-same-move-twice")
+        }
+        if setOrder.contains(where: \.isArm),
+           moves.count != 3 || moves[2].bucket != moves[0].bucket || moves[2].id == moves[0].id {
+            out.append("s6-arm-alternate")
+        }
+        return out
+    }
+
+    private func softViolations(
+        _ strengthBreak: StrengthBreak, setOrder: [StrengthSetSlot], context: StrengthContext
+    ) -> [String] {
         let shared = shared(
             "s6", used: context.usedStrengthIdsToday, excluded: context.excluded,
             cap: context.difficultyCap, unlocked: context.unlockedBuckets
         )
         let warmUp = strengthBreak.warmUp.movement
         let moves = strengthBreak.sets.map(\.movement)
-        let firstBucket = moves.first?.bucket ?? warmUp.bucket
+        let isArmBreak = setOrder.contains(where: \.isArm)
+        let warmUpBucket = Self.warmUpBucket(strengthBreak, isArmBreak: isArmBreak) ?? warmUp.bucket
         var out = Self.needlessBreaks(
             warmUp,
-            universe: library.movements(in: firstBucket).filter { isPossible($0) },
+            universe: library.movements(in: warmUpBucket).filter { isPossible($0) },
             rules: [Rule(id: "s6-warm-up-shape", keeps: StrengthBreakBuilder.isWarmUpShaped)] + shared
         )
+        // With any kit selected a working set should be vigorous; bodyweight-only has no such rule.
+        let vigorous = equipment.isEmpty ? [] : [Rule(id: "s6-vigorous-sets") { $0.vigorous }]
         var earlier: [StrengthMovement] = []
         for movement in distinct(moves) {
             let taken = Set(earlier.map(\.id)).union([warmUp.id])
@@ -116,10 +151,10 @@ struct StrengthRuleChecker {
                 Rule(id: "s6-grip-limit") { !($0.gripDemand && chosen.contains(where: \.gripDemand)) }
             ]
             let universe = library.movements(in: movement.bucket).filter { isPossible($0) && !taken.contains($0.id) }
-            out += Self.needlessBreaks(movement, universe: universe, rules: limits + shared)
+            out += Self.needlessBreaks(movement, universe: universe, rules: limits + vigorous + shared)
             earlier.append(movement)
         }
-        let worked = Set(moves.flatMap(\.regions))
+        let worked = isArmBreak ? Self.armCoolDownRegions : Set(moves.flatMap(\.regions))
         let taken = Set(moves.map(\.id)).union([warmUp.id])
         let coolUniverse = library.movements(in: .end).filter { isPossible($0) && !taken.contains($0.id) }
         let region = Rule(id: "s6-cool-down-region") { !worked.isDisjoint(with: $0.regions) }
@@ -226,9 +261,12 @@ struct StrengthRuleChecker {
     }
 }
 
-/// The planner rules (S22 letters and counts, S6 set orders), judged from the completed breaks
-/// alone rather than by asking the planner again.
+/// The planner rules (S22 letters, counts and the arm break's place, S6 set orders), judged from
+/// the completed breaks alone rather than by asking the planner again.
 struct StrengthPlanChecker {
+    /// Where an arm break falls, from the rules alone: the fourth break, or the third under More
+    /// arms, and none for a kit with equipment but no dumbbells.
+    let armPosition: Int?
     private var letters: [Int: StrengthDayLetter] = [:]
     /// Each pattern's last lead, as the index of the completed break that led with it.
     private var lastLed: [StrengthBucket: Int] = [:]
@@ -236,12 +274,20 @@ struct StrengthPlanChecker {
     private var day = 0
     private var perDay = 0
     private var doneToday = 0
+    /// Today's completed pattern breaks, and their sets: an arm break counts toward neither.
+    private var patternBreaksToday = 0
     private var setsToday: [StrengthBucket: Int] = [:]
+
+    init(focus: StrengthFocus, equipment: Set<StrengthEquipment>) {
+        let possible = equipment.isEmpty || equipment.contains(.dumbbells)
+        armPosition = possible ? (focus == .moreArms ? 2 : 3) : nil
+    }
 
     mutating func startDay(_ day: Int, perDay: Int) {
         self.day = day
         self.perDay = perDay
         doneToday = 0
+        patternBreaksToday = 0
         setsToday = [:]
     }
 
@@ -251,17 +297,30 @@ struct StrengthPlanChecker {
         return letter.other
     }
 
+    /// Today's arm break index: the position, only when the day has more breaks than it.
+    private var armIndex: Int? {
+        guard let armPosition, perDay > armPosition else { return nil }
+        return armPosition
+    }
+
     /// The planner rules `plan` breaks, `sets` being the patterns of the break built from it.
     func check(_ plan: NextFullBreak, sets: [StrengthBucket]) -> [String] {
-        guard case let .strength(letter, _, _, _) = plan else {
+        guard case let .strength(letter, _, _, setOrder) = plan else {
             return doneToday < perDay ? ["s22-count"] : []
         }
         var out: [String] = []
         if doneToday >= perDay { out.append("s22-count") }
         let expected = expectedLetter()
         if letter != expected { out.append("s22-letter") }
+        let isArmBreak = setOrder.contains(where: \.isArm)
+        if isArmBreak != (doneToday == armIndex) { out.append("s22-arm-break-position") }
+        if isArmBreak {
+            let arm: StrengthBucket = expected == .dayA ? .tri : .bic
+            let shaped = setOrder == [.arm(arm), .arm(arm), .armAlternate(arm)] && sets == [arm, arm, arm]
+            return shaped ? out : out + ["s6-arm-break"]
+        }
         let (first, second) = expected.patterns
-        if doneToday == 0 {
+        if patternBreaksToday == 0 {
             return sets == [first, second, .cor] ? out : out + ["s6-day-patterns"]
         }
         guard sets.count == 3, sets[0] == sets[2], Set(sets.prefix(2)) == [first, second] else {
@@ -281,11 +340,15 @@ struct StrengthPlanChecker {
         return led > otherLed || (led == otherLed && lead != first) ? ["s6-lead"] : []
     }
 
-    mutating func recordCompleted(letter: StrengthDayLetter, sets: [StrengthBucket]) {
+    /// Records a completed break. An arm break leads with nothing and its sets count toward
+    /// neither pattern, so only the pattern breaks move the leads and the set counts.
+    mutating func recordCompleted(letter: StrengthDayLetter, setOrder: [StrengthSetSlot], sets: [StrengthBucket]) {
         if letters[day] == nil { letters[day] = letter }
-        if doneToday > 0, let lead = sets.first { lastLed[lead] = completed }
         completed += 1
         doneToday += 1
+        guard !setOrder.contains(where: \.isArm) else { return }
+        if patternBreaksToday > 0, let lead = sets.first { lastLed[lead] = completed - 1 }
+        patternBreaksToday += 1
         for bucket in sets { setsToday[bucket, default: 0] += 1 }
     }
 }

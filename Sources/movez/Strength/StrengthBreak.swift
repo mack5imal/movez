@@ -144,6 +144,8 @@ struct StrengthRelaxation: Hashable {
         case coolDownRegion
         /// Nothing served today in either mode.
         case servedToday
+        /// With any kit selected, a working set is a vigorous move.
+        case vigorous
         /// No region shared with the previous micro-break.
         case previousMicroRegion
         case excluded

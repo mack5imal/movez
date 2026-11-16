@@ -21,19 +21,21 @@ final class StrengthLibraryTests: XCTestCase {
     private var library: StrengthLibrary { Self.library }
 
     func testDecodesEveryMovement() {
-        XCTAssertEqual(library.movements.count, 145)
+        XCTAssertEqual(library.movements.count, 151)
         XCTAssertEqual(library.mode, "strength")
         XCTAssertEqual(library.version, "1")
     }
 
     func testBucketCounts() {
-        let expected: [StrengthBucket: Int] = [.sqt: 16, .hng: 18, .psh: 18, .pul: 23, .cor: 18, .acc: 11, .end: 41]
-        XCTAssertEqual(StrengthBucket.allCases.count, 7)
-        XCTAssertEqual(library.buckets.count, 7)
+        let expected: [StrengthBucket: Int] = [
+            .sqt: 18, .hng: 18, .psh: 15, .pul: 18, .bic: 6, .tri: 6, .cor: 18, .acc: 11, .end: 41
+        ]
+        XCTAssertEqual(StrengthBucket.allCases.count, 9)
+        XCTAssertEqual(library.buckets.map(\.id), [.sqt, .hng, .psh, .pul, .bic, .tri, .cor, .acc, .end])
         for (bucket, count) in expected {
             XCTAssertEqual(library.movements(in: bucket).count, count, "bucket \(bucket.rawValue)")
         }
-        XCTAssertEqual(expected.values.reduce(0, +), 145)
+        XCTAssertEqual(expected.values.reduce(0, +), 151)
         for info in library.buckets {
             XCTAssertEqual(info.count, expected[info.id], "declared count for \(info.id.rawValue)")
         }
@@ -43,6 +45,31 @@ final class StrengthLibraryTests: XCTestCase {
         XCTAssertEqual(library.microEligible.count, 41)
         XCTAssertTrue(library.microEligible.allSatisfy { $0.bucket == .end })
         XCTAssertEqual(Set(library.microEligible.map(\.id)), Set(library.movements(in: .end).map(\.id)))
+    }
+
+    /// The arm buckets have no kettlebell move, since one bell suits no curl or triceps move, and
+    /// bodyweight-only users still have two biceps and three triceps moves (DECISIONS 70).
+    func testTheArmBucketsAreDumbbellOrBodyweight() {
+        for bucket in [StrengthBucket.bic, .tri] {
+            let movements = library.movements(in: bucket)
+            XCTAssertTrue(movements.allSatisfy { !$0.equipment.contains(.kettlebell) }, bucket.rawValue)
+            XCTAssertTrue(movements.allSatisfy { $0.regions.contains(.arm) }, bucket.rawValue)
+        }
+        XCTAssertEqual(library.movements(in: .bic).filter(\.isBodyweight).map(\.id), ["BIC-03", "BIC-06"])
+        XCTAssertEqual(library.movements(in: .tri).filter(\.isBodyweight).map(\.id), ["TRI-02", "TRI-03", "TRI-05"])
+    }
+
+    /// Every equipment move can be a working set; of the bodyweight moves only the agreed list and
+    /// the whole of Core can (DECISIONS 71).
+    func testVigorousIsEveryEquipmentMoveAndTheAgreedBodyweightMoves() {
+        XCTAssertTrue(library.movements.filter { !$0.isBodyweight }.allSatisfy(\.vigorous))
+        let bodyweightVigorous = Set(library.movements.filter { $0.isBodyweight && $0.vigorous }.map(\.id))
+        let core = Set(library.movements(in: .cor).filter(\.isBodyweight).map(\.id))
+        XCTAssertEqual(core.count, 11)
+        XCTAssertEqual(
+            bodyweightVigorous,
+            core.union(["PSH-04", "PSH-05", "PSH-07", "PSH-08", "HNG-02", "HNG-06", "TRI-03"])
+        )
     }
 
     func testEveryOverlapResolvesToAMovementLibraryMovement() {
@@ -108,6 +135,21 @@ final class StrengthLibraryTests: XCTestCase {
                 return XCTFail("expected a validation error, got \(error)")
             }
             XCTAssertTrue(reason.hasSuffix("overlaps the unknown movement XYZ-99"), reason)
+        }
+    }
+
+    func testAnEquipmentMoveThatIsNotVigorousThrows() throws {
+        let url = try mutatedCopy { json in
+            var movements = try XCTUnwrap(json["movements"] as? [[String: Any]])
+            let index = try XCTUnwrap(movements.firstIndex { $0["id"] as? String == "BIC-01" })
+            movements[index]["vigorous"] = false
+            json["movements"] = movements
+        }
+        XCTAssertThrowsError(try StrengthLibraryLoader.load(from: url, movementLibrary: Self.movementLibrary)) { error in
+            guard case LibraryError.validation(let reason)? = error as? LibraryError else {
+                return XCTFail("expected a validation error, got \(error)")
+            }
+            XCTAssertEqual(reason, "BIC-01 lists equipment but is not vigorous")
         }
     }
 

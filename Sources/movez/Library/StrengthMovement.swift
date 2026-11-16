@@ -1,12 +1,14 @@
 import Foundation
 
-/// The strength library's seven movement patterns. Raw values are the id prefixes used in
+/// The strength library's nine movement patterns. Raw values are the id prefixes used in
 /// `strength-library-v1.json`; they are distinct from `Bucket` so both libraries can load together.
 enum StrengthBucket: String, Codable, CaseIterable, Hashable {
     case sqt = "SQT"
     case hng = "HNG"
     case psh = "PSH"
     case pul = "PUL"
+    case bic = "BIC"
+    case tri = "TRI"
     case cor = "COR"
     case acc = "ACC"
     case end = "END"
@@ -57,6 +59,10 @@ struct StrengthMovement: Codable, Identifiable, Hashable {
     let settings: [MovementSetting]
     let onFloor: Bool
     let equipment: [StrengthEquipment]
+    /// True when the movement can be a working set while the user has equipment selected. Every
+    /// equipment movement is; a bodyweight movement is only when it is hard enough to stand beside
+    /// a loaded one (DECISIONS 71).
+    let vigorous: Bool
     let load: StrengthLoad?
     let gripDemand: Bool
     let microEligible: Bool
@@ -64,7 +70,7 @@ struct StrengthMovement: Codable, Identifiable, Hashable {
     let v4Overlap: StrengthOverlap?
 
     enum CodingKeys: String, CodingKey {
-        case id, name, bucket, regions, dose, difficulty, settings, equipment, load, instructions
+        case id, name, bucket, regions, dose, difficulty, settings, equipment, vigorous, load, instructions
         case perSide = "per_side"
         case blockSeconds = "block_seconds"
         case onFloor = "on_floor"

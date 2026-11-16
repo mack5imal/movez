@@ -265,6 +265,9 @@ final class StrengthCoordinatorTests: XCTestCase {
         changed("difficulty cap")
         settings.strengthFocus = .moreCore
         changed("focus")
+        settings.strengthBreaksPerDay = 3
+        settings.strengthFocus = .moreArms
+        changed("focus that moves the arm break")
         settings.strengthExcludedIds = ["SQT-01"]
         changed("exclusions")
 
