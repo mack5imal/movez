@@ -174,6 +174,7 @@ final class OverlayTimingTests: XCTestCase {
         viewModel.onPauseExpired = { expired += 1 }
         viewModel.onFinished = { completed, total, _ in finished = (completed, total) }
         viewModel.next()
+        clock.advance(2)
         viewModel.next()
         XCTAssertTrue(viewModel.doneAvailable)
 

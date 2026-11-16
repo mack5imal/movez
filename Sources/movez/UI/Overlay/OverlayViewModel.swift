@@ -42,6 +42,8 @@ final class OverlayViewModel: ObservableObject {
     /// Every finished pause added together. The break's own time is the wall clock less this.
     private var pausedTotal: TimeInterval = 0
     private var pauseExpiredHandled = false
+    /// When Next last acted, wall-clock time, for the press guard.
+    private var lastNextAt: Date?
     /// The strip only changes when the block or the side does, not on every tick.
     private var cachedStrip: [StripItem] = []
 
@@ -208,9 +210,13 @@ final class OverlayViewModel: ObservableObject {
     /// deliberately no way back.
     ///
     /// Paused, it does nothing: the pause is there so the movement can be read, and a stray
-    /// Return should not move on from it.
+    /// Return should not move on from it. A second press within the strength timeline's guard is
+    /// the same intention as the first (a double click, Return pressed twice), and is ignored
+    /// rather than passing a block the user never saw.
     func next() {
         guard phase == .running, !isPaused else { return }
+        if let lastNextAt, clock.now.timeIntervalSince(lastNextAt) < StrengthSessionTimeline.pressGuardSeconds { return }
+        lastNextAt = clock.now
         advance(recordCompletion: true, nextStartsAt: now)
     }
 

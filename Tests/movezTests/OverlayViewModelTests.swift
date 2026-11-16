@@ -227,6 +227,7 @@ final class OverlayViewModelTests: XCTestCase {
 
         // Two of four blocks is half the break.
         viewModel.next()
+        clock.advance(2)
         viewModel.next()
         XCTAssertTrue(viewModel.state.doneAvailable)
         XCTAssertFalse(viewModel.state.snoozeAvailable, "Done replaces Snooze once the break counts")
@@ -264,6 +265,7 @@ final class OverlayViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.phase, .running)
 
         viewModel.next()
+        clock.advance(2)
         viewModel.next()
         viewModel.done()
         XCTAssertEqual(finished, 1)
@@ -316,7 +318,10 @@ final class OverlayViewModelTests: XCTestCase {
         let viewModel = OverlayViewModel(routine: fixtureRoutine(), startedAt: clock.now, clock: clock)
         var finished = 0
         viewModel.onFinished = { _, _, _ in finished += 1 }
-        for _ in 0..<3 { viewModel.next() }
+        for _ in 0..<3 {
+            viewModel.next()
+            clock.advance(2)
+        }
         let last = viewModel.state
 
         viewModel.next()
@@ -363,7 +368,10 @@ final class OverlayViewModelTests: XCTestCase {
         let recorder = RecordingChimePlayer()
         let gated = GatedChimePlayer(wrapping: recorder, isEnabled: { false })
         let viewModel = makeViewModel(clock: clock, chimes: gated)
-        for _ in 0..<4 { viewModel.next() }
+        for _ in 0..<4 {
+            viewModel.next()
+            clock.advance(2)
+        }
         XCTAssertEqual(viewModel.phase, .complete)
         XCTAssertTrue(recorder.played.isEmpty)
     }
@@ -415,5 +423,23 @@ final class OverlayViewModelTests: XCTestCase {
         XCTAssertTrue(chimes.played.isEmpty, "and no burst of chimes for blocks long over")
         XCTAssertTrue(viewModel.isLeadIn, "the block starts again with its lead-in")
         XCTAssertGreaterThanOrEqual(viewModel.elapsedSeconds, 230, "the break keeps the time it had run")
+    }
+
+    // MARK: - Presses
+
+    /// A double click on the disc, or Return pressed twice, is one press: it moves on one block,
+    /// not two. Presses a person makes a second or more apart each count.
+    func testADoublePressMovesOnOneBlock() {
+        let clock = ManualClock(now: SchedulerHarness.mondayMorning)
+        let viewModel = makeViewModel(clock: clock)
+        viewModel.next()
+        clock.advance(0.1)
+        viewModel.next()
+        XCTAssertEqual(viewModel.blockIndex, 1)
+        XCTAssertEqual(viewModel.completedBlocks, 1)
+
+        clock.advance(1)
+        viewModel.next()
+        XCTAssertEqual(viewModel.blockIndex, 2)
     }
 }

@@ -170,6 +170,9 @@ final class OverlayWindowController {
     private func installKeyMonitor() {
         keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
             guard let self, self.isPresenting else { return event }
+            // A held key repeats. Swallowed like every other key, but acted on once: holding
+            // Return used to walk through the whole break and record every block as done.
+            if event.isARepeat { return nil }
             switch self.session {
             case let .routine(viewModel):
                 switch OverlayKeyMap.routine(event.keyCode) {
