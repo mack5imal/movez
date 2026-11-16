@@ -23,8 +23,9 @@ anything changed outside them. The agreed edits are two rounds:
 
 - The November 2026 review: COR-17's dose raised to 16 alternating (TST-24).
 
-The baseline is the library before the strength-mode edits, 378386c. The counts the file states
-may change with them. Each expected change must also be present, so
+The baseline is the library before the strength-mode edits, PRE_STRENGTH; the file is the same
+there as at 378386c, where the JSON became the only copy. The counts the file states may change
+with the edits. Each expected change must also be present, so
 the listing it prints is exactly the agreed set.
 """
 import argparse

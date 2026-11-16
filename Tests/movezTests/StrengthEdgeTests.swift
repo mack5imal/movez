@@ -180,7 +180,7 @@ final class StrengthEdgeTests: XCTestCase {
         XCTAssertEqual(sets.map(\.bucket), [.tri, .tri, .tri])
         XCTAssertEqual(sets[0].id, sets[1].id)
         // At the default Beginner cap with no kit TRI-05 is the triceps bucket's one move, so the
-        // third set repeats it rather than serving a move above the cap, and says so (DECISIONS 83).
+        // third set repeats it rather than serving a move above the cap, and says so (DECISIONS 82).
         XCTAssertEqual(sets.map(\.id), ["TRI-05", "TRI-05", "TRI-05"])
         XCTAssertTrue(sets.allSatisfy { $0.difficulty <= SettingsStore.strengthDifficultyDefault })
         let relaxed = try XCTUnwrap(sessions[3].planned.strengthBreak?.relaxed)

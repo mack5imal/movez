@@ -29,7 +29,7 @@ struct StrengthBreakBuilder {
     ]
     /// An arm break's third set may repeat the arm move before the exclusions or the cap go: the
     /// Beginner bodyweight triceps bucket has one difficulty-1 move, and a third set of it beats a
-    /// move above the user's cap (DECISIONS 83).
+    /// move above the user's cap (DECISIONS 82).
     static let armAlternateLadder: [StrengthRelaxation.Rule] = [
         .breakLimits, .servedToday, .vigorous, .armAlternate, .excluded, .difficulty, .anything
     ]

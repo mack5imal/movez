@@ -21,7 +21,7 @@
     {"id": "s6-difficulty", "criterion": "S6", "kind": "where-possible", "text": "Difficulty at most the cap, and difficulty 3 only in an unlocked pattern (S9)."},
     {"id": "s6-dose", "criterion": "S6", "kind": "hard", "text": "Each set's dose is the library's dose for its move (S4)."},
     {"id": "s6-arm-break", "criterion": "S6", "kind": "hard", "text": "An arm break is three sets of the day's arm, triceps on an A day and biceps on a B day, in the slots arm · arm · alternate, with no core set."},
-    {"id": "s6-arm-alternate", "criterion": "S6", "kind": "where-possible", "text": "An arm break's third set is from the same arm pattern as its first two, and a different move unless no other keeps the exclusions and the difficulty cap as the repeat does (DECISIONS 83)."},
+    {"id": "s6-arm-alternate", "criterion": "S6", "kind": "where-possible", "text": "An arm break's third set is from the same arm pattern as its first two, and a different move unless no other keeps the exclusions and the difficulty cap as the repeat does (DECISIONS 82)."},
     {"id": "s6-vigorous-sets", "criterion": "S6", "kind": "where-possible", "text": "With any equipment selected, every working set (core and arm sets included) is a vigorous move."},
     {"id": "s7-end-only", "criterion": "S7", "kind": "hard", "text": "A micro-break draws only from END."},
     {"id": "s7-no-floor", "criterion": "S7", "kind": "hard", "text": "A micro-break never serves a floor move."},

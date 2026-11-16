@@ -607,7 +607,7 @@ of its picks, taken before any of this was built, is replayed by a test to prove
     another rebuilds, from the explicit contexts the script writes to
     `Tests/movezTests/Fixtures/strength-simulation-picks.json`, four days of every configuration
     and requires the same plan, moves and relaxations, so the mirror is checked rather than
-    claimed (*amended by 81*). Weekly sets count a direct set as 1
+    claimed (*amended by 80*). Weekly sets count a direct set as 1
     and a helper set as ½, the fractional counting that fit best in Pelland 2026: squat/lunge
     gives quads 1 and glutes ½, hinge hamstrings 1 and glutes 1, push chest 1 and triceps ½, pull
     back 1 and biceps ½, core 1. At the default (3 strength breaks a day, every break taken,
@@ -716,7 +716,7 @@ Entries from fixing the findings in `docs/code-review-2026-11.md`.
     non-default mic but still cannot tell direction on a duplex device. This is the next step 23h
     named. The minute's sustain stays, since a dictation burst is still a process recording
     (SIG-2).
-79. **A Movement break's seed comes from the day's recorded breaks, as a strength break's does.**
+78. **A Movement break's seed comes from the day's recorded breaks, as a strength break's does.**
     The full break is built from a seed of the day and an index, and the index was the breaks
     this run of the app had put on screen. A relaunch set it back to 0, so a break skipped before
     any block was done, which leaves no completion in history, was built again from exactly the
@@ -727,12 +727,12 @@ Entries from fixing the findings in `docs/code-review-2026-11.md`.
     than the one announced, as in Strength mode. And a break put on screen but not done still
     counts as served only until the app quits; storing its movements in history was left out,
     since a new seed already makes the same break again unlikely, though not impossible (LIB-8).
-80. **A bodyweight strength break's heads-up does not ask for weights.** The design's heads-up
+79. **A bodyweight strength break's heads-up does not ask for weights.** The design's heads-up
     reads "About 5 minutes, three sets. Have your weights nearby." for every strength break, but
     a setup confirmed with nothing ticked is bodyweight only (56), and that user read the request
     before every break. A break with no loaded set now reads "About 5 minutes, three sets.", and
     one with any loaded set keeps the design's sentence (LIB-6).
-81. **The strength simulation is checked against the app, not only against the rules.**
+80. **The strength simulation is checked against the app, not only against the rules.**
     `simulate_strength.py` reimplements the planner, the builders, the generator and the
     ladders, and its report and weekly targets are only as good as that copy, but the Swift
     "cross-check" judged the Swift builders by the rule list alone and never compared a draw.
@@ -744,7 +744,7 @@ Entries from fixing the findings in `docs/code-review-2026-11.md`.
     report; `make simulate` writes both, and `make simulate-check` fails when either committed
     file is stale, which takes about a minute and a half and so is not part of `make test`
     (TST-1).
-82. **A strength move is served once per set, in the app and in both simulations.** The app writes
+81. **A strength move is served once per set, in the app and in both simulations.** The app writes
     one completion per part, so the move of X · Y · X done twice, or an arm break's arm move,
     counts twice towards tomorrow's recency and the difficulty-3 unlock. That is kept: a move done
     for two sets was done twice. The simulations now count it the same way, and they keep the
@@ -752,7 +752,7 @@ Entries from fixing the findings in `docs/code-review-2026-11.md`.
     on screen, so its moves count as served today though none was done; the last micro-break is
     remembered across midnight; and the regions a day worked include the warm-up's. The report's
     served-today relaxations rose accordingly, with no violation (TST-2, TST-28).
-83. **A one-move arm bucket repeats its move for the third set before the cap is let go.** An arm
+82. **A one-move arm bucket repeats its move for the third set before the cap is let go.** An arm
     break is two sets of one arm move and a third of a different one (70). For a Beginner with no
     kit the triceps bucket has one difficulty-1 move, the desk press-down isometric (TRI-05), so
     every A-day arm break let the difficulty cap go and served a difficulty-2 move. The simulation

@@ -2,7 +2,7 @@ import XCTest
 @testable import movez
 
 /// What the strength builder does where a pool runs short: the default Beginner cap is kept, and
-/// a rule that has to give is recorded on the break and kept part by part (DECISIONS 58, 71, 83).
+/// a rule that has to give is recorded on the break and kept part by part (DECISIONS 58, 71, 82).
 final class StrengthBeginnerCapTests: XCTestCase {
     private var library: StrengthLibrary { StrengthTestSupport.library }
     private var builder: StrengthBreakBuilder { StrengthBreakBuilder(library: library) }
@@ -51,7 +51,7 @@ final class StrengthBeginnerCapTests: XCTestCase {
     }
 
     /// The Beginner bodyweight triceps bucket has one difficulty-1 move, so an arm break repeats it
-    /// for the third set rather than serving a move above the cap (DECISIONS 83, TST-3).
+    /// for the third set rather than serving a move above the cap (DECISIONS 82, TST-3).
     func testAOneMoveArmBucketRepeatsItsMoveBeforeTheCapIsLetGo() {
         let beginnerTriceps = library.movements(in: .tri).filter { $0.isBodyweight && $0.difficulty == 1 }
         XCTAssertEqual(beginnerTriceps.map(\.id), ["TRI-05"])

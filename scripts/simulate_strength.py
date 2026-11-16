@@ -32,7 +32,7 @@ break taken.
 Writes docs/strength-simulation.md and Tests/movezTests/Fixtures/strength-simulation-picks.json,
 four days of every configuration with each break's explicit context and the moves drawn, which
 StrengthSimulationPicksTests rebuilds with the Swift code: that test, not this docstring, is what
-shows the mirror is exact (DECISIONS 81). Prints a summary. Exits 1 on any violation, any eligible
+shows the mirror is exact (DECISIONS 80). Prints a summary. Exits 1 on any violation, any eligible
 move never served, or when the default week (3 a day, no focus, 5 days) leaves the research
 targets; exits 2 when this script and strength-rules.json disagree on the rule list. With
 `--check` it writes nothing and exits 3 when either committed file differs from what it would
@@ -414,7 +414,7 @@ class Planner:
 
 WORKING_LADDER = ["breakLimits", "servedToday", "vigorous", "excluded", "difficulty", "anything"]
 # StrengthBreakBuilder.armAlternateLadder: the arm move may come back for the third set before the
-# exclusions or the cap go (DECISIONS 83).
+# exclusions or the cap go (DECISIONS 82).
 ARM_ALTERNATE_LADDER = ["breakLimits", "servedToday", "vigorous", "armAlternate", "excluded", "difficulty",
                         "anything"]
 WARM_UP_LADDER = ["warmUpShape", "servedToday", "excluded", "difficulty", "anything"]

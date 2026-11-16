@@ -358,7 +358,7 @@ extension AppCoordinator {
     /// so the index moves on with each one. It is read from history rather than counted in
     /// memory, so a relaunch carries on from the same index: counted in memory it went back to 0,
     /// and a break skipped before any block was done, which leaves no completion behind, was
-    /// built again exactly as the user had just turned it down (DECISIONS 79).
+    /// built again exactly as the user had just turned it down (DECISIONS 78).
     func breakIndexToday(at now: Date) -> Int {
         rollDayIfNeeded(at: now)
         return history.breaks(on: now).filter { !$0.outcome.isAbsence }.count
