@@ -544,12 +544,15 @@ of its picks, taken before any of this was built, is replayed by a test to prove
     because push and pull already give the arms enough indirect work to maintain them (de França
     2015 and Gentil 2013 found isolation added nothing measurable), so arm work is something a
     pull set may draw, not a guaranteed slot. ACC is not drawn by any strength break.
-63. **Focus weights a working set's draw ×3.** The strength focus is None, More legs and glutes,
+63. **Focus weights every draw of a strength break ×3.** The strength focus is None, More legs and glutes,
     More back and shoulders, More core or More arms. Within a pattern every draw is weighted by
     recency, and a move in a focused region (legs and glutes: quads, glutes, hamstrings and
     adductors; back and shoulders: thoracic and shoulder; core: lumbar and core; arms: arm and
     wrist and forearm) weighs three times as much. Focus never changes which patterns a day
     works, so it tilts a week without unbalancing it. Three is judgment, kept as one constant.
+    The warm-up and the cool-down are draws of the break too, so More legs and glutes, More back
+    and shoulders and More core also tilt which warm-up opens a break and which END stretch closes
+    it. *Title corrected in the November 2026 review: it said "a working set's draw" (LIB-13).*
 64. **A move served in either mode is not served again that day in either mode.** A strength move
     whose `v4_overlap.kind` is `same` (28 of them) is the same exercise as its movement-library id,
     and that id counts together with its family (entry 45), so a glute bridge (STR-01) in a

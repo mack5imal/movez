@@ -35,7 +35,8 @@ struct StrengthMicroContext: Hashable {
 }
 
 extension StrengthFocus {
-    /// The regions this focus weights up, ×3, in a working set's draw.
+    /// The regions this focus weights up, ×3, in every draw of a strength break: the warm-up and
+    /// the cool-down as well as the working sets (DECISIONS 63).
     var boostedRegions: Set<Region> {
         switch self {
         case .none: return []
