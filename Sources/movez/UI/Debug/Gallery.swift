@@ -109,31 +109,56 @@ struct GalleryView: View {
                     )
                 }
                 HStack(alignment: .center, spacing: 40) {
-                    discSample("panel 64", TimerDisc(size: 64, progress: 0.4, numerals: "1:00", label: nil))
-                    discSample("menu 40 · sitting", TimerDisc(size: 40, progress: 0.65, numerals: "32", label: nil))
-                    discSample("menu 40 · paused", TimerDisc(size: 40, progress: 0, numerals: "", label: nil, mode: .dashed))
-                    discSample("menu 40 · off hours", TimerDisc(size: 40, progress: 0, numerals: "", label: nil, mode: .empty))
+                    discSample("panel 64", Self.panelDiscSample)
+                    discSample("menu 40 · sitting", Self.menuDiscSample)
+                    discSample(
+                        "menu 40 · paused",
+                        TimerDisc(size: 40, progress: 0, numerals: "", label: nil, mode: .dashed, numeralStyle: MovezType.menuDisc)
+                    )
+                    discSample(
+                        "menu 40 · off hours",
+                        TimerDisc(size: 40, progress: 0, numerals: "", label: nil, mode: .empty, numeralStyle: MovezType.menuDisc)
+                    )
                 }
             }
         }
     }
 
+    /// One sequence-strip row on the page.
+    struct StripSample {
+        var label: String
+        var items: [StripItem]
+        var allAccent = false
+    }
+
+    /// Built from explicit lengths of the five-block fixture, so each row draws what its label
+    /// says. The fixture grew to five names when every break took the five-block shape (28), and
+    /// rows built for four drew five and six columns, one with two items sharing an id.
+    static let stripSamples: [StripSample] = [
+        StripSample(label: "3 columns", items: Array(SnapshotFixtures.strip(currentIndex: 1).prefix(3))),
+        StripSample(
+            label: "4 columns · current is a /side block, left half",
+            items: Array(SnapshotFixtures.strip(currentIndex: 2, sideIndex: 0).prefix(4))
+        ),
+        StripSample(label: "5 columns", items: SnapshotFixtures.strip(currentIndex: 3)),
+        StripSample(label: "all accent · end of break", items: SnapshotFixtures.strip(currentIndex: 4), allAccent: true)
+    ]
+
+    /// The small discs as the heads-up and the menu draw them, with the numeral style each passes.
+    static let panelDiscSample = TimerDisc(
+        size: Tokens.Metric.panelDisc, progress: 0.4, numerals: "1:00", label: nil, numeralStyle: MovezType.panelDisc
+    )
+    static let menuDiscSample = TimerDisc(
+        size: Tokens.Metric.menuDisc, progress: 0.65, numerals: "32", label: nil, numeralStyle: MovezType.menuDisc
+    )
+
     private var strips: some View {
         section("Sequence strip") {
             VStack(alignment: .leading, spacing: 26) {
-                labelled("3 columns") {
-                    SequenceStrip(items: Array(SnapshotFixtures.strip(currentIndex: 1).prefix(3)))
-                }
-                labelled("4 columns · current is a /side block, left half") {
-                    SequenceStrip(items: SnapshotFixtures.strip(currentIndex: 1, sideIndex: 0))
-                }
-                labelled("5 columns") {
-                    SequenceStrip(items: SnapshotFixtures.strip(currentIndex: 2) + [
-                        StripItem(number: 5, name: "Box breathing", state: .upcoming, sideIndex: nil)
-                    ])
-                }
-                labelled("all accent · end of break") {
-                    SequenceStrip(items: SnapshotFixtures.strip(currentIndex: 4), allAccent: true)
+                ForEach(Array(Self.stripSamples.enumerated()), id: \.offset) { _, sample in
+                    labelled(sample.label) {
+                        SequenceStrip(items: sample.items, allAccent: sample.allAccent)
+                    }
                 }
             }
         }

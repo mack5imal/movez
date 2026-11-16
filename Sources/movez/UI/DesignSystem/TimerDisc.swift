@@ -38,8 +38,9 @@ struct TimerDisc: View {
     var announcement: String { Self.announcement(numerals: numerals, label: label) }
 
     /// The handoff specifies the 300 pt overlay disc: a 6 pt ring, 84 pt numerals and a 16 pt
-    /// label. Every other size is that same disc scaled, which is how the 64 pt panel disc lands
-    /// on its specified 17 pt numerals without a second table.
+    /// label. Every other size is that same disc scaled. Scaling does not land the small discs on
+    /// their specified numerals (the 64 pt panel disc would get 18 pt, not 17), so the heads-up
+    /// and the menu pass their own `numeralStyle`, `panelDisc` and `menuDisc`.
     private static let ringRatio: CGFloat = 6.0 / 300
     private static let numeralRatio: CGFloat = 84.0 / 300
     private static let labelRatio: CGFloat = 16.0 / 300
