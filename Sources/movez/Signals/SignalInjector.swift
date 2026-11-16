@@ -45,8 +45,11 @@ enum SignalInjector: String, CaseIterable, Identifiable {
 
     /// The event this injector sends. `fireMicro` has no event of its own — the coordinator
     /// re-anchors the micro-break instead — so it is the one case that returns nil.
-    func event(now: Date) -> SchedulerEvent? {
-        powerEvent ?? suppressionEvent
+    ///
+    /// `holds` is what the panel is holding on, so a suppression event carries every held signal
+    /// and not only this one.
+    func event(now: Date, holding holds: SignalOverrides) -> SchedulerEvent? {
+        powerEvent ?? suppressionEvent(holding: holds)
     }
 
     /// Idle, sleep, wake, lock, unlock and the two "do it now" shortcuts.
@@ -90,15 +93,22 @@ enum SignalInjector: String, CaseIterable, Identifiable {
         }
     }
 
-    /// The three suppression signals, on and off.
-    private var suppressionEvent: SchedulerEvent? {
-        switch self {
-        case .micOn: return .signals(SignalSnapshot(microphoneActive: true))
-        case .captureOn: return .signals(SignalSnapshot(screenCaptureActive: true))
-        case .fullscreenOn: return .signals(SignalSnapshot(fullscreenActive: true))
-        case .micOff, .captureOff, .fullscreenOff: return .signals(.quiet)
-        default: return nil
+    /// The three suppression signals, on and off. The snapshot is built from every held signal
+    /// with this injector's own one set as it says: "Mic off" used to send a quiet snapshot, which
+    /// ended a suppression that a capture still held on should have kept.
+    private func suppressionEvent(holding holds: SignalOverrides) -> SchedulerEvent? {
+        guard let hold else { return nil }
+        var snapshot = SignalSnapshot(
+            microphoneActive: holds.micInUse == true,
+            screenCaptureActive: holds.captured == true,
+            fullscreenActive: holds.fullscreen == true
+        )
+        switch hold {
+        case .mic(let on): snapshot.microphoneActive = on
+        case .capture(let on): snapshot.screenCaptureActive = on
+        case .fullscreen(let on): snapshot.fullscreenActive = on
         }
+        return .signals(snapshot)
     }
 }
 

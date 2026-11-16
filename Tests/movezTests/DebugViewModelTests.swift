@@ -138,6 +138,46 @@ final class DebugViewModelTests: XCTestCase {
         )
     }
 
+    /// The real poll runs the mic through the minute's sustain, which `read` skips. Before the
+    /// aggregator knew about holds, the poll after "Mic on" reported the mic off and ended the
+    /// suppression into a grace that no real call produces.
+    func testAHeldMicKeepsSuppressingThroughThePollsThatFollowIt() {
+        let harness = harness()
+        let overrides = harness.coordinator.signalOverrides
+        let aggregator = SignalAggregator(
+            idle: FakeIdleSource(),
+            mic: OverridingMicSource(FakeMicSource(), overrides: overrides),
+            capture: FakeCaptureSource(),
+            fullscreen: FakeFullscreenSource(),
+            clock: harness.clock,
+            settings: harness.settings,
+            overrides: overrides,
+            dispatch: { [weak harness] event in harness?.coordinator.inject(event) }
+        )
+
+        debug(harness).fire(.micOn)
+        XCTAssertEqual(harness.state.name, "suppressed")
+        for _ in 0..<2 {
+            harness.clock.advance(SignalAggregator.pollSeconds)
+            aggregator.poll()
+        }
+        XCTAssertEqual(harness.state.name, "suppressed", states(harness).joined(separator: " > "))
+        XCTAssertFalse(states(harness).contains("post_break_grace"), "a held mic never opens the grace")
+    }
+
+    /// "Mic off" used to send a quiet snapshot, which cleared a capture still held on.
+    func testSwitchingOneSignalOffLeavesAnotherHeldOneSuppressing() {
+        let harness = harness()
+        let debug = debug(harness)
+        debug.fire(.captureOn)
+        debug.fire(.micOn)
+        debug.fire(.micOff)
+        XCTAssertEqual(harness.state.name, "suppressed", "capture is still on")
+
+        debug.fire(.captureOff)
+        XCTAssertEqual(harness.state.name, "post_break_grace")
+    }
+
     func testSleepTakesEverySurfaceDownAndGoesAway() {
         let harness = harness()
         harness.sink.clear()

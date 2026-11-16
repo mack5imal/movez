@@ -46,7 +46,7 @@ final class DebugViewModel: ObservableObject {
 
         if injector == .fireMicro {
             fireMicroBreak()
-        } else if let event = injector.event(now: coordinator.clock.now) {
+        } else if let event = injector.event(now: coordinator.clock.now, holding: coordinator.signalOverrides) {
             coordinator.inject(event)
         }
         refresh()

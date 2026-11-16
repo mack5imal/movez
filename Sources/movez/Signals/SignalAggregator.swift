@@ -26,6 +26,8 @@ final class SignalAggregator {
     private let fullscreen: FullscreenSource
     private let clock: Clock
     private let settings: SettingsStore
+    /// The debug panel's holds, so a held mic can skip the sustain — see `sustained`.
+    private let overrides: SignalOverrides?
     private let dispatch: (SchedulerEvent) -> Void
 
     private var timer: DispatchSourceTimer?
@@ -42,6 +44,7 @@ final class SignalAggregator {
         fullscreen: FullscreenSource,
         clock: Clock,
         settings: SettingsStore,
+        overrides: SignalOverrides? = nil,
         dispatch: @escaping (SchedulerEvent) -> Void
     ) {
         self.idle = idle
@@ -50,6 +53,7 @@ final class SignalAggregator {
         self.fullscreen = fullscreen
         self.clock = clock
         self.settings = settings
+        self.overrides = overrides
         self.dispatch = dispatch
     }
 
@@ -140,13 +144,19 @@ final class SignalAggregator {
     ///
     /// Only the mic is held this way. A screen share and a fullscreen app are steady states that
     /// mean what they say from the first reading.
+    ///
+    /// A debug "Mic on" skips the minute. It stands in for a call already under way, and the
+    /// panel's own event suppresses at once; held to the sustain, the next poll reported the mic
+    /// off, ended the suppression into a grace, and the sustained reading a minute later was
+    /// dropped by that grace, a sequence no real call produces.
     func sustained(_ snapshot: SignalSnapshot, now: Date) -> SignalSnapshot {
         var held = snapshot
-        held.microphoneActive = micSustain.isSustained(
+        let sustained = micSustain.isSustained(
             snapshot.microphoneActive,
             now: now,
             threshold: Self.micSustainSeconds
         )
+        held.microphoneActive = sustained || (snapshot.microphoneActive && overrides?.micInUse == true)
         return held
     }
 

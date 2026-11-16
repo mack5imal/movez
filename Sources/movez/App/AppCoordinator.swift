@@ -236,6 +236,7 @@ final class AppCoordinator: ObservableObject {
             fullscreen: OverridingFullscreenSource(FullscreenMonitor(), overrides: signalOverrides),
             clock: clock,
             settings: settings,
+            overrides: signalOverrides,
             dispatch: { [weak self] event in self?.inject(event) }
         )
         self.aggregator = aggregator
