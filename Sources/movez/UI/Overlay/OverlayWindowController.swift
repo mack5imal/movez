@@ -199,8 +199,11 @@ final class OverlayWindowController {
     }
 
     /// A display plugged in or unplugged mid-break gets its own copy of the break rather than a gap.
+    ///
+    /// Keyed on the session rather than on the windows: with every display gone there are no
+    /// windows, and the break must come back when a display does.
     private func rebuildForScreenChange() {
-        guard isPresenting, session != nil else { return }
+        guard session != nil else { return }
         closeWindows()
         build()
     }

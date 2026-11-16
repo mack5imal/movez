@@ -89,12 +89,23 @@ final class PanelWindowController {
 
     // MARK: - Placement
 
-    /// The screen the user is looking at, which is the one the pointer is on.
-    static func activeScreen() -> NSScreen {
-        let location = NSEvent.mouseLocation
-        return NSScreen.screens.first { $0.frame.contains(location) }
-            ?? NSScreen.main
-            ?? NSScreen.screens[0]
+    /// The screen the user is looking at, which is the one the pointer is on. Nil when no display
+    /// is attached at all: a desktop Mac whose only monitor is switched off, say, which used to
+    /// crash here on `screens[0]`.
+    static func activeScreen() -> NSScreen? {
+        activeScreen(among: NSScreen.screens, main: NSScreen.main, pointer: NSEvent.mouseLocation)
+    }
+
+    static func activeScreen(among screens: [NSScreen], main: NSScreen?, pointer: CGPoint) -> NSScreen? {
+        screens.first { $0.frame.contains(pointer) } ?? main ?? screens.first
+    }
+
+    /// The screen a panel should be on now: the one it opened on while that display is still
+    /// attached, otherwise whichever the user is on. A panel pinned to a display that went away
+    /// was placed at coordinates nobody can see.
+    private static func attached(_ screen: NSScreen?) -> NSScreen? {
+        if let screen, NSScreen.screens.contains(screen) { return screen }
+        return activeScreen()
     }
 
     /// Top-centre of the working area, clear of the menu bar so the movez icon stays reachable.
@@ -137,6 +148,7 @@ final class PanelWindowController {
     /// Re-measures and re-places the panel. Called every tick, because the body text — and so the
     /// height — changes as the count-in becomes the movement.
     private func layoutPanel() {
+        panelScreen = Self.attached(panelScreen)
         guard let window = panelWindow, let screen = panelScreen, let hosting = window.contentView else { return }
         let fitting = hosting.fittingSize
         let shell = CGSize(
@@ -149,6 +161,7 @@ final class PanelWindowController {
     }
 
     private func layoutToast() {
+        toastScreen = Self.attached(toastScreen)
         guard let window = toastWindow, let screen = toastScreen, let hosting = window.contentView else { return }
         let fitting = hosting.fittingSize
         let shell = CGSize(

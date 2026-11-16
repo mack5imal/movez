@@ -142,12 +142,13 @@ enum PanelHygiene {
         nonactivating: Bool,
         before: String
     ) -> PanelObservation {
+        // The harness runs with a display attached; with none there is nothing to measure.
         let screen = PanelWindowController.activeScreen()
         return PanelObservation(
             name: name,
             frame: frame,
-            visible: screen.visibleFrame,
-            screen: screen.frame.size,
+            visible: screen?.visibleFrame ?? .zero,
+            screen: screen?.frame.size ?? .zero,
             frontmostBefore: before,
             frontmostAfter: frontmost(),
             nonactivating: nonactivating

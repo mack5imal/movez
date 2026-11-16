@@ -347,4 +347,10 @@ final class PanelViewModelTests: XCTestCase {
         let window = PanelWindowController.windowFrame(forShell: shell)
         XCTAssertEqual(window.insetBy(dx: PanelWindowController.shadowMargin, dy: PanelWindowController.shadowMargin), shell)
     }
+
+    /// With no display attached (a desktop Mac whose only monitor is off) there is no active
+    /// screen, and asking for one must not crash.
+    func testNoDisplayMeansNoActiveScreen() {
+        XCTAssertNil(PanelWindowController.activeScreen(among: [], main: nil, pointer: .zero))
+    }
 }
