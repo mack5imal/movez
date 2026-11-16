@@ -66,4 +66,25 @@ final class SchedulerDeferralTests: XCTestCase {
         XCTAssertNil(deferredSince, "a fresh break never waited for a call")
         XCTAssertNil(harness.snapshot.snoozeAllowanceThisBreak, "and keeps its full two snoozes")
     }
+
+    /// A call that comes back inside the two-minute grace after it (a rejoined call, a
+    /// back-to-back meeting) is the same deferral, so the scheduler goes straight back to
+    /// suppressing instead of serving the break into the call.
+    func testACallThatComesBackInsideTheGraceIsSuppressedAgain() {
+        let harness = harness()
+        harness.run(seconds: 50 * minute)
+        harness.send(.signals(call))
+        harness.run(seconds: 7 * minute)
+        let deferred = harness.snapshot.deferredFullDueAt
+        XCTAssertNotNil(deferred)
+
+        harness.send(.signals(quiet))
+        harness.run(seconds: 60)
+        harness.send(.signals(call))
+        XCTAssertEqual(harness.state.name, "suppressed", "got \(harness.state)")
+        XCTAssertEqual(harness.snapshot.deferredFullDueAt, deferred)
+
+        harness.run(seconds: 3 * minute)
+        XCTAssertEqual(harness.state.name, "suppressed", "no heads-up while the call is live, got \(harness.state)")
+    }
 }

@@ -104,9 +104,12 @@ final class SignalAggregator {
         let snapshot = sustained(read(now: now), now: now)
         lastSnapshot = snapshot
 
+        // Signals first: a call this poll can see must suppress before this poll's input raises a
+        // heads-up (and chimes into the call), or its idle age turns a quiet listener into an
+        // absence.
+        dispatch(.signals(snapshot))
         dispatch(.input(lastEventAgeSeconds: snapshot.idleSeconds))
         dispatch(.idle(seconds: snapshot.idleSeconds))
-        dispatch(.signals(snapshot))
     }
 
     /// Reads every source, then lets the settings veto each signal.

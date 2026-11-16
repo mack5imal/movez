@@ -22,6 +22,10 @@ extension Scheduler {
         case .headsUp(_, let deferredSince):
             deferred = deferredSince ?? snapshot.nextFullDueAt
             effects.append(.hideHeadsUp)
+        case .postBreakGrace(_, .afterSuppression):
+            // The call, share or presentation came back inside the grace after it: a rejoined
+            // call or a back-to-back meeting. It is the same deferral, still waiting.
+            deferred = snapshot.deferredFullDueAt
         default:
             // A break already on screen is left alone — a micro-break as much as a full one, since
             // both are a few seconds from over and taking one down loses it entirely: its re-anchor

@@ -106,6 +106,28 @@ final class SignalAggregatorTests: XCTestCase {
         XCTAssertFalse(aggregator.read(now: harness.now).fullscreenActive, "an excepted app never suppresses")
     }
 
+    /// One poll that sees a call must suppress before its own input reading can raise a heads-up,
+    /// or the heads-up chimes into the call for the moment it is on screen.
+    func testAPollReportsItsSignalsBeforeItsInput() {
+        let harness = CoordinatorHarness()
+        var events: [SchedulerEvent] = []
+        let aggregator = SignalAggregator(
+            idle: FakeIdleSource(), mic: FakeMicSource(), capture: FakeCaptureSource(),
+            fullscreen: FakeFullscreenSource(), clock: harness.clock, settings: harness.settings,
+            dispatch: { events.append($0) }
+        )
+        aggregator.poll()
+        let order = events.map { event -> String in
+            switch event {
+            case .signals: return "signals"
+            case .input: return "input"
+            case .idle: return "idle"
+            default: return "other"
+            }
+        }
+        XCTAssertEqual(order, ["signals", "input", "idle"])
+    }
+
     func testATwelveSecondGapSynthesisesAWake() {
         let harness = CoordinatorHarness()
         let aggregator = makeAggregator(harness: harness).aggregator
