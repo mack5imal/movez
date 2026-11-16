@@ -149,8 +149,13 @@ final class OverlayWindowController {
         }
     }
 
-    /// The dim covers the screen but stops below the menu bar, so the movez icon stays reachable
-    /// during a break — the research is explicit that a break must never trap the user.
+    /// The dim covers the screen but stops below the menu bar, so the menu bar, and the movez icon
+    /// with its countdown, stay visible during a break.
+    ///
+    /// The icon's dropdown is not usable then: it opens below the menu bar, under the overlay's
+    /// shielding level. The way out of a break is the overlay's own buttons, Skip from three
+    /// seconds in and Snooze or Done, which is what keeps a break from ever trapping the user
+    /// (DECISIONS 87).
     private func dimFrame(for screen: NSScreen) -> NSRect {
         let frame = screen.frame
         let menuBarHeight = max(0, frame.maxY - screen.visibleFrame.maxY)

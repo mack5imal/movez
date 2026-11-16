@@ -101,8 +101,8 @@ Use the `SCH-n`, `APP-n`, `SIG-n`, `LIB-n`, `UI-n` and `TST-n` ids below to refe
 
 Every finding has been dealt with on `fix/code-review-2026-11`; each one below carries an
 **Outcome** line with the commits that fixed it. Two were settled as won't fix by the owner
-(LIB-14, APP-6) and one needs checking by hand (UI-19). The decisions the fixes needed are
-DECISIONS 72 to 86. The test suite went from 702 to 835 tests. One ruling changed the plan: there
+(LIB-14, APP-6), and UI-19 was checked by hand and settled as DECISIONS 87. The decisions the
+fixes needed are DECISIONS 72 to 87. The test suite went from 702 to 835 tests. One ruling changed the plan: there
 is no Movement end screen and no streak (UI-7, DECISIONS 76).
 
 ## 1. Scheduler
@@ -1388,7 +1388,7 @@ The delay is defined in OverlayViewModel.skipDelaySeconds (15), PanelViewModel.s
 
 ### UI-19 · low · The menu bar is left uncovered so the icon stays reachable, but its dropdown opens underneath the shielding-level overlay
 
-**Outcome:** Pending: needs checking by hand during a break.
+**Outcome:** confirmed by hand: the dropdown opens under the overlay. Settled as DECISIONS 87: the overlay's own buttons are the way out, and the comment says so.
 
 **Where:** `Sources/movez/UI/Overlay/OverlayWindowController.swift:138` · **Category:** macos-edge
 

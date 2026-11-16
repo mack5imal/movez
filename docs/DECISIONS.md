@@ -805,3 +805,10 @@ Entries from fixing the findings in `docs/code-review-2026-11.md`.
     launch macOS is asked for the filter's current value. Held is not stubborn: once taken, the
     request is settled, so "Resume now" during a Focus stands until the Focus changes again, and
     a pause set by hand still outranks the Focus (APP-1).
+87. **The way out of a break is the overlay's own buttons.** The overlay stops below the menu bar,
+    so the menu bar and the Movez icon stay visible during a break, but the icon's dropdown opens
+    under the overlay, which sits at the shielding level above every pop-up window, and cannot be
+    used until the break ends (checked by hand). The menu is not needed to leave a break: Skip
+    works from three seconds in, Snooze while one is left, and Done once the break counts, so a
+    break never traps the user. Raising the menu above the overlay, or lowering the overlay while
+    it is open, was judged not worth the window-level work (UI-19).
