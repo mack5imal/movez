@@ -189,8 +189,12 @@ extension Scheduler {
 
     /// Notes what both countdowns had left when the user went, measured from when they went.
     mutating func captureCountdowns(at since: Date) {
-        snapshot.dueAtAway = snapshot.nextFullDueAt
-        snapshot.remainingAtAwaySeconds = snapshot.nextFullDueAt.map { max(0, Int($0.timeIntervalSince(since))) }
+        // A snooze is a promise of quiet until it runs out. The due time it put off is already
+        // past, so a short lock handing that back brought the heads-up straight back.
+        var due = snapshot.nextFullDueAt
+        if case .snoozed(let until) = snapshot.state { due = max(due ?? until, until) }
+        snapshot.dueAtAway = due
+        snapshot.remainingAtAwaySeconds = due.map { max(0, Int($0.timeIntervalSince(since))) }
         snapshot.remainingMicroAtAwaySeconds = snapshot.nextMicroDueAt.map { max(0, Int($0.timeIntervalSince(since))) }
     }
 

@@ -498,4 +498,24 @@ final class AwayReturnCoordinatorTests: XCTestCase {
     func testTheToastChimeShipsWithTheApp() {
         XCTAssertNotNil(MovezBundle.resources.url(forResource: "toast", withExtension: "wav", subdirectory: "Chimes"))
     }
+
+    /// A thirty-second lock one minute into a five-minute snooze must not end the snooze.
+    func testAShortLockDuringASnoozeKeepsTheSnooze() {
+        let harness = SchedulerHarness()
+        harness.run(until: { $0.isPendingFull }, limit: 3600)
+        harness.send(.input(lastEventAgeSeconds: 12))
+        harness.clock.advance(4)
+        harness.send(.userSnooze)
+        guard case .snoozed(let until) = harness.state else { return XCTFail("got \(harness.state)") }
+
+        harness.clock.advance(60)
+        harness.send(.lock)
+        harness.clock.advance(30)
+        harness.send(.unlock(gapSeconds: 30))
+        harness.run(seconds: 70)
+
+        XCTAssertFalse(harness.state.isHeadsUp, "got \(harness.state)")
+        XCTAssertFalse(harness.state.isPendingFull, "got \(harness.state)")
+        XCTAssertDate(harness.snapshot.nextFullDueAt, until, accuracy: 2, "the break waits for the snooze to run out")
+    }
 }
