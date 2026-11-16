@@ -162,6 +162,10 @@ extension Scheduler {
     /// on screen.
     mutating func reverseCredit(now: Date) -> [SchedulerEffect] {
         guard let restore = snapshot.creditRestore, now <= restore.expiresAt else { return [] }
+        // "I was sitting" undoes what the return did to a sitting countdown. Once the scheduler
+        // has moved on (the heads-up of a break the pause handed back, say), undoing it would
+        // jump to sitting under a surface that is still on screen.
+        guard snapshot.state == .sitting else { return [] }
         snapshot.boutStartedAt = restore.boutStartedAt
         snapshot.nextFullDueAt = restore.nextFullDueAt
         snapshot.nextMicroDueAt = restore.nextMicroDueAt

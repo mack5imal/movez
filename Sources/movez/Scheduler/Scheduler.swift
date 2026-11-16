@@ -72,7 +72,10 @@ struct Scheduler {
             return paused
                 ? pause(seconds: nil, focusInitiated: true, now: now)
                 : resumeFromPause(now: now, focusInitiated: true, reason: "focus filter cleared")
-        case .userStartSession: return beginAdHocSession(now: now)
+        case .userStartSession:
+            // A session by hand is for off hours, which is the only place the menu offers it.
+            // From any other state it would drop whatever was running without ending it.
+            return snapshot.state == .offHours ? beginAdHocSession(now: now) : []
         case .userEndSession: return endAdHocSession(now: now)
         default: return nil
         }

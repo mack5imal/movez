@@ -176,4 +176,37 @@ final class EdgeCaseTests: XCTestCase {
         XCTAssertEqual(harness.state.name, "sitting")
         XCTAssertTrue(harness.scheduler.pollingRequired)
     }
+
+    // MARK: - Total handling
+
+    /// `handle` promises that an event a state does not take changes nothing. Starting a session
+    /// by hand from a running break is one the menu never offers.
+    func testStartingASessionDuringABreakChangesNothing() {
+        let harness = SchedulerHarness()
+        harness.run(until: { $0.isPendingFull }, limit: 3600)
+        harness.send(.input(lastEventAgeSeconds: 12))
+        harness.clock.advance(4)
+        harness.send(.userStartNow)
+        XCTAssertTrue(harness.state.isFullBreak)
+
+        XCTAssertEqual(harness.send(.userStartSession), [])
+        XCTAssertTrue(harness.state.isFullBreak)
+    }
+
+    /// "I was sitting" after the state has moved on leaves the new state alone.
+    func testReversingAnAbsenceAfterTheStateMovedOnChangesNothing() {
+        let harness = SchedulerHarness()
+        harness.run(seconds: 600)
+        harness.scheduler.snapshot.creditRestore = CreditRestore(
+            boutStartedAt: harness.start, nextFullDueAt: harness.now, nextMicroDueAt: nil, microAnchorAt: nil,
+            lastCompletedBreakAt: nil, doneToday: 0, longestBoutSeconds: 0, expiresAt: harness.now.addingTimeInterval(15)
+        )
+        harness.run(until: { $0.isPendingFull }, limit: 3600)
+        harness.scheduler.snapshot.creditRestore?.expiresAt = harness.now.addingTimeInterval(15)
+        harness.send(.input(lastEventAgeSeconds: 12))
+        XCTAssertTrue(harness.state.isHeadsUp)
+
+        XCTAssertEqual(harness.send(.toastReverse(.wasSitting)), [])
+        XCTAssertTrue(harness.state.isHeadsUp)
+    }
 }
