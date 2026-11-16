@@ -672,3 +672,9 @@ Entries from fixing the findings in `docs/code-review-2026-11.md`.
     log all use the auto-updating calendar, so a Mac that flies from London to New York with Movez
     running starts judging hours, midnight and the day's counters in New York time at once, rather
     than on the next launch or settings change (SCH-9).
+75. **A full break holds the display awake.** While the overlay is up it holds an idle
+    display-sleep assertion, released the moment the break leaves the screen. The user is meant to
+    step back from the keyboard, so without it the display slept a minute or two into a break on a
+    laptop on battery, which the scheduler takes for a closed lid. Panels hold nothing: a heads-up
+    or a micro-break that the display sleeps through is no loss. A closed lid or a lock by hand
+    still interrupts a break (UI-2).

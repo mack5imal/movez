@@ -91,6 +91,7 @@ enum OverlayHygiene {
             "keyWindowOwner=\(NSApp.keyWindow.map { String(describing: type(of: $0)) } ?? "none")",
             "visible=\(controller.visibleWindowCount)",
             "presentMs=\(String(format: "%.0f", presentMs))",
+            "displayAwake=\(controller.holdsDisplayAwake)",
             "policy=\(NSApp.activationPolicy().rawValue)"
         ].joined(separator: " "))
 
@@ -102,6 +103,7 @@ enum OverlayHygiene {
         emit([
             "windowsAfterSleep=\(controller.windowCount)",
             "monitorRemoved=\(!controller.hasKeyMonitor)",
+            "displayReleased=\(!controller.holdsDisplayAwake)",
             "frontmostAfter=\(frontmostAfter)",
             "focusRestored=\(frontmostAfter == frontmostBefore)"
         ].joined(separator: " "))

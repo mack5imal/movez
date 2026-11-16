@@ -20,6 +20,11 @@ final class OverlayWindowController {
     private var previousApp: NSRunningApplication?
     private var screenObserver: NSObjectProtocol?
     private var tickTimer: DispatchSourceTimer?
+    /// Holds the display awake for as long as a break is on screen. The user is meant to step
+    /// back from the keyboard, so the idle display-sleep timer keeps counting through a break,
+    /// and on a laptop on battery it used to put the screen to sleep a minute or two in, which
+    /// the scheduler takes for a closed lid and ends the break.
+    private var displayAwake: NSObjectProtocol?
     /// Bumped on every presentation. A fade-out that completes after the next break has already
     /// opened would otherwise hand focus back to the app underneath — the exact keystroke leak
     /// this class exists to prevent.
@@ -36,6 +41,7 @@ final class OverlayWindowController {
     var isPresenting: Bool { !windows.isEmpty }
     var windowCount: Int { windows.count }
     var hasKeyMonitor: Bool { keyMonitor != nil }
+    var holdsDisplayAwake: Bool { displayAwake != nil }
 
     // MARK: - Presenting
 
@@ -59,6 +65,21 @@ final class OverlayWindowController {
         installKeyMonitor()
         observeScreenChanges()
         startTicking()
+        keepDisplayAwake()
+    }
+
+    private func keepDisplayAwake() {
+        guard displayAwake == nil else { return }
+        displayAwake = ProcessInfo.processInfo.beginActivity(
+            options: [.idleDisplaySleepDisabled],
+            reason: "A movement break is on screen"
+        )
+    }
+
+    private func letDisplaySleep() {
+        guard let displayAwake else { return }
+        ProcessInfo.processInfo.endActivity(displayAwake)
+        self.displayAwake = nil
     }
 
     private func build() {
@@ -206,6 +227,7 @@ final class OverlayWindowController {
     func dismiss(animated: Bool = true) {
         tickTimer?.cancel()
         tickTimer = nil
+        letDisplaySleep()
 
         if let keyMonitor {
             NSEvent.removeMonitor(keyMonitor)

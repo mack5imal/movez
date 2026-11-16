@@ -69,6 +69,8 @@ hygiene: build
 	@grep -q "key=true" "$(HYGIENE_REPORT)" || { echo "overlay never became key" >&2; exit 1; }
 	@grep -q "windowsAfterSleep=0" "$(HYGIENE_REPORT)" || { echo "overlay left windows behind" >&2; exit 1; }
 	@grep -q "focusRestored=true" "$(HYGIENE_REPORT)" || { echo "focus was not restored" >&2; exit 1; }
+	@grep -q "displayAwake=true" "$(HYGIENE_REPORT)" || { echo "the break did not hold the display awake" >&2; exit 1; }
+	@grep -q "displayReleased=true" "$(HYGIENE_REPORT)" || { echo "the display stayed held after the break" >&2; exit 1; }
 
 # The panels must never activate the app, so this one is run straight from the shell: whatever
 # was frontmost before should still be frontmost after.
