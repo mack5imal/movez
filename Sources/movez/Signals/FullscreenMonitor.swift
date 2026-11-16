@@ -24,8 +24,30 @@ final class FullscreenMonitor: FullscreenSource {
             ownBundleId: ownBundleId,
             exceptions: exceptions,
             windows: { Self.frontmostWindowBounds(pid: frontmost.processIdentifier) },
-            screens: Self.screenFrames
+            screens: Self.screens
         )
+    }
+
+    /// One display, in Core Graphics coordinates (origin top-left), with the height of the strip
+    /// a camera housing takes off its top.
+    struct Screen: Equatable {
+        var frame: CGRect
+        /// `NSScreen.safeAreaInsets.top`: 32 pt on a notched MacBook panel, 0 everywhere else.
+        var topInset: CGFloat = 0
+
+        /// The rects a fullscreen window on this display can occupy. A notched panel has two:
+        /// macOS places native fullscreen content inside the safe area, below the camera housing,
+        /// but an app set to draw over the notch fills the whole frame.
+        var fullscreenRects: [CGRect] {
+            guard topInset > 0 else { return [frame] }
+            let safeArea = CGRect(
+                x: frame.minX,
+                y: frame.minY + topInset,
+                width: frame.width,
+                height: frame.height - topInset
+            )
+            return [frame, safeArea]
+        }
     }
 
     /// The decision on its own, so it can be tested without a window server. Movez itself and
@@ -36,37 +58,44 @@ final class FullscreenMonitor: FullscreenSource {
         ownBundleId: String?,
         exceptions: Set<String>,
         windows: () -> [CGRect],
-        screens: () -> [CGRect]
+        screens: () -> [Screen]
     ) -> FullscreenReading {
         if let bundleId, bundleId == ownBundleId || exceptions.contains(bundleId) {
             return FullscreenReading(isFullscreen: false, bundleId: bundleId)
         }
-        let frames = screens()
-        let fullscreen = windows().contains { isFullscreen(windowBounds: $0, screenFrames: frames) }
+        let displays = screens()
+        let fullscreen = windows().contains { isFullscreen(windowBounds: $0, screens: displays) }
         return FullscreenReading(isFullscreen: fullscreen, bundleId: bundleId)
     }
 
-    /// True when the window covers any screen entirely, within a point.
-    static func isFullscreen(windowBounds: CGRect, screenFrames: [CGRect]) -> Bool {
-        screenFrames.contains { frame in
-            abs(windowBounds.width - frame.width) <= tolerance
-                && abs(windowBounds.height - frame.height) <= tolerance
-                && abs(windowBounds.minX - frame.minX) <= tolerance
-                && abs(windowBounds.minY - frame.minY) <= tolerance
+    /// True when the window covers any screen entirely, or a notched screen's safe area, within a
+    /// point.
+    ///
+    /// The safe area costs nothing in false positives: a zoomed window on a notched panel starts
+    /// under the menu bar, which is taller than the camera housing, so it matches neither rect.
+    static func isFullscreen(windowBounds: CGRect, screens: [Screen]) -> Bool {
+        screens.flatMap(\.fullscreenRects).contains { rect in
+            abs(windowBounds.width - rect.width) <= tolerance
+                && abs(windowBounds.height - rect.height) <= tolerance
+                && abs(windowBounds.minX - rect.minX) <= tolerance
+                && abs(windowBounds.minY - rect.minY) <= tolerance
         }
     }
 
-    /// Screen frames in Core Graphics coordinates (origin top-left), which is what the window
-    /// list reports in.
-    static func screenFrames() -> [CGRect] {
+    /// Every display in Core Graphics coordinates (origin top-left), which is what the window
+    /// list reports in, with its camera-housing inset.
+    static func screens() -> [Screen] {
         guard let primary = NSScreen.screens.first else { return [] }
         let flipHeight = primary.frame.maxY
         return NSScreen.screens.map { screen in
-            CGRect(
-                x: screen.frame.minX,
-                y: flipHeight - screen.frame.maxY,
-                width: screen.frame.width,
-                height: screen.frame.height
+            Screen(
+                frame: CGRect(
+                    x: screen.frame.minX,
+                    y: flipHeight - screen.frame.maxY,
+                    width: screen.frame.width,
+                    height: screen.frame.height
+                ),
+                topInset: screen.safeAreaInsets.top
             )
         }
     }
