@@ -191,7 +191,8 @@ Sources of truth, in order: `product-brief-v1.md`, `scheduler-research-v1.md`,
     its thirty seconds ran out unnoticed, which reads to the user as a micro-break that fired
     without a count-in, or as one that never fired at all.
 24. **Settings apply live.** The scheduler re-plans from the bout that is already running, so
-    changing a preset never costs the user the time they have already sat.
+    changing a preset never costs the user the time they have already sat. *Refined by 72: the
+    countdown moves by the change, not from the bout start.*
 
 ## Known compromises
 
@@ -645,3 +646,17 @@ of its picks, taken before any of this was built, is replayed by a test to prove
     light one, and it goes before the exclusions and the difficulty cap. In the simulation it has
     never had to let go: every pattern a kit can reach has a vigorous move, and a kettlebell
     alone at cap 2, with the push-up as its only vigorous push, repeats the push-up instead.
+
+## The November 2026 review
+
+Entries from fixing the findings in `docs/code-review-2026-11.md`.
+
+72. **A settings change moves the countdown by the change, not from the bout start.** A longer
+    or shorter sitting interval moves the next break by the difference, and every other setting
+    leaves the due time alone. The micro-break keeps its own cycle: it is re-planned only when the
+    sitting interval or a micro-break setting changed, from its due time less the old interval,
+    and from now when micro-breaks are turned on. For a bout nobody has touched this is the same
+    as entry 24. The difference is after a skip, a resumed pause or a finished micro-break, which
+    restart a countdown without moving the bout: re-planning from the bout start brought back the
+    break the user had just skipped, cut a pause's hour off the countdown, and served a second
+    micro-break minutes after the first (SCH-1).

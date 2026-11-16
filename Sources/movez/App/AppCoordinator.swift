@@ -398,8 +398,8 @@ final class AppCoordinator: ObservableObject {
     /// The length goes in through the config whenever the preview changes, rather than with the
     /// start of the break, because the scheduler starts a break on its own clock (the heads-up
     /// running out) and has the length to hand when it does; and it goes in through its own event
-    /// rather than `.settingsChanged`, which re-plans the due times and would undo a skip's fresh
-    /// interval. The preview is the break on screen while there is one, so a running break's
+    /// rather than `.settingsChanged`, which persists and redraws for a change the user made. The
+    /// preview is the break on screen while there is one, so a running break's
     /// "done at half" is measured against that break, not the one after it.
     private func syncBreakLength(_ preview: PlannedBreak) {
         guard scheduler.config.breakSeconds != preview.plannedSeconds else { return }

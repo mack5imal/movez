@@ -246,16 +246,23 @@ struct Scheduler {
 
     // MARK: - Settings
 
-    /// Settings apply live. The due times are re-planned from the bout that is already running,
-    /// so changing the preset never costs the user the time they have already sat.
+    /// Settings apply live, to the countdown that is already running, by the change they make.
+    ///
+    /// A longer or shorter sitting interval moves the next break by the difference, so changing
+    /// the preset mid-bout never costs the user the time they have already sat. Anything else
+    /// leaves the due time alone. It is deliberately not re-planned from `boutStartedAt`: a skip,
+    /// a resumed pause and a wake each restart the countdown without moving the bout, and
+    /// re-planning from the bout brought the break they had just dealt with straight back.
     mutating func apply(_ updated: SchedulerConfig, now: Date) -> [SchedulerEffect] {
         let wasPolling = pollingRequired
+        let previous = config
         config = updated
         snapshot.configHash = updated.stableHash
 
         if snapshot.state.countdownRuns {
-            snapshot.nextFullDueAt = snapshot.boutStartedAt.addingTimeInterval(TimeInterval(updated.sitSeconds))
-            snapshot.nextMicroDueAt = microDue(anchoredAt: snapshot.microAnchorAt ?? snapshot.boutStartedAt)
+            let sitChange = TimeInterval(updated.sitSeconds - previous.sitSeconds)
+            snapshot.nextFullDueAt = snapshot.nextFullDueAt?.addingTimeInterval(sitChange)
+            snapshot.nextMicroDueAt = replannedMicroDue(previous: previous, now: now)
         }
 
         var effects: [SchedulerEffect] = [.persist, .menuRefresh]
@@ -263,12 +270,31 @@ struct Scheduler {
         return effects
     }
 
+    /// The micro-break due time after a settings change, measured from the cycle it belongs to.
+    ///
+    /// A scheduled micro-break keeps its own cycle: its anchor is its due time less the old
+    /// interval, whatever set it (a bout start, a skip, a snooze or a closed micro-break). It is
+    /// then checked again against the full break, which may have moved. Micro-breaks turned on
+    /// mid-bout, or one dropped by the quiet zone that the change might let back, are planned from
+    /// now, so a micro-break is never due in the past.
+    private func replannedMicroDue(previous: SchedulerConfig, now: Date) -> Date? {
+        let unchanged = previous.microEnabled == config.microEnabled
+            && previous.microEverySeconds == config.microEverySeconds
+            && previous.microMinGapBeforeFullSeconds == config.microMinGapBeforeFullSeconds
+            && previous.sitSeconds == config.sitSeconds
+        if unchanged { return snapshot.nextMicroDueAt }
+        guard config.microEnabled else { return nil }
+        if previous.microEnabled, let due = snapshot.nextMicroDueAt {
+            return microDue(anchoredAt: due.addingTimeInterval(-TimeInterval(previous.microEverySeconds)))
+        }
+        return microDue(anchoredAt: now)
+    }
+
     /// Takes the next break's planned length, which is what "half the time" in the completion
     /// rule and a slept-through break's planned end are measured against.
     ///
-    /// Deliberately not `apply(_:now:)`: that re-plans the due times from the bout start, which
-    /// would undo a skip's fresh interval, and the length changes after every strength break. A
-    /// length is not a setting the user changed, so nothing is re-planned, persisted or redrawn.
+    /// Deliberately not `apply(_:now:)`: the length changes after every strength break, and it is
+    /// not a setting the user changed, so nothing is re-planned, persisted or redrawn.
     mutating func setBreakLength(_ seconds: Int) -> [SchedulerEffect] {
         config.breakSeconds = max(1, seconds)
         snapshot.configHash = config.stableHash
