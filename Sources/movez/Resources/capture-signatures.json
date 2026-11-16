@@ -16,13 +16,6 @@
       "enabled": true
     },
     {
-      "name": "QuickTime Player screen recording",
-      "bundleIds": ["com.apple.QuickTimePlayerX"],
-      "processNames": ["screencapture"],
-      "requireProcessName": true,
-      "enabled": true
-    },
-    {
       "name": "OBS Studio",
       "bundleIds": ["com.obsproject.obs-studio"],
       "processNames": [],

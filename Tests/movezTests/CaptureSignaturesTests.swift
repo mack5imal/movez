@@ -42,9 +42,36 @@ final class CaptureSignaturesTests: XCTestCase {
         XCTAssertTrue(names.contains { $0.contains("Zoom") })
         XCTAssertTrue(names.contains { $0.contains("Teams") })
         XCTAssertTrue(names.contains { $0.contains("OBS") })
-        XCTAssertTrue(names.contains { $0.contains("QuickTime") })
+        // QuickTime has no row of its own: it records through `screencapture`, which the generic
+        // row catches — see testAQuickTimeRecordingIsCaught.
         XCTAssertTrue(names.contains { $0.contains("ScreenFlow") })
         XCTAssertTrue(names.contains { $0.contains("Loom") })
+    }
+
+    /// Each enabled signature must catch something no other one does: a row whose removal
+    /// changes nothing is one a maintainer will edit expecting an effect it cannot have.
+    func testEveryEnabledSignatureEarnsItsPlace() {
+        let all = signatures.signatures
+        for (index, signature) in all.enumerated() where signature.enabled {
+            var others = all
+            others.remove(at: index)
+            let without = CaptureSignatures(note: "", signatures: others)
+            let bundles = Set(signature.bundleIds)
+            let processes = Set(signature.processNames)
+            XCTAssertNil(
+                without.firstMatch(bundleIds: bundles, processNames: processes),
+                "\(signature.name) is already covered by another signature"
+            )
+        }
+    }
+
+    /// QuickTime records through `screencapture`, which the generic row catches.
+    func testAQuickTimeRecordingIsCaught() {
+        XCTAssertEqual(
+            signatures.firstMatch(bundleIds: ["com.apple.QuickTimePlayerX"], processNames: ["screencapture"])?.name,
+            "macOS screen recording"
+        )
+        XCTAssertNil(signatures.firstMatch(bundleIds: ["com.apple.QuickTimePlayerX"], processNames: []))
     }
 
     func testZoomOnlyMatchesWithItsShareHelper() {

@@ -74,18 +74,34 @@ extension CaptureSignature {
 }
 
 struct CaptureSignatures: Codable, Equatable {
-    var note: String
-    var signatures: [CaptureSignature]
+    let note: String
+    let signatures: [CaptureSignature]
+    /// The signatures with every id and name already lowercased, computed once when the file is
+    /// read rather than on every poll. It was a computed property, so `firstMatch` rebuilt every
+    /// copy every two seconds.
+    private let lowercased: [CaptureSignature]
 
-    /// The signatures with every id and name already lowercased, computed once rather than on
-    /// every poll.
-    private var lowercased: [CaptureSignature] {
-        signatures.map { signature in
+    private enum CodingKeys: String, CodingKey {
+        case note, signatures
+    }
+
+    init(note: String, signatures: [CaptureSignature]) {
+        self.note = note
+        self.signatures = signatures
+        lowercased = signatures.map { signature in
             var lowered = signature
             lowered.bundleIds = signature.bundleIds.map { $0.lowercased() }
             lowered.processNames = signature.processNames.map { $0.lowercased() }
             return lowered
         }
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(
+            note: try container.decode(String.self, forKey: .note),
+            signatures: try container.decode([CaptureSignature].self, forKey: .signatures)
+        )
     }
 
     enum LoadError: Error {
@@ -166,8 +182,11 @@ final class ScreenCaptureMonitor: CaptureSource {
     ///
     /// `proc_name` rather than `proc_pidpath`: this runs on every poll across ~1,200 processes,
     /// and asking each one for its full executable path costs five times as much as asking for
-    /// its name. The name arrives truncated to sixteen characters, which is precisely what
-    /// `CaptureSignature.namesMatch` was written to tolerate.
+    /// its name. `proc_name` copies the kernel's `pbi_name`, a buffer of twice `MAXCOMLEN` (32
+    /// bytes with the terminator), so a name arrives cut at 31 characters, which is
+    /// `CaptureSignature.nameLimit` and what `namesMatch` tolerates. It is not the sixteen of
+    /// `p_comm`: names such as "Brave Browser Helper (Renderer)" come through whole, and the
+    /// 30-character Teams share helper only matches because they do.
     static func runningProcessNames() -> Set<String> {
         var pids = [pid_t](repeating: 0, count: 8192)
         let byteCount = proc_listpids(UInt32(PROC_ALL_PIDS), 0, &pids, Int32(pids.count * MemoryLayout<pid_t>.size))
