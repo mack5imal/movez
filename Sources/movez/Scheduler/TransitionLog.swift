@@ -35,7 +35,7 @@ struct TransitionLog: Codable, Equatable {
     static let timeFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm:ss"
-        formatter.timeZone = .current
+        formatter.timeZone = .autoupdatingCurrent
         return formatter
     }()
 

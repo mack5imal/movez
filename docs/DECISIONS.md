@@ -667,3 +667,8 @@ Entries from fixing the findings in `docs/code-review-2026-11.md`.
     the quiet minute confirmed it. Away for a whole sitting interval, the break is still not
     resumed, but one that had already met the completion rule is credited as done; one that had
     not is let go with no skip recorded, because the user left rather than turned it down (SCH-3).
+74. **Working hours follow the Mac's current time zone.** "9 to 6" means local time wherever the
+    Mac is. The scheduler, the history's calendar days, the strength planner and the transition
+    log all use the auto-updating calendar, so a Mac that flies from London to New York with Movez
+    running starts judging hours, midnight and the day's counters in New York time at once, rather
+    than on the next launch or settings change (SCH-9).

@@ -124,13 +124,13 @@ final class HistoryStore {
         }
     }
 
-    init(data: HistoryData = HistoryData(), store: HistoryPersisting? = nil, calendar: Calendar = .current) {
+    init(data: HistoryData = HistoryData(), store: HistoryPersisting? = nil, calendar: Calendar = .autoupdatingCurrent) {
         self.data = data
         self.store = store
         self.calendar = calendar
     }
 
-    convenience init(store: HistoryPersisting, calendar: Calendar = .current) {
+    convenience init(store: HistoryPersisting, calendar: Calendar = .autoupdatingCurrent) {
         self.init(data: HistoryStore.restore(from: store), store: store, calendar: calendar)
     }
 

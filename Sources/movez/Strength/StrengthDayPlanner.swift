@@ -74,7 +74,7 @@ struct StrengthDayPlanner {
     /// what "today" holds.
     let calendar: Calendar
 
-    init(calendar: Calendar = .current) {
+    init(calendar: Calendar = .autoupdatingCurrent) {
         self.calendar = calendar
     }
 

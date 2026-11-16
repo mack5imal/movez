@@ -42,7 +42,7 @@ struct SchedulerConfig: Codable, Equatable, Hashable {
     var deferredBadgeSeconds: Int = 1800
     var deferredSnoozeAllowance: Int = 1
     var workingHours: WorkingHours = .standard
-    var calendar: Calendar = .current
+    var calendar: Calendar = .autoupdatingCurrent
 
     /// The smallest sit interval a break can be completed at, in seconds — used by the
     /// completion rule's time half.
@@ -58,7 +58,7 @@ struct SchedulerConfig: Codable, Equatable, Hashable {
         preset: PresetId,
         customSitMinutes: Int? = nil,
         microOn: Bool = true,
-        calendar: Calendar = .current
+        calendar: Calendar = .autoupdatingCurrent
     ) -> SchedulerConfig {
         var config = SchedulerConfig()
         config.calendar = calendar

@@ -142,12 +142,12 @@ struct MenuBarState: Equatable {
     }
 
     /// "Breaks resume Monday at 9:00" — or today, or tomorrow, which read better than the day name.
-    static func offHoursSubtitle(nextStart: Date?, now: Date, calendar: Calendar = .current) -> String {
+    static func offHoursSubtitle(nextStart: Date?, now: Date, calendar: Calendar = .autoupdatingCurrent) -> String {
         guard let nextStart else { return "No working days are switched on" }
         return "Breaks resume \(dayPhrase(nextStart, now: now, calendar: calendar)) at \(MovezClock.label(nextStart))"
     }
 
-    static func dayPhrase(_ date: Date, now: Date, calendar: Calendar = .current) -> String {
+    static func dayPhrase(_ date: Date, now: Date, calendar: Calendar = .autoupdatingCurrent) -> String {
         if calendar.isDate(date, inSameDayAs: now) { return "today" }
         if let tomorrow = calendar.date(byAdding: .day, value: 1, to: now),
            calendar.isDate(date, inSameDayAs: tomorrow) {

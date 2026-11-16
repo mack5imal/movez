@@ -92,4 +92,23 @@ final class WorkingHoursTests: XCTestCase {
         let hours = WorkingHours(days: Array(repeating: .off, count: 7))
         XCTAssertNil(hours.nextStart(after: date(2026, 9, 7, 9, 0), calendar: calendar))
     }
+
+    /// Working hours are local time wherever the Mac is (DECISIONS 74). A config built before the
+    /// time zone changed judges "9 to 6" in the new zone, not the one it was built in.
+    func testWorkingHoursFollowTheMacsCurrentTimeZone() throws {
+        let original = NSTimeZone.default
+        defer { NSTimeZone.default = original }
+        NSTimeZone.default = try XCTUnwrap(TimeZone(identifier: "Europe/London"))
+        var config = SchedulerConfig()
+        config.workingHours = .standard
+
+        NSTimeZone.default = try XCTUnwrap(TimeZone(identifier: "America/New_York"))
+        // 14:00 UTC on a Monday is 10:00 in New York and 15:00 in London; 20:00 UTC is 16:00 and 21:00.
+        let tenInNewYork = Date(timeIntervalSince1970: 1_788_789_600)     // 2026-09-07 14:00 UTC
+        let fourInNewYork = tenInNewYork.addingTimeInterval(6 * 3600)
+        XCTAssertEqual(config.calendar.timeZone.identifier, "America/New_York")
+        XCTAssertTrue(config.workingHours.isWithin(tenInNewYork, calendar: config.calendar))
+        XCTAssertTrue(config.workingHours.isWithin(fourInNewYork, calendar: config.calendar),
+                      "16:00 in New York is still the working day, though it is 21:00 in London")
+    }
 }
