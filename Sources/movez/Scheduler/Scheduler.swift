@@ -198,6 +198,8 @@ struct Scheduler {
     }
 
     private mutating func handleInput(lastEventAgeSeconds age: Int, now: Date) -> [SchedulerEffect] {
+        snapshot.lastInputAgeSeconds = age
+        snapshot.lastInputReadAt = now
         if case .away(let since) = snapshot.state { return handleInputWhileAway(age: age, since: since, now: now) }
         guard case .pendingFull = snapshot.state, age >= config.inputPauseSeconds else { return [] }
         return enterHeadsUp(now: now, reason: "input paused for \(age) s")

@@ -34,6 +34,11 @@ struct SchedulerSnapshot: Codable, Equatable {
     /// is touched, so a reading below it is the evidence of a return. Optional so older state
     /// files still decode.
     var awayInputAge: Int?
+    /// The input age the last poll reported, and when. A display that sleeps or a screen that
+    /// locks from inactivity is a user who left when they last touched anything, not when the
+    /// screen went dark. Optional so older state files still decode.
+    var lastInputAgeSeconds: Int?
+    var lastInputReadAt: Date?
     var remainingAtPauseSeconds: Int?
     /// When the pause began, so its end can tell whether a working day opened during it. Optional
     /// so older state files still decode; a pause saved without it resumes as before.

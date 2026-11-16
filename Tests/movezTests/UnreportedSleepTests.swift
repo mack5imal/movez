@@ -70,4 +70,40 @@ final class UnreportedSleepTests: XCTestCase {
         }
         XCTAssertEqual(after, until)
     }
+
+    /// A four-minute walk with the display set to sleep after two: the absence began at the last
+    /// keystroke, so it is four minutes, past the three-minute threshold, and not the two since
+    /// the screen went dark.
+    func testADisplayThatSleptFromInactivityDatesTheAbsenceFromTheLastInput() {
+        let harness = SchedulerHarness()
+        harness.run(seconds: 10 * minute)
+        var age = 0
+        for _ in 0..<60 {                  // two minutes untouched, polled every two seconds
+            harness.clock.advance(2)
+            age += 2
+            harness.send(.input(lastEventAgeSeconds: age))
+            harness.send(.idle(seconds: age))
+            harness.send(.tick)
+        }
+        harness.send(.sleep)               // the display sleeps
+        guard case .away(let since) = harness.state else { return XCTFail("got \(harness.state)") }
+        XCTAssertDate(since, harness.now.addingTimeInterval(-120), accuracy: 2)
+
+        harness.clock.advance(2 * minute)
+        harness.send(.wake(gapSeconds: 120))
+        harness.clearEffects()
+        harness.run(seconds: 70)
+
+        XCTAssertTrue(harness.effects.contains { if case .showToast = $0 { return true } else { return false } },
+                      "four minutes away is an absence, and the toast says so")
+    }
+
+    /// A closed lid comes seconds after the last keystroke, so it is dated as it always was.
+    func testAClosedLidIsDatedFromWhenItClosed() {
+        let harness = SchedulerHarness()
+        harness.run(seconds: 10 * minute, inputAge: 1)
+        harness.send(.sleep)
+        guard case .away(let since) = harness.state else { return XCTFail("got \(harness.state)") }
+        XCTAssertDate(since, harness.now, accuracy: 2)
+    }
 }

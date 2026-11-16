@@ -42,12 +42,33 @@ extension Scheduler {
         for dismissal in [SchedulerEffect.hideHeadsUp, .hideMicro] where !effects.contains(dismissal) {
             effects.append(dismissal)
         }
-        captureCountdowns(at: now)
+        let since = absenceStart(sleptAt: now)
+        captureCountdowns(at: since)
         // The idle age at the moment of locking is unknown here; the next poll sets the baseline.
         snapshot.awayInputAge = nil
-        transition(to: .away(since: now), reason: reason, at: now)
+        transition(to: .away(since: since), reason: reason, at: now)
         effects += [.persist, .menuRefresh]
         return effects
+    }
+
+    /// When an absence that ends in sleep or a lock began.
+    ///
+    /// A closed lid or Ctrl-Cmd-Q comes seconds after the last keystroke, so it changes nothing.
+    /// A display that slept, or a screen saver that locked, from inactivity comes minutes after
+    /// it: the user left when they last touched anything, and dating the absence from the screen
+    /// going dark measured every such absence short by the display-sleep delay. The last poll's
+    /// input age says when that was, floored, as the idle path is, by the last break and the
+    /// last absence. A break on screen is the exception: the user is away from the keyboard on
+    /// purpose, and the break ran until the screen went.
+    private func absenceStart(sleptAt now: Date) -> Date {
+        if case .fullBreak = snapshot.state { return now }
+        guard let age = snapshot.lastInputAgeSeconds, let readAt = snapshot.lastInputReadAt,
+              now.timeIntervalSince(readAt) <= SignalAggregator.tickGapThresholdSeconds else { return now }
+        var since = min(now, readAt.addingTimeInterval(-Double(age)))
+        for floor in [snapshot.lastCompletedBreakAt, snapshot.lastAbsenceEndedAt].compactMap({ $0 }) where floor > since {
+            since = floor
+        }
+        return since
     }
 
     /// The machine or the screen came back.
