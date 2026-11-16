@@ -84,16 +84,7 @@ final class StrengthSimulationPicksTests: XCTestCase {
                 let label = "day \(day.day) \(event.kind) \(compared)"
                 compared += 1
                 if event.kind == "micro" {
-                    var context = StrengthMicroContext()
-                    context.usedStrengthIdsToday = Set(event.used)
-                    context.lastMicroMovementIds = Set(event.lastMicro ?? [])
-                    context.nextFullBreakIds = Set(event.nextFull ?? [])
-                    context.solidWallNearby = configuration.wall
-                    context.difficultyCap = configuration.cap
-                    context.unlockedBuckets = unlocked
-                    context.recency = day.recency
-                    context.seed = seed
-                    let micro = StrengthMicroBuilder(library: library).build(context: context)
+                    let micro = microBreak(event, seed: seed, day: day, configuration: configuration, unlocked: unlocked)
                     compare(label, micro.blocks.map(\.movement.id), micro.relaxed, event, &mismatches)
                     continue
                 }
@@ -134,6 +125,21 @@ final class StrengthSimulationPicksTests: XCTestCase {
             }
         }
         return compared
+    }
+
+    private func microBreak(
+        _ event: Event, seed: UInt64, day: Day, configuration: Configuration, unlocked: Set<StrengthBucket>
+    ) -> StrengthMicroBreak {
+        var context = StrengthMicroContext()
+        context.usedStrengthIdsToday = Set(event.used)
+        context.lastMicroMovementIds = Set(event.lastMicro ?? [])
+        context.nextFullBreakIds = Set(event.nextFull ?? [])
+        context.solidWallNearby = configuration.wall
+        context.difficultyCap = configuration.cap
+        context.unlockedBuckets = unlocked
+        context.recency = day.recency
+        context.seed = seed
+        return StrengthMicroBuilder(library: library).build(context: context)
     }
 
     private func compare(
