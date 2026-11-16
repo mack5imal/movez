@@ -161,6 +161,8 @@ struct StrengthRelaxation: Hashable {
         case servedToday
         /// With any kit selected, a working set is a vigorous move.
         case vigorous
+        /// An arm break's third set is a different move from its first two.
+        case armAlternate
         /// No region shared with the previous micro-break.
         case previousMicroRegion
         case excluded

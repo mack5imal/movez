@@ -27,6 +27,12 @@ struct StrengthBreakBuilder {
     static let workingLadder: [StrengthRelaxation.Rule] = [
         .breakLimits, .servedToday, .vigorous, .excluded, .difficulty, .anything
     ]
+    /// An arm break's third set may repeat the arm move before the exclusions or the cap go: the
+    /// Beginner bodyweight triceps bucket has one difficulty-1 move, and a third set of it beats a
+    /// move above the user's cap (DECISIONS 83).
+    static let armAlternateLadder: [StrengthRelaxation.Rule] = [
+        .breakLimits, .servedToday, .vigorous, .armAlternate, .excluded, .difficulty, .anything
+    ]
     static let warmUpLadder: [StrengthRelaxation.Rule] = [.warmUpShape, .servedToday, .excluded, .difficulty, .anything]
     static let coolDownLadder: [StrengthRelaxation.Rule] = [.coolDownRegion, .servedToday, .excluded, .difficulty, .anything]
 
@@ -40,6 +46,8 @@ struct StrengthBreakBuilder {
         let bucket: StrengthBucket
         let ladder: [StrengthRelaxation.Rule]
         let taken: Set<String>
+        /// Moves in `taken` that come back once `.armAlternate` is let go: the arm move itself.
+        var repeatable: Set<String> = []
     }
 
     /// The regions an arm break's cool-down may stretch. No END move stretches the arm itself, so
@@ -80,10 +88,16 @@ struct StrengthBreakBuilder {
                 continue
             }
             let distinct = drawn.map(\.movement)
-            let request = SlotRequest(
+            var request = SlotRequest(
                 slot: .set(index + 1), bucket: Self.bucket(for: setSlot), ladder: Self.workingLadder,
                 taken: Set(distinct.map(\.id)).union([warmUp.id])
             )
+            if case .armAlternate = setSlot {
+                request = SlotRequest(
+                    slot: request.slot, bucket: request.bucket, ladder: Self.armAlternateLadder, taken: request.taken,
+                    repeatable: Set(drawn.filter { $0.slot.isArm }.map(\.movement.id))
+                )
+            }
             let pick = draw(
                 request, context: context, state: &state,
                 narrow: { pool, letGo in
@@ -194,7 +208,8 @@ struct StrengthBreakBuilder {
             },
             candidates: { letGo in
                 let pool = inBucket.filter { movement in
-                    guard !request.taken.contains(movement.id) else { return false }
+                    let comesBack = letGo.contains(.armAlternate) && request.repeatable.contains(movement.id)
+                    guard !request.taken.contains(movement.id) || comesBack else { return false }
                     guard !letGo.contains(.anything) else {
                         return StrengthEligibility.isPossible(
                             movement, equipment: context.equipment, solidWallNearby: context.solidWallNearby

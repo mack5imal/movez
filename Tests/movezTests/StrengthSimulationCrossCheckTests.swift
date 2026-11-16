@@ -29,7 +29,7 @@ final class StrengthSimulationCrossCheckTests: XCTestCase {
 
     func testTwoHundredSeedsBreakNoRuleInAnyConfiguration() {
         XCTAssertEqual(StrengthSimulationRun.Configuration.all.count, 16)
-        for configuration in StrengthSimulationRun.Configuration.all + [.appDefaults] {
+        for configuration in StrengthSimulationRun.Configuration.all + [.appDefaults, .appDefaultsWithDumbbells] {
             var outcome = StrengthSimulationRun.Outcome()
             for weekStart in stride(from: 0, to: Self.seeds, by: Self.daysPerWeek) {
                 let focus: StrengthFocus = (weekStart / Self.daysPerWeek).isMultiple(of: 2) ? .none : .moreArms
@@ -74,6 +74,12 @@ private final class StrengthSimulationRun {
         /// smallest, so it is where a long day runs out of moves and the ladders are tested hardest.
         static let appDefaults = Configuration(
             equipment: [], wall: true, cap: SettingsStore.strengthDifficultyDefault, unlocked: []
+        )
+
+        /// The defaults with dumbbells: kit at the Beginner cap, where no squat or lunge is
+        /// vigorous and the cap wins over the vigorous rule (DECISIONS 71, LIB-2).
+        static let appDefaultsWithDumbbells = Configuration(
+            equipment: [.dumbbells], wall: true, cap: SettingsStore.strengthDifficultyDefault, unlocked: []
         )
 
         /// Dumbbells × kettlebell × wall at caps 2 and 3, every difficulty-3 pattern unlocked.

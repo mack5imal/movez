@@ -14,7 +14,8 @@ focus weights are distributions rather than per-break rules, so they show up in 
 and not as violations. No configuration excludes anything, so the exclusion rules are vacuous here
 and are covered by the builders' unit tests.
 
-Each configuration owns every difficulty-3 pattern, simulates days of 6 full breaks and
+Each configuration but the app's defaults (`def` and `dbl`, which unlock nothing at cap 1) owns every
+difficulty-3 pattern. Each simulates days of 6 full breaks and
 6 micro-breaks with the strength breaks a day cycling 1, 2, 3, 4 (shifted a day every four
 days, so each setting meets both letters), skips one strength
 break in 10 so the planner has to offer it again, and runs until each kind of break reaches
@@ -44,6 +45,8 @@ break in 10 so the planner has to offer it again, and runs until each kind of br
 | dumbbells, wall, cap 2, More arms | `D-W2a` | 5,003 | 581 | 6,440 | 12,024 | 0 |
 | kettlebell, wall, cap 2, More arms | `-KW2a` | 5,001 | 534 | 6,489 | 12,024 | 0 |
 | dumbbells + kettlebell, wall, cap 2, More arms | `DKW2a` | 5,002 | 546 | 6,476 | 12,024 | 0 |
+| app defaults: bodyweight, wall, cap 1 | `def` | 5,000 | 534 | 6,484 | 12,018 | 0 |
+| app defaults with dumbbells: dumbbells, wall, cap 1 | `dbl` | 5,001 | 574 | 6,461 | 12,036 | 0 |
 | app defaults: bodyweight, wall, cap 1, no focus, 1 a day, 20 × 2 weeks | `def1` | 200 | 0 | 1,000 | 1,200 | 0 |
 | app defaults: bodyweight, wall, cap 1, no focus, 2 a day, 20 × 2 weeks | `def2` | 400 | 0 | 800 | 1,200 | 0 |
 | app defaults: bodyweight, wall, cap 1, no focus, 3 a day, 20 × 2 weeks | `def3` | 600 | 0 | 600 | 1,200 | 0 |
@@ -69,96 +72,104 @@ by the strength breaks a day.
 
 Every rule in `scripts/strength-rules.json`, per configuration. Every cell must be 0.
 
-| Rule | Kind | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` | `def1` | `def2` | `def3` | `def4` | `def1a` | `def2a` | `def3a` | `def4a` | `dbl1` | `dbl2` | `dbl3` | `dbl4` | `dbl1a` | `dbl2a` | `dbl3a` | `dbl4a` |
-|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| `s6-shape` A strength break is a warm-up, three working sets and a cool-down. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s6-day-patterns` A pattern break's sets are the day's two patterns (A: squat/lunge and push, B: hinge and pull); the day's first pattern break is X · Y · Core and every later one X · Y · X. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s6-lead` A later pattern break leads with the pattern that has fewer sets so far today, an arm break's sets counting for neither; a tie goes to the one that led less recently. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s6-same-move-twice` The same slot twice is the same move both times (the pattern done twice, an arm break's first two sets), and two different slots are two different moves. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s6-distinct` No move appears twice in a break other than that repeat. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s6-warm-up-pattern` The warm-up is drawn from the first set's pattern; an arm break's from the day's push (A) or pull (B). | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s6-warm-up-shape` The warm-up is bodyweight, not on the floor, difficulty 1 and two-sided. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s6-warm-up-timing` The warm-up runs 30 s with no rep target. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s6-cool-down-end` The cool-down is one END move for 30 s (15 s a side on a per-side move). | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s6-cool-down-region` The cool-down stretches a region the sets worked; for an arm break, the shoulder, chest, arm or wrist/forearm. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s6-per-side-limit` At most one per-side move among the working moves. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s6-floor-limit` At most one floor move among the working moves. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s6-grip-limit` At most one grip move among the working moves. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s6-equipment` Only bodyweight moves or moves listing a piece of equipment the user owns (the kettlebell only where a move lists it). | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s6-wall` No Wall-setting move with the wall off. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s6-served-today` No move served earlier today in either mode, counting `same` overlaps and their families as one (S8). | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s6-excluded` No excluded move. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s6-difficulty` Difficulty at most the cap, and difficulty 3 only in an unlocked pattern (S9). | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s6-dose` Each set's dose is the library's dose for its move (S4). | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s6-arm-break` An arm break is three sets of the day's arm, triceps on an A day and biceps on a B day, in the slots arm · arm · alternate, with no core set. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s6-arm-alternate` An arm break's third set is a different move from the same arm pattern as its first two. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s6-vigorous-sets` With any equipment selected, every working set (core and arm sets included) is a vigorous move. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s7-end-only` A micro-break draws only from END. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s7-no-floor` A micro-break never serves a floor move. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s7-wall` No Wall-setting move with the wall off. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s7-distinct` A micro-break's two moves differ. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s7-shape` One per-side move for 60 s, or two two-sided moves of 30 s each; a two-sided move runs the minute alone only when no per-side move or partner was available. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s7-same-posture` The second move keeps the first one's posture, standing or seated. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s7-previous-region` No region shared with the previous micro-break. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s7-next-break-region` The next full break's regions are avoided. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s7-served-today` No move served earlier today in either mode (S8). | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s7-excluded` No excluded move. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s7-difficulty` Difficulty at most the cap, and difficulty 3 only when END is unlocked. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s22-letter` A day's strength breaks share one letter: the other one from the last day with a completed strength break, A the first time. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s22-count` The first N completed full breaks of a day are strength breaks (a skipped one does not count) and every full break after them is an end-range break. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s22-end-range-shape` An end-range break is four END moves of 60 s each. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s22-end-range-distinct` No move appears twice in an end-range break. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s22-end-range-wall` No Wall-setting move with the wall off. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s22-end-range-served-today` No move served earlier today in either mode (S8). | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s22-end-range-worked-regions` The regions the day's strength breaks worked are avoided. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s22-end-range-excluded` No excluded move. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s22-end-range-difficulty` Difficulty at most the cap, and difficulty 3 only when END is unlocked. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `s22-arm-break-position` A day's arm break is its fourth strength break (its third under More arms), only when the day has more strength breaks than that and the kit is none or includes dumbbells; no other break is one. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| Rule | Kind | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` | `def` | `dbl` | `def1` | `def2` | `def3` | `def4` | `def1a` | `def2a` | `def3a` | `def4a` | `dbl1` | `dbl2` | `dbl3` | `dbl4` | `dbl1a` | `dbl2a` | `dbl3a` | `dbl4a` |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `s6-shape` A strength break is a warm-up, three working sets and a cool-down. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s6-day-patterns` A pattern break's sets are the day's two patterns (A: squat/lunge and push, B: hinge and pull); the day's first pattern break is X · Y · Core and every later one X · Y · X. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s6-lead` A later pattern break leads with the pattern that has fewer sets so far today, an arm break's sets counting for neither; a tie goes to the one that led less recently. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s6-same-move-twice` The same slot twice is the same move both times (the pattern done twice, an arm break's first two sets), and two different slots are two different moves, apart from an arm break's third set, which s6-arm-alternate judges. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s6-distinct` No move appears twice in a break other than that repeat. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s6-warm-up-pattern` The warm-up is drawn from the first set's pattern; an arm break's from the day's push (A) or pull (B). | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s6-warm-up-shape` The warm-up is bodyweight, not on the floor, difficulty 1 and two-sided. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s6-warm-up-timing` The warm-up runs 30 s with no rep target. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s6-cool-down-end` The cool-down is one END move for 30 s (15 s a side on a per-side move). | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s6-cool-down-region` The cool-down stretches a region the sets worked; for an arm break, the shoulder, chest, arm or wrist/forearm. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s6-per-side-limit` At most one per-side move among the working moves. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s6-floor-limit` At most one floor move among the working moves. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s6-grip-limit` At most one grip move among the working moves. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s6-equipment` Only bodyweight moves or moves listing a piece of equipment the user owns (the kettlebell only where a move lists it). | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s6-wall` No Wall-setting move with the wall off. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s6-served-today` No move served earlier today in either mode, counting `same` overlaps and their families as one (S8). | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s6-excluded` No excluded move. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s6-difficulty` Difficulty at most the cap, and difficulty 3 only in an unlocked pattern (S9). | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s6-dose` Each set's dose is the library's dose for its move (S4). | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s6-arm-break` An arm break is three sets of the day's arm, triceps on an A day and biceps on a B day, in the slots arm · arm · alternate, with no core set. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s6-arm-alternate` An arm break's third set is from the same arm pattern as its first two, and a different move unless no other keeps the exclusions and the difficulty cap as the repeat does (DECISIONS 83). | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s6-vigorous-sets` With any equipment selected, every working set (core and arm sets included) is a vigorous move. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s7-end-only` A micro-break draws only from END. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s7-no-floor` A micro-break never serves a floor move. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s7-wall` No Wall-setting move with the wall off. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s7-distinct` A micro-break's two moves differ. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s7-shape` One per-side move for 60 s, or two two-sided moves of 30 s each; a two-sided move runs the minute alone only when no per-side move or partner was available. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s7-same-posture` The second move keeps the first one's posture, standing or seated. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s7-previous-region` No region shared with the previous micro-break. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s7-next-break-region` The next full break's regions are avoided. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s7-served-today` No move served earlier today in either mode (S8). | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s7-excluded` No excluded move. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s7-difficulty` Difficulty at most the cap, and difficulty 3 only when END is unlocked. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s22-letter` A day's strength breaks share one letter: the other one from the last day with a completed strength break, A the first time. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s22-count` The first N completed full breaks of a day are strength breaks (a skipped one does not count) and every full break after them is an end-range break. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s22-end-range-shape` An end-range break is four END moves of 60 s each. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s22-end-range-distinct` No move appears twice in an end-range break. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s22-end-range-wall` No Wall-setting move with the wall off. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s22-end-range-served-today` No move served earlier today in either mode (S8). | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s22-end-range-worked-regions` The regions the day's strength breaks worked are avoided. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s22-end-range-excluded` No excluded move. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s22-end-range-difficulty` Difficulty at most the cap, and difficulty 3 only when END is unlocked. | where-possible | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `s22-arm-break-position` A day's arm break is its fourth strength break (its third under More arms), only when the day has more strength breaks than that and the kit is none or includes dumbbells; no other break is one. | hard | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
 ## Relaxations
 
 How often a builder had to let a rule go because nothing was left that kept it, per break kind
-and rule, summed over the 20 configurations; the `arm break` rows are the part of the
+and rule, summed over the 22 configurations; the `arm break` rows are the part of the
 strength rows drawn for arm breaks. These are the ladders doing their job, not violations: each
 one was checked above and no move that kept the rule was available.
 
 | Break | Rule let go | Times | Per 1,000 breaks of that kind |
 |---|---|---:|---:|
-| arm break | `servedToday` | 1,278 | 129.4 |
-| arm break | `warmUpShape` | 6,903 | 698.9 |
-| micro | `servedToday` | 983 | 4.1 |
-| strength | `breakLimits` | 12,482 | 112.3 |
-| strength | `servedToday` | 11,419 | 102.7 |
-| strength | `warmUpShape` | 34,346 | 309.0 |
+| arm break | `armAlternate` | 269 | 24.5 |
+| arm break | `coolDownRegion` | 15 | 1.4 |
+| arm break | `servedToday` | 1,799 | 164.1 |
+| arm break | `warmUpShape` | 7,419 | 676.8 |
+| endRange | `servedToday` | 10,194 | 71.6 |
+| micro | `servedToday` | 4,911 | 18.6 |
+| strength | `armAlternate` | 269 | 2.2 |
+| strength | `breakLimits` | 13,975 | 114.3 |
+| strength | `coolDownRegion` | 41 | 0.3 |
+| strength | `servedToday` | 15,887 | 129.9 |
+| strength | `vigorous` | 2,535 | 20.7 |
+| strength | `warmUpShape` | 37,165 | 304.0 |
 
 Strength-break relaxations per configuration, per 1,000 strength breaks built (skipped ones
 included), with the arm-break share of the `vigorous` count in brackets. `vigorous` is the rung
 that lets a light bodyweight move be a working set when nothing vigorous is left.
 
-| Config | `breakLimits` | `servedToday` | `vigorous` | `warmUpShape` |
-|---|---:|---:|---:|---:|
-| `--W2` | 163.6 | 126.2 | 0 | 346.9 |
-| `---2` | 179.6 | 243.2 | 0 | 420.9 |
-| `-KW2` | 272.7 | 403.9 | 0 | 257.4 |
-| `-K-2` | 275.7 | 404.7 | 0 | 400.0 |
-| `D-W2` | 3.8 | 1.4 | 0 | 236.7 |
-| `D--2` | 5.2 | 3.1 | 0 | 323.6 |
-| `DKW2` | 4.3 | 1.6 | 0 | 238.4 |
-| `DK-2` | 4.5 | 4.9 | 0 | 317.9 |
-| `--W3` | 173.9 | 29.2 | 0 | 378.6 |
-| `---3` | 182.5 | 40.7 | 0 | 455.4 |
-| `-KW3` | 271.9 | 115.9 | 0 | 237.5 |
-| `-K-3` | 282.7 | 137.3 | 0 | 342.5 |
-| `D-W3` | 4.5 | 1.1 | 0 | 229.7 |
-| `D--3` | 5.6 | 0.7 | 0 | 317.3 |
-| `DKW3` | 4.5 | 1.1 | 0 | 230.9 |
-| `DK-3` | 5.4 | 1.1 | 0 | 314.8 |
-| `--W2a` | 132.0 | 128.4 | 0 | 390.4 |
-| `D-W2a` | 4.3 | 3.8 | 0 | 241.8 |
-| `-KW2a` | 264.5 | 400.0 | 0 | 253.5 |
-| `DKW2a` | 3.2 | 4.7 | 0 | 244.8 |
+| Config | `breakLimits` | `servedToday` | `vigorous` | `armAlternate` | `warmUpShape` | `coolDownRegion` |
+|---|---:|---:|---:|---:|---:|---:|
+| `--W2` | 163.6 | 126.2 | 0 | 0 | 346.9 | 0 |
+| `---2` | 179.6 | 243.2 | 0 | 0 | 420.9 | 0 |
+| `-KW2` | 272.7 | 403.9 | 0 | 0 | 257.4 | 0 |
+| `-K-2` | 275.7 | 404.7 | 0 | 0 | 400.0 | 0 |
+| `D-W2` | 3.8 | 1.4 | 0 | 0 | 236.7 | 0 |
+| `D--2` | 5.2 | 3.1 | 0 | 0 | 323.6 | 0 |
+| `DKW2` | 4.3 | 1.6 | 0 | 0 | 238.4 | 0 |
+| `DK-2` | 4.5 | 4.9 | 0 | 0 | 317.9 | 0 |
+| `--W3` | 173.9 | 29.2 | 0 | 0 | 378.6 | 0 |
+| `---3` | 182.5 | 40.7 | 0 | 0 | 455.4 | 0 |
+| `-KW3` | 271.9 | 115.9 | 0 | 0 | 237.5 | 0 |
+| `-K-3` | 282.7 | 137.3 | 0 | 0 | 342.5 | 0 |
+| `D-W3` | 4.5 | 1.1 | 0 | 0 | 229.7 | 0 |
+| `D--3` | 5.6 | 0.7 | 0 | 0 | 317.3 | 0 |
+| `DKW3` | 4.5 | 1.1 | 0 | 0 | 230.9 | 0 |
+| `DK-3` | 5.4 | 1.1 | 0 | 0 | 314.8 | 0 |
+| `--W2a` | 132.0 | 128.4 | 0 | 0 | 390.4 | 0 |
+| `D-W2a` | 4.3 | 3.8 | 0 | 0 | 241.8 | 0 |
+| `-KW2a` | 264.5 | 400.0 | 0 | 0 | 253.5 | 0 |
+| `DKW2a` | 3.2 | 4.7 | 0 | 0 | 244.8 | 0 |
+| `def` | 234.0 | 443.8 | 0 | 48.6 | 287.9 | 4.0 |
+| `dbl` | 35.5 | 360.9 | 454.7 (0.0) | 0 | 219.9 | 3.4 |
 
-Micro-break shapes over the 20 configurations: one per-side move 75.8%, two two-sided moves 24.2%.
+Micro-break shapes over the 22 configurations: one per-side move 75.7%, two two-sided moves 24.3%.
 
 ## Eligible moves never served
 
@@ -187,6 +198,8 @@ kind draws from its pattern (ACC is drawn by none of them, so its moves are list
 | dumbbells, wall, cap 2, More arms | 97 | 0 | – |
 | kettlebell, wall, cap 2, More arms | 72 | 0 | – |
 | dumbbells + kettlebell, wall, cap 2, More arms | 98 | 0 | – |
+| app defaults: bodyweight, wall, cap 1 | 47 | 0 | – |
+| app defaults with dumbbells: dumbbells, wall, cap 1 | 47 | 0 | – |
 
 Not drawn by any strength-mode break: ACC-01, ACC-02, ACC-03, ACC-04, ACC-05, ACC-06, ACC-07, ACC-08, ACC-09, ACC-10, ACC-11. The arm moves (BIC, TRI) are drawn only by the
 arm break (DECISIONS 70), which a kettlebell-only kit never gets, so they are eligible only where
@@ -234,6 +247,7 @@ drawn for more than three times that share is listed with the rule that concentr
 | `-KW2a` | COR working sets | COR-10 Seated knee tuck | 59.7 | 9.1 | S6 floor limit: 8 of the 11 eligible COR moves are on the floor, so when another working move already is, the set falls to the 3 that are not (COR-10, COR-12, COR-15) |
 | `DKW2a` | COR working sets | COR-10 Seated knee tuck | 31.8 | 7.1 | S6 floor limit: 10 of the 14 eligible COR moves are on the floor, so when another working move already is, the set falls to the 4 that are not (COR-10, COR-11, COR-12, COR-15) |
 | `DKW2a` | COR working sets | COR-11 Halo | 28.6 | 7.1 | S6 floor limit: 10 of the 14 eligible COR moves are on the floor, so when another working move already is, the set falls to the 4 that are not (COR-10, COR-11, COR-12, COR-15) |
+| `def` | COR working sets | COR-10 Seated knee tuck | 70.4 | 16.7 | S6 floor limit: 5 of the 6 eligible COR moves are on the floor, so when another working move already is, the set falls to the 1 that are not (COR-10) |
 
 ## Share per move
 
@@ -242,284 +256,284 @@ configuration code. A dash means the move is not eligible for that slot there.
 
 ### SQT working sets
 
-| Move | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| SQT-01 Bodyweight squat | 5.9 | 3.7 | – | – | – | – | – | – | 5.2 | 3.8 | – | – | – | – | – | – | 7.2 | – | – | – |
-| SQT-02 Tempo squat | 18.7 | 21.0 | – | – | – | – | – | – | 15.4 | 16.9 | – | – | – | – | – | – | 16.7 | – | – | – |
-| SQT-03 Chair sit-to-stand | 5.1 | 3.6 | – | – | – | – | – | – | 5.0 | 3.1 | – | – | – | – | – | – | 6.4 | – | – | – |
-| SQT-04 Goblet squat | – | – | 14.5 | 14.1 | 16.6 | 17.0 | 16.8 | 16.4 | – | – | 12.6 | 12.8 | 13.6 | 13.4 | 13.7 | 14.1 | – | 17.1 | 14.1 | 17.1 |
-| SQT-05 Dumbbell front squat | – | – | – | – | 16.5 | 15.5 | 14.8 | 17.3 | – | – | – | – | 14.2 | 14.2 | 13.9 | 13.3 | – | 16.8 | – | 15.3 |
-| SQT-06 Suitcase squat | – | – | 14.0 | 14.3 | 11.0 | 11.4 | 11.7 | 11.3 | – | – | 12.0 | 12.3 | 9.5 | 10.3 | 10.7 | 10.2 | – | 11.4 | 13.9 | 11.6 |
-| SQT-07 Split squat | 13.4 | 15.8 | – | – | – | – | – | – | 13.5 | 13.2 | – | – | – | – | – | – | 13.9 | – | – | – |
-| SQT-08 Loaded split squat | – | – | 14.5 | 14.2 | 11.1 | 11.6 | 11.6 | 11.2 | – | – | 12.9 | 12.7 | 10.6 | 9.9 | 10.4 | 10.3 | – | 11.6 | 14.5 | 11.8 |
-| SQT-09 Reverse lunge | 14.2 | 14.5 | – | – | – | – | – | – | 11.6 | 13.8 | – | – | – | – | – | – | 13.4 | – | – | – |
-| SQT-10 Loaded reverse lunge | – | – | 14.0 | 14.4 | 11.6 | 9.8 | 11.0 | 10.7 | – | – | 12.3 | 12.5 | 10.0 | 10.6 | 9.8 | 10.4 | – | 11.1 | 14.8 | 10.8 |
-| SQT-11 Lateral lunge | 17.8 | 20.9 | – | – | – | – | – | – | 14.5 | 15.7 | – | – | – | – | – | – | 17.3 | – | – | – |
-| SQT-12 Goblet lateral lunge | – | – | 13.5 | 14.1 | 11.5 | 11.4 | 11.1 | 11.0 | – | – | 13.1 | 12.5 | 10.7 | 10.7 | 10.2 | 10.5 | – | 10.7 | 14.8 | 10.9 |
-| SQT-13 Curtsy lunge | 18.0 | 20.5 | – | – | – | – | – | – | 15.4 | 16.1 | – | – | – | – | – | – | 18.3 | – | – | – |
-| SQT-14 Rear-foot-elevated split squat | – | – | – | – | – | – | – | – | 14.5 | 17.3 | – | – | – | – | – | – | – | – | – | – |
-| SQT-15 Loaded rear-foot-elevated split squat | – | – | – | – | – | – | – | – | – | – | 12.6 | 12.1 | 10.1 | 10.1 | 10.7 | 9.6 | – | – | – | – |
-| SQT-16 Wall sit | 6.9 | – | – | – | – | – | – | – | 4.9 | – | – | – | – | – | – | – | 7.0 | – | – | – |
-| SQT-17 Loaded curtsy lunge | – | – | 14.9 | 14.7 | 10.2 | 11.1 | 11.4 | 11.2 | – | – | 12.0 | 12.7 | 10.4 | 10.5 | 10.3 | 11.1 | – | 10.5 | 13.2 | 10.9 |
-| SQT-18 Loaded forward lunge | – | – | 14.6 | 14.1 | 11.5 | 12.1 | 11.6 | 10.7 | – | – | 12.6 | 12.4 | 10.9 | 10.3 | 10.2 | 10.5 | – | 10.6 | 14.7 | 11.8 |
+| Move | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` | `def` | `dbl` |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| SQT-01 Bodyweight squat | 5.9 | 3.7 | – | – | – | – | – | – | 5.2 | 3.8 | – | – | – | – | – | – | 7.2 | – | – | – | 18.1 | – |
+| SQT-02 Tempo squat | 18.7 | 21.0 | – | – | – | – | – | – | 15.4 | 16.9 | – | – | – | – | – | – | 16.7 | – | – | – | – | – |
+| SQT-03 Chair sit-to-stand | 5.1 | 3.6 | – | – | – | – | – | – | 5.0 | 3.1 | – | – | – | – | – | – | 6.4 | – | – | – | 15.8 | – |
+| SQT-04 Goblet squat | – | – | 14.5 | 14.1 | 16.6 | 17.0 | 16.8 | 16.4 | – | – | 12.6 | 12.8 | 13.6 | 13.4 | 13.7 | 14.1 | – | 17.1 | 14.1 | 17.1 | – | – |
+| SQT-05 Dumbbell front squat | – | – | – | – | 16.5 | 15.5 | 14.8 | 17.3 | – | – | – | – | 14.2 | 14.2 | 13.9 | 13.3 | – | 16.8 | – | 15.3 | – | – |
+| SQT-06 Suitcase squat | – | – | 14.0 | 14.3 | 11.0 | 11.4 | 11.7 | 11.3 | – | – | 12.0 | 12.3 | 9.5 | 10.3 | 10.7 | 10.2 | – | 11.4 | 13.9 | 11.6 | – | – |
+| SQT-07 Split squat | 13.4 | 15.8 | – | – | – | – | – | – | 13.5 | 13.2 | – | – | – | – | – | – | 13.9 | – | – | – | 25.3 | – |
+| SQT-08 Loaded split squat | – | – | 14.5 | 14.2 | 11.1 | 11.6 | 11.6 | 11.2 | – | – | 12.9 | 12.7 | 10.6 | 9.9 | 10.4 | 10.3 | – | 11.6 | 14.5 | 11.8 | – | – |
+| SQT-09 Reverse lunge | 14.2 | 14.5 | – | – | – | – | – | – | 11.6 | 13.8 | – | – | – | – | – | – | 13.4 | – | – | – | 23.7 | – |
+| SQT-10 Loaded reverse lunge | – | – | 14.0 | 14.4 | 11.6 | 9.8 | 11.0 | 10.7 | – | – | 12.3 | 12.5 | 10.0 | 10.6 | 9.8 | 10.4 | – | 11.1 | 14.8 | 10.8 | – | – |
+| SQT-11 Lateral lunge | 17.8 | 20.9 | – | – | – | – | – | – | 14.5 | 15.7 | – | – | – | – | – | – | 17.3 | – | – | – | – | – |
+| SQT-12 Goblet lateral lunge | – | – | 13.5 | 14.1 | 11.5 | 11.4 | 11.1 | 11.0 | – | – | 13.1 | 12.5 | 10.7 | 10.7 | 10.2 | 10.5 | – | 10.7 | 14.8 | 10.9 | – | – |
+| SQT-13 Curtsy lunge | 18.0 | 20.5 | – | – | – | – | – | – | 15.4 | 16.1 | – | – | – | – | – | – | 18.3 | – | – | – | – | – |
+| SQT-14 Rear-foot-elevated split squat | – | – | – | – | – | – | – | – | 14.5 | 17.3 | – | – | – | – | – | – | – | – | – | – | – | – |
+| SQT-15 Loaded rear-foot-elevated split squat | – | – | – | – | – | – | – | – | – | – | 12.6 | 12.1 | 10.1 | 10.1 | 10.7 | 9.6 | – | – | – | – | – | – |
+| SQT-16 Wall sit | 6.9 | – | – | – | – | – | – | – | 4.9 | – | – | – | – | – | – | – | 7.0 | – | – | – | 17.1 | – |
+| SQT-17 Loaded curtsy lunge | – | – | 14.9 | 14.7 | 10.2 | 11.1 | 11.4 | 11.2 | – | – | 12.0 | 12.7 | 10.4 | 10.5 | 10.3 | 11.1 | – | 10.5 | 13.2 | 10.9 | – | – |
+| SQT-18 Loaded forward lunge | – | – | 14.6 | 14.1 | 11.5 | 12.1 | 11.6 | 10.7 | – | – | 12.6 | 12.4 | 10.9 | 10.3 | 10.2 | 10.5 | – | 10.6 | 14.7 | 11.8 | – | – |
 
 ### HNG working sets
 
-| Move | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| HNG-01 Glute bridge | 8.9 | 10.2 | – | – | – | – | – | – | 9.1 | 7.7 | – | – | – | – | – | – | 11.1 | – | – | – |
-| HNG-02 Single-leg glute bridge | 10.2 | 10.7 | 10.6 | 9.8 | 12.7 | 12.0 | 13.0 | 12.3 | 8.7 | 9.2 | 7.7 | 6.9 | 8.8 | 8.5 | 6.9 | 7.2 | 9.6 | 12.3 | 11.5 | 12.0 |
-| HNG-03 Loaded glute bridge | – | – | 20.4 | 20.4 | 16.7 | 16.4 | 17.2 | 16.5 | – | – | 18.2 | 17.6 | 13.7 | 13.5 | 12.8 | 12.1 | – | 17.0 | 20.5 | 16.8 |
-| HNG-04 Chair-edge hip thrust | 10.3 | 10.2 | – | – | – | – | – | – | 9.0 | 9.0 | – | – | – | – | – | – | 10.4 | – | – | – |
-| HNG-05 Loaded chair-edge hip thrust | – | – | 19.6 | 20.0 | 17.0 | 17.1 | 16.8 | 17.2 | – | – | 18.2 | 18.3 | 13.9 | 13.0 | 11.3 | 12.1 | – | 16.0 | 20.8 | 17.7 |
-| HNG-06 Single-leg chair-edge hip thrust | – | – | – | – | – | – | – | – | 12.1 | 12.2 | 7.5 | 7.4 | 8.6 | 9.7 | 8.6 | 8.2 | – | – | – | – |
-| HNG-07 Bodyweight good morning | 0.8 | 0.4 | – | – | – | – | – | – | 0.1 | 0.1 | – | – | – | – | – | – | 0.4 | – | – | – |
-| HNG-08 Romanian deadlift | – | – | 12.9 | 12.7 | 14.4 | 14.4 | 13.0 | 13.6 | – | – | 8.2 | 8.5 | 11.2 | 10.6 | 8.2 | 8.7 | – | 14.9 | 12.1 | 13.7 |
-| HNG-09 Sumo deadlift | – | – | 13.1 | 13.8 | 13.1 | 14.5 | 14.0 | 13.5 | – | – | 8.3 | 8.9 | 11.2 | 11.6 | 8.8 | 8.7 | – | 13.9 | 12.4 | 14.3 |
-| HNG-10 Kettlebell swing | – | – | – | – | – | – | – | – | – | – | 8.8 | 8.6 | – | – | 8.7 | 7.7 | – | – | – | – |
-| HNG-11 One-arm kettlebell swing | – | – | – | – | – | – | – | – | – | – | 7.2 | 8.0 | – | – | 7.7 | 8.7 | – | – | – | – |
-| HNG-12 Single-leg RDL | 28.1 | 26.7 | – | – | – | – | – | – | 26.7 | 25.8 | – | – | – | – | – | – | 26.1 | – | – | – |
-| HNG-13 Loaded single-leg RDL | – | – | – | – | – | – | – | – | – | – | – | – | 12.8 | 12.9 | 11.6 | 11.7 | – | – | – | – |
-| HNG-14 Kickstand RDL | – | – | 11.5 | 11.0 | 12.6 | 12.6 | 13.4 | 14.2 | – | – | 7.8 | 7.9 | 10.0 | 10.6 | 7.8 | 7.5 | – | 13.3 | 11.2 | 12.2 |
-| HNG-15 Prone back extension | 14.5 | 14.0 | – | – | – | – | – | – | 11.8 | 11.0 | – | – | – | – | – | – | 14.1 | – | – | – |
-| HNG-16 Frog pump | 12.7 | 13.4 | – | – | – | – | – | – | 11.0 | 12.9 | – | – | – | – | – | – | 13.2 | – | – | – |
-| HNG-17 Hamstring walkout | 14.5 | 14.4 | – | – | – | – | – | – | 11.7 | 12.2 | – | – | – | – | – | – | 15.0 | – | – | – |
-| HNG-18 Suitcase deadlift | – | – | 11.8 | 12.2 | 13.4 | 13.1 | 12.5 | 12.7 | – | – | 8.1 | 7.9 | 9.8 | 9.7 | 7.7 | 7.3 | – | 12.5 | 11.6 | 13.2 |
+| Move | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` | `def` | `dbl` |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| HNG-01 Glute bridge | 8.9 | 10.2 | – | – | – | – | – | – | 9.1 | 7.7 | – | – | – | – | – | – | 11.1 | – | – | – | 28.8 | – |
+| HNG-02 Single-leg glute bridge | 10.2 | 10.7 | 10.6 | 9.8 | 12.7 | 12.0 | 13.0 | 12.3 | 8.7 | 9.2 | 7.7 | 6.9 | 8.8 | 8.5 | 6.9 | 7.2 | 9.6 | 12.3 | 11.5 | 12.0 | – | – |
+| HNG-03 Loaded glute bridge | – | – | 20.4 | 20.4 | 16.7 | 16.4 | 17.2 | 16.5 | – | – | 18.2 | 17.6 | 13.7 | 13.5 | 12.8 | 12.1 | – | 17.0 | 20.5 | 16.8 | – | 49.8 |
+| HNG-04 Chair-edge hip thrust | 10.3 | 10.2 | – | – | – | – | – | – | 9.0 | 9.0 | – | – | – | – | – | – | 10.4 | – | – | – | – | – |
+| HNG-05 Loaded chair-edge hip thrust | – | – | 19.6 | 20.0 | 17.0 | 17.1 | 16.8 | 17.2 | – | – | 18.2 | 18.3 | 13.9 | 13.0 | 11.3 | 12.1 | – | 16.0 | 20.8 | 17.7 | – | – |
+| HNG-06 Single-leg chair-edge hip thrust | – | – | – | – | – | – | – | – | 12.1 | 12.2 | 7.5 | 7.4 | 8.6 | 9.7 | 8.6 | 8.2 | – | – | – | – | – | – |
+| HNG-07 Bodyweight good morning | 0.8 | 0.4 | – | – | – | – | – | – | 0.1 | 0.1 | – | – | – | – | – | – | 0.4 | – | – | – | 11.9 | – |
+| HNG-08 Romanian deadlift | – | – | 12.9 | 12.7 | 14.4 | 14.4 | 13.0 | 13.6 | – | – | 8.2 | 8.5 | 11.2 | 10.6 | 8.2 | 8.7 | – | 14.9 | 12.1 | 13.7 | – | – |
+| HNG-09 Sumo deadlift | – | – | 13.1 | 13.8 | 13.1 | 14.5 | 14.0 | 13.5 | – | – | 8.3 | 8.9 | 11.2 | 11.6 | 8.8 | 8.7 | – | 13.9 | 12.4 | 14.3 | – | 50.2 |
+| HNG-10 Kettlebell swing | – | – | – | – | – | – | – | – | – | – | 8.8 | 8.6 | – | – | 8.7 | 7.7 | – | – | – | – | – | – |
+| HNG-11 One-arm kettlebell swing | – | – | – | – | – | – | – | – | – | – | 7.2 | 8.0 | – | – | 7.7 | 8.7 | – | – | – | – | – | – |
+| HNG-12 Single-leg RDL | 28.1 | 26.7 | – | – | – | – | – | – | 26.7 | 25.8 | – | – | – | – | – | – | 26.1 | – | – | – | – | – |
+| HNG-13 Loaded single-leg RDL | – | – | – | – | – | – | – | – | – | – | – | – | 12.8 | 12.9 | 11.6 | 11.7 | – | – | – | – | – | – |
+| HNG-14 Kickstand RDL | – | – | 11.5 | 11.0 | 12.6 | 12.6 | 13.4 | 14.2 | – | – | 7.8 | 7.9 | 10.0 | 10.6 | 7.8 | 7.5 | – | 13.3 | 11.2 | 12.2 | – | – |
+| HNG-15 Prone back extension | 14.5 | 14.0 | – | – | – | – | – | – | 11.8 | 11.0 | – | – | – | – | – | – | 14.1 | – | – | – | 29.6 | – |
+| HNG-16 Frog pump | 12.7 | 13.4 | – | – | – | – | – | – | 11.0 | 12.9 | – | – | – | – | – | – | 13.2 | – | – | – | 29.7 | – |
+| HNG-17 Hamstring walkout | 14.5 | 14.4 | – | – | – | – | – | – | 11.7 | 12.2 | – | – | – | – | – | – | 15.0 | – | – | – | – | – |
+| HNG-18 Suitcase deadlift | – | – | 11.8 | 12.2 | 13.4 | 13.1 | 12.5 | 12.7 | – | – | 8.1 | 7.9 | 9.8 | 9.7 | 7.7 | 7.3 | – | 12.5 | 11.6 | 13.2 | – | – |
 
 ### PSH working sets
 
-| Move | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| PSH-01 Wall push-up | 15.8 | – | – | – | – | – | – | – | 8.0 | – | – | – | – | – | – | – | 17.3 | – | – | – |
-| PSH-02 Desk incline push-up | 14.3 | 19.1 | – | – | – | – | – | – | 8.3 | 7.7 | – | – | – | – | – | – | 16.3 | – | – | – |
-| PSH-03 Knee push-up | 25.5 | 26.6 | – | – | – | – | – | – | 14.2 | 16.9 | – | – | – | – | – | – | 22.5 | – | – | – |
-| PSH-04 Push-up | 18.9 | 26.1 | 100.0 | 100.0 | 14.1 | 14.1 | 15.3 | 13.1 | 12.1 | 12.5 | 23.3 | 22.9 | 9.8 | 9.3 | 8.8 | 9.3 | 21.2 | 8.2 | 100.0 | 8.7 |
-| PSH-05 Tempo push-up | – | – | – | – | – | – | – | – | 14.7 | 15.6 | 25.2 | 25.1 | 11.0 | 10.4 | 10.9 | 10.0 | – | – | – | – |
-| PSH-07 Decline push-up | – | – | – | – | – | – | – | – | 14.2 | 15.5 | 25.2 | 26.3 | 10.7 | 10.3 | 11.4 | 10.1 | – | – | – | – |
-| PSH-08 Pike push-up | – | – | – | – | – | – | – | – | 14.2 | 16.2 | 26.3 | 25.8 | 11.5 | 10.4 | 10.8 | 10.2 | – | – | – | – |
-| PSH-10 Push-up plus | 25.5 | 28.2 | – | – | – | – | – | – | 14.3 | 15.5 | – | – | – | – | – | – | 22.7 | – | – | – |
-| PSH-11 Dumbbell floor press | – | – | – | – | 16.4 | 17.0 | 15.2 | 16.7 | – | – | – | – | 11.6 | 10.6 | 10.8 | 12.0 | – | 20.0 | – | 20.0 |
-| PSH-12 Single-arm floor press | – | – | – | – | 6.9 | 6.6 | 7.5 | 7.5 | – | – | – | – | 4.1 | 4.3 | 4.7 | 4.8 | – | 7.5 | – | 7.6 |
-| PSH-13 Squeeze press | – | – | – | – | 16.0 | 16.5 | 16.6 | 15.9 | – | – | – | – | 10.7 | 11.7 | 10.7 | 11.3 | – | 19.2 | – | 19.4 |
-| PSH-14 Standing dumbbell overhead press | – | – | – | – | 15.7 | 16.4 | 15.7 | 16.2 | – | – | – | – | 11.0 | 10.9 | 11.6 | 11.7 | – | 19.3 | – | 19.2 |
-| PSH-15 Single-arm overhead press | – | – | – | – | 6.7 | 6.3 | 6.8 | 7.7 | – | – | – | – | 4.3 | 5.2 | 4.3 | 5.1 | – | 7.8 | – | 7.8 |
-| PSH-16 Half-kneeling single-arm press | – | – | – | – | 7.4 | 6.8 | 6.5 | 6.6 | – | – | – | – | 4.9 | 5.1 | 4.8 | 4.4 | – | 8.2 | – | 6.9 |
-| PSH-17 Lateral raise | – | – | – | – | 16.8 | 16.4 | 16.3 | 16.3 | – | – | – | – | 10.5 | 11.7 | 11.2 | 11.1 | – | 9.6 | – | 10.3 |
+| Move | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` | `def` | `dbl` |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| PSH-01 Wall push-up | 15.8 | – | – | – | – | – | – | – | 8.0 | – | – | – | – | – | – | – | 17.3 | – | – | – | 19.7 | – |
+| PSH-02 Desk incline push-up | 14.3 | 19.1 | – | – | – | – | – | – | 8.3 | 7.7 | – | – | – | – | – | – | 16.3 | – | – | – | 20.5 | – |
+| PSH-03 Knee push-up | 25.5 | 26.6 | – | – | – | – | – | – | 14.2 | 16.9 | – | – | – | – | – | – | 22.5 | – | – | – | 30.3 | – |
+| PSH-04 Push-up | 18.9 | 26.1 | 100.0 | 100.0 | 14.1 | 14.1 | 15.3 | 13.1 | 12.1 | 12.5 | 23.3 | 22.9 | 9.8 | 9.3 | 8.8 | 9.3 | 21.2 | 8.2 | 100.0 | 8.7 | – | – |
+| PSH-05 Tempo push-up | – | – | – | – | – | – | – | – | 14.7 | 15.6 | 25.2 | 25.1 | 11.0 | 10.4 | 10.9 | 10.0 | – | – | – | – | – | – |
+| PSH-07 Decline push-up | – | – | – | – | – | – | – | – | 14.2 | 15.5 | 25.2 | 26.3 | 10.7 | 10.3 | 11.4 | 10.1 | – | – | – | – | – | – |
+| PSH-08 Pike push-up | – | – | – | – | – | – | – | – | 14.2 | 16.2 | 26.3 | 25.8 | 11.5 | 10.4 | 10.8 | 10.2 | – | – | – | – | – | – |
+| PSH-10 Push-up plus | 25.5 | 28.2 | – | – | – | – | – | – | 14.3 | 15.5 | – | – | – | – | – | – | 22.7 | – | – | – | 29.5 | – |
+| PSH-11 Dumbbell floor press | – | – | – | – | 16.4 | 17.0 | 15.2 | 16.7 | – | – | – | – | 11.6 | 10.6 | 10.8 | 12.0 | – | 20.0 | – | 20.0 | – | 33.0 |
+| PSH-12 Single-arm floor press | – | – | – | – | 6.9 | 6.6 | 7.5 | 7.5 | – | – | – | – | 4.1 | 4.3 | 4.7 | 4.8 | – | 7.5 | – | 7.6 | – | – |
+| PSH-13 Squeeze press | – | – | – | – | 16.0 | 16.5 | 16.6 | 15.9 | – | – | – | – | 10.7 | 11.7 | 10.7 | 11.3 | – | 19.2 | – | 19.4 | – | 33.3 |
+| PSH-14 Standing dumbbell overhead press | – | – | – | – | 15.7 | 16.4 | 15.7 | 16.2 | – | – | – | – | 11.0 | 10.9 | 11.6 | 11.7 | – | 19.3 | – | 19.2 | – | – |
+| PSH-15 Single-arm overhead press | – | – | – | – | 6.7 | 6.3 | 6.8 | 7.7 | – | – | – | – | 4.3 | 5.2 | 4.3 | 5.1 | – | 7.8 | – | 7.8 | – | – |
+| PSH-16 Half-kneeling single-arm press | – | – | – | – | 7.4 | 6.8 | 6.5 | 6.6 | – | – | – | – | 4.9 | 5.1 | 4.8 | 4.4 | – | 8.2 | – | 6.9 | – | – |
+| PSH-17 Lateral raise | – | – | – | – | 16.8 | 16.4 | 16.3 | 16.3 | – | – | – | – | 10.5 | 11.7 | 11.2 | 11.1 | – | 9.6 | – | 10.3 | – | 33.7 |
 
 ### PUL working sets
 
-| Move | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| PUL-01 Prone Y-T-W | 8.3 | 7.3 | – | – | – | – | – | – | 7.8 | 8.3 | – | – | – | – | – | – | 7.1 | – | – | – |
-| PUL-02 Reverse snow angel | 8.7 | 7.9 | – | – | – | – | – | – | 6.4 | 8.1 | – | – | – | – | – | – | 7.3 | – | – | – |
-| PUL-03 Prone lat pull-down | 9.0 | 9.9 | – | – | – | – | – | – | 9.9 | 9.2 | – | – | – | – | – | – | 8.6 | – | – | – |
-| PUL-04 Prone cobra hold | 9.2 | 9.9 | – | – | – | – | – | – | 9.1 | 9.6 | – | – | – | – | – | – | 8.3 | – | – | – |
-| PUL-05 Supine elbow press | 8.6 | 9.0 | – | – | – | – | – | – | 10.4 | 9.0 | – | – | – | – | – | – | 8.8 | – | – | – |
-| PUL-06 Reverse tabletop | 9.8 | 10.1 | – | – | – | – | – | – | 10.1 | 8.9 | – | – | – | – | – | – | 8.6 | – | – | – |
-| PUL-07 Prone T-raise | 9.0 | 9.0 | – | – | – | – | – | – | 8.6 | 9.6 | – | – | – | – | – | – | 9.0 | – | – | – |
-| PUL-08 Bodyweight bent-over T and Y raise | 37.5 | 36.9 | – | – | – | – | – | – | 37.7 | 37.3 | – | – | – | – | – | – | 42.2 | – | – | – |
-| PUL-09 Bent-over dumbbell row | – | – | – | – | 10.1 | 10.3 | 8.9 | 9.0 | – | – | – | – | 11.0 | 11.2 | 9.1 | 8.5 | – | 10.5 | – | 8.6 |
-| PUL-10 Single-arm supported row | – | – | 30.8 | 31.3 | 8.3 | 7.8 | 6.9 | 6.5 | – | – | 29.9 | 30.5 | 7.0 | 7.2 | 5.5 | 5.3 | – | 7.7 | 30.7 | 7.3 |
-| PUL-11 Gorilla row | – | – | – | – | 9.5 | 8.9 | 8.2 | 8.2 | – | – | – | – | 10.1 | 11.1 | 8.3 | 9.0 | – | 9.2 | – | 7.8 |
-| PUL-12 Bent-over reverse fly | – | – | – | – | 20.3 | 19.0 | 17.3 | 17.8 | – | – | – | – | 18.6 | 17.7 | 17.8 | 16.1 | – | 19.4 | – | 18.4 |
-| PUL-13 Bent-over Y raise | – | – | – | – | 19.3 | 19.4 | 17.6 | 17.6 | – | – | – | – | 18.1 | 17.7 | 16.5 | 17.7 | – | 19.4 | – | 18.2 |
-| PUL-14 Dumbbell pullover | – | – | – | – | 15.2 | 16.6 | 15.5 | 15.6 | – | – | – | – | 14.0 | 14.2 | 14.8 | 15.7 | – | 15.8 | – | 16.1 |
-| PUL-15 Side-lying external rotation | – | – | – | – | 10.1 | 10.1 | 10.0 | 10.5 | – | – | – | – | 9.0 | 8.3 | 9.6 | 9.3 | – | 9.6 | – | 9.7 |
-| PUL-16 Renegade row | – | – | – | – | – | – | – | – | – | – | – | – | 5.6 | 5.8 | 4.5 | 4.7 | – | – | – | – |
-| PUL-17 Two-hand kettlebell row | – | – | 38.9 | 38.0 | – | – | 8.0 | 8.1 | – | – | 39.7 | 40.0 | – | – | 8.4 | 8.1 | – | – | 39.3 | 7.9 |
-| PUL-18 Kickstand single-arm row | – | – | 30.4 | 30.8 | 7.1 | 7.9 | 7.5 | 6.7 | – | – | 30.5 | 29.5 | 6.7 | 6.8 | 5.4 | 5.5 | – | 8.4 | 30.0 | 5.8 |
+| Move | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` | `def` | `dbl` |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| PUL-01 Prone Y-T-W | 8.3 | 7.3 | – | – | – | – | – | – | 7.8 | 8.3 | – | – | – | – | – | – | 7.1 | – | – | – | – | – |
+| PUL-02 Reverse snow angel | 8.7 | 7.9 | – | – | – | – | – | – | 6.4 | 8.1 | – | – | – | – | – | – | 7.3 | – | – | – | – | – |
+| PUL-03 Prone lat pull-down | 9.0 | 9.9 | – | – | – | – | – | – | 9.9 | 9.2 | – | – | – | – | – | – | 8.6 | – | – | – | 15.7 | – |
+| PUL-04 Prone cobra hold | 9.2 | 9.9 | – | – | – | – | – | – | 9.1 | 9.6 | – | – | – | – | – | – | 8.3 | – | – | – | 13.9 | – |
+| PUL-05 Supine elbow press | 8.6 | 9.0 | – | – | – | – | – | – | 10.4 | 9.0 | – | – | – | – | – | – | 8.8 | – | – | – | 15.3 | – |
+| PUL-06 Reverse tabletop | 9.8 | 10.1 | – | – | – | – | – | – | 10.1 | 8.9 | – | – | – | – | – | – | 8.6 | – | – | – | – | – |
+| PUL-07 Prone T-raise | 9.0 | 9.0 | – | – | – | – | – | – | 8.6 | 9.6 | – | – | – | – | – | – | 9.0 | – | – | – | 13.4 | – |
+| PUL-08 Bodyweight bent-over T and Y raise | 37.5 | 36.9 | – | – | – | – | – | – | 37.7 | 37.3 | – | – | – | – | – | – | 42.2 | – | – | – | 41.7 | – |
+| PUL-09 Bent-over dumbbell row | – | – | – | – | 10.1 | 10.3 | 8.9 | 9.0 | – | – | – | – | 11.0 | 11.2 | 9.1 | 8.5 | – | 10.5 | – | 8.6 | – | – |
+| PUL-10 Single-arm supported row | – | – | 30.8 | 31.3 | 8.3 | 7.8 | 6.9 | 6.5 | – | – | 29.9 | 30.5 | 7.0 | 7.2 | 5.5 | 5.3 | – | 7.7 | 30.7 | 7.3 | – | 32.2 |
+| PUL-11 Gorilla row | – | – | – | – | 9.5 | 8.9 | 8.2 | 8.2 | – | – | – | – | 10.1 | 11.1 | 8.3 | 9.0 | – | 9.2 | – | 7.8 | – | – |
+| PUL-12 Bent-over reverse fly | – | – | – | – | 20.3 | 19.0 | 17.3 | 17.8 | – | – | – | – | 18.6 | 17.7 | 17.8 | 16.1 | – | 19.4 | – | 18.4 | – | 35.5 |
+| PUL-13 Bent-over Y raise | – | – | – | – | 19.3 | 19.4 | 17.6 | 17.6 | – | – | – | – | 18.1 | 17.7 | 16.5 | 17.7 | – | 19.4 | – | 18.2 | – | – |
+| PUL-14 Dumbbell pullover | – | – | – | – | 15.2 | 16.6 | 15.5 | 15.6 | – | – | – | – | 14.0 | 14.2 | 14.8 | 15.7 | – | 15.8 | – | 16.1 | – | – |
+| PUL-15 Side-lying external rotation | – | – | – | – | 10.1 | 10.1 | 10.0 | 10.5 | – | – | – | – | 9.0 | 8.3 | 9.6 | 9.3 | – | 9.6 | – | 9.7 | – | 32.3 |
+| PUL-16 Renegade row | – | – | – | – | – | – | – | – | – | – | – | – | 5.6 | 5.8 | 4.5 | 4.7 | – | – | – | – | – | – |
+| PUL-17 Two-hand kettlebell row | – | – | 38.9 | 38.0 | – | – | 8.0 | 8.1 | – | – | 39.7 | 40.0 | – | – | 8.4 | 8.1 | – | – | 39.3 | 7.9 | – | – |
+| PUL-18 Kickstand single-arm row | – | – | 30.4 | 30.8 | 7.1 | 7.9 | 7.5 | 6.7 | – | – | 30.5 | 29.5 | 6.7 | 6.8 | 5.4 | 5.5 | – | 8.4 | 30.0 | 5.8 | – | – |
 
 ### BIC working sets
 
-| Move | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| BIC-01 Dumbbell curl | – | – | – | – | 25.3 | 22.4 | 24.6 | 26.1 | – | – | – | – | 24.0 | 21.5 | 24.2 | 24.9 | – | 26.2 | – | 25.4 |
-| BIC-02 Hammer curl | – | – | – | – | 26.3 | 26.0 | 25.8 | 26.9 | – | – | – | – | 24.4 | 26.7 | 24.6 | 23.7 | – | 23.8 | – | 24.5 |
-| BIC-03 Under-desk isometric curl | 50.0 | 50.0 | – | – | – | – | – | – | 50.0 | 50.0 | – | – | – | – | – | – | 50.0 | – | – | – |
-| BIC-04 Seated concentration curl | – | – | – | – | 25.1 | 27.2 | 24.6 | 24.1 | – | – | – | – | 27.0 | 25.1 | 24.2 | 26.3 | – | 25.2 | – | 24.6 |
-| BIC-05 Reverse curl | – | – | – | – | 23.3 | 24.4 | 25.0 | 22.9 | – | – | – | – | 24.6 | 26.7 | 27.0 | 25.1 | – | 24.8 | – | 25.5 |
-| BIC-06 Self-resisted curl | 50.0 | 50.0 | – | – | – | – | – | – | 50.0 | 50.0 | – | – | – | – | – | – | 50.0 | – | – | – |
+| Move | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` | `def` | `dbl` |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| BIC-01 Dumbbell curl | – | – | – | – | 25.3 | 22.4 | 24.6 | 26.1 | – | – | – | – | 24.0 | 21.5 | 24.2 | 24.9 | – | 26.2 | – | 25.4 | – | 32.8 |
+| BIC-02 Hammer curl | – | – | – | – | 26.3 | 26.0 | 25.8 | 26.9 | – | – | – | – | 24.4 | 26.7 | 24.6 | 23.7 | – | 23.8 | – | 24.5 | – | 33.0 |
+| BIC-03 Under-desk isometric curl | 50.0 | 50.0 | – | – | – | – | – | – | 50.0 | 50.0 | – | – | – | – | – | – | 50.0 | – | – | – | 50.0 | – |
+| BIC-04 Seated concentration curl | – | – | – | – | 25.1 | 27.2 | 24.6 | 24.1 | – | – | – | – | 27.0 | 25.1 | 24.2 | 26.3 | – | 25.2 | – | 24.6 | – | 34.2 |
+| BIC-05 Reverse curl | – | – | – | – | 23.3 | 24.4 | 25.0 | 22.9 | – | – | – | – | 24.6 | 26.7 | 27.0 | 25.1 | – | 24.8 | – | 25.5 | – | – |
+| BIC-06 Self-resisted curl | 50.0 | 50.0 | – | – | – | – | – | – | 50.0 | 50.0 | – | – | – | – | – | – | 50.0 | – | – | – | 50.0 | – |
 
 ### TRI working sets
 
-| Move | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| TRI-01 Overhead triceps extension | – | – | – | – | 23.9 | 24.5 | 24.2 | 25.2 | – | – | – | – | 26.9 | 27.3 | 28.2 | 27.4 | – | 24.8 | – | 27.2 |
-| TRI-02 Close-grip desk push-up | 35.7 | 35.5 | – | – | – | – | – | – | 33.3 | 31.8 | – | – | – | – | – | – | 32.5 | – | – | – |
-| TRI-03 Chair dip | 31.7 | 30.4 | – | – | 25.9 | 24.5 | 26.2 | 23.8 | 31.7 | 34.0 | – | – | 24.3 | 24.5 | 25.3 | 25.9 | 33.3 | 24.5 | – | 24.2 |
-| TRI-04 Dumbbell kickback | – | – | – | – | 23.7 | 26.5 | 23.4 | 26.2 | – | – | – | – | 23.3 | 23.9 | 23.1 | 25.3 | – | 26.4 | – | 25.1 |
-| TRI-05 Desk press-down isometric | 32.7 | 34.1 | – | – | – | – | – | – | 35.0 | 34.2 | – | – | – | – | – | – | 34.2 | – | – | – |
-| TRI-06 Dumbbell skull crusher | – | – | – | – | 26.5 | 24.5 | 26.2 | 24.8 | – | – | – | – | 25.5 | 24.3 | 23.5 | 21.4 | – | 24.4 | – | 23.5 |
+| Move | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` | `def` | `dbl` |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| TRI-01 Overhead triceps extension | – | – | – | – | 23.9 | 24.5 | 24.2 | 25.2 | – | – | – | – | 26.9 | 27.3 | 28.2 | 27.4 | – | 24.8 | – | 27.2 | – | 50.0 |
+| TRI-02 Close-grip desk push-up | 35.7 | 35.5 | – | – | – | – | – | – | 33.3 | 31.8 | – | – | – | – | – | – | 32.5 | – | – | – | – | – |
+| TRI-03 Chair dip | 31.7 | 30.4 | – | – | 25.9 | 24.5 | 26.2 | 23.8 | 31.7 | 34.0 | – | – | 24.3 | 24.5 | 25.3 | 25.9 | 33.3 | 24.5 | – | 24.2 | – | – |
+| TRI-04 Dumbbell kickback | – | – | – | – | 23.7 | 26.5 | 23.4 | 26.2 | – | – | – | – | 23.3 | 23.9 | 23.1 | 25.3 | – | 26.4 | – | 25.1 | – | 50.0 |
+| TRI-05 Desk press-down isometric | 32.7 | 34.1 | – | – | – | – | – | – | 35.0 | 34.2 | – | – | – | – | – | – | 34.2 | – | – | – | 100.0 | – |
+| TRI-06 Dumbbell skull crusher | – | – | – | – | 26.5 | 24.5 | 26.2 | 24.8 | – | – | – | – | 25.5 | 24.3 | 23.5 | 21.4 | – | 24.4 | – | 23.5 | – | – |
 
 ### COR working sets
 
-| Move | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| COR-01 Dead bug | 2.9 | 2.4 | 4.6 | 5.0 | 4.5 | 3.7 | 4.1 | 4.1 | 1.6 | 1.5 | 4.0 | 4.8 | 2.9 | 2.6 | 2.8 | 3.3 | 3.1 | 4.6 | 4.9 | 3.6 |
-| COR-02 Weighted dead bug | – | – | – | – | 3.7 | 3.9 | 3.9 | 4.2 | – | – | – | – | 2.2 | 2.8 | 2.8 | 3.4 | – | 4.1 | – | 4.8 |
-| COR-03 Front plank | 3.1 | 3.0 | 4.9 | 5.8 | 4.1 | 3.5 | 3.7 | 4.1 | 2.1 | 1.3 | 4.3 | 5.0 | 3.0 | 2.3 | 2.6 | 2.9 | 2.5 | 3.8 | 6.0 | 4.6 |
-| COR-04 Side plank | 0.7 | 0.5 | 0.3 | 0.4 | 0.6 | 1.1 | 1.1 | 1.0 | 0.2 | 0.1 | 0.3 | 0.5 | 0.5 | 0.5 | 0.3 | 0.3 | 1.0 | 1.0 | 0.5 | 0.7 |
-| COR-05 Bird dog | 3.2 | 2.3 | 4.9 | 5.2 | 4.1 | 3.5 | 4.3 | 3.1 | 1.7 | 1.8 | 4.5 | 5.4 | 2.6 | 3.0 | 3.0 | 2.7 | 3.0 | 4.1 | 4.2 | 3.5 |
-| COR-06 Plank shoulder taps | 3.0 | 3.3 | 5.0 | 6.0 | 3.7 | 4.2 | 4.3 | 4.2 | 1.9 | 1.0 | 5.1 | 4.4 | 2.5 | 2.8 | 2.5 | 2.5 | 3.0 | 3.7 | 5.8 | 3.5 |
-| COR-07 Bear hold | 3.4 | 2.0 | 6.0 | 5.6 | 4.9 | 3.5 | 4.0 | 3.8 | 1.7 | 1.5 | 5.2 | 5.8 | 2.5 | 2.7 | 2.7 | 2.8 | 3.4 | 3.9 | 5.2 | 3.2 |
-| COR-08 Hollow body hold | – | – | – | – | – | – | – | – | 1.6 | 1.4 | 5.4 | 4.9 | 2.3 | 2.5 | 2.8 | 2.4 | – | – | – | – |
-| COR-09 Reverse crunch | 2.7 | 1.7 | 7.0 | 5.0 | 4.0 | 4.6 | 3.8 | 4.0 | 2.0 | 1.8 | 4.1 | 4.2 | 2.2 | 2.2 | 3.0 | 3.0 | 2.6 | 3.6 | 4.9 | 4.0 |
-| COR-10 Seated knee tuck | 52.0 | 55.0 | 56.7 | 57.5 | 29.4 | 29.8 | 29.4 | 30.0 | 57.0 | 61.4 | 59.3 | 56.8 | 31.2 | 30.7 | 30.9 | 30.1 | 50.5 | 30.0 | 59.7 | 31.8 |
-| COR-11 Halo | – | – | – | – | 30.3 | 30.9 | 30.7 | 30.6 | – | – | – | – | 32.4 | 32.2 | 30.8 | 30.4 | – | 30.4 | – | 28.6 |
-| COR-12 Suitcase march | – | – | 3.7 | 2.9 | 2.8 | 2.6 | 2.1 | 2.8 | – | – | 2.6 | 2.7 | 2.4 | 2.3 | 1.6 | 1.7 | – | 2.6 | 3.0 | 2.6 |
-| COR-13 Half-kneeling chop | – | – | – | – | 0.8 | 0.9 | 0.6 | 0.5 | – | – | – | – | 0.3 | 0.6 | 0.3 | 0.5 | – | 0.8 | – | 0.9 |
-| COR-14 Windmill | – | – | – | – | – | – | – | – | – | – | – | – | 4.5 | 4.6 | 4.7 | 5.5 | – | – | – | – |
-| COR-15 Bodyweight windmill | 27.8 | 29.3 | 6.2 | 5.8 | 6.3 | 6.8 | 6.9 | 6.7 | 29.6 | 27.9 | 4.4 | 5.1 | 5.0 | 4.9 | 5.1 | 4.4 | 29.9 | 6.5 | 5.3 | 7.4 |
-| COR-16 Half Turkish get-up | – | – | – | – | – | – | – | – | – | – | – | – | 0.5 | 0.2 | 0.4 | 0.2 | – | – | – | – |
-| COR-17 Plank pull-through | – | – | – | – | – | – | – | – | – | – | – | – | 2.4 | 2.5 | 2.8 | 3.2 | – | – | – | – |
-| COR-18 Short side plank | 1.1 | 0.3 | 0.6 | 0.6 | 0.7 | 0.7 | 0.9 | 0.8 | 0.4 | 0.1 | 0.6 | 0.3 | 0.2 | 0.3 | 0.5 | 0.5 | 0.8 | 0.6 | 0.2 | 0.6 |
+| Move | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` | `def` | `dbl` |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| COR-01 Dead bug | 2.9 | 2.4 | 4.6 | 5.0 | 4.5 | 3.7 | 4.1 | 4.1 | 1.6 | 1.5 | 4.0 | 4.8 | 2.9 | 2.6 | 2.8 | 3.3 | 3.1 | 4.6 | 4.9 | 3.6 | 6.1 | 4.4 |
+| COR-02 Weighted dead bug | – | – | – | – | 3.7 | 3.9 | 3.9 | 4.2 | – | – | – | – | 2.2 | 2.8 | 2.8 | 3.4 | – | 4.1 | – | 4.8 | – | – |
+| COR-03 Front plank | 3.1 | 3.0 | 4.9 | 5.8 | 4.1 | 3.5 | 3.7 | 4.1 | 2.1 | 1.3 | 4.3 | 5.0 | 3.0 | 2.3 | 2.6 | 2.9 | 2.5 | 3.8 | 6.0 | 4.6 | 7.0 | 5.3 |
+| COR-04 Side plank | 0.7 | 0.5 | 0.3 | 0.4 | 0.6 | 1.1 | 1.1 | 1.0 | 0.2 | 0.1 | 0.3 | 0.5 | 0.5 | 0.5 | 0.3 | 0.3 | 1.0 | 1.0 | 0.5 | 0.7 | – | – |
+| COR-05 Bird dog | 3.2 | 2.3 | 4.9 | 5.2 | 4.1 | 3.5 | 4.3 | 3.1 | 1.7 | 1.8 | 4.5 | 5.4 | 2.6 | 3.0 | 3.0 | 2.7 | 3.0 | 4.1 | 4.2 | 3.5 | 6.4 | 5.0 |
+| COR-06 Plank shoulder taps | 3.0 | 3.3 | 5.0 | 6.0 | 3.7 | 4.2 | 4.3 | 4.2 | 1.9 | 1.0 | 5.1 | 4.4 | 2.5 | 2.8 | 2.5 | 2.5 | 3.0 | 3.7 | 5.8 | 3.5 | – | – |
+| COR-07 Bear hold | 3.4 | 2.0 | 6.0 | 5.6 | 4.9 | 3.5 | 4.0 | 3.8 | 1.7 | 1.5 | 5.2 | 5.8 | 2.5 | 2.7 | 2.7 | 2.8 | 3.4 | 3.9 | 5.2 | 3.2 | – | – |
+| COR-08 Hollow body hold | – | – | – | – | – | – | – | – | 1.6 | 1.4 | 5.4 | 4.9 | 2.3 | 2.5 | 2.8 | 2.4 | – | – | – | – | – | – |
+| COR-09 Reverse crunch | 2.7 | 1.7 | 7.0 | 5.0 | 4.0 | 4.6 | 3.8 | 4.0 | 2.0 | 1.8 | 4.1 | 4.2 | 2.2 | 2.2 | 3.0 | 3.0 | 2.6 | 3.6 | 4.9 | 4.0 | 6.4 | 5.2 |
+| COR-10 Seated knee tuck | 52.0 | 55.0 | 56.7 | 57.5 | 29.4 | 29.8 | 29.4 | 30.0 | 57.0 | 61.4 | 59.3 | 56.8 | 31.2 | 30.7 | 30.9 | 30.1 | 50.5 | 30.0 | 59.7 | 31.8 | 70.4 | 39.2 |
+| COR-11 Halo | – | – | – | – | 30.3 | 30.9 | 30.7 | 30.6 | – | – | – | – | 32.4 | 32.2 | 30.8 | 30.4 | – | 30.4 | – | 28.6 | – | 37.5 |
+| COR-12 Suitcase march | – | – | 3.7 | 2.9 | 2.8 | 2.6 | 2.1 | 2.8 | – | – | 2.6 | 2.7 | 2.4 | 2.3 | 1.6 | 1.7 | – | 2.6 | 3.0 | 2.6 | – | – |
+| COR-13 Half-kneeling chop | – | – | – | – | 0.8 | 0.9 | 0.6 | 0.5 | – | – | – | – | 0.3 | 0.6 | 0.3 | 0.5 | – | 0.8 | – | 0.9 | – | – |
+| COR-14 Windmill | – | – | – | – | – | – | – | – | – | – | – | – | 4.5 | 4.6 | 4.7 | 5.5 | – | – | – | – | – | – |
+| COR-15 Bodyweight windmill | 27.8 | 29.3 | 6.2 | 5.8 | 6.3 | 6.8 | 6.9 | 6.7 | 29.6 | 27.9 | 4.4 | 5.1 | 5.0 | 4.9 | 5.1 | 4.4 | 29.9 | 6.5 | 5.3 | 7.4 | – | – |
+| COR-16 Half Turkish get-up | – | – | – | – | – | – | – | – | – | – | – | – | 0.5 | 0.2 | 0.4 | 0.2 | – | – | – | – | – | – |
+| COR-17 Plank pull-through | – | – | – | – | – | – | – | – | – | – | – | – | 2.4 | 2.5 | 2.8 | 3.2 | – | – | – | – | – | – |
+| COR-18 Short side plank | 1.1 | 0.3 | 0.6 | 0.6 | 0.7 | 0.7 | 0.9 | 0.8 | 0.4 | 0.1 | 0.6 | 0.3 | 0.2 | 0.3 | 0.5 | 0.5 | 0.8 | 0.6 | 0.2 | 0.6 | 3.5 | 3.4 |
 
 ### SQT warm-ups
 
-| Move | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| SQT-01 Bodyweight squat | 32.3 | 44.2 | 31.9 | 42.9 | 33.8 | 44.8 | 32.8 | 46.3 | 31.3 | 41.8 | 33.3 | 42.6 | 32.5 | 44.8 | 31.9 | 45.8 | 30.6 | 32.3 | 32.2 | 33.4 |
-| SQT-03 Chair sit-to-stand | 31.9 | 43.5 | 31.8 | 43.4 | 33.0 | 47.2 | 32.9 | 46.3 | 33.5 | 44.0 | 31.5 | 42.9 | 32.9 | 47.5 | 33.1 | 45.5 | 33.1 | 33.3 | 32.3 | 34.3 |
-| SQT-16 Wall sit | 32.1 | – | 33.3 | – | 31.7 | – | 33.5 | – | 31.7 | – | 32.3 | – | 33.5 | – | 33.2 | – | 33.3 | 33.6 | 32.6 | 31.7 |
+| Move | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` | `def` | `dbl` |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| SQT-01 Bodyweight squat | 32.3 | 44.2 | 31.9 | 42.9 | 33.8 | 44.8 | 32.8 | 46.3 | 31.3 | 41.8 | 33.3 | 42.6 | 32.5 | 44.8 | 31.9 | 45.8 | 30.6 | 32.3 | 32.2 | 33.4 | 32.1 | 32.2 |
+| SQT-03 Chair sit-to-stand | 31.9 | 43.5 | 31.8 | 43.4 | 33.0 | 47.2 | 32.9 | 46.3 | 33.5 | 44.0 | 31.5 | 42.9 | 32.9 | 47.5 | 33.1 | 45.5 | 33.1 | 33.3 | 32.3 | 34.3 | 34.0 | 32.0 |
+| SQT-16 Wall sit | 32.1 | – | 33.3 | – | 31.7 | – | 33.5 | – | 31.7 | – | 32.3 | – | 33.5 | – | 33.2 | – | 33.3 | 33.6 | 32.6 | 31.7 | 32.2 | 34.2 |
 
 ### HNG warm-ups
 
-| Move | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| HNG-07 Bodyweight good morning | 56.6 | 55.8 | 50.5 | 51.4 | 55.7 | 54.8 | 54.9 | 55.1 | 55.9 | 56.1 | 52.2 | 51.7 | 56.2 | 55.0 | 56.3 | 56.8 | 60.4 | 59.5 | 51.7 | 60.8 |
+| Move | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` | `def` | `dbl` |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| HNG-07 Bodyweight good morning | 56.6 | 55.8 | 50.5 | 51.4 | 55.7 | 54.8 | 54.9 | 55.1 | 55.9 | 56.1 | 52.2 | 51.7 | 56.2 | 55.0 | 56.3 | 56.8 | 60.4 | 59.5 | 51.7 | 60.8 | 64.6 | 56.0 |
 
 ### PSH warm-ups
 
-| Move | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| PSH-01 Wall push-up | 53.8 | – | 74.3 | – | 50.2 | – | 50.9 | – | 41.4 | – | 59.5 | – | 48.7 | – | 48.7 | – | 40.3 | 45.7 | 74.5 | 47.7 |
-| PSH-02 Desk incline push-up | 30.7 | 58.1 | – | – | 35.0 | 47.0 | 32.0 | 51.7 | 27.7 | 43.0 | 25.8 | 43.3 | 39.2 | 51.7 | 38.5 | 53.3 | 23.7 | 39.1 | – | 38.4 |
+| Move | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` | `def` | `dbl` |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| PSH-01 Wall push-up | 53.8 | – | 74.3 | – | 50.2 | – | 50.9 | – | 41.4 | – | 59.5 | – | 48.7 | – | 48.7 | – | 40.3 | 45.7 | 74.5 | 47.7 | 46.0 | 48.4 |
+| PSH-02 Desk incline push-up | 30.7 | 58.1 | – | – | 35.0 | 47.0 | 32.0 | 51.7 | 27.7 | 43.0 | 25.8 | 43.3 | 39.2 | 51.7 | 38.5 | 53.3 | 23.7 | 39.1 | – | 38.4 | 47.8 | 45.5 |
 
 ### PUL warm-ups
 
-| Move | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| PUL-08 Bodyweight bent-over T and Y raise | 4.7 | 5.2 | 74.9 | 74.6 | 64.3 | 63.8 | 64.3 | 64.9 | 3.9 | 5.3 | 75.2 | 73.8 | 65.4 | 64.9 | 64.4 | 63.7 | 4.4 | 56.5 | 74.9 | 51.7 |
+| Move | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` | `def` | `dbl` |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| PUL-08 Bodyweight bent-over T and Y raise | 4.7 | 5.2 | 74.9 | 74.6 | 64.3 | 63.8 | 64.3 | 64.9 | 3.9 | 5.3 | 75.2 | 73.8 | 65.4 | 64.9 | 64.4 | 63.7 | 4.4 | 56.5 | 74.9 | 51.7 | 10.5 | 65.1 |
 
 ### END cool-downs
 
-| Move | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| END-01 Standing knee-lift hold | 2.4 | 2.7 | 3.4 | 4.1 | 3.6 | 3.9 | 3.3 | 3.7 | 2.0 | 2.1 | 2.2 | 3.0 | 2.8 | 3.1 | 3.2 | 3.1 | 2.1 | 3.1 | 3.3 | 2.9 |
-| END-02 Seated knee lift-off | 1.0 | 1.5 | 1.0 | 1.0 | 0.8 | 0.9 | 0.7 | 1.0 | 1.4 | 1.2 | 1.1 | 1.3 | 0.6 | 0.8 | 0.6 | 1.0 | 1.2 | 0.7 | 1.2 | 0.9 |
-| END-03 Seated straight-leg lift-off | – | – | – | – | – | – | – | – | 2.9 | 3.9 | 3.6 | 4.2 | 3.7 | 4.2 | 4.4 | 4.9 | – | – | – | – |
-| END-04 90/90 back-leg lift-off | 1.8 | 1.9 | 1.3 | 1.5 | 1.3 | 1.1 | 1.0 | 0.8 | 1.7 | 1.6 | 1.1 | 1.0 | 1.1 | 0.9 | 0.8 | 0.9 | 1.4 | 0.9 | 1.3 | 1.0 |
-| END-05 Half-kneeling hip flexor contract-relax | 4.2 | 4.3 | 2.7 | 3.2 | 3.3 | 3.8 | 3.1 | 3.7 | 3.3 | 3.2 | 2.5 | 2.2 | 2.2 | 2.5 | 1.8 | 2.3 | 3.7 | 2.7 | 2.7 | 2.8 |
-| END-06 Cossack squat with end-range pause | 1.7 | 2.3 | 2.2 | 2.1 | 1.8 | 1.9 | 1.9 | 1.9 | 1.7 | 2.0 | 1.4 | 1.6 | 1.3 | 1.3 | 1.3 | 1.4 | 1.5 | 1.8 | 1.5 | 1.7 |
-| END-07 Deep squat hold with reach | 2.6 | 2.9 | 3.3 | 3.7 | 2.3 | 2.3 | 2.5 | 2.3 | 2.9 | 3.1 | 3.5 | 3.3 | 2.0 | 2.6 | 2.1 | 2.6 | 2.3 | 2.4 | 3.6 | 2.3 |
-| END-08 Standing hip CARs | 1.0 | 1.0 | 1.3 | 1.2 | 0.8 | 1.0 | 0.9 | 1.0 | 1.2 | 1.6 | 0.8 | 0.9 | 0.9 | 0.7 | 0.6 | 0.9 | 1.2 | 0.7 | 0.9 | 0.9 |
-| END-09 Side-lying hip internal rotation lift-off | 1.2 | 2.0 | 1.1 | 1.3 | 1.2 | 1.1 | 0.8 | 1.2 | 1.8 | 2.0 | 1.2 | 1.2 | 0.8 | 1.0 | 0.9 | 1.1 | 1.0 | 1.0 | 1.3 | 1.1 |
-| END-10 Adductor rock-back | 2.9 | 3.1 | 2.4 | 2.4 | 2.2 | 2.3 | 2.1 | 2.4 | 2.1 | 2.4 | 1.8 | 2.2 | 1.7 | 1.7 | 1.7 | 1.5 | 2.6 | 2.1 | 2.5 | 1.7 |
-| END-11 Prone straight-leg hip extension | 5.0 | 6.5 | 5.7 | 6.2 | 6.4 | 7.3 | 6.3 | 7.1 | 4.5 | 4.7 | 5.1 | 5.8 | 5.6 | 5.6 | 5.0 | 5.3 | 5.0 | 5.8 | 5.8 | 5.4 |
-| END-12 Standing hip airplane | – | – | – | – | – | – | – | – | 3.3 | 4.0 | 4.1 | 4.4 | 4.4 | 4.8 | 4.6 | 4.6 | – | – | – | – |
-| END-13 Shin box get-up | – | – | – | – | – | – | – | – | 4.4 | 5.0 | 5.2 | 5.6 | 5.4 | 5.4 | 5.2 | 5.7 | – | – | – | – |
-| END-14 Standing straight-leg front raise | 1.8 | 2.3 | 3.2 | 3.4 | 2.4 | 3.4 | 2.6 | 3.1 | 1.9 | 2.5 | 2.9 | 3.0 | 2.5 | 3.1 | 2.5 | 3.0 | 1.9 | 2.6 | 3.3 | 2.3 |
-| END-15 Supine active straight-leg raise | 2.5 | 2.8 | 3.7 | 4.4 | 3.3 | 3.3 | 3.3 | 3.8 | 2.8 | 2.7 | 3.6 | 4.1 | 3.4 | 3.1 | 2.8 | 3.7 | 2.3 | 2.5 | 4.0 | 3.6 |
-| END-16 Elephant walk | 0.9 | 0.9 | 1.1 | 1.4 | 1.2 | 1.5 | 1.2 | 1.1 | 0.8 | 0.8 | 1.0 | 0.9 | 1.1 | 1.4 | 0.9 | 1.5 | 0.9 | 1.2 | 1.3 | 1.4 |
-| END-17 Bodyweight Jefferson curl | 3.0 | 3.1 | 4.1 | 4.8 | 3.7 | 4.2 | 3.8 | 4.5 | 2.5 | 2.5 | 2.6 | 3.2 | 2.9 | 3.0 | 2.8 | 3.1 | 2.7 | 3.2 | 4.6 | 3.6 |
-| END-18 Quadruped thoracic rotation with hold | 1.5 | 1.4 | 1.7 | 2.0 | 1.1 | 1.2 | 1.4 | 1.1 | 1.2 | 1.2 | 1.4 | 1.5 | 1.0 | 1.0 | 1.0 | 1.0 | 1.2 | 1.1 | 1.6 | 1.2 |
-| END-19 Seated rotation lift-off | 1.4 | 1.6 | 1.3 | 1.9 | 0.9 | 1.0 | 1.3 | 1.4 | 1.1 | 1.4 | 1.4 | 1.6 | 1.0 | 1.0 | 0.8 | 0.9 | 1.5 | 0.8 | 1.6 | 0.9 |
-| END-20 Sphinx lift-off | 6.5 | 7.2 | 6.1 | 6.3 | 6.6 | 7.4 | 6.4 | 7.6 | 5.8 | 5.4 | 5.3 | 5.8 | 5.9 | 6.4 | 5.5 | 6.5 | 7.0 | 7.4 | 5.4 | 6.7 |
-| END-21 Standing side-bend lift-off | 3.1 | 3.2 | 4.7 | 5.2 | 3.9 | 3.7 | 4.1 | 3.8 | 2.5 | 2.8 | 3.1 | 3.3 | 2.7 | 3.0 | 3.0 | 3.4 | 2.3 | 3.5 | 5.0 | 4.0 |
-| END-22 Open book with lift-off | 6.2 | 6.3 | 5.3 | 5.7 | 5.5 | 6.9 | 5.8 | 6.2 | 4.9 | 5.4 | 4.1 | 4.7 | 4.6 | 5.1 | 4.8 | 4.9 | 6.8 | 6.0 | 5.9 | 6.4 |
-| END-23 Segmental cat-cow | 3.9 | 4.6 | 5.4 | 6.1 | 5.0 | 5.6 | 5.3 | 5.3 | 3.3 | 3.7 | 4.3 | 4.7 | 4.1 | 4.4 | 4.5 | 4.6 | 3.2 | 4.6 | 5.6 | 4.6 |
-| END-24 Shoulder CARs | 5.0 | 5.0 | 4.6 | 4.5 | 4.0 | 4.5 | 3.8 | 4.9 | 4.0 | 4.2 | 3.7 | 3.3 | 3.3 | 4.3 | 3.9 | 3.5 | 4.9 | 4.3 | 3.9 | 4.1 |
-| END-25 Wall-facing overhead lift-off | 4.8 | – | 4.4 | – | 4.6 | – | 4.1 | – | 4.2 | – | 3.6 | – | 3.9 | – | 4.0 | – | 5.3 | 5.0 | 3.7 | 4.2 |
-| END-26 Behind-the-back arm lift | 4.8 | 5.7 | 3.7 | 4.4 | 5.4 | 5.9 | 5.3 | 6.2 | 3.5 | 3.7 | 2.9 | 3.8 | 4.3 | 4.7 | 3.9 | 4.4 | 4.5 | 5.6 | 3.9 | 5.2 |
-| END-27 Prone overhead lift-off | 6.5 | 6.9 | 5.2 | 6.3 | 6.1 | 7.0 | 6.5 | 7.0 | 5.4 | 6.7 | 5.2 | 5.6 | 5.9 | 6.1 | 5.8 | 6.0 | 7.0 | 6.2 | 5.8 | 6.3 |
-| END-28 Prone 90/90 external rotation lift-off | 6.3 | 7.6 | 5.8 | 6.0 | 5.7 | 6.7 | 6.5 | 7.2 | 6.1 | 6.1 | 5.3 | 5.3 | 5.3 | 6.4 | 5.5 | 6.2 | 6.4 | 6.0 | 5.2 | 6.6 |
-| END-29 Wall slide with lift-off | 5.4 | – | 4.5 | – | 5.2 | – | 4.9 | – | 3.9 | – | 4.1 | – | 4.1 | – | 4.4 | – | 5.7 | 4.8 | 4.1 | 5.1 |
-| END-30 Hand-behind-back lift-off | 5.2 | 5.4 | 4.3 | 4.0 | 4.4 | 4.9 | 4.5 | 4.3 | 4.0 | 4.0 | 3.8 | 3.4 | 4.1 | 4.1 | 4.0 | 3.6 | 4.7 | 4.5 | 4.1 | 3.9 |
-| END-31 Chin tuck hold | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
-| END-32 Neck side-bend isometric | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
-| END-33 Neck rotation end-range hold | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
-| END-34 Half-kneeling ankle rock | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
-| END-35 Top-range calf raise hold | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
-| END-36 Seated ankle CARs | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
-| END-37 Toe yoga and short foot | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
-| END-38 Reverse Nordic (short range) | – | – | – | – | – | – | – | – | 3.0 | 3.3 | 2.2 | 2.5 | 2.4 | 2.7 | 2.3 | 2.3 | – | – | – | – |
-| END-39 Knee-over-toe split squat hold | 3.4 | 3.5 | 2.6 | 3.1 | 3.1 | 3.3 | 3.2 | 3.5 | 2.5 | 2.7 | 1.9 | 2.1 | 2.0 | 2.3 | 1.8 | 2.4 | 3.1 | 2.7 | 2.4 | 2.9 |
-| END-40 Kneeling wrist rocks with lift-off | 0.9 | 1.0 | 0.0 | 0.0 | 0.8 | 1.1 | 0.8 | 1.1 | 0.7 | 1.0 | 0.0 | 0.0 | 0.6 | 0.7 | 0.8 | 0.9 | 3.9 | 3.8 | 0.0 | 3.6 |
-| END-41 Spiderman lunge with reach | 3.0 | 3.4 | 3.9 | 3.9 | 3.1 | 2.9 | 2.6 | 2.8 | 2.8 | 3.4 | 4.1 | 4.7 | 2.4 | 2.5 | 3.1 | 2.8 | 2.7 | 3.0 | 4.5 | 2.7 |
+| Move | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` | `def` | `dbl` |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| END-01 Standing knee-lift hold | 2.4 | 2.7 | 3.4 | 4.1 | 3.6 | 3.9 | 3.3 | 3.7 | 2.0 | 2.1 | 2.2 | 3.0 | 2.8 | 3.1 | 3.2 | 3.1 | 2.1 | 3.1 | 3.3 | 2.9 | 5.8 | 5.1 |
+| END-02 Seated knee lift-off | 1.0 | 1.5 | 1.0 | 1.0 | 0.8 | 0.9 | 0.7 | 1.0 | 1.4 | 1.2 | 1.1 | 1.3 | 0.6 | 0.8 | 0.6 | 1.0 | 1.2 | 0.7 | 1.2 | 0.9 | – | – |
+| END-03 Seated straight-leg lift-off | – | – | – | – | – | – | – | – | 2.9 | 3.9 | 3.6 | 4.2 | 3.7 | 4.2 | 4.4 | 4.9 | – | – | – | – | – | – |
+| END-04 90/90 back-leg lift-off | 1.8 | 1.9 | 1.3 | 1.5 | 1.3 | 1.1 | 1.0 | 0.8 | 1.7 | 1.6 | 1.1 | 1.0 | 1.1 | 0.9 | 0.8 | 0.9 | 1.4 | 0.9 | 1.3 | 1.0 | – | – |
+| END-05 Half-kneeling hip flexor contract-relax | 4.2 | 4.3 | 2.7 | 3.2 | 3.3 | 3.8 | 3.1 | 3.7 | 3.3 | 3.2 | 2.5 | 2.2 | 2.2 | 2.5 | 1.8 | 2.3 | 3.7 | 2.7 | 2.7 | 2.8 | 9.3 | 9.3 |
+| END-06 Cossack squat with end-range pause | 1.7 | 2.3 | 2.2 | 2.1 | 1.8 | 1.9 | 1.9 | 1.9 | 1.7 | 2.0 | 1.4 | 1.6 | 1.3 | 1.3 | 1.3 | 1.4 | 1.5 | 1.8 | 1.5 | 1.7 | – | – |
+| END-07 Deep squat hold with reach | 2.6 | 2.9 | 3.3 | 3.7 | 2.3 | 2.3 | 2.5 | 2.3 | 2.9 | 3.1 | 3.5 | 3.3 | 2.0 | 2.6 | 2.1 | 2.6 | 2.3 | 2.4 | 3.6 | 2.3 | – | – |
+| END-08 Standing hip CARs | 1.0 | 1.0 | 1.3 | 1.2 | 0.8 | 1.0 | 0.9 | 1.0 | 1.2 | 1.6 | 0.8 | 0.9 | 0.9 | 0.7 | 0.6 | 0.9 | 1.2 | 0.7 | 0.9 | 0.9 | – | – |
+| END-09 Side-lying hip internal rotation lift-off | 1.2 | 2.0 | 1.1 | 1.3 | 1.2 | 1.1 | 0.8 | 1.2 | 1.8 | 2.0 | 1.2 | 1.2 | 0.8 | 1.0 | 0.9 | 1.1 | 1.0 | 1.0 | 1.3 | 1.1 | – | – |
+| END-10 Adductor rock-back | 2.9 | 3.1 | 2.4 | 2.4 | 2.2 | 2.3 | 2.1 | 2.4 | 2.1 | 2.4 | 1.8 | 2.2 | 1.7 | 1.7 | 1.7 | 1.5 | 2.6 | 2.1 | 2.5 | 1.7 | 3.5 | 6.0 |
+| END-11 Prone straight-leg hip extension | 5.0 | 6.5 | 5.7 | 6.2 | 6.4 | 7.3 | 6.3 | 7.1 | 4.5 | 4.7 | 5.1 | 5.8 | 5.6 | 5.6 | 5.0 | 5.3 | 5.0 | 5.8 | 5.8 | 5.4 | 11.8 | 12.9 |
+| END-12 Standing hip airplane | – | – | – | – | – | – | – | – | 3.3 | 4.0 | 4.1 | 4.4 | 4.4 | 4.8 | 4.6 | 4.6 | – | – | – | – | – | – |
+| END-13 Shin box get-up | – | – | – | – | – | – | – | – | 4.4 | 5.0 | 5.2 | 5.6 | 5.4 | 5.4 | 5.2 | 5.7 | – | – | – | – | – | – |
+| END-14 Standing straight-leg front raise | 1.8 | 2.3 | 3.2 | 3.4 | 2.4 | 3.4 | 2.6 | 3.1 | 1.9 | 2.5 | 2.9 | 3.0 | 2.5 | 3.1 | 2.5 | 3.0 | 1.9 | 2.6 | 3.3 | 2.3 | – | – |
+| END-15 Supine active straight-leg raise | 2.5 | 2.8 | 3.7 | 4.4 | 3.3 | 3.3 | 3.3 | 3.8 | 2.8 | 2.7 | 3.6 | 4.1 | 3.4 | 3.1 | 2.8 | 3.7 | 2.3 | 2.5 | 4.0 | 3.6 | 5.9 | 7.9 |
+| END-16 Elephant walk | 0.9 | 0.9 | 1.1 | 1.4 | 1.2 | 1.5 | 1.2 | 1.1 | 0.8 | 0.8 | 1.0 | 0.9 | 1.1 | 1.4 | 0.9 | 1.5 | 0.9 | 1.2 | 1.3 | 1.4 | 1.9 | 4.3 |
+| END-17 Bodyweight Jefferson curl | 3.0 | 3.1 | 4.1 | 4.8 | 3.7 | 4.2 | 3.8 | 4.5 | 2.5 | 2.5 | 2.6 | 3.2 | 2.9 | 3.0 | 2.8 | 3.1 | 2.7 | 3.2 | 4.6 | 3.6 | – | – |
+| END-18 Quadruped thoracic rotation with hold | 1.5 | 1.4 | 1.7 | 2.0 | 1.1 | 1.2 | 1.4 | 1.1 | 1.2 | 1.2 | 1.4 | 1.5 | 1.0 | 1.0 | 1.0 | 1.0 | 1.2 | 1.1 | 1.6 | 1.2 | 4.2 | 2.9 |
+| END-19 Seated rotation lift-off | 1.4 | 1.6 | 1.3 | 1.9 | 0.9 | 1.0 | 1.3 | 1.4 | 1.1 | 1.4 | 1.4 | 1.6 | 1.0 | 1.0 | 0.8 | 0.9 | 1.5 | 0.8 | 1.6 | 0.9 | 3.3 | 2.3 |
+| END-20 Sphinx lift-off | 6.5 | 7.2 | 6.1 | 6.3 | 6.6 | 7.4 | 6.4 | 7.6 | 5.8 | 5.4 | 5.3 | 5.8 | 5.9 | 6.4 | 5.5 | 6.5 | 7.0 | 7.4 | 5.4 | 6.7 | – | – |
+| END-21 Standing side-bend lift-off | 3.1 | 3.2 | 4.7 | 5.2 | 3.9 | 3.7 | 4.1 | 3.8 | 2.5 | 2.8 | 3.1 | 3.3 | 2.7 | 3.0 | 3.0 | 3.4 | 2.3 | 3.5 | 5.0 | 4.0 | 6.9 | 5.6 |
+| END-22 Open book with lift-off | 6.2 | 6.3 | 5.3 | 5.7 | 5.5 | 6.9 | 5.8 | 6.2 | 4.9 | 5.4 | 4.1 | 4.7 | 4.6 | 5.1 | 4.8 | 4.9 | 6.8 | 6.0 | 5.9 | 6.4 | 13.1 | 12.4 |
+| END-23 Segmental cat-cow | 3.9 | 4.6 | 5.4 | 6.1 | 5.0 | 5.6 | 5.3 | 5.3 | 3.3 | 3.7 | 4.3 | 4.7 | 4.1 | 4.4 | 4.5 | 4.6 | 3.2 | 4.6 | 5.6 | 4.6 | 7.3 | 5.9 |
+| END-24 Shoulder CARs | 5.0 | 5.0 | 4.6 | 4.5 | 4.0 | 4.5 | 3.8 | 4.9 | 4.0 | 4.2 | 3.7 | 3.3 | 3.3 | 4.3 | 3.9 | 3.5 | 4.9 | 4.3 | 3.9 | 4.1 | 13.5 | 10.2 |
+| END-25 Wall-facing overhead lift-off | 4.8 | – | 4.4 | – | 4.6 | – | 4.1 | – | 4.2 | – | 3.6 | – | 3.9 | – | 4.0 | – | 5.3 | 5.0 | 3.7 | 4.2 | – | – |
+| END-26 Behind-the-back arm lift | 4.8 | 5.7 | 3.7 | 4.4 | 5.4 | 5.9 | 5.3 | 6.2 | 3.5 | 3.7 | 2.9 | 3.8 | 4.3 | 4.7 | 3.9 | 4.4 | 4.5 | 5.6 | 3.9 | 5.2 | 9.2 | 10.9 |
+| END-27 Prone overhead lift-off | 6.5 | 6.9 | 5.2 | 6.3 | 6.1 | 7.0 | 6.5 | 7.0 | 5.4 | 6.7 | 5.2 | 5.6 | 5.9 | 6.1 | 5.8 | 6.0 | 7.0 | 6.2 | 5.8 | 6.3 | – | – |
+| END-28 Prone 90/90 external rotation lift-off | 6.3 | 7.6 | 5.8 | 6.0 | 5.7 | 6.7 | 6.5 | 7.2 | 6.1 | 6.1 | 5.3 | 5.3 | 5.3 | 6.4 | 5.5 | 6.2 | 6.4 | 6.0 | 5.2 | 6.6 | – | – |
+| END-29 Wall slide with lift-off | 5.4 | – | 4.5 | – | 5.2 | – | 4.9 | – | 3.9 | – | 4.1 | – | 4.1 | – | 4.4 | – | 5.7 | 4.8 | 4.1 | 5.1 | – | – |
+| END-30 Hand-behind-back lift-off | 5.2 | 5.4 | 4.3 | 4.0 | 4.4 | 4.9 | 4.5 | 4.3 | 4.0 | 4.0 | 3.8 | 3.4 | 4.1 | 4.1 | 4.0 | 3.6 | 4.7 | 4.5 | 4.1 | 3.9 | – | – |
+| END-31 Chin tuck hold | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
+| END-32 Neck side-bend isometric | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.1 |
+| END-33 Neck rotation end-range hold | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
+| END-34 Half-kneeling ankle rock | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.1 |
+| END-35 Top-range calf raise hold | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | – | – |
+| END-36 Seated ankle CARs | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
+| END-37 Toe yoga and short foot | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
+| END-38 Reverse Nordic (short range) | – | – | – | – | – | – | – | – | 3.0 | 3.3 | 2.2 | 2.5 | 2.4 | 2.7 | 2.3 | 2.3 | – | – | – | – | – | – |
+| END-39 Knee-over-toe split squat hold | 3.4 | 3.5 | 2.6 | 3.1 | 3.1 | 3.3 | 3.2 | 3.5 | 2.5 | 2.7 | 1.9 | 2.1 | 2.0 | 2.3 | 1.8 | 2.4 | 3.1 | 2.7 | 2.4 | 2.9 | – | – |
+| END-40 Kneeling wrist rocks with lift-off | 0.9 | 1.0 | 0.0 | 0.0 | 0.8 | 1.1 | 0.8 | 1.1 | 0.7 | 1.0 | 0.0 | 0.0 | 0.6 | 0.7 | 0.8 | 0.9 | 3.9 | 3.8 | 0.0 | 3.6 | 4.2 | 4.2 |
+| END-41 Spiderman lunge with reach | 3.0 | 3.4 | 3.9 | 3.9 | 3.1 | 2.9 | 2.6 | 2.8 | 2.8 | 3.4 | 4.1 | 4.7 | 2.4 | 2.5 | 3.1 | 2.8 | 2.7 | 3.0 | 4.5 | 2.7 | – | – |
 
 ### END end-range blocks
 
-| Move | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| END-01 Standing knee-lift hold | 1.5 | 1.6 | 1.2 | 1.5 | 1.0 | 1.3 | 1.1 | 1.2 | 1.3 | 1.5 | 1.2 | 1.2 | 0.9 | 1.0 | 0.9 | 1.1 | 1.3 | 1.0 | 1.4 | 1.0 |
-| END-02 Seated knee lift-off | 1.7 | 1.8 | 2.4 | 2.6 | 3.0 | 3.1 | 2.9 | 3.1 | 1.3 | 1.4 | 2.4 | 2.5 | 2.8 | 2.8 | 2.8 | 2.9 | 1.7 | 2.9 | 2.5 | 2.9 |
-| END-03 Seated straight-leg lift-off | – | – | – | – | – | – | – | – | 2.0 | 2.1 | 1.7 | 1.8 | 1.6 | 1.6 | 1.4 | 1.6 | – | – | – | – |
-| END-04 90/90 back-leg lift-off | 2.9 | 3.1 | 3.6 | 3.8 | 4.1 | 4.2 | 4.1 | 4.3 | 2.3 | 2.4 | 3.3 | 3.4 | 3.6 | 3.8 | 3.8 | 3.8 | 3.1 | 4.2 | 3.6 | 4.1 |
-| END-05 Half-kneeling hip flexor contract-relax | 2.2 | 2.5 | 3.3 | 3.3 | 3.2 | 3.3 | 3.1 | 3.2 | 2.0 | 2.2 | 3.1 | 3.1 | 3.0 | 3.1 | 3.0 | 3.1 | 2.4 | 3.2 | 3.2 | 3.2 |
-| END-06 Cossack squat with end-range pause | 1.3 | 1.5 | 1.9 | 2.1 | 2.1 | 2.1 | 2.0 | 2.2 | 1.2 | 1.4 | 2.0 | 2.1 | 2.1 | 2.1 | 2.2 | 2.3 | 1.5 | 2.2 | 1.9 | 2.2 |
-| END-07 Deep squat hold with reach | 2.3 | 2.2 | 1.8 | 1.7 | 2.2 | 2.2 | 2.2 | 2.2 | 1.9 | 1.7 | 1.4 | 1.3 | 1.8 | 1.8 | 1.9 | 1.7 | 2.3 | 2.1 | 1.7 | 2.2 |
-| END-08 Standing hip CARs | 1.8 | 2.0 | 2.4 | 2.4 | 3.0 | 3.1 | 3.1 | 3.1 | 1.4 | 1.4 | 2.3 | 2.6 | 2.8 | 2.9 | 2.7 | 2.8 | 1.8 | 3.1 | 2.4 | 3.1 |
-| END-09 Side-lying hip internal rotation lift-off | 3.1 | 3.1 | 3.7 | 3.8 | 4.1 | 4.2 | 4.1 | 4.2 | 2.5 | 2.5 | 3.3 | 3.4 | 3.7 | 3.8 | 3.7 | 3.7 | 3.1 | 4.1 | 3.5 | 4.1 |
-| END-10 Adductor rock-back | 2.5 | 2.7 | 3.0 | 3.2 | 3.2 | 3.2 | 3.1 | 3.4 | 2.2 | 2.3 | 2.8 | 3.0 | 2.9 | 3.0 | 3.1 | 3.1 | 2.6 | 3.3 | 3.0 | 3.3 |
-| END-11 Prone straight-leg hip extension | 2.2 | 2.2 | 2.0 | 2.0 | 1.7 | 1.7 | 1.6 | 1.9 | 1.9 | 2.1 | 1.6 | 1.7 | 1.4 | 1.5 | 1.5 | 1.6 | 2.2 | 1.7 | 2.0 | 1.8 |
-| END-12 Standing hip airplane | – | – | – | – | – | – | – | – | 1.1 | 1.4 | 1.0 | 1.0 | 0.8 | 1.0 | 0.8 | 0.9 | – | – | – | – |
-| END-13 Shin box get-up | – | – | – | – | – | – | – | – | 1.9 | 2.0 | 1.6 | 1.7 | 1.3 | 1.4 | 1.3 | 1.5 | – | – | – | – |
-| END-14 Standing straight-leg front raise | 2.1 | 2.0 | 1.4 | 1.7 | 1.8 | 2.0 | 1.9 | 2.0 | 1.6 | 1.7 | 1.2 | 1.3 | 1.6 | 1.7 | 1.5 | 1.7 | 2.1 | 1.8 | 1.4 | 1.9 |
-| END-15 Supine active straight-leg raise | 2.9 | 2.9 | 2.1 | 2.3 | 2.5 | 2.8 | 2.5 | 2.7 | 2.3 | 2.3 | 1.8 | 1.8 | 2.0 | 2.2 | 2.0 | 2.1 | 2.9 | 2.6 | 2.1 | 2.6 |
-| END-16 Elephant walk | 2.8 | 2.7 | 2.8 | 2.6 | 2.6 | 2.5 | 2.5 | 2.4 | 2.8 | 2.5 | 2.5 | 2.3 | 2.6 | 2.3 | 2.4 | 2.3 | 2.7 | 2.6 | 2.8 | 2.7 |
-| END-17 Bodyweight Jefferson curl | 1.0 | 1.0 | 1.0 | 0.9 | 0.8 | 0.7 | 0.7 | 0.7 | 0.9 | 0.9 | 0.7 | 0.5 | 0.5 | 0.6 | 0.6 | 0.6 | 1.0 | 0.7 | 0.9 | 0.8 |
-| END-18 Quadruped thoracic rotation with hold | 4.5 | 4.6 | 4.4 | 4.4 | 4.4 | 4.5 | 4.5 | 4.5 | 4.4 | 4.5 | 4.2 | 4.3 | 4.2 | 4.3 | 4.3 | 4.4 | 4.4 | 4.5 | 4.3 | 4.4 |
-| END-19 Seated rotation lift-off | 3.2 | 3.1 | 3.0 | 2.9 | 3.3 | 3.0 | 3.2 | 3.0 | 3.2 | 2.9 | 2.9 | 2.8 | 3.1 | 2.9 | 3.0 | 2.8 | 3.4 | 3.3 | 3.0 | 3.3 |
-| END-20 Sphinx lift-off | 2.1 | 2.2 | 1.8 | 2.1 | 1.7 | 1.8 | 1.5 | 1.8 | 1.8 | 2.1 | 1.6 | 1.6 | 1.4 | 1.5 | 1.4 | 1.5 | 2.0 | 1.6 | 2.0 | 1.7 |
-| END-21 Standing side-bend lift-off | 1.3 | 1.3 | 1.2 | 1.1 | 1.1 | 0.9 | 1.0 | 0.9 | 1.3 | 1.2 | 1.0 | 1.0 | 0.9 | 0.8 | 0.8 | 0.7 | 1.4 | 1.0 | 1.2 | 1.0 |
-| END-22 Open book with lift-off | 2.1 | 2.4 | 2.1 | 2.2 | 2.0 | 2.1 | 2.0 | 2.2 | 2.1 | 2.1 | 1.8 | 1.9 | 1.8 | 1.9 | 1.7 | 1.9 | 2.1 | 2.0 | 2.0 | 2.0 |
-| END-23 Segmental cat-cow | 2.2 | 2.3 | 2.0 | 2.1 | 1.7 | 1.8 | 1.7 | 1.9 | 1.9 | 2.1 | 1.6 | 1.7 | 1.5 | 1.6 | 1.5 | 1.5 | 2.3 | 1.8 | 2.0 | 1.7 |
-| END-24 Shoulder CARs | 1.0 | 0.8 | 0.8 | 0.8 | 0.9 | 0.6 | 0.9 | 0.7 | 0.8 | 0.7 | 0.6 | 0.5 | 0.7 | 0.6 | 0.7 | 0.5 | 1.0 | 0.9 | 0.8 | 0.8 |
-| END-25 Wall-facing overhead lift-off | 1.1 | – | 1.0 | – | 0.9 | – | 0.9 | – | 0.9 | – | 0.6 | – | 0.7 | – | 0.7 | – | 1.0 | 1.0 | 1.0 | 0.9 |
-| END-26 Behind-the-back arm lift | 0.8 | 1.0 | 0.7 | 0.8 | 0.5 | 0.6 | 0.6 | 0.6 | 0.7 | 0.8 | 0.5 | 0.6 | 0.5 | 0.4 | 0.4 | 0.5 | 0.7 | 0.6 | 0.7 | 0.7 |
-| END-27 Prone overhead lift-off | 2.0 | 2.2 | 2.1 | 2.1 | 1.9 | 1.9 | 1.8 | 1.9 | 1.8 | 1.8 | 1.6 | 1.6 | 1.6 | 1.6 | 1.5 | 1.6 | 1.9 | 1.9 | 2.0 | 1.7 |
-| END-28 Prone 90/90 external rotation lift-off | 2.2 | 2.2 | 1.9 | 2.1 | 1.9 | 2.0 | 1.8 | 1.9 | 1.7 | 1.9 | 1.7 | 1.8 | 1.5 | 1.5 | 1.5 | 1.6 | 2.1 | 1.9 | 2.2 | 1.8 |
-| END-29 Wall slide with lift-off | 0.9 | – | 0.9 | – | 0.8 | – | 0.9 | – | 1.0 | – | 0.7 | – | 0.7 | – | 0.7 | – | 1.1 | 0.9 | 1.1 | 0.9 |
-| END-30 Hand-behind-back lift-off | 1.0 | 0.8 | 0.9 | 0.7 | 0.9 | 0.7 | 0.8 | 0.7 | 0.8 | 0.7 | 0.6 | 0.5 | 0.6 | 0.6 | 0.6 | 0.6 | 1.0 | 0.9 | 0.9 | 1.0 |
-| END-31 Chin tuck hold | 3.3 | 3.4 | 3.2 | 3.2 | 3.0 | 3.2 | 3.0 | 3.2 | 3.6 | 3.7 | 3.3 | 3.3 | 3.1 | 3.1 | 3.2 | 3.1 | 3.4 | 3.0 | 3.3 | 3.0 |
-| END-32 Neck side-bend isometric | 4.8 | 4.7 | 4.5 | 4.6 | 4.3 | 4.3 | 4.5 | 4.3 | 4.9 | 4.7 | 4.5 | 4.4 | 4.4 | 4.3 | 4.3 | 4.3 | 4.8 | 4.2 | 4.4 | 4.4 |
-| END-33 Neck rotation end-range hold | 4.7 | 4.6 | 4.5 | 4.6 | 4.2 | 4.3 | 4.2 | 4.3 | 4.8 | 4.9 | 4.4 | 4.4 | 4.4 | 4.3 | 4.4 | 4.4 | 4.6 | 4.3 | 4.6 | 4.5 |
-| END-34 Half-kneeling ankle rock | 7.2 | 7.3 | 7.2 | 7.1 | 7.0 | 7.0 | 7.0 | 7.0 | 7.3 | 7.3 | 7.0 | 7.1 | 6.9 | 6.9 | 6.9 | 7.0 | 7.3 | 7.0 | 7.2 | 7.0 |
-| END-35 Top-range calf raise hold | 5.5 | 5.4 | 5.3 | 5.2 | 5.2 | 5.2 | 5.3 | 5.2 | 5.4 | 5.4 | 5.2 | 5.1 | 5.2 | 5.1 | 5.1 | 5.1 | 5.5 | 5.2 | 5.3 | 5.2 |
-| END-36 Seated ankle CARs | 4.8 | 4.9 | 4.8 | 4.6 | 4.7 | 4.6 | 4.6 | 4.6 | 4.8 | 4.7 | 4.8 | 4.5 | 4.5 | 4.6 | 4.6 | 4.6 | 4.9 | 4.7 | 4.5 | 4.6 |
-| END-37 Toe yoga and short foot | 3.3 | 3.4 | 3.3 | 3.2 | 3.0 | 3.2 | 3.0 | 3.2 | 3.6 | 3.7 | 3.2 | 3.3 | 3.0 | 3.1 | 3.2 | 3.1 | 3.4 | 3.0 | 3.3 | 3.0 |
-| END-38 Reverse Nordic (short range) | – | – | – | – | – | – | – | – | 2.0 | 2.2 | 3.1 | 3.2 | 3.0 | 3.0 | 3.0 | 3.1 | – | – | – | – |
-| END-39 Knee-over-toe split squat hold | 1.6 | 1.9 | 2.5 | 2.7 | 2.4 | 2.4 | 2.4 | 2.5 | 1.4 | 1.6 | 2.4 | 2.6 | 2.4 | 2.5 | 2.4 | 2.5 | 1.6 | 2.4 | 2.5 | 2.4 |
-| END-40 Kneeling wrist rocks with lift-off | 7.0 | 7.1 | 7.2 | 7.2 | 6.4 | 6.4 | 6.4 | 6.3 | 7.2 | 7.2 | 7.1 | 7.2 | 6.4 | 6.4 | 6.4 | 6.4 | 6.5 | 5.4 | 7.1 | 5.4 |
-| END-41 Spiderman lunge with reach | 2.9 | 2.8 | 2.1 | 2.4 | 2.7 | 2.9 | 2.7 | 2.9 | 2.2 | 2.2 | 1.7 | 1.8 | 2.2 | 2.4 | 2.1 | 2.3 | 2.8 | 2.8 | 2.2 | 2.7 |
+| Move | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` | `def` | `dbl` |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| END-01 Standing knee-lift hold | 1.5 | 1.6 | 1.2 | 1.5 | 1.0 | 1.3 | 1.1 | 1.2 | 1.3 | 1.5 | 1.2 | 1.2 | 0.9 | 1.0 | 0.9 | 1.1 | 1.3 | 1.0 | 1.4 | 1.0 | 1.1 | 1.2 |
+| END-02 Seated knee lift-off | 1.7 | 1.8 | 2.4 | 2.6 | 3.0 | 3.1 | 2.9 | 3.1 | 1.3 | 1.4 | 2.4 | 2.5 | 2.8 | 2.8 | 2.8 | 2.9 | 1.7 | 2.9 | 2.5 | 2.9 | – | – |
+| END-03 Seated straight-leg lift-off | – | – | – | – | – | – | – | – | 2.0 | 2.1 | 1.7 | 1.8 | 1.6 | 1.6 | 1.4 | 1.6 | – | – | – | – | – | – |
+| END-04 90/90 back-leg lift-off | 2.9 | 3.1 | 3.6 | 3.8 | 4.1 | 4.2 | 4.1 | 4.3 | 2.3 | 2.4 | 3.3 | 3.4 | 3.6 | 3.8 | 3.8 | 3.8 | 3.1 | 4.2 | 3.6 | 4.1 | – | – |
+| END-05 Half-kneeling hip flexor contract-relax | 2.2 | 2.5 | 3.3 | 3.3 | 3.2 | 3.3 | 3.1 | 3.2 | 2.0 | 2.2 | 3.1 | 3.1 | 3.0 | 3.1 | 3.0 | 3.1 | 2.4 | 3.2 | 3.2 | 3.2 | 5.3 | 6.1 |
+| END-06 Cossack squat with end-range pause | 1.3 | 1.5 | 1.9 | 2.1 | 2.1 | 2.1 | 2.0 | 2.2 | 1.2 | 1.4 | 2.0 | 2.1 | 2.1 | 2.1 | 2.2 | 2.3 | 1.5 | 2.2 | 1.9 | 2.2 | – | – |
+| END-07 Deep squat hold with reach | 2.3 | 2.2 | 1.8 | 1.7 | 2.2 | 2.2 | 2.2 | 2.2 | 1.9 | 1.7 | 1.4 | 1.3 | 1.8 | 1.8 | 1.9 | 1.7 | 2.3 | 2.1 | 1.7 | 2.2 | – | – |
+| END-08 Standing hip CARs | 1.8 | 2.0 | 2.4 | 2.4 | 3.0 | 3.1 | 3.1 | 3.1 | 1.4 | 1.4 | 2.3 | 2.6 | 2.8 | 2.9 | 2.7 | 2.8 | 1.8 | 3.1 | 2.4 | 3.1 | – | – |
+| END-09 Side-lying hip internal rotation lift-off | 3.1 | 3.1 | 3.7 | 3.8 | 4.1 | 4.2 | 4.1 | 4.2 | 2.5 | 2.5 | 3.3 | 3.4 | 3.7 | 3.8 | 3.7 | 3.7 | 3.1 | 4.1 | 3.5 | 4.1 | – | – |
+| END-10 Adductor rock-back | 2.5 | 2.7 | 3.0 | 3.2 | 3.2 | 3.2 | 3.1 | 3.4 | 2.2 | 2.3 | 2.8 | 3.0 | 2.9 | 3.0 | 3.1 | 3.1 | 2.6 | 3.3 | 3.0 | 3.3 | 6.6 | 6.3 |
+| END-11 Prone straight-leg hip extension | 2.2 | 2.2 | 2.0 | 2.0 | 1.7 | 1.7 | 1.6 | 1.9 | 1.9 | 2.1 | 1.6 | 1.7 | 1.4 | 1.5 | 1.5 | 1.6 | 2.2 | 1.7 | 2.0 | 1.8 | 4.8 | 4.5 |
+| END-12 Standing hip airplane | – | – | – | – | – | – | – | – | 1.1 | 1.4 | 1.0 | 1.0 | 0.8 | 1.0 | 0.8 | 0.9 | – | – | – | – | – | – |
+| END-13 Shin box get-up | – | – | – | – | – | – | – | – | 1.9 | 2.0 | 1.6 | 1.7 | 1.3 | 1.4 | 1.3 | 1.5 | – | – | – | – | – | – |
+| END-14 Standing straight-leg front raise | 2.1 | 2.0 | 1.4 | 1.7 | 1.8 | 2.0 | 1.9 | 2.0 | 1.6 | 1.7 | 1.2 | 1.3 | 1.6 | 1.7 | 1.5 | 1.7 | 2.1 | 1.8 | 1.4 | 1.9 | – | – |
+| END-15 Supine active straight-leg raise | 2.9 | 2.9 | 2.1 | 2.3 | 2.5 | 2.8 | 2.5 | 2.7 | 2.3 | 2.3 | 1.8 | 1.8 | 2.0 | 2.2 | 2.0 | 2.1 | 2.9 | 2.6 | 2.1 | 2.6 | 6.1 | 5.9 |
+| END-16 Elephant walk | 2.8 | 2.7 | 2.8 | 2.6 | 2.6 | 2.5 | 2.5 | 2.4 | 2.8 | 2.5 | 2.5 | 2.3 | 2.6 | 2.3 | 2.4 | 2.3 | 2.7 | 2.6 | 2.8 | 2.7 | 3.9 | 3.8 |
+| END-17 Bodyweight Jefferson curl | 1.0 | 1.0 | 1.0 | 0.9 | 0.8 | 0.7 | 0.7 | 0.7 | 0.9 | 0.9 | 0.7 | 0.5 | 0.5 | 0.6 | 0.6 | 0.6 | 1.0 | 0.7 | 0.9 | 0.8 | – | – |
+| END-18 Quadruped thoracic rotation with hold | 4.5 | 4.6 | 4.4 | 4.4 | 4.4 | 4.5 | 4.5 | 4.5 | 4.4 | 4.5 | 4.2 | 4.3 | 4.2 | 4.3 | 4.3 | 4.4 | 4.4 | 4.5 | 4.3 | 4.4 | 7.5 | 7.7 |
+| END-19 Seated rotation lift-off | 3.2 | 3.1 | 3.0 | 2.9 | 3.3 | 3.0 | 3.2 | 3.0 | 3.2 | 2.9 | 2.9 | 2.8 | 3.1 | 2.9 | 3.0 | 2.8 | 3.4 | 3.3 | 3.0 | 3.3 | 3.8 | 3.7 |
+| END-20 Sphinx lift-off | 2.1 | 2.2 | 1.8 | 2.1 | 1.7 | 1.8 | 1.5 | 1.8 | 1.8 | 2.1 | 1.6 | 1.6 | 1.4 | 1.5 | 1.4 | 1.5 | 2.0 | 1.6 | 2.0 | 1.7 | – | – |
+| END-21 Standing side-bend lift-off | 1.3 | 1.3 | 1.2 | 1.1 | 1.1 | 0.9 | 1.0 | 0.9 | 1.3 | 1.2 | 1.0 | 1.0 | 0.9 | 0.8 | 0.8 | 0.7 | 1.4 | 1.0 | 1.2 | 1.0 | 1.7 | 1.7 |
+| END-22 Open book with lift-off | 2.1 | 2.4 | 2.1 | 2.2 | 2.0 | 2.1 | 2.0 | 2.2 | 2.1 | 2.1 | 1.8 | 1.9 | 1.8 | 1.9 | 1.7 | 1.9 | 2.1 | 2.0 | 2.0 | 2.0 | 4.8 | 5.1 |
+| END-23 Segmental cat-cow | 2.2 | 2.3 | 2.0 | 2.1 | 1.7 | 1.8 | 1.7 | 1.9 | 1.9 | 2.1 | 1.6 | 1.7 | 1.5 | 1.6 | 1.5 | 1.5 | 2.3 | 1.8 | 2.0 | 1.7 | 5.4 | 5.6 |
+| END-24 Shoulder CARs | 1.0 | 0.8 | 0.8 | 0.8 | 0.9 | 0.6 | 0.9 | 0.7 | 0.8 | 0.7 | 0.6 | 0.5 | 0.7 | 0.6 | 0.7 | 0.5 | 1.0 | 0.9 | 0.8 | 0.8 | 0.8 | 1.2 |
+| END-25 Wall-facing overhead lift-off | 1.1 | – | 1.0 | – | 0.9 | – | 0.9 | – | 0.9 | – | 0.6 | – | 0.7 | – | 0.7 | – | 1.0 | 1.0 | 1.0 | 0.9 | – | – |
+| END-26 Behind-the-back arm lift | 0.8 | 1.0 | 0.7 | 0.8 | 0.5 | 0.6 | 0.6 | 0.6 | 0.7 | 0.8 | 0.5 | 0.6 | 0.5 | 0.4 | 0.4 | 0.5 | 0.7 | 0.6 | 0.7 | 0.7 | 1.5 | 1.6 |
+| END-27 Prone overhead lift-off | 2.0 | 2.2 | 2.1 | 2.1 | 1.9 | 1.9 | 1.8 | 1.9 | 1.8 | 1.8 | 1.6 | 1.6 | 1.6 | 1.6 | 1.5 | 1.6 | 1.9 | 1.9 | 2.0 | 1.7 | – | – |
+| END-28 Prone 90/90 external rotation lift-off | 2.2 | 2.2 | 1.9 | 2.1 | 1.9 | 2.0 | 1.8 | 1.9 | 1.7 | 1.9 | 1.7 | 1.8 | 1.5 | 1.5 | 1.5 | 1.6 | 2.1 | 1.9 | 2.2 | 1.8 | – | – |
+| END-29 Wall slide with lift-off | 0.9 | – | 0.9 | – | 0.8 | – | 0.9 | – | 1.0 | – | 0.7 | – | 0.7 | – | 0.7 | – | 1.1 | 0.9 | 1.1 | 0.9 | – | – |
+| END-30 Hand-behind-back lift-off | 1.0 | 0.8 | 0.9 | 0.7 | 0.9 | 0.7 | 0.8 | 0.7 | 0.8 | 0.7 | 0.6 | 0.5 | 0.6 | 0.6 | 0.6 | 0.6 | 1.0 | 0.9 | 0.9 | 1.0 | – | – |
+| END-31 Chin tuck hold | 3.3 | 3.4 | 3.2 | 3.2 | 3.0 | 3.2 | 3.0 | 3.2 | 3.6 | 3.7 | 3.3 | 3.3 | 3.1 | 3.1 | 3.2 | 3.1 | 3.4 | 3.0 | 3.3 | 3.0 | 4.8 | 4.7 |
+| END-32 Neck side-bend isometric | 4.8 | 4.7 | 4.5 | 4.6 | 4.3 | 4.3 | 4.5 | 4.3 | 4.9 | 4.7 | 4.5 | 4.4 | 4.4 | 4.3 | 4.3 | 4.3 | 4.8 | 4.2 | 4.4 | 4.4 | 6.6 | 6.3 |
+| END-33 Neck rotation end-range hold | 4.7 | 4.6 | 4.5 | 4.6 | 4.2 | 4.3 | 4.2 | 4.3 | 4.8 | 4.9 | 4.4 | 4.4 | 4.4 | 4.3 | 4.4 | 4.4 | 4.6 | 4.3 | 4.6 | 4.5 | 6.5 | 6.4 |
+| END-34 Half-kneeling ankle rock | 7.2 | 7.3 | 7.2 | 7.1 | 7.0 | 7.0 | 7.0 | 7.0 | 7.3 | 7.3 | 7.0 | 7.1 | 6.9 | 6.9 | 6.9 | 7.0 | 7.3 | 7.0 | 7.2 | 7.0 | 9.9 | 9.7 |
+| END-35 Top-range calf raise hold | 5.5 | 5.4 | 5.3 | 5.2 | 5.2 | 5.2 | 5.3 | 5.2 | 5.4 | 5.4 | 5.2 | 5.1 | 5.2 | 5.1 | 5.1 | 5.1 | 5.5 | 5.2 | 5.3 | 5.2 | – | – |
+| END-36 Seated ankle CARs | 4.8 | 4.9 | 4.8 | 4.6 | 4.7 | 4.6 | 4.6 | 4.6 | 4.8 | 4.7 | 4.8 | 4.5 | 4.5 | 4.6 | 4.6 | 4.6 | 4.9 | 4.7 | 4.5 | 4.6 | 5.0 | 4.8 |
+| END-37 Toe yoga and short foot | 3.3 | 3.4 | 3.3 | 3.2 | 3.0 | 3.2 | 3.0 | 3.2 | 3.6 | 3.7 | 3.2 | 3.3 | 3.0 | 3.1 | 3.2 | 3.1 | 3.4 | 3.0 | 3.3 | 3.0 | 4.8 | 4.8 |
+| END-38 Reverse Nordic (short range) | – | – | – | – | – | – | – | – | 2.0 | 2.2 | 3.1 | 3.2 | 3.0 | 3.0 | 3.0 | 3.1 | – | – | – | – | – | – |
+| END-39 Knee-over-toe split squat hold | 1.6 | 1.9 | 2.5 | 2.7 | 2.4 | 2.4 | 2.4 | 2.5 | 1.4 | 1.6 | 2.4 | 2.6 | 2.4 | 2.5 | 2.4 | 2.5 | 1.6 | 2.4 | 2.5 | 2.4 | – | – |
+| END-40 Kneeling wrist rocks with lift-off | 7.0 | 7.1 | 7.2 | 7.2 | 6.4 | 6.4 | 6.4 | 6.3 | 7.2 | 7.2 | 7.1 | 7.2 | 6.4 | 6.4 | 6.4 | 6.4 | 6.5 | 5.4 | 7.1 | 5.4 | 9.1 | 8.9 |
+| END-41 Spiderman lunge with reach | 2.9 | 2.8 | 2.1 | 2.4 | 2.7 | 2.9 | 2.7 | 2.9 | 2.2 | 2.2 | 1.7 | 1.8 | 2.2 | 2.4 | 2.1 | 2.3 | 2.8 | 2.8 | 2.2 | 2.7 | – | – |
 
 ### END micro-breaks
 
-| Move | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| END-01 Standing knee-lift hold | 3.5 | 3.2 | 3.4 | 3.1 | 3.3 | 3.1 | 3.5 | 3.2 | 3.2 | 3.0 | 2.9 | 2.7 | 2.8 | 2.8 | 2.8 | 2.8 | 3.7 | 3.5 | 3.3 | 3.8 |
-| END-02 Seated knee lift-off | 5.0 | 5.0 | 4.6 | 4.4 | 3.9 | 3.9 | 4.1 | 3.9 | 4.1 | 4.5 | 3.6 | 3.5 | 3.4 | 3.5 | 3.7 | 3.3 | 4.9 | 4.1 | 4.4 | 4.1 |
-| END-06 Cossack squat with end-range pause | 4.8 | 4.6 | 4.4 | 4.2 | 4.2 | 4.4 | 4.1 | 4.2 | 4.3 | 4.0 | 3.5 | 3.5 | 3.5 | 3.7 | 3.5 | 3.4 | 4.8 | 4.3 | 4.4 | 4.2 |
-| END-07 Deep squat hold with reach | 1.7 | 2.2 | 1.8 | 2.5 | 1.8 | 2.5 | 1.8 | 2.3 | 1.7 | 2.3 | 1.8 | 2.6 | 1.8 | 2.2 | 1.7 | 2.4 | 1.8 | 1.7 | 1.9 | 1.8 |
-| END-08 Standing hip CARs | 4.8 | 5.0 | 4.5 | 4.8 | 4.0 | 3.9 | 3.9 | 4.2 | 4.3 | 4.1 | 3.8 | 3.4 | 3.3 | 3.5 | 3.6 | 3.5 | 4.8 | 3.9 | 4.4 | 3.8 |
-| END-12 Standing hip airplane | – | – | – | – | – | – | – | – | 3.2 | 3.2 | 2.9 | 2.9 | 3.2 | 2.9 | 2.9 | 2.9 | – | – | – | – |
-| END-14 Standing straight-leg front raise | 3.0 | 3.2 | 3.3 | 2.8 | 3.0 | 2.7 | 2.8 | 2.8 | 2.6 | 2.5 | 2.5 | 2.3 | 2.4 | 2.2 | 2.4 | 2.4 | 3.1 | 2.9 | 3.2 | 3.1 |
-| END-16 Elephant walk | 5.2 | 6.0 | 4.9 | 5.5 | 5.1 | 5.8 | 5.1 | 5.8 | 5.3 | 6.1 | 5.0 | 5.9 | 5.0 | 5.9 | 5.4 | 5.8 | 5.4 | 5.1 | 4.8 | 4.9 |
-| END-17 Bodyweight Jefferson curl | 5.0 | 5.6 | 4.4 | 5.4 | 4.9 | 5.6 | 4.7 | 5.5 | 4.8 | 6.0 | 5.0 | 6.2 | 5.0 | 5.8 | 4.9 | 5.9 | 4.9 | 4.8 | 4.3 | 4.6 |
-| END-19 Seated rotation lift-off | 3.4 | 4.6 | 3.9 | 4.8 | 3.8 | 4.9 | 3.7 | 4.9 | 3.6 | 4.6 | 3.8 | 4.6 | 3.9 | 4.9 | 3.9 | 5.3 | 3.1 | 3.6 | 3.8 | 3.6 |
-| END-21 Standing side-bend lift-off | 3.8 | 4.8 | 3.5 | 4.7 | 3.8 | 5.2 | 3.9 | 5.4 | 3.6 | 4.8 | 3.9 | 5.0 | 3.9 | 5.2 | 4.1 | 5.2 | 4.0 | 3.7 | 3.5 | 3.9 |
-| END-24 Shoulder CARs | 5.1 | 6.5 | 5.2 | 6.7 | 5.2 | 6.8 | 5.5 | 6.7 | 5.2 | 6.7 | 5.1 | 6.8 | 5.7 | 6.8 | 5.4 | 6.9 | 5.1 | 5.4 | 5.3 | 5.7 |
-| END-25 Wall-facing overhead lift-off | 4.2 | – | 4.2 | – | 4.4 | – | 4.4 | – | 4.1 | – | 4.4 | – | 4.3 | – | 4.3 | – | 4.1 | 4.0 | 4.4 | 4.3 |
-| END-26 Behind-the-back arm lift | 5.9 | 5.7 | 6.0 | 5.8 | 5.8 | 5.8 | 5.7 | 5.7 | 5.8 | 6.0 | 6.1 | 5.8 | 5.8 | 6.2 | 6.0 | 6.1 | 6.1 | 5.7 | 5.8 | 5.6 |
-| END-29 Wall slide with lift-off | 4.2 | – | 4.2 | – | 4.1 | – | 4.2 | – | 4.2 | – | 4.3 | – | 4.2 | – | 4.1 | – | 4.0 | 4.2 | 4.3 | 4.3 |
-| END-30 Hand-behind-back lift-off | 4.9 | 6.7 | 5.1 | 6.9 | 5.4 | 6.9 | 5.4 | 7.2 | 5.2 | 6.6 | 5.2 | 6.9 | 5.3 | 6.7 | 5.3 | 6.8 | 5.1 | 5.4 | 5.2 | 5.4 |
-| END-31 Chin tuck hold | 7.5 | 7.6 | 7.6 | 8.0 | 7.8 | 7.9 | 7.8 | 7.9 | 7.0 | 7.2 | 7.5 | 7.7 | 7.7 | 7.9 | 7.5 | 7.9 | 7.3 | 7.9 | 7.5 | 7.8 |
-| END-32 Neck side-bend isometric | 4.8 | 5.2 | 5.3 | 5.4 | 5.4 | 5.7 | 5.1 | 5.7 | 4.8 | 5.3 | 5.3 | 5.6 | 5.3 | 5.7 | 5.4 | 5.7 | 4.9 | 5.6 | 5.4 | 5.3 |
-| END-33 Neck rotation end-range hold | 4.9 | 5.3 | 5.4 | 5.4 | 5.6 | 5.8 | 5.6 | 5.6 | 4.9 | 4.8 | 5.4 | 5.6 | 5.2 | 5.6 | 5.3 | 5.4 | 5.0 | 5.5 | 5.2 | 5.2 |
-| END-35 Top-range calf raise hold | 3.4 | 3.8 | 3.8 | 4.1 | 3.7 | 3.7 | 3.5 | 3.8 | 3.7 | 3.7 | 3.9 | 4.1 | 3.6 | 3.9 | 3.8 | 3.9 | 3.3 | 3.6 | 3.7 | 3.7 |
-| END-36 Seated ankle CARs | 4.6 | 4.8 | 4.7 | 5.2 | 4.6 | 4.9 | 4.9 | 4.9 | 4.8 | 5.1 | 4.7 | 5.3 | 4.9 | 4.9 | 4.8 | 4.9 | 4.5 | 4.7 | 5.3 | 4.7 |
-| END-37 Toe yoga and short foot | 7.5 | 7.6 | 7.6 | 8.0 | 7.8 | 7.9 | 7.8 | 7.9 | 7.0 | 7.2 | 7.5 | 7.7 | 7.7 | 7.9 | 7.5 | 7.9 | 7.3 | 7.9 | 7.5 | 7.8 |
-| END-39 Knee-over-toe split squat hold | 2.7 | 2.6 | 2.3 | 2.2 | 2.4 | 2.5 | 2.3 | 2.3 | 2.5 | 2.3 | 2.1 | 1.8 | 2.1 | 1.8 | 2.0 | 1.8 | 2.6 | 2.5 | 2.4 | 2.3 |
+| Move | `--W2` | `---2` | `-KW2` | `-K-2` | `D-W2` | `D--2` | `DKW2` | `DK-2` | `--W3` | `---3` | `-KW3` | `-K-3` | `D-W3` | `D--3` | `DKW3` | `DK-3` | `--W2a` | `D-W2a` | `-KW2a` | `DKW2a` | `def` | `dbl` |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| END-01 Standing knee-lift hold | 3.5 | 3.2 | 3.4 | 3.1 | 3.3 | 3.1 | 3.5 | 3.2 | 3.2 | 3.0 | 2.9 | 2.7 | 2.8 | 2.8 | 2.8 | 2.8 | 3.7 | 3.5 | 3.3 | 3.8 | 10.1 | 10.1 |
+| END-02 Seated knee lift-off | 5.0 | 5.0 | 4.6 | 4.4 | 3.9 | 3.9 | 4.1 | 3.9 | 4.1 | 4.5 | 3.6 | 3.5 | 3.4 | 3.5 | 3.7 | 3.3 | 4.9 | 4.1 | 4.4 | 4.1 | – | – |
+| END-06 Cossack squat with end-range pause | 4.8 | 4.6 | 4.4 | 4.2 | 4.2 | 4.4 | 4.1 | 4.2 | 4.3 | 4.0 | 3.5 | 3.5 | 3.5 | 3.7 | 3.5 | 3.4 | 4.8 | 4.3 | 4.4 | 4.2 | – | – |
+| END-07 Deep squat hold with reach | 1.7 | 2.2 | 1.8 | 2.5 | 1.8 | 2.5 | 1.8 | 2.3 | 1.7 | 2.3 | 1.8 | 2.6 | 1.8 | 2.2 | 1.7 | 2.4 | 1.8 | 1.7 | 1.9 | 1.8 | – | – |
+| END-08 Standing hip CARs | 4.8 | 5.0 | 4.5 | 4.8 | 4.0 | 3.9 | 3.9 | 4.2 | 4.3 | 4.1 | 3.8 | 3.4 | 3.3 | 3.5 | 3.6 | 3.5 | 4.8 | 3.9 | 4.4 | 3.8 | – | – |
+| END-12 Standing hip airplane | – | – | – | – | – | – | – | – | 3.2 | 3.2 | 2.9 | 2.9 | 3.2 | 2.9 | 2.9 | 2.9 | – | – | – | – | – | – |
+| END-14 Standing straight-leg front raise | 3.0 | 3.2 | 3.3 | 2.8 | 3.0 | 2.7 | 2.8 | 2.8 | 2.6 | 2.5 | 2.5 | 2.3 | 2.4 | 2.2 | 2.4 | 2.4 | 3.1 | 2.9 | 3.2 | 3.1 | – | – |
+| END-16 Elephant walk | 5.2 | 6.0 | 4.9 | 5.5 | 5.1 | 5.8 | 5.1 | 5.8 | 5.3 | 6.1 | 5.0 | 5.9 | 5.0 | 5.9 | 5.4 | 5.8 | 5.4 | 5.1 | 4.8 | 4.9 | 9.2 | 8.4 |
+| END-17 Bodyweight Jefferson curl | 5.0 | 5.6 | 4.4 | 5.4 | 4.9 | 5.6 | 4.7 | 5.5 | 4.8 | 6.0 | 5.0 | 6.2 | 5.0 | 5.8 | 4.9 | 5.9 | 4.9 | 4.8 | 4.3 | 4.6 | – | – |
+| END-19 Seated rotation lift-off | 3.4 | 4.6 | 3.9 | 4.8 | 3.8 | 4.9 | 3.7 | 4.9 | 3.6 | 4.6 | 3.8 | 4.6 | 3.9 | 4.9 | 3.9 | 5.3 | 3.1 | 3.6 | 3.8 | 3.6 | 7.8 | 8.7 |
+| END-21 Standing side-bend lift-off | 3.8 | 4.8 | 3.5 | 4.7 | 3.8 | 5.2 | 3.9 | 5.4 | 3.6 | 4.8 | 3.9 | 5.0 | 3.9 | 5.2 | 4.1 | 5.2 | 4.0 | 3.7 | 3.5 | 3.9 | 8.2 | 8.5 |
+| END-24 Shoulder CARs | 5.1 | 6.5 | 5.2 | 6.7 | 5.2 | 6.8 | 5.5 | 6.7 | 5.2 | 6.7 | 5.1 | 6.8 | 5.7 | 6.8 | 5.4 | 6.9 | 5.1 | 5.4 | 5.3 | 5.7 | 9.5 | 10.1 |
+| END-25 Wall-facing overhead lift-off | 4.2 | – | 4.2 | – | 4.4 | – | 4.4 | – | 4.1 | – | 4.4 | – | 4.3 | – | 4.3 | – | 4.1 | 4.0 | 4.4 | 4.3 | – | – |
+| END-26 Behind-the-back arm lift | 5.9 | 5.7 | 6.0 | 5.8 | 5.8 | 5.8 | 5.7 | 5.7 | 5.8 | 6.0 | 6.1 | 5.8 | 5.8 | 6.2 | 6.0 | 6.1 | 6.1 | 5.7 | 5.8 | 5.6 | 9.2 | 8.4 |
+| END-29 Wall slide with lift-off | 4.2 | – | 4.2 | – | 4.1 | – | 4.2 | – | 4.2 | – | 4.3 | – | 4.2 | – | 4.1 | – | 4.0 | 4.2 | 4.3 | 4.3 | – | – |
+| END-30 Hand-behind-back lift-off | 4.9 | 6.7 | 5.1 | 6.9 | 5.4 | 6.9 | 5.4 | 7.2 | 5.2 | 6.6 | 5.2 | 6.9 | 5.3 | 6.7 | 5.3 | 6.8 | 5.1 | 5.4 | 5.2 | 5.4 | – | – |
+| END-31 Chin tuck hold | 7.5 | 7.6 | 7.6 | 8.0 | 7.8 | 7.9 | 7.8 | 7.9 | 7.0 | 7.2 | 7.5 | 7.7 | 7.7 | 7.9 | 7.5 | 7.9 | 7.3 | 7.9 | 7.5 | 7.8 | 11.5 | 11.2 |
+| END-32 Neck side-bend isometric | 4.8 | 5.2 | 5.3 | 5.4 | 5.4 | 5.7 | 5.1 | 5.7 | 4.8 | 5.3 | 5.3 | 5.6 | 5.3 | 5.7 | 5.4 | 5.7 | 4.9 | 5.6 | 5.4 | 5.3 | 6.6 | 6.9 |
+| END-33 Neck rotation end-range hold | 4.9 | 5.3 | 5.4 | 5.4 | 5.6 | 5.8 | 5.6 | 5.6 | 4.9 | 4.8 | 5.4 | 5.6 | 5.2 | 5.6 | 5.3 | 5.4 | 5.0 | 5.5 | 5.2 | 5.2 | 6.9 | 6.8 |
+| END-35 Top-range calf raise hold | 3.4 | 3.8 | 3.8 | 4.1 | 3.7 | 3.7 | 3.5 | 3.8 | 3.7 | 3.7 | 3.9 | 4.1 | 3.6 | 3.9 | 3.8 | 3.9 | 3.3 | 3.6 | 3.7 | 3.7 | – | – |
+| END-36 Seated ankle CARs | 4.6 | 4.8 | 4.7 | 5.2 | 4.6 | 4.9 | 4.9 | 4.9 | 4.8 | 5.1 | 4.7 | 5.3 | 4.9 | 4.9 | 4.8 | 4.9 | 4.5 | 4.7 | 5.3 | 4.7 | 9.6 | 9.8 |
+| END-37 Toe yoga and short foot | 7.5 | 7.6 | 7.6 | 8.0 | 7.8 | 7.9 | 7.8 | 7.9 | 7.0 | 7.2 | 7.5 | 7.7 | 7.7 | 7.9 | 7.5 | 7.9 | 7.3 | 7.9 | 7.5 | 7.8 | 11.5 | 11.2 |
+| END-39 Knee-over-toe split squat hold | 2.7 | 2.6 | 2.3 | 2.2 | 2.4 | 2.5 | 2.3 | 2.3 | 2.5 | 2.3 | 2.1 | 1.8 | 2.1 | 1.8 | 2.0 | 1.8 | 2.6 | 2.5 | 2.4 | 2.3 | – | – |
 
 ## Weekly hard sets per body part
 

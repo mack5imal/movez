@@ -21,7 +21,8 @@ kit), the builder's slot-keyed repeats, its arm warm-up and cool-down, the vigor
 focus weighting are mirrored as well.
 
 The sixteen configurations are dumbbells x kettlebell x wall at difficulty caps 2 and 3 with every
-difficulty-3 pattern unlocked, then each kit again with the More arms focus (wall, cap 2). Each
+difficulty-3 pattern unlocked, then each kit again with the More arms focus (wall, cap 2), then the
+app's defaults (bodyweight, wall, cap 1, nothing unlocked) and those defaults with dumbbells. Each
 simulates whole days of six full breaks and six micro-breaks, the strength breaks a day cycling
 through 1-4 so every setting is exercised, one strength break in ten skipped so the planner has to
 offer it again, until each kind reaches 5,000. The weekly tables come from 5-day weeks at the app's
@@ -396,19 +397,23 @@ class Planner:
 
 
 WORKING_LADDER = ["breakLimits", "servedToday", "vigorous", "excluded", "difficulty", "anything"]
+# StrengthBreakBuilder.armAlternateLadder: the arm move may come back for the third set before the
+# exclusions or the cap go (DECISIONS 83).
+ARM_ALTERNATE_LADDER = ["breakLimits", "servedToday", "vigorous", "armAlternate", "excluded", "difficulty",
+                        "anything"]
 WARM_UP_LADDER = ["warmUpShape", "servedToday", "excluded", "difficulty", "anything"]
 COOL_DOWN_LADDER = ["coolDownRegion", "servedToday", "excluded", "difficulty", "anything"]
 END_RANGE_LADDER = ["servedToday", "excluded", "difficulty", "anything"]
 MICRO_LADDER = ["servedToday", "previousMicroRegion", "excluded", "difficulty", "anything"]
 
 
-def draw_slot(slot, bucket, ladder, taken, ctx, state, slot_rule, narrow=None, weight=None):
+def draw_slot(slot, bucket, ladder, taken, ctx, state, slot_rule, narrow=None, weight=None, repeatable=()):
     in_bucket = BUCKET[bucket]
 
     def candidates(let_go):
         out = []
         for m in in_bucket:
-            if m.id in taken:
+            if m.id in taken and not ("armAlternate" in let_go and m.id in repeatable):
                 continue
             if "anything" in let_go:
                 if possible(m, ctx.equipment, ctx.wall):
@@ -449,10 +454,14 @@ def build_strength(letter, order, ctx):
             continue
         distinct = [m for _, m in drawn]
         taken = {m.id for m in distinct} | {warm.id}
-        pick = draw_slot(f"set{index + 1}", slot_bucket(slot), WORKING_LADDER, taken, ctx, state,
+        alternate = slot[0] == "armAlternate"
+        ladder = ARM_ALTERNATE_LADDER if alternate else WORKING_LADDER
+        repeatable = {m.id for s, m in drawn if is_arm(s)} if alternate else set()
+        pick = draw_slot(f"set{index + 1}", slot_bucket(slot), ladder, taken, ctx, state,
                          lambda m, g, d=distinct: ("breakLimits" in g or fits_break_limits(m, d))
                          and ("vigorous" in g or vigorous_enough(m, ctx.equipment)),
-                         lambda pool, g, d=distinct: narrow_break_limits(pool, g, d), weight=weight)
+                         lambda pool, g, d=distinct: narrow_break_limits(pool, g, d), weight=weight,
+                         repeatable=repeatable)
         drawn.append((slot, pick))
         working.append(pick)
     worked = ARM_COOL_DOWN_REGIONS if arm_break else set().union(*(m.regions for m in working))
@@ -680,12 +689,22 @@ class Checker:
         arm_break = any(is_arm(slot) for slot in order)
         if len(sets) != 3 or warm is None or cool is None:
             out.append("s6-shape")
-        # The same slot twice is the same move; two different slots are two different moves.
-        pairs = [(i, j) for i in range(len(moves)) for j in range(i + 1, len(moves))]
+        # The same slot twice is the same move; two different slots are two different moves. The
+        # arm move against its alternate is judged by s6-arm-alternate instead.
+        pairs = [(i, j) for i in range(len(moves)) for j in range(i + 1, len(moves))
+                 if not (arm_break and order[i] != order[j] and is_arm(order[i]) and is_arm(order[j]))]
         if len(order) != len(moves) or any((order[i] == order[j]) != (moves[i].id == moves[j].id) for i, j in pairs):
             out.append("s6-same-move-twice")
-        if arm_break and (len(moves) != 3 or moves[2].bucket != moves[0].bucket or moves[2].id == moves[0].id):
+        if arm_break and (len(moves) != 3 or moves[2].bucket != moves[0].bucket):
             out.append("s6-arm-alternate")
+        elif arm_break and moves[2].id == moves[0].id:
+            # A repeat is let in after served-today and the vigorous rule and before the exclusions
+            # and the cap, so it is needless when another move keeps those two as the repeat does.
+            later = [pred for rule, pred in self._shared("s6", ctx) if rule != "s6-served-today"]
+            kept = [pred for pred in later if pred(moves[0])]
+            if any(c.id != moves[0].id and self._possible(c) and all(p(c) for p in kept)
+                   for c in BUCKET[moves[0].bucket]):
+                out.append("s6-arm-alternate")
         distinct = list(dict.fromkeys(moves))
         ids = [warm.id] + [m.id for m in distinct] + [cool.id]
         if len(set(ids)) != len(ids):
@@ -1107,6 +1126,10 @@ def configurations():
                     out.append(configuration(kit, wall, cap))
     for kit in (set(), {"dumbbells"}, {"kettlebell"}, {"dumbbells", "kettlebell"}):
         out.append(configuration(kit, True, 2, "moreArms"))
+    # The app's defaults get the same cycle-and-skip run, so what they relax is reported and their
+    # never-served moves are checked (TST-3), and so do the defaults with dumbbells, where the
+    # Beginner cap leaves no vigorous squat and the cap wins (DECISIONS 71, LIB-2).
+    out += [DEFAULT, DUMBBELLS]
     return out
 
 
@@ -1230,7 +1253,8 @@ def report(configs, tallies, week_tallies, problems):
         "and not as violations. No configuration excludes anything, so the exclusion rules are vacuous here",
         "and are covered by the builders' unit tests.",
         "",
-        f"Each configuration owns every difficulty-3 pattern, simulates days of {FULL_PER_DAY} full breaks and",
+        "Each configuration but the app's defaults (`def` and `dbl`, which unlock nothing at cap 1) owns every",
+        f"difficulty-3 pattern. Each simulates days of {FULL_PER_DAY} full breaks and",
         f"{FULL_PER_DAY} micro-breaks with the strength breaks a day cycling 1, 2, 3, 4 (shifted a day every four",
         "days, so each setting meets both letters), skips one strength",
         f"break in {SKIP_ONE_IN} so the planner has to offer it again, and runs until each kind of break reaches",
@@ -1376,7 +1400,7 @@ def share_tables(configs, tallies):
 def per_config_relaxations(configs, tallies):
     """Strength-break relaxations per configuration, per 1,000 strength breaks built, so a kit whose
     pools run short (kettlebell-only, above all, under the vigorous rule) stands out."""
-    rules = [r for r in WORKING_LADDER + WARM_UP_LADDER + COOL_DOWN_LADDER if r != "anything"]
+    rules = [r for r in WORKING_LADDER + ARM_ALTERNATE_LADDER + WARM_UP_LADDER + COOL_DOWN_LADDER if r != "anything"]
     rules = list(dict.fromkeys(rules)) + ["anything"]
     # The vigorous rung is always shown, so that a column of zeros says it never had to let go.
     used = [r for r in rules if r == "vigorous" or any(t.relaxed[("strength", r)] for t in tallies)]

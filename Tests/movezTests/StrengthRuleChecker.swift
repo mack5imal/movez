@@ -105,17 +105,18 @@ struct StrengthRuleChecker {
 
     /// `setOrder` is the plan's slots the break was built from; an arm break is told by them.
     func check(_ strengthBreak: StrengthBreak, setOrder: [StrengthSetSlot], context: StrengthContext) -> [String] {
-        hardViolations(strengthBreak, setOrder: setOrder) + softViolations(strengthBreak, setOrder: setOrder, context: context)
+        hardViolations(strengthBreak, setOrder: setOrder, context: context)
+            + softViolations(strengthBreak, setOrder: setOrder, context: context)
     }
 
-    private func hardViolations(_ strengthBreak: StrengthBreak, setOrder: [StrengthSetSlot]) -> [String] {
+    private func hardViolations(_ strengthBreak: StrengthBreak, setOrder: [StrengthSetSlot], context: StrengthContext) -> [String] {
         var out: [String] = []
         let warmUp = strengthBreak.warmUp
         let coolDown = strengthBreak.coolDown
         let moves = strengthBreak.sets.map(\.movement)
         let isArmBreak = setOrder.contains(where: \.isArm)
         if moves.count != 3 { out.append("s6-shape") }
-        out += slotViolations(moves, setOrder: setOrder)
+        out += slotViolations(moves, setOrder: setOrder, context: context)
         let ids = [warmUp.movement.id] + distinct(moves).map(\.id) + [coolDown.movement.id]
         if Set(ids).count != ids.count { out.append("s6-distinct") }
         if warmUp.movement.bucket != Self.warmUpBucket(strengthBreak, isArmBreak: isArmBreak) {
@@ -136,17 +137,36 @@ struct StrengthRuleChecker {
     }
 
     /// The same slot twice is the same move and two different slots are two different moves; an
-    /// arm break's third set is a different move from its first two's bucket.
-    private func slotViolations(_ moves: [StrengthMovement], setOrder: [StrengthSetSlot]) -> [String] {
+    /// arm break's third set is from its first two's bucket, and a different move wherever the
+    /// bucket has another the user may be served. The arm move's own repeat is judged by that
+    /// rule rather than as two slots with one move.
+    private func slotViolations(_ moves: [StrengthMovement], setOrder: [StrengthSetSlot], context: StrengthContext) -> [String] {
         var out: [String] = []
         let pairs = moves.indices.flatMap { first in moves.indices.filter { $0 > first }.map { (first, $0) } }
+        let isArmBreak = setOrder.contains(where: \.isArm)
+        func judged(_ pair: (Int, Int)) -> Bool {
+            !(isArmBreak && setOrder[pair.0] != setOrder[pair.1] && setOrder[pair.0].isArm && setOrder[pair.1].isArm)
+        }
         if setOrder.count != moves.count
-            || pairs.contains(where: { (setOrder[$0.0] == setOrder[$0.1]) != (moves[$0.0].id == moves[$0.1].id) }) {
+            || pairs.filter(judged).contains(where: { (setOrder[$0.0] == setOrder[$0.1]) != (moves[$0.0].id == moves[$0.1].id) }) {
             out.append("s6-same-move-twice")
         }
-        if setOrder.contains(where: \.isArm),
-           moves.count != 3 || moves[2].bucket != moves[0].bucket || moves[2].id == moves[0].id {
+        guard isArmBreak else { return out }
+        if moves.count != 3 || moves[2].bucket != moves[0].bucket {
             out.append("s6-arm-alternate")
+        } else if moves[2].id == moves[0].id {
+            // A repeat is let in only after the moves served today and the vigorous rule are let
+            // go, and before the exclusions and the difficulty cap, so it is needless when another
+            // move keeps those two as well as the repeat does.
+            let rules = shared(
+                "s6", used: context.usedStrengthIdsToday, excluded: context.excluded,
+                cap: context.difficultyCap, unlocked: context.unlockedBuckets
+            ).filter { $0.id != "s6-served-today" }
+            let kept = rules.filter { $0.keeps(moves[0]) }
+            let other = library.movements(in: moves[0].bucket).contains { candidate in
+                candidate.id != moves[0].id && isPossible(candidate) && kept.allSatisfy { $0.keeps(candidate) }
+            }
+            if other { out.append("s6-arm-alternate") }
         }
         return out
     }

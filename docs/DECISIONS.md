@@ -653,9 +653,14 @@ of its picks, taken before any of this was built, is replayed by a test to prove
     selected, a working set (core and arm sets included) draws only vigorous moves, so the light
     bodyweight moves are warm-ups only; bodyweight-only users have no such rule. The rule is a
     rung in the working ladder after "served today", so repeating a vigorous move beats serving a
-    light one, and it goes before the exclusions and the difficulty cap. In the simulation it has
-    never had to let go: every pattern a kit can reach has a vigorous move, and a kettlebell
-    alone at cap 2, with the push-up as its only vigorous push, repeats the push-up instead.
+    light one, and it goes before the exclusions and the difficulty cap. At caps 2 and 3 it never
+    has to let go: every pattern a kit can reach has a vigorous move, and a kettlebell alone at
+    cap 2, with the push-up as its only vigorous push, repeats the push-up instead. At the default
+    Beginner cap it does: no squat or lunge of difficulty 1 is vigorous, and for a kettlebell
+    alone no push is either, so with any kit those sets are light bodyweight moves. The cap wins
+    there by design, since a Beginner asked for difficulty 1, so the light moves are not warm-ups
+    only at cap 1, and the simulation's `dbl` configuration and a builder test show it (*amended
+    in the November 2026 review, LIB-2*).
 
 ## The November 2026 review
 
@@ -742,3 +747,14 @@ Entries from fixing the findings in `docs/code-review-2026-11.md`.
     on screen, so its moves count as served today though none was done; the last micro-break is
     remembered across midnight; and the regions a day worked include the warm-up's. The report's
     served-today relaxations rose accordingly, with no violation (TST-2, TST-28).
+83. **A one-move arm bucket repeats its move for the third set before the cap is let go.** An arm
+    break is two sets of one arm move and a third of a different one (70). For a Beginner with no
+    kit the triceps bucket has one difficulty-1 move, the desk press-down isometric (TRI-05), so
+    every A-day arm break let the difficulty cap go and served a difficulty-2 move. The simulation
+    never showed it, because it ran the app's defaults only through the week tables, which its
+    relaxation and never-served sections did not read. The third set's ladder now has an
+    `armAlternate` rung after "served today" and the vigorous rule and before the exclusions and
+    the cap: when nothing else is left the arm move is served a third time, and the break records
+    it. The rule list's `s6-arm-alternate` became where-possible to match. The app's defaults, and
+    those defaults with dumbbells, now get the full cycle-and-skip run, so their relaxations and
+    never-served moves are reported with every other configuration's (TST-3).

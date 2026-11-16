@@ -114,6 +114,7 @@
 		76AA843627F2C9900600BFB6 /* EndRangeBreakBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57716DAB5FAFFC146D4EF5DC /* EndRangeBreakBuilder.swift */; };
 		77E1B1A2C7F9DA8D30EFD56E /* FakeSignalsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27F7A41D0D2F936D62D9033D /* FakeSignalsTests.swift */; };
 		78439A2E723C4F9AB5D4FF85 /* StrengthTimelineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABDF90215DDF39583C80F107 /* StrengthTimelineTests.swift */; };
+		7B5079DE34181B075380CA4A /* StrengthBeginnerCapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1254F5B911D085C7014808BD /* StrengthBeginnerCapTests.swift */; };
 		7B60EDAB1A4F4463129BD935 /* DebugSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A16302839551B0EF15BD30E4 /* DebugSection.swift */; };
 		7BD789F4A4598BA094F7C5E9 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E0673B5DB4AABDE27607DA2 /* SettingsViewModel.swift */; };
 		7CB847E57CD2C1001B1D99B9 /* PanelEffectSink.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAAA3D3EA536817F34D08C4D /* PanelEffectSink.swift */; };
@@ -261,6 +262,7 @@
 		0E6B82408B7C92BD5FB70A8A /* DoseText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoseText.swift; sourceTree = "<group>"; };
 		11E064B310C5B6C0E0E2D8C9 /* SettingsViewModel+StrengthLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsViewModel+StrengthLibrary.swift"; sourceTree = "<group>"; };
 		12186C3EB10709B6CBD27A71 /* TimerDisc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerDisc.swift; sourceTree = "<group>"; };
+		1254F5B911D085C7014808BD /* StrengthBeginnerCapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrengthBeginnerCapTests.swift; sourceTree = "<group>"; };
 		1357C14B78E301196BDC5185 /* Scheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scheduler.swift; sourceTree = "<group>"; };
 		139F174AFC2AD7EFB2B40268 /* Scheduler+Idle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Scheduler+Idle.swift"; sourceTree = "<group>"; };
 		13DE805FBC3C0DA9C2B42248 /* SchedulerDayBoundaryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerDayBoundaryTests.swift; sourceTree = "<group>"; };
@@ -574,6 +576,7 @@
 				4DF40E023521C26572E6BD61 /* SignalAggregatorTests.swift */,
 				DC6FF3E805F3DBB1698443F8 /* SittingBadgeTests.swift */,
 				F1DDDDC773AAE7422F7A1D24 /* SmokeTests.swift */,
+				1254F5B911D085C7014808BD /* StrengthBeginnerCapTests.swift */,
 				7B4609D450869032E2C94947 /* StrengthBreakBuilderTests.swift */,
 				159C4AA58F2ADAC08329C1E3 /* StrengthCoordinatorTests.swift */,
 				48F6414E4D76752A2502F568 /* StrengthDayPlannerTests.swift */,
@@ -1262,6 +1265,7 @@
 				0E8D878682F4ABE344D4D397 /* SignalAggregatorTests.swift in Sources */,
 				ADE411D3E7C16B169952D431 /* SittingBadgeTests.swift in Sources */,
 				1F539EFD5D18C4F5ABE07347 /* SmokeTests.swift in Sources */,
+				7B5079DE34181B075380CA4A /* StrengthBeginnerCapTests.swift in Sources */,
 				05088318CA5E8EBAA668F4FE /* StrengthBreakBuilderTests.swift in Sources */,
 				0E8919EBF6CDCD95B38B420A /* StrengthCoordinatorTests.swift in Sources */,
 				7CDCAD26A5CC82AB491C82DE /* StrengthDayPlannerTests.swift in Sources */,
