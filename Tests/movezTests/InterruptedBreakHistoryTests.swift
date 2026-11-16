@@ -97,4 +97,24 @@ final class InterruptedBreakHistoryTests: XCTestCase {
         XCTAssertEqual(harness.coordinator.currentBreak?.completedBlocks, 2)
         XCTAssertEqual(harness.history.usedMovementIds(on: harness.now).count - before, 2)
     }
+
+    /// The lid closed on a break, and the app was relaunched before the user came back. The
+    /// kept session died with the process, so the break served on return is a new one, starting
+    /// now, with nothing done.
+    func testAResumeAfterARelaunchServesAFreshBreakFromNow() {
+        let harness = sleepDuringABreak(ran: 2 * minute)
+        harness.clock.advance(5)
+        harness.relaunch()
+        XCTAssertNil(harness.coordinator.interruptedSession)
+
+        harness.clock.advance(30)
+        harness.coordinator.inject(.wake(gapSeconds: 35))
+        harness.coordinator.inject(.input(lastEventAgeSeconds: 0))
+        _ = harness.run(until: { $0.isFullBreak }, limit: 2 * minute)
+
+        let session = harness.coordinator.currentBreak
+        XCTAssertNotNil(session, "got \(harness.state)")
+        XCTAssertEqual(session?.completedBlocks, 0)
+        XCTAssertDate(session?.startedAt, harness.now, accuracy: 70, "not backdated by the two minutes the old break ran")
+    }
 }

@@ -108,14 +108,18 @@ extension AppCoordinator {
             return
         }
 
-        let announced = headsUpBreak ?? (planned: nextBreak(at: plan.startedAt), mode: settings.mode)
+        // A resume with nothing kept is a break the app was relaunched under: the session died
+        // with the process. The break served instead is new, so it starts now; backdated, its
+        // opening blocks read as already run and were recorded as done.
+        let startedAt = plan.resumed ? clock.now : plan.startedAt
+        let announced = headsUpBreak ?? (planned: nextBreak(at: startedAt), mode: settings.mode)
         headsUpBreak = nil
-        rememberBreak(announced.planned, at: plan.startedAt)
+        rememberBreak(announced.planned, at: startedAt)
         cachedPreview = nil
         currentBreak = BreakSession(
             planned: announced.planned,
             mode: announced.mode,
-            startedAt: plan.startedAt,
+            startedAt: startedAt,
             deferred: plan.deferred
         )
     }
