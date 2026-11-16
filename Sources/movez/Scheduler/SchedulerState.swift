@@ -2,8 +2,6 @@ import Foundation
 
 /// Where the scheduler resumes after a grace period ends.
 enum GraceResume: Codable, Equatable {
-    case sitting
-    case pendingFull
     /// A wake or unlock: judge the absence from when it began to when the machine came back.
     ///
     /// Dates rather than a length, so a later notification for the same wake can keep the

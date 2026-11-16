@@ -51,7 +51,6 @@ struct SchedulerSnapshot: Codable, Equatable {
     var adHocSession: Bool = false
     var adHocSessionStartedAt: Date?
 
-    var pendingInputWaitStartedAt: Date?
     /// When the file this snapshot came from was written — the app's proof of life, so a relaunch
     /// can tell whether it was gone for two minutes or two days.
     ///
@@ -64,7 +63,6 @@ struct SchedulerSnapshot: Codable, Equatable {
     /// over from the emphasis rotation it used to drive; it stays because the synthesized decoder
     /// requires every non-optional key, so renaming it would stop an existing `state.json` loading.
     var microEmphasisIndex: Int = 0
-    var configHash: UInt64 = 0
     var transitions = TransitionLog()
 
     init(now: Date, dayKey: String = "") {

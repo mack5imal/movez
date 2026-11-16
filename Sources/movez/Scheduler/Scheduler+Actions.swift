@@ -5,14 +5,12 @@ extension Scheduler {
     // MARK: - State entries
 
     mutating func enterPendingFull(now: Date) -> [SchedulerEffect] {
-        snapshot.pendingInputWaitStartedAt = now
         transition(to: .pendingFull(since: now), reason: "full break due", at: now)
         return [.persist, .menuRefresh]
     }
 
-    mutating func enterHeadsUp(now: Date, deferredSince: Date? = nil, reason: String) -> [SchedulerEffect] {
-        snapshot.pendingInputWaitStartedAt = nil
-        let deferral = deferredSince ?? snapshot.deferredFullDueAt
+    mutating func enterHeadsUp(now: Date, reason: String) -> [SchedulerEffect] {
+        let deferral = snapshot.deferredFullDueAt
         if let deferral, now.timeIntervalSince(deferral) > Double(config.deferredBadgeSeconds) {
             // A break that has been waiting for half an hour has earned less patience.
             snapshot.snoozeAllowanceThisBreak = config.deferredSnoozeAllowance
@@ -171,7 +169,6 @@ extension Scheduler {
         snapshot.snoozeAllowanceThisBreak = nil
         snapshot.microAnchorAt = nil
         snapshot.microSnoozeUsed = false
-        snapshot.pendingInputWaitStartedAt = nil
         snapshot.deferredFullDueAt = nil
     }
 

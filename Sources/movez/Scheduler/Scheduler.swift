@@ -12,7 +12,6 @@ struct Scheduler {
     init(config: SchedulerConfig = SchedulerConfig(), now: Date) {
         self.config = config
         snapshot = SchedulerSnapshot(now: now, dayKey: DayKey.key(for: now, calendar: config.calendar))
-        snapshot.configHash = config.stableHash
         startFreshInterval(now: now)
     }
 
@@ -224,7 +223,6 @@ struct Scheduler {
         snapshot.microSnoozeUsed = false
         snapshot.snoozesUsedThisBreak = 0
         snapshot.snoozeAllowanceThisBreak = nil
-        snapshot.pendingInputWaitStartedAt = nil
         // A deferral belongs to the countdown it was deferred from. Left behind, it would label
         // the next break as having waited for a call, and send a later call's end straight to a
         // break nobody owed.
@@ -274,10 +272,8 @@ struct Scheduler {
     /// a resumed pause and a wake each restart the countdown without moving the bout, and
     /// re-planning from the bout brought the break they had just dealt with straight back.
     mutating func apply(_ updated: SchedulerConfig, now: Date) -> [SchedulerEffect] {
-        let wasPolling = pollingRequired
         let previous = config
         config = updated
-        snapshot.configHash = updated.stableHash
 
         if snapshot.state.countdownRuns {
             let sitChange = TimeInterval(updated.sitSeconds - previous.sitSeconds)
@@ -285,9 +281,9 @@ struct Scheduler {
             snapshot.nextMicroDueAt = replannedMicroDue(previous: previous, now: now)
         }
 
-        var effects: [SchedulerEffect] = [.persist, .menuRefresh]
-        if wasPolling != pollingRequired { effects.append(.pollingChanged(pollingRequired)) }
-        return effects
+        // Polling follows the state alone, which a settings change never moves, so there is no
+        // `.pollingChanged` to send here.
+        return [.persist, .menuRefresh]
     }
 
     /// The micro-break due time after a settings change, measured from the cycle it belongs to.
@@ -317,7 +313,6 @@ struct Scheduler {
     /// not a setting the user changed, so nothing is re-planned, persisted or redrawn.
     mutating func setBreakLength(_ seconds: Int) -> [SchedulerEffect] {
         config.breakSeconds = max(1, seconds)
-        snapshot.configHash = config.stableHash
         return []
     }
 

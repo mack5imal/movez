@@ -139,11 +139,6 @@ extension Scheduler {
             return endAbsence(since: now.addingTimeInterval(-Double(seconds)), returnedAt: now, now: now)
         case .afterSuppression:
             return resumeAfterSuppression(now: now)
-        case .pendingFull:
-            return enterPendingFull(now: now)
-        case .sitting:
-            transition(to: .sitting, reason: "grace ended", at: now)
-            return [.persist, .menuRefresh]
         }
     }
 
@@ -256,7 +251,6 @@ extension Scheduler {
         rollDayCountersIfStale(now: now)
 
         snapshot.deferredFullDueAt = snapshot.deferredFullDueAt?.addingTimeInterval(gap)
-        snapshot.pendingInputWaitStartedAt = snapshot.pendingInputWaitStartedAt?.addingTimeInterval(gap)
 
         let reason = "relaunched after \(seconds) s — countdown moved on"
         transition(to: Self.shifted(snapshot.state, by: gap), reason: reason, at: now)

@@ -85,8 +85,8 @@ struct SchedulerConfig: Codable, Equatable, Hashable {
         return min(customSitRangeMinutes.upperBound, max(customSitRangeMinutes.lowerBound, stepped))
     }
 
-    /// A hash that is stable across launches, unlike `hashValue`. Stored in the snapshot so a
-    /// resumed session can tell whether the settings changed while it was gone.
+    /// A hash that is stable across launches, unlike `hashValue`. Part of the menu's break preview
+    /// key, so a settings change rebuilds the preview.
     var stableHash: UInt64 {
         var hash: UInt64 = 0xCBF2_9CE4_8422_2325
         func mix(_ value: Int) {

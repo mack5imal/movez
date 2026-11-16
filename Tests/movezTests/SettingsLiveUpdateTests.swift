@@ -171,7 +171,7 @@ final class SettingsLiveUpdateTests: XCTestCase {
 
         XCTAssertEqual(harness.settings.workingHours.days[5].endMinutes, 13 * 60)
         XCTAssertEqual(
-            harness.coordinator.scheduler.snapshot.configHash,
+            harness.coordinator.scheduler.config.stableHash,
             harness.settings.schedulerConfig.stableHash,
             "the scheduler is holding the config the settings now describe"
         )
