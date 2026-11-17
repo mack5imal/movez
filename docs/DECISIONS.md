@@ -783,7 +783,9 @@ Entries from fixing the findings in `docs/code-review-2026-11.md`.
     bar shows "‖" with no minutes and the dropdown offers no "Extend pause", and the scheduler
     ignores an extension of a pause with no end. A snooze counts down to its own end, and a break
     that is due and waiting reads "Break due", or "Break waiting for your call" (or screen share,
-    or fullscreen app), instead of "Next break in 0 min" (UI-4, UI-5, UI-6).
+    or fullscreen app), instead of "Next break in 0 min" (UI-4, UI-5, UI-6). "Pause for" is
+    hidden while a full break is on screen as well: the scheduler does not pause a running break,
+    and the overlay has its own Pause and its other buttons are the way out (87).
 85. **The debug time scale is scratch.** It stays in every build, because the product brief
     specifies the Debug section, but nothing it does outlives it. The scale is held in memory
     only, so every launch starts at 1× (a scale an earlier build saved is dropped). While it is

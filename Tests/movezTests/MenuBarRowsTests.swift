@@ -132,6 +132,11 @@ final class MenuBarRowsTests: XCTestCase {
         menu.refresh()
         XCTAssertFalse(menu.state.rows.contains(.takeBreak))
         XCTAssertFalse(menu.state.rows.contains(.makeDue))
+        XCTAssertFalse(menu.state.rows.contains(.pauseFor), "the scheduler does not pause a running break")
+        XCTAssertEqual(menu.state.rows, [], "and the overlay's own buttons are the way out of it")
+
+        harness.coordinator.pause(forSeconds: 30 * 60)
+        XCTAssertEqual(harness.state.name, "full_break", "which is why the row is not offered")
     }
 
     // MARK: - Paused

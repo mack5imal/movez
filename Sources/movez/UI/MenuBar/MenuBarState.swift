@@ -81,6 +81,9 @@ struct MenuBarState: Equatable {
     var makeDueAvailable = true
     /// False while a full break is on screen: the break the row would start is already running.
     var takeBreakAvailable = true
+    /// False while a full break is on screen: the scheduler does not pause a running break, and
+    /// the overlay has its own Pause (DECISIONS 84).
+    var pauseAvailable = true
     /// A Focus pause, which ends when the Focus does rather than at a time. It has no minutes to
     /// show and nothing to extend.
     var pauseIndefinite = false
@@ -106,7 +109,11 @@ struct MenuBarState: Equatable {
             if takeBreakAvailable { rows.append(.takeBreak) }
             if makeDueAvailable { rows.append(.makeDue) }
             // A session started by hand ends by hand; pausing it would be the long way round.
-            rows.append(isAdHocSession ? .endSession : .pauseFor)
+            if isAdHocSession {
+                rows.append(.endSession)
+            } else if pauseAvailable {
+                rows.append(.pauseFor)
+            }
             return rows
         case .paused:
             return pauseIndefinite ? [.resume, .takeBreak] : [.resume, .extendPause, .takeBreak]

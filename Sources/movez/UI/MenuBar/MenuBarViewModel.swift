@@ -160,7 +160,10 @@ final class MenuBarViewModel: ObservableObject {
         next.isBreaking = schedulerState.isBreakSurfaceVisible
         next.breakLabel = Self.breakLabel(for: schedulerState)
         next.makeDueAvailable = schedulerState == .sitting
-        if case .fullBreak = schedulerState { next.takeBreakAvailable = false }
+        if case .fullBreak = schedulerState {
+            next.takeBreakAvailable = false
+            next.pauseAvailable = false
+        }
 
         switch next.mode {
         case .sitting: applySitting(to: &next, now: now)
