@@ -1,6 +1,6 @@
 # Code review: movez, November 2026
 
-Reviewed at `3f69dd2` on `relay/add-a-strength-mode-to-movez-alongside-t-DWCNKz`, 2026-11-16.
+Reviewed at `44863d3` on `main`, 2026-11-16 (the strength-mode work, since squashed into one commit; it was `3f69dd2` on its own branch when reviewed).
 Scope: everything in `Sources/movez/`, `Tests/movezTests/`, `scripts/`, `project.yml` and the
 `Makefile`. Out of scope: `build/`, `.relay/`, `design/` and the generated `movez.xcodeproj`.
 
@@ -109,7 +109,7 @@ is no Movement end screen and no streak (UI-7, DECISIONS 76).
 
 ### SCH-1 · high · A settings change re-plans from the bout start, which re-serves a skipped or paused break and fires a second micro-break
 
-**Outcome:** fixed in `d339878`.
+**Outcome:** fixed in `b80d95c`.
 
 **Where:** `Sources/movez/Scheduler/Scheduler.swift:257` · **Category:** correctness · **DECISIONS checked:** 24, 48 (skip keeps the bout), memory: defer-never-reset
 
@@ -135,7 +135,7 @@ Traced: apply() sets nextFullDueAt = boutStartedAt + sitSeconds whenever countdo
 
 ### SCH-2 · high · An absence after a deferred break leaves `deferredFullDueAt` behind: the next break is mislabelled and a later call triggers an early break
 
-**Outcome:** fixed in `b7aa561`.
+**Outcome:** fixed in `d49b9f0`.
 
 **Where:** `Sources/movez/Scheduler/Scheduler+Idle.swift:127` · **Category:** correctness · **DECISIONS checked:** 8, 20, 43
 
@@ -157,7 +157,7 @@ Traced. tickSuppressed sets snapshot.deferredFullDueAt. Only enterFullBreak, res
 
 ### SCH-3 · high · A break the lid or display sleep interrupted is settled without telling the coordinator, so it never reaches history
 
-**Outcome:** fixed in `9f156b0`.
+**Outcome:** fixed in `31d5385`.
 
 **Where:** `Sources/movez/Scheduler/Scheduler+Sleep.swift:141` · **Category:** persistence · **DECISIONS checked:** 20, 22, 23c, 38, 59
 
@@ -175,7 +175,7 @@ Core claim holds. The settle branch of resumeInterruptedBreak returns only [.per
 
 ### SCH-4 · medium · Ad-hoc sessions: midnight takes down a running break without recording it, and the four-hour-gap end in DECISIONS 16 is missing
 
-**Outcome:** fixed in `51360f4`.
+**Outcome:** fixed in `98b2681`.
 
 **Where:** `Sources/movez/Scheduler/Scheduler+Hours.swift:10` · **Category:** correctness · **DECISIONS checked:** 16, 20a
 
@@ -191,7 +191,7 @@ Midnight: with adHocSession set, applyWorkingHours returns endAdHocSessionIfStal
 
 ### SCH-5 · medium · A Focus pause that starts off hours, or runs past the start of a working day, resumes with yesterday's bout and countdown
 
-**Outcome:** fixed in `380a11b`.
+**Outcome:** fixed in `69c7b0b`.
 
 **Where:** `Sources/movez/Scheduler/Scheduler+Pause.swift:74` · **Category:** correctness · **DECISIONS checked:** 23c, 26, 51
 
@@ -216,7 +216,7 @@ pause() refuses only .fullBreak, so .focusFilter(paused:true) from .offHours sto
 
 ### SCH-6 · medium · A wake or tick gap with nothing away skips the sleep path's bookkeeping, and at the 60× debug scale the scheduler never leaves the quiet minute
 
-**Outcome:** fixed in `4b704cb`.
+**Outcome:** fixed in `726f5f2`.
 
 **Where:** `Sources/movez/Scheduler/Scheduler+Sleep.swift:77` · **Category:** macos-edge · **DECISIONS checked:** 19a, 23b, 43
 
@@ -244,7 +244,7 @@ The default branch (79-84) calls enterAbsenceGrace without dismissSurfaces or ca
 
 ### SCH-7 · medium · A call, share or fullscreen app that comes back during the 2-minute post-call grace is ignored, so the heads-up chimes in the call
 
-**Outcome:** fixed in `1d2f526`.
+**Outcome:** fixed in `eef8905`.
 
 **Where:** `Sources/movez/Scheduler/Scheduler+Suppression.swift:25` · **Category:** correctness · **DECISIONS checked:** 20, 23h
 
@@ -264,7 +264,7 @@ beginSuppression's switch covers only .sitting, .pendingFull/.snoozed and .heads
 
 ### SCH-8 · medium · A snoozed micro-break's anchor survives a pause or a call, so a later micro-break fires again two seconds after it closes
 
-**Outcome:** fixed in `a0aea17`.
+**Outcome:** fixed in `982b08d`.
 
 **Where:** `Sources/movez/Scheduler/Scheduler+Suppression.swift:67` · **Category:** correctness · **DECISIONS checked:** 9, 10, 30
 
@@ -284,7 +284,7 @@ Traced the 85/5 example. snoozeMicro keeps microAnchorAt (09:30) and sets microS
 
 ### SCH-9 · medium · The scheduler's calendar is fixed when the config is built, so a time-zone change shifts working hours and midnight
 
-**Outcome:** fixed in `f24d85c`.
+**Outcome:** fixed in `57fc45d`.
 
 **Where:** `Sources/movez/Scheduler/SchedulerConfig.swift:45` · **Category:** macos-edge · **DECISIONS checked:** 14, 20a, 20c
 
@@ -302,7 +302,7 @@ SchedulerConfig.calendar and from(preset:) default to Calendar.current, a snapsh
 
 ### SCH-10 · low · A short lock or display sleep during a snooze cuts the snooze short
 
-**Outcome:** fixed in `ee88408`.
+**Outcome:** fixed in `3f08201`.
 
 **Where:** `Sources/movez/Scheduler/Scheduler+Idle.swift:100` · **Category:** correctness · **DECISIONS checked:** 20, 43
 
@@ -320,7 +320,7 @@ handleSleepOrLock from .snoozed reaches captureCountdowns(at: now), and dueAtAwa
 
 ### SCH-11 · low · Two handlers change state without checking it, which breaks `handle`'s promise to be total
 
-**Outcome:** fixed in `e5bf14e`.
+**Outcome:** fixed in `6da0eb9`.
 
 **Where:** `Sources/movez/Scheduler/Scheduler+Idle.swift:165` · **Category:** correctness · **DECISIONS checked:** 16, 43
 
@@ -340,7 +340,7 @@ reverseCredit guards only on creditRestore and its 15 s expiry, then transitions
 
 ### SCH-12 · low · A relaunch within 10 s of the last save leaves the scheduler in `.fullBreak` with nothing on screen
 
-**Outcome:** fixed in `2b50b3f`.
+**Outcome:** fixed in `e24040c`.
 
 **Where:** `Sources/movez/Scheduler/Scheduler+Sleep.swift:157` · **Category:** lifecycle · **DECISIONS checked:** 20b
 
@@ -356,7 +356,7 @@ The mechanism is real: a gap ≤10 s returns rollDayIfStale before the isBreakSu
 
 ### SCH-13 · low · After a relaunch, a snooze or pending break keeps its wall-clock deadline while the countdown is moved on
 
-**Outcome:** fixed in `2b50b3f`.
+**Outcome:** fixed in `e24040c`.
 
 **Where:** `Sources/movez/Scheduler/Scheduler+Sleep.swift:207` · **Category:** correctness · **DECISIONS checked:** 20b
 
@@ -372,7 +372,7 @@ Confirmed. shiftInterval (192-211) shifts boutStartedAt, both due times, microAn
 
 ### SCH-14 · low · Dead state and dead branches in the scheduler
 
-**Outcome:** fixed in `812159b`.
+**Outcome:** fixed in `185a6c2`.
 
 **Where:** `Sources/movez/Scheduler/SchedulerSnapshot.swift:59` · **Category:** dead-code
 
@@ -398,7 +398,7 @@ Verified each item by grep. snapshot.configHash is written at Scheduler.swift:15
 
 ### SCH-15 · low · Dead SignalSnapshot fields and an unused report path
 
-**Outcome:** fixed in `be544e7`.
+**Outcome:** fixed in `0f18826`.
 
 **Where:** `Sources/movez/Scheduler/SignalSnapshot.swift:12` · **Category:** dead-code
 
@@ -421,7 +421,7 @@ Neither screenLocked nor displaySleeping is referenced anywhere in Sources or Te
 
 ### APP-1 · medium · The Focus filter is applied as a one-shot event, and the event can be lost
 
-**Outcome:** fixed in `57f0eed`.
+**Outcome:** fixed in `e0feb57`.
 
 **Where:** `Sources/movez/FocusFilter/MovezFocusFilterIntent.swift:37` · **Category:** lifecycle · **DECISIONS checked:** 26, 51
 
@@ -445,7 +445,7 @@ perform() calls AppCoordinator.shared?.focusFilter, a static weak reference set 
 
 ### APP-2 · low · A relaunch with an interrupted break still in state.json serves a different, backdated break
 
-**Outcome:** fixed in `1077269`.
+**Outcome:** fixed in `859cc4c`.
 
 **Where:** `Sources/movez/App/AppCoordinator+Effects.swift:111` · **Category:** lifecycle · **DECISIONS checked:** 20b
 
@@ -463,7 +463,7 @@ interruptedSession is in-memory only. interruptedBreak is in the snapshot with a
 
 ### APP-3 · low · Persistence failures are silent, and a failed store setup runs a whole session with nothing saved
 
-**Outcome:** fixed in `8381d02`.
+**Outcome:** fixed in `44d9479`.
 
 **Where:** `Sources/movez/App/AppDelegate.swift:115` · **Category:** persistence · **DECISIONS checked:** 3
 
@@ -481,7 +481,7 @@ AppDelegate.swift:115-121 builds both stores with try? and falls back to History
 
 ### APP-4 · low · An unreadable history file is overwritten by the next save, so the record cannot be recovered
 
-**Outcome:** fixed in `a098459`.
+**Outcome:** fixed in `21c01ee`.
 
 **Where:** `Sources/movez/History/HistoryStore.swift:118` · **Category:** persistence · **DECISIONS checked:** 43
 
@@ -497,7 +497,7 @@ The mechanism is confirmed. restore() returns an empty HistoryData on any decode
 
 ### APP-5 · low · "Longest sitting bout" ignores bouts that only skips touched; recordLongestBout is never called
 
-**Outcome:** fixed in `a06345e`.
+**Outcome:** fixed in `10568a9`.
 
 **Where:** `Sources/movez/History/HistoryStore.swift:159` · **Category:** dead-code
 
@@ -532,7 +532,7 @@ Confirmed: save() re-encodes and atomically rewrites the whole HistoryData on ev
 
 ### SIG-1 · high · Fullscreen detection never fires for native fullscreen apps on a notched MacBook display
 
-**Outcome:** fixed in `4857ac0`.
+**Outcome:** fixed in `1967b60`.
 
 **Where:** `Sources/movez/Signals/FullscreenMonitor.swift:35` · **Category:** macos-edge · **DECISIONS checked:** none (20 and 23h say fullscreen suppresses; README's known limitation covers maximised editors, not this)
 
@@ -558,7 +558,7 @@ isFullscreen (35-42) requires all four edges to be within tolerance = 1 pt of a 
 
 ### SIG-2 · medium · The mic signal reads only the default input device, and that property can't tell input from output
 
-**Outcome:** fixed in `5d90194`.
+**Outcome:** fixed in `192686b`.
 
 **Where:** `Sources/movez/Signals/MicrophoneMonitor.swift:10` · **Category:** macos-edge · **DECISIONS checked:** 23h
 
@@ -584,7 +584,7 @@ isInUse reads kAudioDevicePropertyDeviceIsRunningSomewhere with global scope on 
 
 ### SIG-3 · medium · A display that sleeps from inactivity dates the absence from the sleep, not from the last input
 
-**Outcome:** fixed in `b8e3de9`.
+**Outcome:** fixed in `f4b0b34`.
 
 **Where:** `Sources/movez/Signals/PowerMonitor.swift:30` · **Category:** correctness · **DECISIONS checked:** 23b (an absence is measured from when it began), 43
 
@@ -608,7 +608,7 @@ Line 30 maps screensDidSleepNotification to .sleep. handleSleepOrLock (Scheduler
 
 ### SIG-4 · medium · Input before signals in each poll plays a heads-up chime in back-to-back calls
 
-**Outcome:** fixed in `1d2f526`.
+**Outcome:** fixed in `eef8905`.
 
 **Where:** `Sources/movez/Signals/SignalAggregator.swift:107` · **Category:** correctness · **DECISIONS checked:** 20 (defer, never reset), 23h
 
@@ -634,7 +634,7 @@ poll() sends .input, then .idle, then .signals (107-109). beginSuppression retur
 
 ### SIG-5 · medium · At the 60x debug scale every poll is a synthesised wake, and no break ever fires
 
-**Outcome:** fixed in `d6b9b10`.
+**Outcome:** fixed in `ed8816f`.
 
 **Where:** `Sources/movez/Signals/SignalAggregator.swift:159` · **Category:** correctness · **DECISIONS checked:** none (21 and 23b set the quiet minute; the time scale is not in DECISIONS)
 
@@ -660,7 +660,7 @@ pollInterval = max(0.25, 2/60) = 0.25 s real (59-61), while SystemClock.now scal
 
 ### SIG-6 · low · Test-only fake sources ship in the app target, and the header comment says otherwise
 
-**Outcome:** fixed in `ca153a6`.
+**Outcome:** fixed in `84a3c0b`.
 
 **Where:** `Sources/movez/Signals/FakeSignals.swift:5` · **Category:** dead-code
 
@@ -678,7 +678,7 @@ A grep of Sources/movez finds no use of FakeIdleSource, FakeMicSource, FakeCaptu
 
 ### SIG-7 · low · The debug 'Mic on' hold is undone by the 60 s sustain, and 'off' clears every held signal
 
-**Outcome:** fixed in `3e2fe61`.
+**Outcome:** fixed in `8169709`.
 
 **Where:** `Sources/movez/Signals/FakeSignals.swift:125` · **Category:** test-gap · **DECISIONS checked:** 23h
 
@@ -707,7 +707,7 @@ fire(.micOn) applies the hold and then injects .signals(SignalSnapshot(microphon
 
 ### SIG-8 · low · Capture-matcher comments contradict the code, and the QuickTime row is redundant
 
-**Outcome:** fixed in `72f646f`.
+**Outcome:** fixed in `a1b714e`.
 
 **Where:** `Sources/movez/Signals/ScreenCaptureMonitor.swift:62` · **Category:** dead-code · **DECISIONS checked:** 25
 
@@ -727,7 +727,7 @@ fire(.micOn) applies the hold and then injects .signals(SignalSnapshot(microphon
 
 ### SIG-9 · low · A malformed capture-signatures.json silently turns off screen-share detection
 
-**Outcome:** fixed in `f574b07`.
+**Outcome:** fixed in `8cdd890`.
 
 **Where:** `Sources/movez/Signals/ScreenCaptureMonitor.swift:74` · **Category:** persistence · **DECISIONS checked:** 25
 
@@ -750,7 +750,7 @@ Swift's synthesized Decodable decodes non-optional properties with decode, not d
 
 ### LIB-1 · medium · Movement micro-breaks ignore the difficulty cap
 
-**Outcome:** fixed in `52a4d56`.
+**Outcome:** fixed in `8919c6b`.
 
 **Where:** `Sources/movez/Routine/MicroBreakBuilder.swift:57` · **Category:** correctness · **DECISIONS checked:** none (product brief §Settings difficulty cap; 41 refers to the default cap)
 
@@ -766,7 +766,7 @@ MicroBreakBuilder.candidates (57-70) filters only on needsEquipment, requiresFlo
 
 ### LIB-2 · medium · With kit at the default Beginner cap, every squat/lunge set (and every push set for a kettlebell-only user) is a light bodyweight move
 
-**Outcome:** fixed in `1b329cf`.
+**Outcome:** fixed in `2a958fb`.
 
 **Where:** `Sources/movez/Strength/StrengthBreakBuilder.swift:27` · **Category:** correctness · **DECISIONS checked:** 71, 56, 69
 
@@ -782,7 +782,7 @@ Mechanism confirmed. I dumped strength-library-v1.json: every vigorous SQT move 
 
 ### LIB-3 · low · The loader is strict about data the app never reads and does not check a stale list
 
-**Outcome:** fixed in `488a375`.
+**Outcome:** fixed in `7b5a96c`.
 
 **Where:** `Sources/movez/Library/LibraryLoader.swift:30` · **Category:** dead-code · **DECISIONS checked:** 41, 50
 
@@ -798,7 +798,7 @@ The facts check out. Expected 9/8/3 is checked at :133-148. Nothing outside the 
 
 ### LIB-4 · low · The strength loader's structural checks are untested, and the meter-dose test skips the arm buckets
 
-**Outcome:** fixed in `3e54d2d`.
+**Outcome:** fixed in `8d7ed5d`.
 
 **Where:** `Sources/movez/Library/StrengthLibrary.swift:93` · **Category:** test-gap · **DECISIONS checked:** 41, 70
 
@@ -814,7 +814,7 @@ validate and validateMovements check mode, the total of 151, buckets declared on
 
 ### LIB-5 · low · The micro-break timeline is written four times with two lead-in constants
 
-**Outcome:** fixed in `f286ba7`.
+**Outcome:** fixed in `f73dc80`.
 
 **Where:** `Sources/movez/Modes/ModeBuilder.swift:96` · **Category:** duplication · **DECISIONS checked:** 30, 39, 67
 
@@ -830,7 +830,7 @@ The timeline appears in Routine.swift:62-85, ModeBuilder.swift:96-106 (StrengthT
 
 ### LIB-6 · low · Strength heads-up tells bodyweight-only users to have their weights nearby
 
-**Outcome:** fixed in `aaea40f`.
+**Outcome:** fixed in `fdc4ab1`.
 
 **Where:** `Sources/movez/Modes/PlannedBreak.swift:70` · **Category:** correctness · **DECISIONS checked:** 56
 
@@ -846,7 +846,7 @@ fixedBody returns the same sentence for every strength break. It is the design's
 
 ### LIB-7 · low · MicroBreakBuilder can return a micro-break with no movements
 
-**Outcome:** fixed in `52a4d56`.
+**Outcome:** fixed in `8919c6b`.
 
 **Where:** `Sources/movez/Routine/MicroBreakBuilder.swift:38` · **Category:** correctness · **DECISIONS checked:** 32, 45
 
@@ -862,7 +862,7 @@ Only usedMovementIdsToday is relaxed (31-36). If choose() returns nil, the build
 
 ### LIB-8 · low · After a relaunch, Movement mode forgets skipped breaks and can rebuild the identical routine
 
-**Outcome:** fixed in `d4f556d`.
+**Outcome:** fixed in `da3f349`.
 
 **Where:** `Sources/movez/Routine/MovementModeBuilder.swift:11` · **Category:** persistence · **DECISIONS checked:** 32
 
@@ -878,7 +878,7 @@ breakIndexToday (AppCoordinator+Effects.swift:333-336) returns breaksToday.count
 
 ### LIB-9 · low · Production code that only tests reach
 
-**Outcome:** fixed in `1f758d5`.
+**Outcome:** fixed in `fb09063`.
 
 **Where:** `Sources/movez/Routine/Routine.swift:88` · **Category:** dead-code · **DECISIONS checked:** 54, 55
 
@@ -896,7 +896,7 @@ Mostly confirmed. eyebrow/regionWord/plainRegionWords (Routine.swift:88-121), by
 
 ### LIB-10 · low · Substitutions only reorders the candidate pool; it never changes what can be drawn
 
-**Outcome:** fixed in `ffffaa9`.
+**Outcome:** fixed in `bde6630`.
 
 **Where:** `Sources/movez/Routine/RoutineBuilder.swift:76` · **Category:** complexity · **DECISIONS checked:** 23e, 28
 
@@ -914,7 +914,7 @@ Substitutions.resolve returns the original movement, or a peer from bodyweightPe
 
 ### LIB-11 · low · relaxedCandidates' last rung can never run, and it tightens the pool
 
-**Outcome:** fixed in `ffffaa9`.
+**Outcome:** fixed in `bde6630`.
 
 **Where:** `Sources/movez/Routine/RoutineBuilder.swift:100` · **Category:** dead-code
 
@@ -930,7 +930,7 @@ I checked the JSON: 75 movements have no equipment, no requires, and difficulty 
 
 ### LIB-12 · low · The warm-up shape is let go as one block, so a floor warm-up is served even when a standing one is left
 
-**Outcome:** fixed in `9c78576`.
+**Outcome:** fixed in `a042db8`.
 
 **Where:** `Sources/movez/Strength/StrengthBreakBuilder.swift:71` · **Category:** correctness · **DECISIONS checked:** 58
 
@@ -946,7 +946,7 @@ Mechanism confirmed. Once .warmUpShape is let go, the slot rule is just isBodywe
 
 ### LIB-13 · low · The strength focus ×3 weights the warm-up and cool-down too, though DECISIONS 63 and the code comment say working sets only
 
-**Outcome:** fixed in `654fb6c`.
+**Outcome:** fixed in `82905eb`.
 
 **Where:** `Sources/movez/Strength/StrengthBreakBuilder.swift:192` · **Category:** correctness · **DECISIONS checked:** 63
 
@@ -980,7 +980,7 @@ Mechanism confirmed. strengthDays keys each record by DayKey.key(for: record.at)
 
 ### LIB-15 · low · After a mode switch, a strength micro-break ignores the previous micro-break's regions
 
-**Outcome:** fixed in `7f8f497`.
+**Outcome:** fixed in `dd494aa`.
 
 **Where:** `Sources/movez/Strength/StrengthMicroBuilder.swift:103` · **Category:** correctness · **DECISIONS checked:** 67
 
@@ -1000,7 +1000,7 @@ regions(of:) resolves ids only through library.movement(id:) (line 103-105). coo
 
 ### LIB-16 · low · Cool-down, end-range and lone micro-break blocks show a dose that contradicts their timer
 
-**Outcome:** fixed in `95c5cff`.
+**Outcome:** fixed in `05aa5e9`.
 
 **Where:** `Sources/movez/Strength/StrengthSessionTimeline.swift:112` · **Category:** correctness · **DECISIONS checked:** 58, 59
 
@@ -1029,7 +1029,7 @@ The cool-down segment uses dose: coolDown.movement.dose (line 112) and end-range
 
 ### LIB-17 · low · Strength APIs that only tests use, or nothing uses
 
-**Outcome:** fixed in `d63f6fb`.
+**Outcome:** fixed in `4966135`.
 
 **Where:** `Sources/movez/Strength/StrengthUnlock.swift:28` · **Category:** dead-code
 
@@ -1054,7 +1054,7 @@ Grep confirms each one. StrengthUnlock.unlockedDiff3 is called only from Strengt
 
 ### UI-1 · high · A resumed Movement break replays its finished blocks and writes them to history a second time
 
-**Outcome:** fixed in `7b90d9d`.
+**Outcome:** fixed in `2d1244d`.
 
 **Where:** `Sources/movez/UI/Overlay/OverlayEffectSink.swift:87` · **Category:** correctness
 
@@ -1072,7 +1072,7 @@ beginBreak rebuilds the resumed session with the old blockIndex and completedBlo
 
 ### UI-2 · high · Idle display sleep takes the overlay down mid-break, because nothing keeps the display awake during a break
 
-**Outcome:** fixed in `d620c45`.
+**Outcome:** fixed in `f5c69f8`.
 
 **Where:** `Sources/movez/UI/Overlay/OverlayWindowController.swift:52` · **Category:** macos-edge · **DECISIONS checked:** 38 (lid close and lock interrupting a break is intended; idle display sleep during a break is not covered by any entry)
 
@@ -1090,7 +1090,7 @@ grep for IOPMAssertion/beginActivity/idleDisplaySleep in Sources finds nothing. 
 
 ### UI-3 · medium · VoiceOver reads every Settings switch as just "On" or "Off", with no name
 
-**Outcome:** fixed in `7e3424f`.
+**Outcome:** fixed in `748e0be`.
 
 **Where:** `Sources/movez/UI/DesignSystem/Controls.swift:23` · **Category:** correctness
 
@@ -1106,7 +1106,7 @@ MovezToggle (Controls.swift:4-26) is a plain Button with .accessibilityLabel(isO
 
 ### UI-4 · medium · The dropdown shows "Take a break now" and "Make due in" in states where the scheduler ignores them
 
-**Outcome:** fixed in `378cf91`.
+**Outcome:** fixed in `88e0e5d`.
 
 **Where:** `Sources/movez/UI/MenuBar/MenuBarView.swift:104` · **Category:** correctness · **DECISIONS checked:** 17
 
@@ -1126,7 +1126,7 @@ MenuBarViewModel.mode maps .sitting and .breaking to the sitting menu, and makeM
 
 ### UI-5 · medium · An indefinite Focus pause shows "‖ 0m", and "Extend pause" turns it into a 15-minute pause
 
-**Outcome:** fixed in `378cf91`.
+**Outcome:** fixed in `88e0e5d`.
 
 **Where:** `Sources/movez/UI/MenuBar/MenuBarView.swift:120` · **Category:** correctness · **DECISIONS checked:** 26, 51
 
@@ -1146,7 +1146,7 @@ A Focus pause is pause(seconds: nil, focusInitiated: true) (Scheduler.swift:71-7
 
 ### UI-6 · medium · During a snooze the menu says "Next break in 0 min" and the menu bar shows "0m"
 
-**Outcome:** fixed in `378cf91`.
+**Outcome:** fixed in `88e0e5d`.
 
 **Where:** `Sources/movez/UI/MenuBar/MenuBarViewModel.swift:175` · **Category:** correctness · **DECISIONS checked:** 19a, 20
 
@@ -1173,7 +1173,7 @@ snooze (Scheduler+Actions.swift:103-110) transitions to .snoozed(until:) and lea
 
 ### UI-7 · medium · The Movement end screen is visible only during the 0.3 s fade, and its Back to work button does nothing
 
-**Outcome:** fixed in `18e9d0a`, `8017f99`.
+**Outcome:** fixed in `4e468f7`, `6b28df2`.
 
 **Where:** `Sources/movez/UI/Overlay/OverlayViewModel.swift:286` · **Category:** correctness · **DECISIONS checked:** 4, 33, 58
 
@@ -1189,7 +1189,7 @@ finish() sets .complete and calls onFinished in the same pass. That reaches fini
 
 ### UI-8 · medium · A strength break whose pause runs out is always recorded as snoozed, even when it already counts as done
 
-**Outcome:** fixed in `6f781f7`.
+**Outcome:** fixed in `86872b6`.
 
 **Where:** `Sources/movez/UI/Overlay/StrengthOverlayViewModel.swift:183` · **Category:** correctness · **DECISIONS checked:** 38, 59
 
@@ -1207,7 +1207,7 @@ pauseExpired (183-189) always calls onPauseExpired. The sink wires that to coord
 
 ### UI-9 · medium · activeScreen() crashes when no display is attached, and a break shown with no windows is never rebuilt
 
-**Outcome:** fixed in `4bdd6f2`.
+**Outcome:** fixed in `79de140`.
 
 **Where:** `Sources/movez/UI/Panels/PanelWindowController.swift:97` · **Category:** macos-edge
 
@@ -1223,7 +1223,7 @@ activeScreen() falls back to NSScreen.screens[0], which traps on an empty array.
 
 ### UI-10 · medium · The debug time scale is saved across relaunches, and while it runs it writes future timestamps into the real history and state files
 
-**Outcome:** fixed in `7cedabc`.
+**Outcome:** fixed in `cf2d8b8`.
 
 **Where:** `Sources/movez/UI/Settings/DebugViewModel.swift:35` · **Category:** persistence
 
@@ -1250,7 +1250,7 @@ setTimeScale writes settings.debugTimeScale. SettingsStore persists it (Settings
 
 ### UI-11 · low · The gallery's strip and disc samples no longer match the app
 
-**Outcome:** fixed in `f8f75ec`.
+**Outcome:** fixed in `0026980`.
 
 **Where:** `Sources/movez/UI/Debug/Gallery.swift:131` · **Category:** correctness · **DECISIONS checked:** 28, 6
 
@@ -1271,7 +1271,7 @@ SnapshotFixtures.stripNames has 5 entries (SnapshotFixtures.swift:23), and 'Hip 
 
 ### UI-12 · low · Snapshot fixtures fail silently, and nothing checks them
 
-**Outcome:** fixed in `856d6f1`.
+**Outcome:** fixed in `fac506a`.
 
 **Where:** `Sources/movez/UI/Debug/SnapshotRenderer.swift:327` · **Category:** test-gap · **DECISIONS checked:** 70
 
@@ -1292,7 +1292,7 @@ view(for:) (:143-147) chains optional lookups that end in overlayView, which has
 
 ### UI-13 · low · The strength micro-break long-text snapshot draws the wrong instruction
 
-**Outcome:** fixed in `856d6f1`.
+**Outcome:** fixed in `fac506a`.
 
 **Where:** `Sources/movez/UI/Debug/StrengthPanelFixtures.swift:65` · **Category:** correctness · **DECISIONS checked:** 67
 
@@ -1308,7 +1308,7 @@ renamed(_:after:) (StrengthSnapshotFixtures.swift:231-240) takes name, equipment
 
 ### UI-14 · low · Line heights tighter than Manrope's natural 1.37 are silently ignored (10 of 44 styles)
 
-**Outcome:** fixed in `fc5177b`.
+**Outcome:** fixed in `bdb206d`.
 
 **Where:** `Sources/movez/UI/DesignSystem/TextStyles.swift:23` · **Category:** correctness
 
@@ -1324,7 +1324,7 @@ I measured the bundled Manrope[wght].ttf with a small swiftc program: ascender -
 
 ### UI-15 · low · Two unused tokens, and three components that re-implement a neighbouring one
 
-**Outcome:** fixed in `44c2e32`.
+**Outcome:** fixed in `4109eb0`.
 
 **Where:** `Sources/movez/UI/DesignSystem/Tokens.swift:109` · **Category:** duplication
 
@@ -1340,7 +1340,7 @@ Confirmed by grep: leadinRingTrack (Tokens.swift:109) and overlayRingStroke (:17
 
 ### UI-16 · low · The menu-bar item redraws every 2 s because the elapsed fraction changes every tick
 
-**Outcome:** fixed in `378cf91`.
+**Outcome:** fixed in `88e0e5d`.
 
 **Where:** `Sources/movez/UI/MenuBar/MenuBarViewModel.swift:177` · **Category:** complexity
 
@@ -1356,7 +1356,7 @@ The coordinator republishes menuState on every tick (AppCoordinator.swift:278), 
 
 ### UI-17 · low · Fixed-size break card and notice window do not fit small displays
 
-**Outcome:** fixed in `81aaec8`.
+**Outcome:** fixed in `f85662c`.
 
 **Where:** `Sources/movez/UI/Overlay/OverlayView.swift:124` · **Category:** macos-edge · **DECISIONS checked:** 49, 53
 
@@ -1372,7 +1372,7 @@ Tokens.Metric.overlayCard is 1000×660 and overlayDisc is 300 (Tokens.swift:167-
 
 ### UI-18 · low · The skip delay is stated three times, and the panel layout code is duplicated
 
-**Outcome:** fixed in `baf77bb`.
+**Outcome:** fixed in `6ba11f1`.
 
 **Where:** `Sources/movez/UI/Overlay/OverlayViewModel.swift:15` · **Category:** duplication
 
@@ -1404,7 +1404,7 @@ The overlay is at CGShieldingWindowLevel (117), which is above every standard Ap
 
 ### UI-20 · low · Movement overlay keys act from the first instant, with no repeat filter or press guard, so stray typing pauses or advances the break
 
-**Outcome:** fixed in `f4161d0`.
+**Outcome:** fixed in `6c94e77`.
 
 **Where:** `Sources/movez/UI/Overlay/OverlayWindowController.swift:150` · **Category:** correctness · **DECISIONS checked:** 5, 29
 
@@ -1422,7 +1422,7 @@ Confirmed mechanically. The local monitor never checks event.isARepeat (150-165)
 
 ### UI-21 · low · The strength overlay redraws the whole card every display frame during a set
 
-**Outcome:** fixed in `f7c65bd`.
+**Outcome:** fixed in `0471a02`.
 
 **Where:** `Sources/movez/UI/Overlay/StrengthOverlayView.swift:238` · **Category:** complexity · **DECISIONS checked:** 66
 
@@ -1438,7 +1438,7 @@ Lines 235-243 wrap the entire StrengthOverlayView in TimelineView(.animation) wh
 
 ### UI-22 · low · Panels and the toast stay pinned to the screen they opened on, even after that display is gone
 
-**Outcome:** fixed in `4bdd6f2`.
+**Outcome:** fixed in `79de140`.
 
 **Where:** `Sources/movez/UI/Panels/PanelWindowController.swift:147` · **Category:** macos-edge
 
@@ -1454,7 +1454,7 @@ panelScreen and toastScreen are set once (43-44, 58-59). layoutPanel and layoutT
 
 ### UI-23 · low · Dead accessors and stale comments in the window controllers
 
-**Outcome:** fixed in `8017f99`.
+**Outcome:** fixed in `6b28df2`.
 
 **Where:** `Sources/movez/UI/Panels/PanelWindowController.swift:207` · **Category:** dead-code · **DECISIONS checked:** 49
 
@@ -1470,7 +1470,7 @@ A grep across Sources and Tests finds no callers for hideAll, isShowingPanel, is
 
 ### UI-24 · low · After Settings has been opened once, the debug inspector republishes the whole Settings view model every poll until quit
 
-**Outcome:** fixed in `f75d567`.
+**Outcome:** fixed in `e64906a`.
 
 **Where:** `Sources/movez/UI/Settings/SettingsWindow.swift:44` · **Category:** lifecycle
 
@@ -1493,7 +1493,7 @@ show() builds the DebugViewModel once and attaches it (lines 44-48), and nothing
 
 ### UI-25 · low · Closing the Settings window leaves an open sheet and its draft for next time
 
-**Outcome:** fixed in `f75d567`.
+**Outcome:** fixed in `e64906a`.
 
 **Where:** `Sources/movez/UI/Settings/SettingsWindow.swift:63` · **Category:** lifecycle · **DECISIONS checked:** 15, 56
 
@@ -1514,7 +1514,7 @@ The window has no delegate, and close() only calls orderOut. The red close butto
 
 ### TST-1 · medium · Nothing checks that simulate_strength.py draws what the Swift builders draw, so its proofs and weekly-volume targets are unchecked against the app
 
-**Outcome:** fixed in `5dfa8ce`, `3cf447f`.
+**Outcome:** fixed in `74bcffc`, `f3edd42`.
 
 **Where:** `Tests/movezTests/StrengthSimulationCrossCheckTests.swift:30` · **Category:** test-gap · **DECISIONS checked:** 69
 
@@ -1532,7 +1532,7 @@ The test file reads only scripts/strength-rules.json (testTheRuleListMatchesTheS
 
 ### TST-2 · medium · In the app a move done for two sets carries twice the recency; both simulations count it once
 
-**Outcome:** fixed in `a5021f4`.
+**Outcome:** fixed in `b3df0ce`.
 
 **Where:** `scripts/simulate_strength.py:936` · **Category:** correctness · **DECISIONS checked:** 23e, 65, 69
 
@@ -1548,7 +1548,7 @@ In Swift, recordOverlayPart writes one MovementCompletion per part (AppCoordinat
 
 ### TST-3 · medium · The simulation never reports the app defaults' relaxations, which hides that every Beginner bodyweight triceps arm break serves a difficulty-2 move
 
-**Outcome:** fixed in `1b329cf`.
+**Outcome:** fixed in `2a958fb`.
 
 **Where:** `scripts/simulate_strength.py:1205` · **Category:** test-gap · **DECISIONS checked:** 56, 58, 65, 69, 70
 
@@ -1564,7 +1564,7 @@ Read main() (1086-1125) and report() (1131-1240). The Relaxations table (1203-12
 
 ### TST-4 · low · `make test` hides compiler warnings, and nothing fails on a new concurrency warning
 
-**Outcome:** fixed in `6b96999`.
+**Outcome:** fixed in `de51b5e`.
 
 **Where:** `Makefile:33` · **Category:** test-gap · **DECISIONS checked:** 1
 
@@ -1580,7 +1580,7 @@ Confirmed that `make test` greps for 'Test Suite|Executed|error:|failed|** TEST'
 
 ### TST-5 · low · NSMicrophoneUsageDescription is never shown, and its text says 'movez'
 
-**Outcome:** fixed in `587a1c7`.
+**Outcome:** fixed in `4a4726b`.
 
 **Where:** `Sources/movez/Resources/Info.plist:32` · **Category:** dead-code · **DECISIONS checked:** 52
 
@@ -1596,7 +1596,7 @@ Confirmed that nothing in Sources calls AVCaptureDevice or requestAccess, and th
 
 ### TST-6 · low · 'Transitions are identical whatever the scale' compares one run with itself
 
-**Outcome:** fixed in `8ba7640`.
+**Outcome:** fixed in `514b5c9`.
 
 **Where:** `Tests/movezTests/ClockTests.swift:52` · **Category:** test-gap
 
@@ -1612,7 +1612,7 @@ Confirmed. Line 52 compares transitions(tickSeconds: 2) with itself, and line 21
 
 ### TST-7 · low · Coordinator tests finish breaks through intents production never calls
 
-**Outcome:** fixed in `7b90d9d`, `5ffdf0b`, `8017f99`.
+**Outcome:** fixed in `2d1244d`, `6762389`, `6b28df2`.
 
 **Where:** `Tests/movezTests/CoordinatorTestSupport.swift:92` · **Category:** test-gap · **DECISIONS checked:** 38
 
@@ -1628,7 +1628,7 @@ Confirmed: the coordinator's nextBlock(), done(), endBreak(), canFinishBreak and
 
 ### TST-8 · low · FullscreenMonitorTests tests the fake's exception list, not the monitor's
 
-**Outcome:** fixed in `8ba7640`.
+**Outcome:** fixed in `514b5c9`.
 
 **Where:** `Tests/movezTests/FullscreenMonitorTests.swift:33` · **Category:** duplication
 
@@ -1644,7 +1644,7 @@ Confirmed. Lines 33-39 test FakeFullscreenSource, duplicating FakeSignalsTests.s
 
 ### TST-9 · low · The 'does not fire a break at launch' checks cannot fail, because the relaunch helper never ticks
 
-**Outcome:** fixed in `8ba7640`.
+**Outcome:** fixed in `514b5c9`.
 
 **Where:** `Tests/movezTests/LaunchStateTests.swift:140` · **Category:** test-gap · **DECISIONS checked:** 20b
 
@@ -1660,7 +1660,7 @@ The mechanism is correct. relaunch() (lines 22-41) only calls applyLaunchGap(). 
 
 ### TST-10 · low · The font fallback check passes a non-optional value to XCTAssertNotNil
 
-**Outcome:** fixed in `8ba7640`.
+**Outcome:** fixed in `514b5c9`.
 
 **Where:** `Tests/movezTests/LaunchStateTests.swift:290` · **Category:** test-gap
 
@@ -1676,7 +1676,7 @@ Confirmed. MovezFont.nsFont returns a non-optional NSFont (Fonts.swift:70), so X
 
 ### TST-11 · low · The mode-branching test misses `case let .strength(`, and a switch already lives in UI/Panels
 
-**Outcome:** fixed in `8ba7640`.
+**Outcome:** fixed in `514b5c9`.
 
 **Where:** `Tests/movezTests/ModeExtensibilityTests.swift:90` · **Category:** test-gap · **DECISIONS checked:** 54
 
@@ -1694,7 +1694,7 @@ The regex at :90 is `case \.strength|== \.strength|\.movement \?`. MicroPanelBre
 
 ### TST-12 · low · The Movement golden fixture overwrites itself and passes whenever the record flag is set; its only guard is an audit outside the repo
 
-**Outcome:** fixed in `8ba7640`.
+**Outcome:** fixed in `514b5c9`.
 
 **Where:** `Tests/movezTests/MovementPicksGoldenTests.swift:47` · **Category:** test-gap · **DECISIONS checked:** Strength mode preamble, 64
 
@@ -1710,7 +1710,7 @@ Confirmed. The record branch (lines 47-56) writes the fixture and returns, so th
 
 ### TST-13 · low · testDoneIsNeverOfferedBeforeTheSchedulerWouldAcceptIt compares a function with itself and misses that the overlay reads the wrong config
 
-**Outcome:** fixed in `6f781f7`.
+**Outcome:** fixed in `86872b6`.
 
 **Where:** `Tests/movezTests/OverlayViewModelTests.swift:287` · **Category:** test-gap · **DECISIONS checked:** 22, 29
 
@@ -1726,7 +1726,7 @@ doneAvailable (OverlayViewModel.swift:148-155) is Scheduler.meetsCompletionRule 
 
 ### TST-14 · low · testNoChimesWhenSoundsAreOff only tests the fake player's own switch
 
-**Outcome:** fixed in `8ba7640`.
+**Outcome:** fixed in `514b5c9`.
 
 **Where:** `Tests/movezTests/OverlayViewModelTests.swift:352` · **Category:** test-gap · **DECISIONS checked:** 23a
 
@@ -1742,7 +1742,7 @@ The test sets chimes.enabled = false, and RecordingChimePlayer.play begins with 
 
 ### TST-15 · low · Old state files are only tested by removing one key from a freshly encoded snapshot
 
-**Outcome:** fixed in `8ba7640`.
+**Outcome:** fixed in `514b5c9`.
 
 **Where:** `Tests/movezTests/PersistenceTests.swift:24` · **Category:** persistence
 
@@ -1758,7 +1758,7 @@ Confirmed. SchedulerSnapshot has no custom init(from:), and its own comment at l
 
 ### TST-16 · low · testInMemoryStoreRecordsEverySave only tests its own loop
 
-**Outcome:** fixed in `8ba7640`.
+**Outcome:** fixed in `514b5c9`.
 
 **Where:** `Tests/movezTests/PersistenceTests.swift:70` · **Category:** test-gap
 
@@ -1774,7 +1774,7 @@ Confirmed. Lines 66-77 save once per .persist effect and then assert saveCount e
 
 ### TST-17 · low · testApplicationSupportDirectoryIsCreated creates a folder in the real ~/Library/Application Support
 
-**Outcome:** fixed in `8ba7640`.
+**Outcome:** fixed in `514b5c9`.
 
 **Where:** `Tests/movezTests/PersistenceTests.swift:132` · **Category:** test-gap
 
@@ -1790,7 +1790,7 @@ Confirmed. The test calls the production FileSnapshotStore.applicationSupportDir
 
 ### TST-18 · low · The "split shift" test uses the wrong weekdays and passes for another reason, so the working-day-opening reset is untested
 
-**Outcome:** fixed in `8ba7640`.
+**Outcome:** fixed in `514b5c9`.
 
 **Where:** `Tests/movezTests/SchedulerDayBoundaryTests.swift:202` · **Category:** test-gap · **DECISIONS checked:** 14, 23c
 
@@ -1813,7 +1813,7 @@ WorkingHours.days is indexed weekday-1 (WorkingHours.swift:35,74), so days[2] an
 
 ### TST-19 · low · The check that the micro-break is not lost cannot fail
 
-**Outcome:** fixed in `8ba7640`.
+**Outcome:** fixed in `514b5c9`.
 
 **Where:** `Tests/movezTests/SchedulerMicroTests.swift:116` · **Category:** test-gap · **DECISIONS checked:** 23h
 
@@ -1829,7 +1829,7 @@ Confirmed. In sitting after a micro-break, nextFullDueAt is always set, so `next
 
 ### TST-20 · low · The 'never talks to the network' entitlement check proves nothing for an unsandboxed app
 
-**Outcome:** fixed in `8ba7640`.
+**Outcome:** fixed in `514b5c9`.
 
 **Where:** `Tests/movezTests/SecurityAndCopyTests.swift:18` · **Category:** test-gap · **DECISIONS checked:** 3
 
@@ -1845,7 +1845,7 @@ Partly refuted. testTheEntitlementsClaimNothingBeyondWhatIsUsed (55-61) does wha
 
 ### TST-21 · low · The signal-polling tests count their own loop, so the pollCount assertions cannot fail
 
-**Outcome:** fixed in `8ba7640`.
+**Outcome:** fixed in `514b5c9`.
 
 **Where:** `Tests/movezTests/SignalAggregatorTests.swift:37` · **Category:** test-gap · **DECISIONS checked:** 21
 
@@ -1861,7 +1861,7 @@ Confirmed. The helper at lines 32-40 skips poll() when !pollingRequired, and the
 
 ### TST-22 · low · StrengthRuleChecker borrows the builders' own predicates for several rules, and its s6-dose check cannot fail
 
-**Outcome:** fixed in `8ba7640`.
+**Outcome:** fixed in `514b5c9`.
 
 **Where:** `Tests/movezTests/StrengthRuleChecker.swift:140` · **Category:** test-gap · **DECISIONS checked:** 69
 
@@ -1877,7 +1877,7 @@ The checker reuses StrengthBreakBuilder.isWarmUpShaped (line 140), StrengthEligi
 
 ### TST-23 · low · testTheSheetCarriesNoAtLeastOneGate checks whole-string equality, so it can never find the phrase
 
-**Outcome:** fixed in `8ba7640`.
+**Outcome:** fixed in `514b5c9`.
 
 **Where:** `Tests/movezTests/StrengthSettingsWindowTests.swift:218` · **Category:** test-gap · **DECISIONS checked:** 56
 
@@ -1893,7 +1893,7 @@ The checker reuses StrengthBreakBuilder.isWarmUpShaped (line 140), StrengthEligi
 
 ### TST-24 · low · check_strength_library.py allows doses that DECISIONS 60 rules out, with no decision recorded
 
-**Outcome:** fixed in `a15f5eb`.
+**Outcome:** fixed in `b61a889`.
 
 **Where:** `scripts/check_strength_library.py:48` · **Category:** correctness · **DECISIONS checked:** 60, 70
 
@@ -1909,7 +1909,7 @@ COR-05 '12 reps, alternating, 2 s hold' and COR-17 '12 reps, alternating' really
 
 ### TST-25 · low · diff_strength_library.py and the snapshot-baseline tools only work until this branch merges
 
-**Outcome:** fixed in `b19fe67`.
+**Outcome:** fixed in `0e0b60b`.
 
 **Where:** `scripts/diff_strength_library.py:26` · **Category:** dead-code · **DECISIONS checked:** 50, 62, 70, 71
 
@@ -1925,7 +1925,7 @@ diff_strength_library.py hard-codes one migration (lines 26-35) and requires eve
 
 ### TST-26 · low · fetch_font.sh deletes the committed Manrope font when both downloads fail, and fetches an unpinned upstream
 
-**Outcome:** fixed in `899d543`.
+**Outcome:** fixed in `6da1754`.
 
 **Where:** `scripts/fetch_font.sh:35` · **Category:** correctness
 
@@ -1941,7 +1941,7 @@ download() has curl write directly to the final path, `--output "$out"`. When bo
 
 ### TST-27 · low · simulate_selection.py claims to be 'the model to re-run' but no longer models RoutineBuilder or MicroBreakBuilder
 
-**Outcome:** fixed in `0eacc61`.
+**Outcome:** fixed in `bdb4c1a`.
 
 **Where:** `scripts/simulate_selection.py:62` · **Category:** correctness · **DECISIONS checked:** 28, 32, 41, 45
 
@@ -1957,7 +1957,7 @@ The docstring (6-14) calls 'proposed' what the app ships and the model to re-run
 
 ### TST-28 · low · The simulated day keeps its records differently from the coordinator, so the report understates the servedToday relaxations about threefold
 
-**Outcome:** fixed in `a5021f4`.
+**Outcome:** fixed in `b3df0ce`.
 
 **Where:** `scripts/simulate_strength.py:879` · **Category:** correctness · **DECISIONS checked:** 59, 64, 67, 69
 
