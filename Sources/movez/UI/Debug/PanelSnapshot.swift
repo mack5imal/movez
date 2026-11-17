@@ -15,8 +15,8 @@ struct PanelSnapshot: View {
     }
 
     /// The light desktop the handoff draws its panels over.
-    private static let desktop = MovezColor(hex: 0xEFED_E7)
-    private static let desktopCard = MovezColor(hex: 0xF7F5_F0)
+    private static let desktop = Tokens.Backdrop.panelDesktop
+    private static let desktopCard = Tokens.Backdrop.panelDesktopCard
 
     var body: some View {
         ZStack(alignment: placement == .topCentre ? .top : .topTrailing) {

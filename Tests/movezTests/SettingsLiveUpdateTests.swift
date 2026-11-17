@@ -100,13 +100,13 @@ final class SettingsLiveUpdateTests: XCTestCase {
     func testAnExcludedMovementNeverReachesABreak() {
         let harness = harness()
         let settings = viewModel(harness)
-        let first = harness.coordinator.nextRoutine(at: harness.now)
+        let first = harness.coordinator.nextBreak(at: harness.now)
         let victim = first.movementIds[0]
 
         settings.setExcluded(victim, true)
         harness.coordinator.invalidatePreview()
 
-        let rebuilt = harness.coordinator.nextRoutine(at: harness.now)
+        let rebuilt = harness.coordinator.nextBreak(at: harness.now)
         XCTAssertFalse(rebuilt.movementIds.contains(victim))
     }
 

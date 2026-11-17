@@ -41,6 +41,11 @@ struct HeadsUpInfo: Equatable {
     var deferredReason: SuppressionReason?
     /// A break that waited more than half an hour says so, and gets one snooze instead of two.
     var showDeferredBadge: Bool = false
+    /// What kind of break is coming, and roughly how many minutes it runs. The scheduler leaves
+    /// both empty, since it never knows what a break holds; the coordinator fills them in from the
+    /// break it has planned before any surface sees the heads-up.
+    var breakKind: BreakKind?
+    var breakMinutes: Int?
 }
 
 /// The scheduler's half of a break. The coordinator attaches the generated routine.
@@ -48,6 +53,10 @@ struct BreakPlan: Equatable {
     var startedAt: Date
     var seconds: Int
     var deferred: Bool = false
+    /// Set only when a break the lid closed on picks up again, so the coordinator serves the
+    /// session it kept rather than the break the heads-up announced. Any other start is a fresh
+    /// break, even when the scheduler had an interruption on its books a moment before.
+    var resumed: Bool = false
 }
 
 /// How a break finished.

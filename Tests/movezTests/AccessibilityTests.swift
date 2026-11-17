@@ -68,6 +68,77 @@ final class AccessibilityTests: XCTestCase {
         XCTAssertEqual(strip.announcement(for: items[4]), "Box breathing, block 5 of 5, upcoming")
     }
 
+    // MARK: - The mode surfaces
+
+    /// A strength overlay at set 1, `seconds` into the set.
+    private func strengthOverlay(secondsIntoSet seconds: TimeInterval) -> StrengthOverlayViewModel {
+        let clock = ManualClock(now: SchedulerHarness.mondayMorning)
+        let viewModel = StrengthOverlayViewModel(
+            strengthBreak: StrengthTimelineFixture.strengthBreak(), startedAt: clock.now, clock: clock,
+            chimes: RecordingChimePlayer(), snoozesLeft: 2, skipsToday: 1, mode: .strength
+        )
+        var ticks = 0
+        while viewModel.state.segment != .set(1), ticks < 1_000 {
+            clock.advance(1)
+            viewModel.tick()
+            ticks += 1
+        }
+        clock.advance(seconds)
+        viewModel.tick()
+        return viewModel
+    }
+
+    /// The meter's fill has no words, so the whole meter reads as its counter.
+    func testTheRepMeterReadsAsItsCounter() throws {
+        let viewModel = strengthOverlay(secondsIntoSet: 19.5)
+        let pacer = try XCTUnwrap(viewModel.state.pacer)
+
+        XCTAssertEqual(RepMeter(state: pacer).announcement, "Rep 7 of 12")
+        XCTAssertEqual(RepMeter(state: pacer, reduceMotion: true).announcement, "Rep 7 of 12")
+    }
+
+    /// The Done disc names its action as well as the time left in the set.
+    func testTheDoneDiscSaysItIsDone() throws {
+        let viewModel = strengthOverlay(secondsIntoSet: 10)
+        let disc = try XCTUnwrap(StrengthOverlayView(state: viewModel.state).disc)
+
+        XCTAssertEqual(viewModel.state.discLabel, "DONE")
+        XCTAssertEqual(disc.announcement, "\(viewModel.state.discNumerals), DONE")
+        XCTAssertNotNil(disc.action, "the disc is a button, so VoiceOver reads the announcement")
+    }
+
+    /// Past two modes the dropdown collapses the inactive segments to their glyphs; each one is
+    /// still announced by its mode's name.
+    func testEveryModeSegmentIsNamedEvenWhenItShowsOnlyItsGlyph() {
+        let modes = SnapshotFixtures.sheetModes
+        XCTAssertTrue(ModeSegmentedControl.collapsesInactive(.dropdown, modeCount: modes.count))
+
+        XCTAssertEqual(
+            modes.map(ModeSegmentedControl.announcement(for:)),
+            ["Movement", "Strength", "100s", "PT"]
+        )
+        XCTAssertTrue(modes.allSatisfy { !ModeSegmentedControl.announcement(for: $0).isEmpty })
+    }
+
+    /// The text the mode surfaces add, on what it is drawn over: the counter and badge in accent,
+    /// the dose and names in text, the weight-guidance chips' tinted fill and the mode control.
+    func testContrastOnTheModeSurfaces() {
+        let panel = Contrast.composite(Tokens.panel, over: Tokens.ink)
+        let badgeFill = Contrast.composite(Tokens.accentTintBadge, over: panel)
+        let segmentFill = Contrast.composite(Tokens.accentTintSegmented, over: panel)
+        let pairs: [(name: String, ratio: Double)] = [
+            ("rep counter, text on panel", Contrast.ratio(Tokens.text, panel)),
+            ("switch cue, accent on panel", Contrast.ratio(Tokens.accent, panel)),
+            ("weight guidance, text on its fill", Contrast.ratio(Tokens.text, badgeFill)),
+            ("weight guidance, text2 on its fill", Contrast.ratio(Tokens.text2, badgeFill)),
+            ("mode segment, text2 on its track", Contrast.ratio(Tokens.text2, segmentFill)),
+            ("selected mode segment, ink on accent", Contrast.ratio(Tokens.ink, Tokens.accent))
+        ]
+        for pair in pairs {
+            XCTAssertGreaterThanOrEqual(pair.ratio, Contrast.aa, "\(pair.name): \(pair.ratio)")
+        }
+    }
+
     // MARK: - Reduce Motion
 
     func testReduceMotionTurnsTheOverlayAnimationsOff() {

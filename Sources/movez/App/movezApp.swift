@@ -85,9 +85,12 @@ struct MenuBarLabelRoot: View {
 /// view holds nothing — the view model owns which rows are expanded.
 struct MenuBarContent: View {
     @ObservedObject var viewModel: MenuBarViewModel
+    /// Closes the dropdown window. A first switch to Strength uses it to get out of the way of the
+    /// settings window that opens at the setup.
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        MenuBarView(state: viewModel.state, actions: viewModel.actions)
+        MenuBarView(state: viewModel.state, actions: viewModel.actions(closingWith: { dismiss() }))
     }
 }
 

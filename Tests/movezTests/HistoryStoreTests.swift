@@ -169,6 +169,42 @@ final class HistoryStoreTests: XCTestCase {
         XCTAssertEqual(store.data.days["2026-09-07"]?.done, 3, "the file loaded rather than starting fresh")
     }
 
+    /// A history file written before breaks carried a kind still loads, and its breaks read as
+    /// Movement breaks, which is all they could have been.
+    func testAFileWrittenBeforeBreakKindsReadsItsBreaksAsMovement() throws {
+        let directory = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent("movez-history-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+
+        let url = directory.appendingPathComponent("history.json")
+        let legacy = """
+            {"completions":[{"movementId":"FLX-01","at":"2026-09-07T09:00:00Z","seconds":60}],
+             "breakRecords":[
+               {"at":"2026-09-07T09:00:00Z","routineName":"Movement break","outcome":"done",
+                "completedBlocks":5,"totalBlocks":5},
+               {"at":"2026-09-07T10:00:00Z","routineName":"Movement break","outcome":"skipped",
+                "completedBlocks":0,"totalBlocks":5}],
+             "collapsedInstructions":[],
+             "days":{"2026-09-07":{"done":1,"skipped":1,"snoozed":0,"longestBoutSeconds":0}}}
+            """
+        try Data(legacy.utf8).write(to: url)
+
+        let store = HistoryStore(store: FileHistoryStore(url: url))
+        XCTAssertEqual(store.data.breakRecords.count, 2, "the file loaded rather than starting fresh")
+        XCTAssertEqual(store.data.breakRecords.map(\.kind), [nil, nil])
+        XCTAssertEqual(store.data.breakRecords.map(\.breakKind), [.movement, .movement])
+    }
+
+    func testABreakKindSurvivesARelaunch() {
+        let file = InMemoryHistoryStore()
+        HistoryStore(store: file).record(breakRecord: BreakRecord(
+            at: day, routineName: BreakRecord.movementBreakName, outcome: .done,
+            completedBlocks: 5, totalBlocks: 5, kind: .strengthB
+        ))
+        XCTAssertEqual(HistoryStore(store: file).data.breakRecords.first?.breakKind, .strengthB)
+    }
+
     func testEveryMutationWritesToDisk() throws {
         let file = InMemoryHistoryStore()
         let store = HistoryStore(store: file)

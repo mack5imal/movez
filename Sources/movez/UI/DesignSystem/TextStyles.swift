@@ -43,6 +43,15 @@ enum MovezType {
     static let streakLabel = MovezTextStyle(size: 20, weight: .semibold)
     static let backToWork = MovezTextStyle(size: 22, weight: .bold)
     static let sideToggle = MovezTextStyle(size: 30, weight: .bold)
+    /// The movement name on a rep-based set, smaller than `overlayName` to make room for the meter.
+    static let setName = MovezTextStyle(size: 56, weight: .bold, trackingEm: -0.03, lineHeight: 1.05)
+    static let setKicker = MovezTextStyle(size: 20, weight: .semibold, lineHeight: 1.2)
+    static let dose = MovezTextStyle(size: 28, weight: .bold, trackingEm: -0.015, lineHeight: 1.1)
+    static let doseModifier = MovezTextStyle(size: 20, weight: .semibold, lineHeight: 1.2)
+    static let repCounter = MovezTextStyle(size: 28, weight: .bold, trackingEm: -0.015, lineHeight: 1.1)
+    static let upNext = MovezTextStyle(size: 28, weight: .semibold, lineHeight: 1.3)
+    /// The compact SideToggle that sits at the end of the dose line.
+    static let sidePillCompact = MovezTextStyle(size: 22, weight: .bold, lineHeight: 1.2)
 
     // Panels
     static let eyebrowPanel = MovezTextStyle(size: 11, weight: .semibold, trackingEm: 0.1, uppercase: true)
@@ -51,6 +60,12 @@ enum MovezType {
     static let panelDisc = MovezTextStyle(size: 17, weight: .bold)
     static let panelButton = MovezTextStyle(size: 13, weight: .semibold)
     static let badge = MovezTextStyle(size: 12.5, weight: .regular)
+    /// The dose line in a micro panel, drawn in accent.
+    static let panelDose = MovezTextStyle(size: 20, weight: .bold, trackingEm: -0.015, lineHeight: 1.15)
+    /// Weight guidance is an info badge that runs to several lines, so it sets a real line height,
+    /// with its lead sentence in the heavier weight.
+    static let guidance = MovezTextStyle(size: 12.5, weight: .regular, lineHeight: 1.45)
+    static let guidanceLead = MovezTextStyle(size: 12.5, weight: .semibold, lineHeight: 1.45)
     static let toastTitle = MovezTextStyle(size: 14, weight: .bold)
     static let toastBody = MovezTextStyle(size: 12, weight: .regular)
 
@@ -66,6 +81,8 @@ enum MovezType {
     static let settingsTitle = MovezTextStyle(size: 13, weight: .bold)
     static let version = MovezTextStyle(size: 12, weight: .regular)
     static let segment = MovezTextStyle(size: 12, weight: .semibold)
+    /// The sub-label under a Settings row label.
+    static let settingsSub = MovezTextStyle(size: 12, weight: .regular, lineHeight: 1.4)
 
     /// Every style, for the gallery and for the test that checks they all resolve to Manrope.
     static let all: [(name: String, style: MovezTextStyle)] = [
@@ -79,7 +96,11 @@ enum MovezType {
         ("badge", badge), ("toastTitle", toastTitle), ("toastBody", toastBody),
         ("menuRow", menuRow), ("menuTitle", menuTitle), ("menuSecondary", menuSecondary),
         ("menuDisc", menuDisc), ("settingsRow", settingsRow), ("sectionLabel", sectionLabel),
-        ("settingsTitle", settingsTitle), ("version", version), ("segment", segment)
+        ("settingsTitle", settingsTitle), ("version", version), ("segment", segment),
+        ("setName", setName), ("setKicker", setKicker), ("dose", dose), ("doseModifier", doseModifier),
+        ("repCounter", repCounter), ("upNext", upNext), ("sidePillCompact", sidePillCompact),
+        ("panelDose", panelDose), ("guidance", guidance), ("guidanceLead", guidanceLead),
+        ("settingsSub", settingsSub)
     ]
 }
 

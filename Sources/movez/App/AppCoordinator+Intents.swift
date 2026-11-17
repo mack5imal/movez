@@ -23,10 +23,11 @@ extension AppCoordinator {
     /// The overlay sat paused for five minutes without the break counting: it ends as snoozed.
     func pauseExpired() { inject(.overlayPauseExpired) }
 
-    /// Advances to the next block, recording the one that just finished.
+    /// Advances to the next block, recording the one that just finished: a movement block, or a
+    /// strength break's warm-up, set or cool-down.
     func nextBlock() {
-        guard var current = currentBreak, let block = current.block else { return }
-        recordBlockCompletion(block, routineId: current.routine.id)
+        guard var current = currentBreak, let part = current.part else { return }
+        recordPartCompletion(part, breakId: current.planned.id)
         current.completedBlocks += 1
 
         guard !current.isLastBlock else {
@@ -39,14 +40,15 @@ extension AppCoordinator {
         inject(.userNextBlock)
     }
 
-    /// True once the break counts: half the movements, or half the time.
+    /// True once the break counts: half the movements, or half the time. Asked of the scheduler's
+    /// config, which carries the length of the break on screen rather than the Movement default.
     var canFinishBreak: Bool {
         guard let current = currentBreak else { return false }
         return Scheduler.meetsCompletionRule(
             completed: current.completedBlocks,
             total: current.totalBlocks,
             elapsed: elapsedInBreak,
-            config: settings.schedulerConfig
+            config: scheduler.config
         )
     }
 
@@ -78,9 +80,27 @@ extension AppCoordinator {
     /// knows about blocks — so this records what it did without driving the scheduler.
     func recordOverlayBlock(_ block: RoutineBlock) {
         guard var current = currentBreak else { return }
-        recordBlockCompletion(block, routineId: current.routine.id)
+        recordPartCompletion(BreakPart(movementId: block.movement.id, seconds: block.seconds), breakId: current.planned.id)
         current.completedBlocks += 1
         current.blockIndex = min(current.blockIndex + 1, max(0, current.totalBlocks - 1))
+        currentBreak = current
+    }
+
+    /// Records the part of a strength or end-range break the overlay just finished: its warm-up,
+    /// a set, its cool-down or an end-range block. As with `recordOverlayBlock`, the overlay owns
+    /// the progression and this only writes it down.
+    ///
+    /// The part is the one the overlay names by `index`, not the session's own position: after a
+    /// wake the overlay is rebuilt and replays the parts already done from the backdated start,
+    /// so a part already recorded, or an index past the last part, is ignored rather than written
+    /// again.
+    func recordOverlayPart(index: Int) {
+        guard var current = currentBreak else { return }
+        let parts = current.planned.parts
+        guard parts.indices.contains(index), index >= current.completedBlocks else { return }
+        recordPartCompletion(parts[index], breakId: current.planned.id)
+        current.completedBlocks = index + 1
+        current.blockIndex = min(index + 1, max(0, current.totalBlocks - 1))
         currentBreak = current
     }
 

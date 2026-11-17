@@ -23,9 +23,9 @@ final class MicroPanelTests: XCTestCase {
 
     private func running(_ blocks: [(id: String, seconds: Int)], clock: ManualClock, chimes: RecordingChimePlayer) -> PanelViewModel {
         let model = microCountIn(clock: clock)
-        model.micro = MicroBreak(id: UUID(), blocks: blocks.compactMap { entry in
+        model.micro = MicroPanelBreak(MicroBreak(id: UUID(), blocks: blocks.compactMap { entry in
             library.movement(id: entry.id).map { RoutineBlock(movement: $0, seconds: entry.seconds) }
-        })
+        }))
         model.chimes = chimes
         model.beginMicroRunning(at: clock.now)
         return model
@@ -54,7 +54,7 @@ final class MicroPanelTests: XCTestCase {
         clock.advance(30)
         model.tick()
         XCTAssertEqual(model.title, "Distance gaze (20-20-20)", "the second movement appears to be read")
-        XCTAssertEqual(model.eyebrow, "MICRO-BREAK · EYES")
+        XCTAssertEqual(model.eyebrow, "MOVEMENT MICRO-BREAK")
         XCTAssertEqual(model.discNumerals, "−0:05")
         XCTAssertEqual(model.discMode, .leadIn)
         XCTAssertEqual(chimes.count(of: .transition), 2, "the chime plays as it appears")
@@ -87,7 +87,7 @@ final class MicroPanelTests: XCTestCase {
 
         clock.advance(5)
         model.tick()
-        XCTAssertEqual(model.eyebrow, "MICRO-BREAK · HANDS · LEFT SIDE")
+        XCTAssertEqual(model.eyebrow, "MOVEMENT MICRO-BREAK", "the side is no longer in the eyebrow")
         XCTAssertEqual(model.discMode, .halfShare(sideIndex: 0))
         XCTAssertEqual(chimes.count(of: .transition), 1, "the lead-in's chime")
 
@@ -97,7 +97,7 @@ final class MicroPanelTests: XCTestCase {
 
         clock.advance(1)
         model.tick()
-        XCTAssertEqual(model.eyebrow, "MICRO-BREAK · HANDS · RIGHT SIDE")
+        XCTAssertEqual(model.eyebrow, "MOVEMENT MICRO-BREAK")
         XCTAssertEqual(model.discMode, .halfShare(sideIndex: 1))
         XCTAssertEqual(chimes.count(of: .transition), 2, "the halfway chime")
 

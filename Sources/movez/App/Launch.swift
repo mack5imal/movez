@@ -53,6 +53,21 @@ enum Launch {
         }
     }
 
+    /// The strength library is Strength mode's content, checked against the movement library its
+    /// overlaps name. A file that will not load is as loud as a missing movement library: a mode
+    /// that quietly served nothing would be worse than an app that says it cannot start.
+    static func loadStrengthLibrary(
+        movementLibrary: MovementLibrary,
+        presenter: FatalPresenter
+    ) -> StrengthLibrary? {
+        do {
+            return try StrengthLibraryLoader.loadBundled(movementLibrary: movementLibrary)
+        } catch {
+            presenter.presentFatal(error)
+            return nil
+        }
+    }
+
     /// The health and safety notice has to be accepted before anything runs, so a notice that
     /// will not load is as fatal as a missing library: there would be nothing to accept.
     static func loadNotice(

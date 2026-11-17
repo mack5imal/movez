@@ -16,7 +16,9 @@ struct SchedulerConfig: Codable, Equatable, Hashable {
     var sitSeconds: Int = 55 * 60
     /// Five one-minute movements, each after a five-second lead-in. The scheduler never looks
     /// inside a routine, so the figure is restated here rather than read off one; a test holds the
-    /// two together.
+    /// two together. This is the Movement break's length and the starting value: the coordinator
+    /// replaces it with each next break's planned length through `.breakLength`, because a
+    /// strength or end-range break runs for its own.
     var breakSeconds: Int = 325
     var microEnabled: Bool = true
     var microEverySeconds: Int = 1800

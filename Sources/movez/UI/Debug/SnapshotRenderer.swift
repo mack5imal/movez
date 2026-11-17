@@ -13,6 +13,21 @@ enum SnapshotSurface: String, CaseIterable {
     case overlaySide = "overlay-side"
     case overlayEnd = "overlay-end"
     case overlayLongName = "overlay-long-name"
+    case overlayStrengthSet = "overlay-strength-set"
+    case overlayStrengthWarmUp = "overlay-strength-warmup"
+    case overlayStrengthLeadIn = "overlay-strength-leadin"
+    case overlayStrengthRest = "overlay-strength-rest"
+    case overlayStrengthCoolDown = "overlay-strength-cooldown"
+    case overlayStrengthSide = "overlay-strength-side"
+    case overlayStrengthHold = "overlay-strength-hold"
+    case overlayStrengthPaused = "overlay-strength-paused"
+    case overlayStrengthReducedMotion = "overlay-strength-reduced-motion"
+    case overlayStrengthLongDose = "overlay-strength-long-dose"
+    case overlayStrengthRelaxed = "overlay-strength-relaxed"
+    case overlayEndRange = "overlay-endrange"
+    case overlayEndRangeLeadIn = "overlay-endrange-leadin"
+    case overlayEndRangeSide = "overlay-endrange-side"
+    case overlayEndRangePaused = "overlay-endrange-paused"
     case headsUp = "headsup"
     case headsUpDeferred = "headsup-deferred"
     case microCountIn = "micro-countin"
@@ -21,18 +36,39 @@ enum SnapshotSurface: String, CaseIterable {
     case microLeadIn = "micro-leadin"
     case microSecond = "micro-second"
     case microSide = "micro-side"
+    case headsUpStrength = "headsup-strength"
+    case headsUpStrengthEndRange = "headsup-strength-endrange"
+    case headsUpStrengthDeferred = "headsup-strength-deferred"
+    case microStrengthCountIn = "micro-strength-countin"
+    case microStrengthLeadIn = "micro-strength-leadin"
+    case microStrengthRunning = "micro-strength-running"
+    case microStrengthSide = "micro-strength-side"
+    case microStrengthSecond = "micro-strength-second"
+    case microStrengthLongText = "micro-strength-long-text"
     case toast
     case menuSitting = "menu-sitting"
     case menuPaused = "menu-paused"
     case menuOffHours = "menu-offhours"
     case menuAway = "menu-away"
+    case menuStrength = "menu-strength"
+    case menuStrengthPaused = "menu-strength-paused"
+    case menuStrengthOffHours = "menu-strength-offhours"
+    case menuStrengthAway = "menu-strength-away"
     case menuIcon = "menu-icon"
+    case menuIconStrength = "menu-icon-strength"
+    case menuIcons = "menu-icons"
+    case menuIconsPaused = "menu-icons-paused"
+    case menuIconsOffHours = "menu-icons-offhours"
+    case modeBadges = "mode-badges"
     case menuNotice = "menu-notice"
     case settings
     case settingsHours = "settings-hours"
     case settingsLibrary = "settings-library"
     case settingsExceptions = "settings-exceptions"
     case settingsCustom = "settings-custom"
+    case settingsStrength = "settings-strength"
+    case settingsStrengthLibrary = "settings-strength-library"
+    case settingsStrengthSetup = "settings-strength-setup"
     case debug
     case notice
     case noticeEnd = "notice-end"
@@ -50,18 +86,31 @@ enum SnapshotSurface: String, CaseIterable {
     var size: CGSize {
         switch self {
         case .gallery: return CGSize(width: 1400, height: 2900)
-        case .headsUp, .headsUpDeferred, .microCountIn, .microFirstLeadIn, .microRunning, .microLeadIn, .microSecond, .microSide:
+        case .headsUp, .headsUpDeferred, .microCountIn, .microFirstLeadIn, .microRunning, .microLeadIn, .microSecond, .microSide,
+             .headsUpStrength, .headsUpStrengthEndRange, .headsUpStrengthDeferred, .microStrengthCountIn,
+             .microStrengthLeadIn, .microStrengthRunning, .microStrengthSide, .microStrengthSecond,
+             .microStrengthLongText:
             return Self.panelCanvas
         case .toast: return Self.toastCanvas
-        case .menuSitting, .menuPaused, .menuOffHours, .menuAway, .menuNotice: return Self.menuCanvas
-        case .menuIcon: return CGSize(width: 880, height: 260)
-        case .settings, .settingsHours, .settingsLibrary, .settingsExceptions, .settingsCustom:
+        case .menuSitting, .menuPaused, .menuOffHours, .menuAway, .menuNotice,
+             .menuStrength, .menuStrengthPaused, .menuStrengthOffHours, .menuStrengthAway:
+            return Self.menuCanvas
+        case .menuIcon, .menuIconStrength: return CGSize(width: 880, height: 260)
+        case .menuIcons, .menuIconsPaused, .menuIconsOffHours: return MenuIconSheet.size
+        case .modeBadges: return ModeBadgeSheet.size
+        case .settings, .settingsHours, .settingsLibrary, .settingsExceptions, .settingsCustom,
+             .settingsStrength, .settingsStrengthLibrary, .settingsStrengthSetup:
             return SettingsScreen.size
         case .debug:
             return CGSize(width: SettingsScreen.size.width, height: 1_500)
         case .notice, .noticeEnd, .noticeRead:
             return NoticeScreen.size
         case .overlayFull, .overlayLeadIn, .overlayPaused, .overlaySide, .overlayEnd, .overlayLongName:
+            return Self.screen
+        case .overlayStrengthSet, .overlayStrengthWarmUp, .overlayStrengthLeadIn, .overlayStrengthRest,
+             .overlayStrengthCoolDown, .overlayStrengthSide, .overlayStrengthHold, .overlayStrengthPaused,
+             .overlayStrengthReducedMotion, .overlayStrengthLongDose, .overlayStrengthRelaxed, .overlayEndRange, .overlayEndRangeLeadIn,
+             .overlayEndRangeSide, .overlayEndRangePaused:
             return Self.screen
         }
     }
@@ -92,30 +141,51 @@ enum SnapshotRenderer {
     static let scale: CGFloat = 2
 
     static func view(for surface: SnapshotSurface) -> AnyView {
-        panelView(for: surface) ?? menuView(for: surface) ?? settingsView(for: surface) ?? noticeView(for: surface)
-            ?? overlayView(for: surface)
+        strengthPanelView(for: surface) ?? panelView(for: surface) ?? menuView(for: surface)
+            ?? settingsView(for: surface) ?? noticeView(for: surface)
+            ?? strengthOverlayView(for: surface) ?? overlayView(for: surface)
     }
 
-    /// The settings window, and the three sheets that open over it.
+    /// The strength and end-range break, each state from `StrengthSnapshotFixtures`.
+    private static func strengthOverlayView(for surface: SnapshotSurface) -> AnyView? {
+        guard let fixture = strengthOverlayFixtures[surface] else { return nil }
+        return AnyView(StrengthOverlaySnapshot(state: fixture()))
+    }
+
+    private static let strengthOverlayFixtures: [SnapshotSurface: () -> StrengthOverlayState] = [
+        .overlayStrengthSet: SnapshotFixtures.strengthSet,
+        .overlayStrengthWarmUp: SnapshotFixtures.strengthWarmUp,
+        .overlayStrengthLeadIn: SnapshotFixtures.strengthLeadIn,
+        .overlayStrengthRest: SnapshotFixtures.strengthRest,
+        .overlayStrengthCoolDown: SnapshotFixtures.strengthCoolDown,
+        .overlayStrengthSide: SnapshotFixtures.strengthSide,
+        .overlayStrengthHold: SnapshotFixtures.strengthHold,
+        .overlayStrengthPaused: SnapshotFixtures.strengthPaused,
+        .overlayStrengthReducedMotion: SnapshotFixtures.strengthReducedMotion,
+        .overlayStrengthLongDose: SnapshotFixtures.strengthLongDose,
+        .overlayStrengthRelaxed: SnapshotFixtures.strengthRelaxed,
+        .overlayEndRange: SnapshotFixtures.endRange,
+        .overlayEndRangeLeadIn: SnapshotFixtures.endRangeLeadIn,
+        .overlayEndRangeSide: SnapshotFixtures.endRangeSide,
+        .overlayEndRangePaused: SnapshotFixtures.endRangePaused
+    ]
+
+    private static let settingsFixtures: [SnapshotSurface: () -> SettingsViewModel?] = [
+        .settings: { SnapshotFixtures.settingsViewModel() },
+        .settingsHours: { SnapshotFixtures.settingsViewModel(sheet: .workingHours) },
+        .settingsLibrary: { SnapshotFixtures.settingsViewModel(sheet: .library, search: "hip") },
+        .settingsExceptions: { SnapshotFixtures.settingsViewModel(sheet: .exceptions) },
+        .settingsCustom: { SnapshotFixtures.settingsViewModel(preset: .custom) },
+        .settingsStrength: { SnapshotFixtures.strengthSettingsViewModel() },
+        .settingsStrengthLibrary: { SnapshotFixtures.strengthSettingsViewModel(sheet: .modeLibrary) },
+        .settingsStrengthSetup: { SnapshotFixtures.strengthSetupViewModel() },
+        .debug: { SnapshotFixtures.debugSettingsViewModel() }
+    ]
+
+    /// The settings window, the sheets that open over it, and its Strength states.
     private static func settingsView(for surface: SnapshotSurface) -> AnyView? {
-        let viewModel: SettingsViewModel?
-        switch surface {
-        case .settings:
-            viewModel = SnapshotFixtures.settingsViewModel()
-        case .settingsHours:
-            viewModel = SnapshotFixtures.settingsViewModel(sheet: .workingHours)
-        case .settingsLibrary:
-            viewModel = SnapshotFixtures.settingsViewModel(sheet: .library, search: "hip")
-        case .settingsExceptions:
-            viewModel = SnapshotFixtures.settingsViewModel(sheet: .exceptions)
-        case .settingsCustom:
-            viewModel = SnapshotFixtures.settingsViewModel(preset: .custom)
-        case .debug:
-            viewModel = SnapshotFixtures.debugSettingsViewModel()
-        default:
-            return nil
-        }
-        guard let viewModel else {
+        guard let fixture = settingsFixtures[surface] else { return nil }
+        guard let viewModel = fixture() else {
             return AnyView(MovezText("The bundled movement library did not load.", MovezType.panelTitle))
         }
         return AnyView(SettingsScreen(viewModel: viewModel, height: surface.size.height))
@@ -153,6 +223,26 @@ enum SnapshotRenderer {
         }
     }
 
+    /// The strength heads-up and micro-break panels, each state from `StrengthPanelFixtures`.
+    private static func strengthPanelView(for surface: SnapshotSurface) -> AnyView? {
+        guard let fixture = strengthPanelFixtures[surface] else { return nil }
+        return AnyView(PanelSnapshot(viewModel: fixture()))
+    }
+
+    private static let strengthPanelFixtures: [SnapshotSurface: () -> PanelViewModel] = [
+        .headsUpStrength: { SnapshotFixtures.strengthHeadsUp() },
+        .headsUpStrengthEndRange: { SnapshotFixtures.strengthHeadsUp(announced: .endRange) },
+        .headsUpStrengthDeferred: { SnapshotFixtures.strengthHeadsUp(deferred: true) },
+        .microStrengthCountIn: { SnapshotFixtures.strengthMicroCountIn() },
+        .microStrengthLeadIn: { SnapshotFixtures.strengthMicroRunning(elapsed: SnapshotFixtures.microFirstLeadInElapsed) },
+        .microStrengthRunning: { SnapshotFixtures.strengthMicroRunning() },
+        .microStrengthSide: {
+            SnapshotFixtures.strengthMicroRunning(elapsed: SnapshotFixtures.microSideElapsed, perSide: true)
+        },
+        .microStrengthSecond: { SnapshotFixtures.strengthMicroRunning(elapsed: SnapshotFixtures.microLeadInElapsed) },
+        .microStrengthLongText: { SnapshotFixtures.strengthMicroLongText() }
+    ]
+
     /// The micro-break panel at each of its moments.
     private static func microView(for surface: SnapshotSurface) -> AnyView? {
         switch surface {
@@ -169,7 +259,7 @@ enum SnapshotRenderer {
         case .microSide:
             return AnyView(PanelSnapshot(viewModel: SnapshotFixtures.microRunning(
                 elapsed: SnapshotFixtures.microSideElapsed,
-                micro: SnapshotFixtures.microSideBreak()
+                micro: MicroPanelBreak(SnapshotFixtures.microSideBreak())
             )))
         default:
             return nil
@@ -187,10 +277,36 @@ enum SnapshotRenderer {
             return AnyView(MenuSnapshot(state: SnapshotFixtures.menuOffHours()))
         case .menuAway:
             return AnyView(MenuSnapshot(state: SnapshotFixtures.menuAway()))
-        case .menuIcon:
-            return AnyView(MenuIconStrip())
         case .menuNotice:
             return AnyView(MenuSnapshot(state: SnapshotFixtures.menuOffHours(), pendingNotice: true))
+        case .menuStrength:
+            return AnyView(MenuSnapshot(state: SnapshotFixtures.menuStrength()))
+        case .menuStrengthPaused:
+            return AnyView(MenuSnapshot(state: SnapshotFixtures.menuStrengthPaused()))
+        case .menuStrengthOffHours:
+            return AnyView(MenuSnapshot(state: SnapshotFixtures.menuStrengthOffHours()))
+        case .menuStrengthAway:
+            return AnyView(MenuSnapshot(state: SnapshotFixtures.menuStrengthAway()))
+        default:
+            return modeSheetView(for: surface)
+        }
+    }
+
+    /// The menu-bar icon on its own, and the sheets that draw every mode's icon and badge.
+    private static func modeSheetView(for surface: SnapshotSurface) -> AnyView? {
+        switch surface {
+        case .menuIcon:
+            return AnyView(MenuIconStrip())
+        case .menuIconStrength:
+            return AnyView(MenuIconStrip(definition: SnapshotFixtures.strengthMode))
+        case .menuIcons:
+            return AnyView(MenuIconSheet(mode: .sitting))
+        case .menuIconsPaused:
+            return AnyView(MenuIconSheet(mode: .paused))
+        case .menuIconsOffHours:
+            return AnyView(MenuIconSheet(mode: .offHours))
+        case .modeBadges:
+            return AnyView(ModeBadgeSheet())
         default:
             return nil
         }

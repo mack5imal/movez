@@ -10,7 +10,7 @@ struct OverlaySnapshot: View {
 
     var body: some View {
         ZStack {
-            desktop
+            Self.desktop
             (state.phase == .complete ? Tokens.dimEnd : Tokens.dim).color
             OverlayView(state: state, animated: false)
         }
@@ -19,11 +19,27 @@ struct OverlaySnapshot: View {
     }
 
     /// A stand-in for whatever the user was looking at.
-    private var desktop: some View {
+    static var desktop: some View {
         LinearGradient(
             colors: [Color(red: 0.29, green: 0.36, blue: 0.40), Color(red: 0.17, green: 0.23, blue: 0.28)],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
+    }
+}
+
+/// The strength overlay as a snapshot: the card over a flat dim on a placeholder desktop, as
+/// `OverlaySnapshot` draws the movement break.
+struct StrengthOverlaySnapshot: View {
+    var state: StrengthOverlayState
+
+    var body: some View {
+        ZStack {
+            OverlaySnapshot.desktop
+            Tokens.dim.color
+            StrengthOverlayView(state: state, animated: false)
+        }
+        .frame(width: SnapshotSurface.screen.width, height: SnapshotSurface.screen.height)
+        .clipped()
     }
 }

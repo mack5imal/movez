@@ -74,7 +74,9 @@ enum PanelHygiene {
             ("headsup", SnapshotFixtures.headsUp()),
             ("headsup-deferred", SnapshotFixtures.headsUp(deferred: true)),
             ("micro-countin", SnapshotFixtures.microCountIn()),
-            ("micro-running", SnapshotFixtures.microRunning())
+            ("micro-running", SnapshotFixtures.microRunning()),
+            ("headsup-strength", SnapshotFixtures.strengthHeadsUp()),
+            ("micro-strength-running", SnapshotFixtures.strengthMicroRunning())
         ]
     }
 

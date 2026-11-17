@@ -12,27 +12,55 @@ final class CoordinatorHarness {
     let sink = RecordingEffectSink()
     let snapshotStore = InMemorySnapshotStore()
     let historyStore = InMemoryHistoryStore()
-    let coordinator: AppCoordinator
+    /// The settings' own defaults, so a relaunch can read the same settings back.
+    let defaults: UserDefaults
+    private(set) var coordinator: AppCoordinator
+    private let modeBuilders: ModeBuilderTable?
 
     init(
         workingHours: WorkingHours = .standard,
         startAt: Date = SchedulerHarness.mondayMorning,
+        modeBuilders: ModeBuilderTable? = nil,
         configure: (SettingsStore) -> Void = { _ in }
     ) {
         clock = ManualClock(now: startAt)
-        let suite = ScratchDefaults.make()
-        settings = SettingsStore(defaults: suite)
+        defaults = ScratchDefaults.make()
+        settings = SettingsStore(defaults: defaults)
         settings.workingHours = workingHours
         configure(settings)
         history = HistoryStore(store: historyStore)
+        self.modeBuilders = modeBuilders
         coordinator = AppCoordinator(
             library: RoutineTestSupport.library,
+            strengthLibrary: RoutineTestSupport.strengthLibrary,
+            modeBuilders: modeBuilders,
             settings: settings,
             history: history,
             clock: clock,
             snapshotStore: snapshotStore,
             sink: sink
         )
+    }
+
+    /// Quits and starts again on the same state file, history file and settings, the way a
+    /// relaunch reads them back: the coordinator, the settings and the history are all new
+    /// objects, and only what was written survives. Read them through `coordinator` afterwards:
+    /// `history` and `settings` stay the first launch's.
+    func relaunch() {
+        coordinator.stop()
+        let settings = SettingsStore(defaults: defaults)
+        let history = HistoryStore(store: historyStore)
+        coordinator = AppCoordinator(
+            library: RoutineTestSupport.library,
+            strengthLibrary: RoutineTestSupport.strengthLibrary,
+            modeBuilders: modeBuilders,
+            settings: settings,
+            history: history,
+            clock: clock,
+            snapshotStore: snapshotStore,
+            sink: sink
+        )
+        coordinator.applyLaunchGap()
     }
 
     var scheduler: Scheduler { coordinator.scheduler }
@@ -69,4 +97,15 @@ final class CoordinatorHarness {
             remaining -= 1
         }
     }
+}
+
+extension RoutineTestSupport {
+    /// The bundled strength library, loaded once for every coordinator a test builds.
+    static let strengthLibrary: StrengthLibrary = {
+        do {
+            return try StrengthLibraryLoader.loadBundled(movementLibrary: library)
+        } catch {
+            fatalError("Bundled strength library failed to load: \(error)")
+        }
+    }()
 }

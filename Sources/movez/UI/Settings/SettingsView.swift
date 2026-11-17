@@ -47,12 +47,22 @@ struct SettingsScreen: View {
         case .workingHours: WorkingHoursPopover(viewModel: viewModel)
         case .library: LibraryBrowserSheet(viewModel: viewModel)
         case .exceptions: FullscreenExceptionsSheet(viewModel: viewModel)
+        case .modeLibrary: StrengthLibraryBrowserSheet(viewModel: viewModel)
+        case .modeSetup:
+            StrengthSetupSheet(viewModel: viewModel)
+                .frame(maxHeight: .infinity, alignment: .top)
+                .padding(.top, StrengthSetupSheet.top)
         }
     }
 }
 
-/// The four sections, in the order the brief puts them.
+/// The sections, in the order the brief puts them, with the mode chooser first and the chosen
+/// mode's own section in place of the other's.
 struct SettingsView: View {
+    // design: settings
+    // design: settings-strength
+    // Both settings screens are marked here, where the mode's section is chosen, because the
+    // design checker counts "settings" as marked wherever "settings-strength" is.
     @ObservedObject var viewModel: SettingsViewModel
 
     private var settings: SettingsStore { viewModel.settings }
@@ -60,9 +70,11 @@ struct SettingsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
+                mode
+                sectionRule
                 schedule
                 sectionRule
-                movements
+                modeSettings
                 sectionRule
                 stayOutOfTheWay
                 sectionRule
@@ -86,6 +98,29 @@ struct SettingsView: View {
     private var sectionRule: some View {
         MovezDivider(color: Tokens.ruleSettings)
             .padding(.vertical, 15)
+    }
+
+    // MARK: - Mode
+
+    private var mode: some View {
+        SettingsSection(label: "Mode") {
+            SettingsRow(label: "Break mode", sub: "Switch any day. Your schedule and today’s stats carry over.") {
+                ModeSegmentedControl(
+                    definitions: SettingsViewModel.modeOptions,
+                    selection: Binding(get: { settings.mode.definition.id }, set: viewModel.requestMode(id:))
+                )
+            }
+        }
+    }
+
+    /// The selected mode's own section, looked up by its settings group rather than by asking
+    /// which mode is on.
+    @ViewBuilder
+    private var modeSettings: some View {
+        switch settings.mode.definition.settingsGroup.id {
+        case ModeSettingsGroup.strength.id: StrengthSettingsSection(viewModel: viewModel)
+        default: movements
+        }
     }
 
     // MARK: - Schedule
@@ -267,13 +302,23 @@ struct SettingsLink {
 /// Label on the left, control on the right.
 struct SettingsRow<Control: View>: View {
     var label: String
+    /// A quieter line under the label, like "Later breaks that day are end-range breaks."
+    var sub: String?
     var detail: String?
     var link: SettingsLink?
     @ViewBuilder var control: Control
 
     var body: some View {
         HStack(spacing: 8) {
-            MovezText(label, MovezType.settingsRow)
+            if let sub {
+                VStack(alignment: .leading, spacing: 3) {
+                    MovezText(label, MovezType.settingsRow)
+                    MovezText(sub, MovezType.settingsSub, color: Tokens.text3)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            } else {
+                MovezText(label, MovezType.settingsRow)
+            }
             if let detail {
                 MovezText(detail, MovezType.settingsRow, color: Tokens.text3)
             }

@@ -1,17 +1,23 @@
 import Combine
 import Foundation
 
-/// The break currently on screen, with the routine attached.
+/// The break currently on screen, with the break it is serving attached.
+///
+/// The mode is the one the break was built in. It is kept with the session, not read from the
+/// settings, because a switch while the break is on screen applies from the next one (S13).
 struct BreakSession: Equatable {
-    var routine: Routine
+    var planned: PlannedBreak
+    var mode: BreakMode
     var startedAt: Date
     var blockIndex: Int = 0
     var completedBlocks: Int = 0
     var deferred: Bool = false
 
-    var block: RoutineBlock? { routine.blocks.indices.contains(blockIndex) ? routine.blocks[blockIndex] : nil }
-    var totalBlocks: Int { routine.blocks.count }
-    var isLastBlock: Bool { blockIndex >= routine.blocks.count - 1 }
+    /// The movement routine, for a Movement break; the overlay shows the others from `planned`.
+    var routine: Routine? { planned.routine }
+    var part: BreakPart? { planned.parts.indices.contains(blockIndex) ? planned.parts[blockIndex] : nil }
+    var totalBlocks: Int { planned.parts.count }
+    var isLastBlock: Bool { blockIndex >= planned.parts.count - 1 }
 }
 
 /// How the menu bar presents the scheduler right now.
@@ -34,6 +40,10 @@ struct MenuState: Equatable {
     var awaySeconds: Int?
     var nextBreakAt: Date?
     var pausedUntil: Date?
+    /// The mode the next break will be built in.
+    var breakMode: BreakMode = .fallback
+    /// The day letter and "break n of N", for a mode that plans its day.
+    var dayProgress: ModeDayProgress?
 }
 
 /// The one object that ties the pure scheduler to the world: it owns the clock, drives ticks,
@@ -53,12 +63,14 @@ final class AppCoordinator: ObservableObject {
     /// A break that sleep or a locked screen cut short, kept so the one that resumes is the same
     /// break rather than a fresh routine at block zero.
     var interruptedSession: BreakSession?
-    @Published var currentMicro: MicroBreak?
+    @Published var currentMicro: PlannedMicro?
+    /// The mode the micro-break on screen was built in.
+    var currentMicroMode: BreakMode?
     @Published var headsUpInfo: HeadsUpInfo?
     @Published var toastInfo: ToastInfo?
     @Published var todayStats = DailyStats.empty
     @Published var streak = 0
-    @Published var nextRoutinePreview: Routine?
+    @Published var nextBreakPreview: PlannedBreak?
 
     /// The running coordinator. App Intents are created by the system with no way to be handed
     /// dependencies, so the Focus Filter needs a way home.
@@ -66,6 +78,12 @@ final class AppCoordinator: ObservableObject {
 
     let clock: Clock
     let library: MovementLibrary
+    /// Nil where no strength library was supplied, as in tests that never use Strength mode; the
+    /// mode then serves Movement breaks rather than none.
+    let strengthLibrary: StrengthLibrary?
+    let modeBuilders: ModeBuilderTable
+    /// How a strength move served today rules out its movement-library counterpart (S8).
+    let crossModeUsage: CrossModeUsage?
     let history: HistoryStore
     let settings: SettingsStore
     let builder: RoutineBuilder
@@ -93,14 +111,23 @@ final class AppCoordinator: ObservableObject {
     /// The newest transition already written to the unified log.
     private var lastLoggedTransition: Transition?
 
-    /// Routines already served today, so the builder can avoid repeats and know whether balance
-    /// has been covered.
-    var routinesToday: [Routine] = []
+    /// Breaks already put on screen today, so the builders can avoid repeats and know whether
+    /// balance has been covered.
+    var breaksToday: [PlannedBreak] = []
     var routinesDayKey = ""
     var lastMicroIds: Set<String> = []
-    /// The routine the menu is currently advertising, kept so the overlay serves exactly what the
+    /// The break the menu is currently advertising, kept so the overlay serves exactly what the
     /// menu promised. Rebuilt whenever anything it depends on moves.
-    var cachedPreview: (key: String, routine: Routine)?
+    var cachedPreview: (key: String, planned: PlannedBreak)?
+    /// The break a heads-up on screen announced, in the mode it was built in. The full break that
+    /// follows serves this one, even if the mode changed while the heads-up was up.
+    var headsUpBreak: (planned: PlannedBreak, mode: BreakMode)?
+    /// A heads-up's break, kept for the rest of the effects that dismissed it, so that a snooze or
+    /// skip records the break it turned away.
+    var dismissedHeadsUpBreak: (planned: PlannedBreak, mode: BreakMode)?
+    /// The day's progress the menu shows, refreshed with the preview rather than on every tick,
+    /// because the planner reads the whole break history.
+    var dayProgress: ModeDayProgress?
 
     /// How often the coordinator asks the scheduler to look at the clock.
     static let tickSeconds: TimeInterval = 2
@@ -120,6 +147,8 @@ final class AppCoordinator: ObservableObject {
 
     init(
         library: MovementLibrary,
+        strengthLibrary: StrengthLibrary? = nil,
+        modeBuilders: ModeBuilderTable? = nil,
         settings: SettingsStore,
         history: HistoryStore,
         clock: Clock,
@@ -127,6 +156,9 @@ final class AppCoordinator: ObservableObject {
         sink: EffectSink? = nil
     ) {
         self.library = library
+        self.strengthLibrary = strengthLibrary
+        self.modeBuilders = modeBuilders ?? .standard(strengthLibrary: strengthLibrary, movementLibrary: library)
+        crossModeUsage = strengthLibrary.map { CrossModeUsage(movementLibrary: library, strengthLibrary: $0) }
         self.settings = settings
         self.history = history
         self.clock = clock
@@ -155,6 +187,9 @@ final class AppCoordinator: ObservableObject {
         lastLoggedTransition = scheduler.snapshot.transitions.transitions.last
         refreshPublished()
     }
+
+    /// The active mode's builder.
+    var activeModeBuilder: any ModeBreakBuilding { modeBuilders.builder(for: settings.mode.rawValue) }
 
     /// A state file that will not parse is not worth crashing over — the day simply starts fresh
     /// — but it is worth saying so somewhere a developer can find it.
@@ -264,7 +299,9 @@ final class AppCoordinator: ObservableObject {
     func settingsChanged() {
         applyTimeScale()
         invalidatePreview()
-        deliver(scheduler.handle(.settingsChanged(settings.schedulerConfig), now: clock.now))
+        var config = settings.schedulerConfig
+        config.breakSeconds = previewNextBreak(now: clock.now).plannedSeconds
+        deliver(scheduler.handle(.settingsChanged(config), now: clock.now))
     }
 
     private func applyTimeScale() {
@@ -302,11 +339,18 @@ final class AppCoordinator: ObservableObject {
     func deliver(_ effects: [SchedulerEffect]) {
         guard !effects.isEmpty else { return }
         var pollingChanged = false
-        for effect in effects {
+        defer { dismissedHeadsUpBreak = nil }
+        for planned in effects {
+            let effect = attachingBreak(to: planned)
             apply(effect)
             if case .pollingChanged = effect { pollingChanged = true }
             sink.apply(effect, coordinator: self)
         }
+        // The kept session is only good while the scheduler still holds the interruption it
+        // belongs to. A wake after the break's planned end settles the interruption without
+        // starting a break, and a session kept past that point would stand in for the next break
+        // in the preview, the break length and the next start.
+        if scheduler.snapshot.interruptedBreak == nil { interruptedSession = nil }
         logNewTransitions()
         // Whether the monitors run is a fact about the state the scheduler is in, not about which
         // effects it remembered to emit on the way there. A wake that took the scheduler out of
@@ -342,8 +386,24 @@ final class AppCoordinator: ObservableObject {
         let now = clock.now
         assign(history.stats(on: now), to: \.todayStats)
         assign(history.streak(on: now), to: \.streak)
-        assign(previewNextRoutine(now: now), to: \.nextRoutinePreview)
+        let preview = previewNextBreak(now: now)
+        assign(preview, to: \.nextBreakPreview)
+        dayProgress = activeModeBuilder.dayProgress(for: self, at: now)
+        syncBreakLength(preview)
         menuState = makeMenuState(now: now)
+    }
+
+    /// Tells the scheduler how long the break it will start next runs.
+    ///
+    /// The length goes in through the config whenever the preview changes, rather than with the
+    /// start of the break, because the scheduler starts a break on its own clock (the heads-up
+    /// running out) and has the length to hand when it does; and it goes in through its own event
+    /// rather than `.settingsChanged`, which re-plans the due times and would undo a skip's fresh
+    /// interval. The preview is the break on screen while there is one, so a running break's
+    /// "done at half" is measured against that break, not the one after it.
+    private func syncBreakLength(_ preview: PlannedBreak) {
+        guard scheduler.config.breakSeconds != preview.plannedSeconds else { return }
+        deliver(scheduler.handle(.breakLength(seconds: preview.plannedSeconds), now: clock.now))
     }
 
     private func assign<Value: Equatable>(_ value: Value, to keyPath: ReferenceWritableKeyPath<AppCoordinator, Value>) {

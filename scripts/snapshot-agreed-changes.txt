@@ -1,0 +1,12 @@
+# Snapshots the strength-mode work is allowed to change (SPEC S19), one glob per line.
+# scripts/compare_snapshots.py matches each glob against the file name and its surface name.
+# Everything else must stay pixel-identical to the baseline: toast, notice, notice-read,
+# notice-end and gallery are deliberately absent.
+settings*
+# The debug snapshot is the settings window with its debug section open, so it gains the MODE
+# section with every other Settings surface (S19 agrees "Settings surfaces").
+debug
+menu-*
+headsup*
+overlay*
+micro-*

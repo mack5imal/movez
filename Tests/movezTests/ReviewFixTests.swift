@@ -172,9 +172,9 @@ final class ReviewFixTests: XCTestCase {
         harness.run(seconds: 90)
 
         let resumed = harness.coordinator.currentBreak
-        XCTAssertEqual(resumed?.routine.id, original?.routine.id, "the same movements, not a fresh routine")
+        XCTAssertEqual(resumed?.planned.id, original?.planned.id, "the same movements, not a fresh routine")
         XCTAssertEqual(resumed?.completedBlocks, 1, "and it picks up where it left off")
-        XCTAssertEqual(harness.coordinator.routinesToday.count, 1, "counted against the day once")
+        XCTAssertEqual(harness.coordinator.breaksToday.count, 1, "counted against the day once")
     }
 
     // MARK: - Working hours

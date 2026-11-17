@@ -41,6 +41,38 @@ break, then gets out of the way again.
   <img src="docs/images/menu.png" width="40%" alt="The menu-bar dropdown: next break in 32 minutes, Take a break now, Make due in, Pause for, and today's numbers">
 </p>
 
+## Two modes: Movement and Strength
+
+Movez has two kinds of break, and you pick one. **Movement**, the default, is everything above:
+five one-minute movements for circulation, balance, flexibility and strength. **Strength** is for
+keeping strong through long desk days with your own weights: short sets, not a gym session.
+
+- **Switching.** Choose the mode in Settings, or with the Movement · Strength row in the menu-bar
+  dropdown, as often as you like. A break already on screen finishes in the mode it started in;
+  the next one uses the new mode.
+- **Setting up Strength.** The first time you switch, Settings opens at a short setup: what you
+  have to hand (a pair of dumbbells, a kettlebell, or neither for bodyweight only), whether a solid
+  wall is nearby, and how many strength breaks you want a day (1 to 4, three by default). Movement
+  stays on until you press Switch to Strength. Strength keeps its own difficulty cap, focus and
+  excluded moves, so setting it up changes nothing in Movement.
+- **A strength break** is about five minutes: a 30-second warm-up, three working sets with a rest
+  between them, and a 30-second cool-down stretch. Each set shows its move and its target, such as
+  "12 reps" or "10 each side", with a rep meter that paces an even three seconds a rep. Pick a
+  weight you could lift a few more times when the set ends; nothing asks you to push to failure.
+  After the day's strength breaks, the rest of the day's breaks are end-range stretches with no
+  weights, and Strength micro-breaks are short stretches you can do in your chair or standing.
+- **A days and B days.** Strength days alternate: an A day works squats and lunges with pushing
+  moves, a B day hinges with pulling moves, and each day includes one core set. Tomorrow's strength
+  day is the other letter, even if you spent the days between in Movement. A move done in either
+  mode is not served again that day.
+- **The badge.** You can always tell which mode is on from the mode badge, the mode's glyph next to
+  its name, as in "STRENGTH BREAK" on a break, and from the glyph inside the menu-bar circle: a wave
+  for Movement, a dumbbell for Strength. The colors are the same in both modes.
+
+The strength moves come from their own library of 145 movements,
+[`strength-library-v1.json`](strength-library-v1.json). The reasoning behind the sets, reps and
+weekly volume is in [docs/DECISIONS.md](docs/DECISIONS.md), entries 54 onward.
+
 ## Why
 
 Research on desk work points the same way: break up sitting at least every half hour, and a few
@@ -144,14 +176,16 @@ up a newer build.
 project.yml                 XcodeGen spec (source of truth for the Xcode project)
 Makefile                    build / test / lint / snapshot entry points
 Sources/movez/App           app entry point, delegate, coordinator, launch arguments
-Sources/movez/Library       the movement library, decoded and validated
-Sources/movez/Routine       routine and micro-break generation
+Sources/movez/Library       the movement and strength libraries, decoded and validated
+Sources/movez/Modes         the mode table: each mode's name, badge, library and builders
+Sources/movez/Routine       Movement routine and micro-break generation
+Sources/movez/Strength      Strength day plan, breaks, micro-breaks and rep pacing
 Sources/movez/Scheduler     the sitting-to-break state machine (pure, clock-injected)
 Sources/movez/Signals       idle, microphone, screen capture, fullscreen, power
 Sources/movez/UI            design system and the five UI surfaces
 Sources/movez/Resources     Info.plist, Manrope, chimes
 Tests/movezTests            XCTest suite
-scripts/                    font fetch and chime synthesis
+scripts/                    font fetch, chime synthesis, strength simulation
 ```
 
 The Markdown and JSON documents at the repository root — `product-brief-v1.md`,

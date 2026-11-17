@@ -39,8 +39,40 @@ final class OverlayEffectSink: EffectSink {
 
     private func present(coordinator: AppCoordinator) {
         guard let session = coordinator.currentBreak else { return }
+        let reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
+        if let routine = session.routine {
+            presentRoutine(routine, session: session, coordinator: coordinator, reduceMotion: reduceMotion)
+            return
+        }
+        let viewModel: StrengthOverlayViewModel
+        if let strengthBreak = session.planned.strengthBreak {
+            viewModel = StrengthOverlayViewModel(
+                strengthBreak: strengthBreak, startedAt: session.startedAt, clock: coordinator.clock,
+                chimes: chimes, snoozesLeft: coordinator.scheduler.snoozesLeft,
+                skipsToday: coordinator.scheduler.snapshot.skipsToday, reduceMotion: reduceMotion, mode: session.mode
+            )
+        } else if let endRangeBreak = session.planned.endRangeBreak {
+            viewModel = StrengthOverlayViewModel(
+                endRangeBreak: endRangeBreak, startedAt: session.startedAt, clock: coordinator.clock,
+                chimes: chimes, snoozesLeft: coordinator.scheduler.snoozesLeft,
+                skipsToday: coordinator.scheduler.snapshot.skipsToday, reduceMotion: reduceMotion, mode: session.mode
+            )
+        } else {
+            return
+        }
+        viewModel.onWorkCompleted = { [weak coordinator] index in coordinator?.recordOverlayPart(index: index) }
+        viewModel.onSnooze = { [weak coordinator] in coordinator?.snooze() }
+        viewModel.onSkip = { [weak coordinator] in coordinator?.skip() }
+        viewModel.onPauseExpired = { [weak coordinator] in coordinator?.pauseExpired() }
+        viewModel.onFinished = { [weak coordinator] completed, total, elapsed in
+            coordinator?.finishOverlayBreak(completed: completed, total: total, elapsed: elapsed)
+        }
+        controller.present(viewModel)
+    }
+
+    private func presentRoutine(_ routine: Routine, session: BreakSession, coordinator: AppCoordinator, reduceMotion: Bool) {
         let viewModel = OverlayViewModel(
-            routine: session.routine,
+            routine: routine,
             startedAt: session.startedAt,
             clock: coordinator.clock,
             config: coordinator.settings.schedulerConfig,
@@ -49,7 +81,8 @@ final class OverlayEffectSink: EffectSink {
             skipsToday: coordinator.scheduler.snapshot.skipsToday,
             streak: coordinator.streak,
             nextBreakAt: coordinator.scheduler.snapshot.nextFullDueAt,
-            reduceMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
+            reduceMotion: reduceMotion,
+            mode: session.mode
         )
         viewModel.onBlockCompleted = { [weak coordinator] block, _ in
             coordinator?.recordOverlayBlock(block)

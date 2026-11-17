@@ -5,8 +5,18 @@ import SwiftUI
 /// is expected to have.
 ///
 /// A window-style `MenuBarExtra` has no submenus, so "Make due in" and "Pause for" expand inline
-/// instead of flying out.
+/// instead of flying out, and the mode row is a plain inline control rather than a menu.
+///
+/// Every mode shares this view; what differs by mode arrives as plain values in the state (the
+/// header subtitle, the selected segment, the icon's glyph).
 struct MenuBarView: View {
+    // design: menu
+    // design: menu-strength
+    // design: menu-icons
+    // The three dropdown screens share one marker file because the design checker counts a
+    // prefix id ("menu") as marked wherever a longer one ("menu-strength") is. The Strength
+    // header copy comes from ModeMenuCopy; the icon is drawn by MenuBarIcon in the menu bar
+    // this dropdown hangs from.
     var state: MenuBarState
     var actions = MenuBarActions()
 
@@ -15,6 +25,8 @@ struct MenuBarView: View {
             header
             MovezDivider()
                 .padding(.bottom, 6)
+            modeRow
+            divider
             rows
             divider
             statsBlock
@@ -52,6 +64,21 @@ struct MenuBarView: View {
             Spacer(minLength: 0)
         }
         .padding(EdgeInsets(top: 10, leading: 10, bottom: 12, trailing: 10))
+    }
+
+    /// One click switches mode. The selection is the state's, never the control's own: the
+    /// dropdown is rebuilt on every open, and a first switch to Strength leaves the mode where it
+    /// was until the setup is confirmed, so the row must keep showing the mode actually in use.
+    private var modeRow: some View {
+        ModeSegmentedControl(
+            definitions: state.modes,
+            selection: Binding(
+                get: { state.breakMode.rawValue },
+                set: { actions.selectMode($0) }
+            ),
+            variant: .dropdown
+        )
+        .padding(EdgeInsets(top: 2, leading: 4, bottom: 4, trailing: 4))
     }
 
     private var divider: some View {
@@ -124,6 +151,8 @@ struct MenuBarView: View {
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 7)
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Make due in \(MenuBarState.makeDueSummary)")
     }
 
     // MARK: - Stats and footer

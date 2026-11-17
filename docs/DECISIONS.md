@@ -421,3 +421,184 @@ are in `docs/rule-changes-2026-10.md` and `scripts/simulate_selection.py`.
     and terms" shows when it was accepted and reopens it read-only. While it waits, the menu says
     so and offers "Show notice" and Quit. A notice that is missing or has no version is fatal at
     launch, like a missing library.
+
+## Strength mode, November 2026
+
+Movez gained a second mode, Strength, beside the existing break mix, which is now called
+Movement. Strength breaks are for keeping office workers strong through long desk days:
+maintenance, not muscle building, and never gym-heavy. The brief and the scheduler research say
+nothing about strength work, so the rules below rest on three pieces of research done for this
+change. Where a finding came from training knowledge rather than a study, or a number was derived
+rather than measured, the entry says it is judgment. The studies are cited by author as the
+research cited them: Spiering et al. (J Strength Cond Res 2021) on the maintenance dose, the
+ACSM position stands (2009 and March 2026), Nuzzo et al.'s overview of minimal-dose training and
+exercise snacks (Sports Med 2024), Ralston et al. (Sports Med Open 2018) on frequency, Robinson,
+Refalo, Zourdos et al. (2024) on proximity to failure, Pelland et al. (Sports Med 2026) on
+counting sets, Bickel, Cross and Bamman (MSSE 2011) on older adults, de França et al. (2015) and
+Gentil et al. (2013) on arm isolation, and Martuscello et al. (J Strength Cond Res 2013) on the
+core. Movement mode's library, routine rules, timings and chimes are unchanged; a golden record
+of its picks, taken before any of this was built, is replayed by a test to prove it.
+
+54. **A mode is a row in a table.** Two more modes are planned, a "100s" rep mode and a physical
+    therapy mode, so the mode is not a flag but an enum backed by one `ModeDefinition` per mode
+    in `Sources/movez/Modes/`: its name, the word in its eyebrows, its badge and menu-bar glyphs,
+    its library, its break builders and its settings group. The Settings mode control, the
+    dropdown's mode row, every badge, the menu-bar icon and the coordinator's one build path all
+    read the definition rather than branching on Movement or Strength, and a test that adds a
+    fake third mode in the test target shows each of them serving it with no production change.
+    Any code that must tell the modes apart lives in `Modes/`, which a test enforces by grepping
+    the rest of `Sources/`. The mode is persisted under its own key, absent meaning Movement, so
+    an existing install upgrades to exactly what it had.
+55. **The mode is shown by a badge and the menu-bar glyph, never by color.** The first plan
+    recolored the whole app orange in Strength mode. That was dropped before it was built:
+    orange is too close to `warn`, which already means "waiting" and "paused"; four modes would
+    need four accents; and the menu bar is monochrome anyway. Instead every surface that names a
+    break or the app's state (heads-up, overlay, micro-break panel, dropdown, Settings) carries
+    the mode badge, the mode's glyph beside its name, as in "STRENGTH BREAK" with a dumbbell, in
+    fixed places, and seafoam stays the only accent in every mode. The menu-bar icon became the
+    design's 18 pt circle with the mode's glyph inside, Movement's wave included, so the two
+    modes differ by glyph alone and Movement's icon changed too. Movement's panels gained its
+    badge, and the micro-break eyebrow now reads `MOVEMENT MICRO-BREAK` without the body area.
+    Glyphs for 100s and PT are drawn already, so those modes add a row and not a theme.
+56. **Strength has its own settings, and the first switch opens them.** Equipment (a pair of
+    dumbbells, one kettlebell), "Solid wall nearby", strength breaks a day, the difficulty cap,
+    focus and excluded moves are all separate keys from Movement's, so changing one mode's setup
+    never touches the other's; working hours, break timing and away handling stay shared. The
+    first switch to Strength, from Settings or the dropdown, leaves the mode on Movement and opens
+    Settings at a strength setup, because a strength break built for equipment the user does not
+    own is worse than none. "Switch to Strength" confirms it, and may be pressed with nothing
+    ticked, which means bodyweight only. The cap starts at Beginner. Every later switch is
+    instant. A switch never changes what is on screen: a heads-up, break or micro-break finishes
+    in the mode it started in, and the next one uses the new mode, also after a relaunch.
+57. **Strength days alternate an A day and a B day, with core once a day.** An A day works
+    squat/lunge and push, a B day hinge and pull. The next strength day is the other letter from
+    the last day that had a completed strength break, whatever mode the days between were in, and
+    the first ever is A. The first plan had a leg move and a rotating upper-body move in every
+    break, which the research showed would give the legs about twice the weekly volume of chest
+    or back (Pelland's counting, below); pairing non-competing patterns and resting each pattern
+    a day is the usual coaching answer, so it is judgment rather than a trial result (the ACSM
+    2009 recovery window of 24–48 h is the evidence it leans on). The day's first strength break
+    replaces its third set with one core set, since the core needs only a few direct sets a week
+    once loaded moves are in the pool (Martuscello 2013).
+58. **A strength break is a warm-up, three sets X · Y · X and a cool-down, with no end screen.**
+    The research found the draft of five moves in every break to be 10–90 times the evidenced
+    maintenance dose of about one hard set per exercise a week (Spiering 2021), and exercise-snack
+    trials used one set of a few exercises (Nuzzo 2024). So a break is a 30 s warm-up (one
+    bodyweight, difficulty-1, two-sided move from the first set's pattern, off the floor, with no
+    rep target), three working sets of the day's two patterns, the pattern done twice using the
+    same move both times, then a 30 s cool-down (one END stretch for a region the sets worked,
+    15 s a side for a per-side move). The next break leads with whichever pattern has had fewer
+    sets today, a tie going to the one that led less recently. Between sets is 45 s of rest that
+    shows what comes next and whose last 5 s are the next set's lead-in. A set's timer is the reps
+    × 3 s plus 5 s of grace, with 3 s more on a per-side set to switch and (3 + hold) s a rep for
+    a dose with a hold; when it runs out the rest starts with a chime, and Done (the disc or
+    Space) ends a set early. The rest of 45 s, shorter than the 2–3 min strength coaching uses
+    between sets of one muscle, works because the sets alternate patterns; that is coaching
+    practice, not a finding. A break runs about 4½–5½ min and closes itself after the cool-down:
+    the design dropped the end screen because there is nothing to review. A break has at most
+    one per-side, one floor and one grip working move, never a wall move with the wall off, and
+    only moves that are bodyweight or use what the user owns. When the pool runs short, the draw
+    lets rules go one at a time and then takes back every rule it can, so a break is never empty
+    and never relaxed further than it has to be.
+59. **The first three strength breaks of a day are strength, and the rest are end-range.**
+    "Strength breaks a day" is 1, 2, 3 or 4, default 3. The first that many full breaks completed
+    in Strength mode are strength breaks; a skipped or snoozed one does not count, so the next is a
+    strength break again with the same shape. Every later full break that day is an end-range
+    break: four END stretches of 60 s (30 s a side) after a 5 s lead-in each, 260 s in all,
+    recency-weighted, never repeating a move that day and avoiding the regions the day's strength
+    breaks worked where it can. The research suggested 2 a day; the owner chose 3, which puts the
+    bigger muscles slightly above the derived maintenance target (entry 69) and was accepted
+    because the loads are light and real weeks miss breaks. One a day still meets the floor for
+    every body part, which is why 1 is allowed. Switching from Movement mid-day counts only that
+    day's strength breaks.
+60. **Doses are 10–15 reps, 16–20 alternating and 8–10 a side, at a weight you could lift 3–5
+    more times.** In the working buckets (SQT, HNG, PSH, PUL, COR, ACC) the strength library's
+    two-sided rep doses are 10–15, alternating doses 16–20 in total and per-side doses 8–10 a
+    side, so five 20-rep doses became 15 and two became 10 a side. Six slow multi-part moves keep
+    their doses, because a rep of each is several movements and the count is already the right
+    effort: PUL-01 ("5 of each"), HNG-17 (6 reps), COR-11 (8 each direction), COR-14 (5/side),
+    COR-15 (6/side) and COR-16 (3/side). Doses in seconds and every END dose are unchanged. The
+    load guidance asks for a weight that leaves 3–5 reps in reserve, about RPE 7: stopping short
+    of failure costs little strength (Robinson et al. 2024), people training unsupervised rarely
+    go near maximal loads (Nuzzo 2024), and a break must not leave anyone winded or sweaty in
+    work clothes. The guidance appears in Strength settings and the first-switch setup only, never
+    during a set, and no copy asks for "max reps" or "as many as you can". The rep range itself is
+    judgment: the research's evidence is for about 12 reps per snack.
+61. **The kettlebell is the heavy bell, and moves it is too heavy for are dumbbell-only.** The
+    equipment is one kettlebell of about 20–23 kg (45–50 lb) and one pair of dumbbells, with chair,
+    desk and floor always there and a wall only when the setting says so. A fixed heavy bell
+    suits squats, hinges, rows and the heavy-tier moves, so SQT-04, SQT-06, SQT-08, SQT-10,
+    SQT-12, SQT-15, HNG-14, HNG-18, PUL-10, PUL-18 and every heavy-tier move keep it. Eight moves
+    that listed either but cannot be done well with one heavy bell (PSH-12, PSH-15, HNG-13,
+    COR-02, COR-11, COR-14, COR-16, COR-17) became dumbbell-only, in their equipment and
+    instructions, and
+    the kettlebell is only ever offered for a move that lists it. A kettlebell-weight setting was
+    decided against: a goblet move that feels too heavy can be done with a dumbbell held
+    goblet-style, which the copy says.
+62. **Five curls join PUL, and "Arm" means biceps and triceps.** The library had triceps work and
+    nothing for the biceps. PUL gained a dumbbell curl, a hammer curl, an under-desk isometric curl
+    (bodyweight), a seated concentration curl (one arm at a time, per side) and a reverse curl
+    (grip), each in the library's style with a dose in range, which makes 145 movements and 23 in
+    PUL; the Arm region is documented as biceps and triceps. They sit in PUL rather than ACC
+    because push and pull already give the arms enough indirect work to maintain them (de França
+    2015 and Gentil 2013 found isolation added nothing measurable), so arm work is something a
+    pull set may draw, not a guaranteed slot. ACC is not drawn by any strength break.
+63. **Focus weights a working set's draw ×3.** The strength focus is None, More legs and glutes,
+    More back and shoulders, More core or More arms. Within a pattern every draw is weighted by
+    recency, and a move in a focused region (legs and glutes: quads, glutes, hamstrings and
+    adductors; back and shoulders: thoracic and shoulder; core: lumbar and core; arms: arm and
+    wrist and forearm) weighs three times as much. Focus never changes which patterns a day
+    works, so it tilts a week without unbalancing it. Three is judgment, kept as one constant.
+64. **A move served in either mode is not served again that day in either mode.** A strength move
+    whose `v4_overlap.kind` is `same` (28 of them) is the same exercise as its movement-library id,
+    and that id counts together with its family (entry 45), so a glute bridge (STR-01) in a
+    Movement break in the morning keeps the strength glute bridge (HNG-01) out of the afternoon,
+    and the reverse. A
+    `similar` overlap is different enough to share a day. When no strength move was served,
+    Movement's picks are exactly what they were.
+65. **Difficulty 3 unlocks per strength bucket.** Movement unlocks difficulty 3 per movement. In
+    Strength a bucket's difficulty-3 moves become eligible once difficulty-2 moves from that
+    bucket have been completed 5 times in all, using the same threshold. Counting by bucket fits a
+    library where a bucket is one movement pattern and its harder moves are progressions of the
+    easier ones, so the practice that earns the unlock is the pattern's, not one move's. The
+    threshold is judgment, shared with Movement so there is one figure to tune.
+66. **A rep meter paces every rep at 3 s, from one constant.** During a rep-based set a meter rises
+    for 1.5 s and falls for 1.5 s once a rep, beside "Rep n of N", and stops at N for the 5 s of
+    grace. A per-side set counts N, shows "Switch sides" for 3 s, then counts N again; a dose with
+    a hold rises, holds full for the hold, then falls; alternating reps each count toward the
+    total. It is silent, freezes when paused, and steps once a rep instead of moving with Reduce
+    Motion on. Timed holds, doses in seconds and the six slow moves of entry 60 show no meter and
+    use the library's `block_seconds` as the set length. The 3 s pace is the one figure the set
+    timer and the meter share, `StrengthBreak.repPaceSeconds`; a pace per movement was considered
+    and deferred, since one even pace is enough to keep reps controlled. The meter takes a rep
+    count and a pace rather than a strength break, so the 100s mode can reuse it. The rep target
+    is a target only: reps and weights are not logged.
+67. **Strength micro-breaks are END stretches, never on the floor.** After the 30 s count-in a
+    strength micro-break is either one per-side END move for 60 s (30 s a side) or two two-sided
+    END moves of 30 s, each after a 5 s lead-in; the design's "always two moves of 25 s" was
+    turned down to keep that shape. A micro-break is taken at the desk in work clothes, so there
+    is no floor move, which overrides an earlier answer that allowed one, and the second move
+    keeps the first one's posture, standing or seated, so nobody is up and down inside a minute.
+    A micro-break shares no region with the previous one, avoids the next full break's regions
+    when it can, and repeats no move that day while the pool allows.
+68. **Away works the same in both modes.** For a while Strength mode was to ignore absences and
+    keep its countdown running. That was reversed: an absence past "Count me away after" resets
+    or pauses both countdowns according to the shared "When I'm away" setting, is logged as an
+    away entry that counts for nothing, and shows the same toast with "I was sitting", exactly as
+    entry 43 has it for Movement. The scheduler has no strength branch at all.
+69. **The simulation proves the rules and reports weekly hard sets per body part.**
+    `scripts/simulate_strength.py` mirrors the Swift draws exactly, checks every break against
+    `scripts/strength-rules.json` and writes `docs/strength-simulation.md`: at least 5,000
+    strength, end-range and micro-breaks for every combination of dumbbells, kettlebell and wall
+    at caps 2 and 3, plus the app defaults, with zero violations and no eligible move never
+    served; a Swift test cross-checks 200 seeds against it. Weekly sets count a direct set as 1
+    and a helper set as ½, the fractional counting that fit best in Pelland 2026: squat/lunge
+    gives quads 1 and glutes ½, hinge hamstrings 1 and glutes 1, push chest 1 and triceps ½, pull
+    back 1 and biceps ½, core 1. At the default (3 strength breaks a day, every break taken,
+    5 days) the targets are 8–12 sets a week for quads, chest, back and hamstrings, 12–18 for
+    glutes, 4–7 for biceps and triceps and 4–6 of direct core. These are judgment: no trial tests
+    maintenance volume per muscle or a desk strength break, and the research's derived target of
+    4–8 per muscle (higher for people over about 50, per Bickel 2011) sits a little below them for
+    the reasons in entry 59. The ½ helper mapping and the claim that loaded moves cover most core
+    work are training knowledge, not findings. Re-run the script after any change to a strength
+    builder or the strength library.

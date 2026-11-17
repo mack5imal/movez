@@ -139,8 +139,9 @@ extension SnapshotFixtures {
 ///
 /// Copy note: the design handoff's micro-break panels say "Shoulder rolls", which is placeholder
 /// copy — there is no such movement in `movement-library-v4.json`. The fixture uses the real
-/// shoulder micro-break the builder would actually serve, CIR-06 "Arm circles", which produces
-/// the same eyebrow the handoff draws: "MICRO-BREAK · SHOULDERS".
+/// shoulder micro-break the builder would actually serve, CIR-06 "Arm circles". Since the mode
+/// badge the eyebrow reads "MOVEMENT MICRO-BREAK" on every state, as `design/HANDOFF.md`
+/// §micro-panel draws it.
 @MainActor
 extension SnapshotFixtures {
     /// A fixed instant, so every panel PNG is byte-identical between runs.
@@ -182,13 +183,13 @@ extension SnapshotFixtures {
             startedAt: clock.now.addingTimeInterval(microCountInRemaining - 30),
             totalSeconds: 30
         )
-        model.micro = microBreak()
+        model.micro = MicroPanelBreak(microBreak())
         return model
     }
 
-    static func microRunning(elapsed: TimeInterval? = nil, micro: MicroBreak? = nil) -> PanelViewModel {
+    static func microRunning(elapsed: TimeInterval? = nil, micro: MicroPanelBreak? = nil) -> PanelViewModel {
         let elapsed = elapsed ?? microFirstElapsed
-        let micro = micro ?? microBreak()
+        let micro = micro ?? MicroPanelBreak(microBreak())
         let clock = ManualClock(now: panelInstant)
         let model = PanelViewModel(
             phase: .microRunning,
@@ -326,6 +327,35 @@ extension SnapshotFixtures {
         return state
     }
 
+    /// The Strength dropdown at the same moments, on an A day with the second of three strength
+    /// breaks next. Only the mode, and the header and away subtitles it brings, differ.
+    static let menuStrengthProgress = ModeDayProgress(dayLetter: .dayA, breakNumber: 2, breaksPerDay: 3)
+
+    static func menuStrength() -> MenuBarState {
+        var state = strengthMenu(menuSitting())
+        state.subtitle = menuStrengthProgress.menuSubtitle
+        return state
+    }
+
+    static func menuStrengthPaused() -> MenuBarState { strengthMenu(menuPaused()) }
+
+    static func menuStrengthOffHours() -> MenuBarState { strengthMenu(menuOffHours()) }
+
+    /// Seven minutes away under the default away setting, which restarts the timer.
+    static func menuStrengthAway() -> MenuBarState {
+        var state = strengthMenu(menuAway())
+        state.minutesRemaining = 7
+        state.title = MenuBarState.awayTitle(seconds: 7 * 60)
+        state.subtitle = menuStrengthProgress.awaySubtitle(behaviour: .reset, minutesLeft: 0)
+        return state
+    }
+
+    private static func strengthMenu(_ base: MenuBarState) -> MenuBarState {
+        var state = base
+        state.breakMode = BreakMode(rawValue: strengthMode.id) ?? .fallback
+        return state
+    }
+
     /// 15:00, when the paused countdown picks up again.
     static let menuResumeAt = menuDate(month: 9, day: 11, hour: 15)
     /// Saturday 12 September 2026, and the Monday morning that follows it.
@@ -376,8 +406,10 @@ extension SnapshotFixtures {
         let viewModel = SettingsViewModel(
             settings: settings,
             library: library,
+            strengthLibrary: strengthLibrary,
             launchAtLogin: FakeLaunchAtLogin()
         )
+        viewModel.bundleInfo = frozenBundleInfo
         viewModel.librarySearch = search
         viewModel.hoursDraft = settings.workingHours
         viewModel.openSheet = sheet
@@ -386,6 +418,14 @@ extension SnapshotFixtures {
 }
 
 extension SnapshotFixtures {
+    /// The version and build the settings footer shows in every snapshot: the build the
+    /// pre-strength baseline snapshots were rendered from, so `scripts/compare_snapshots.py` sees
+    /// only real UI changes rather than a build number that moves with every commit.
+    static let frozenBundleInfo: [String: Any] = [
+        "CFBundleShortVersionString": "0.5.0",
+        "CFBundleVersion": "61"
+    ]
+
     /// When the snapshot user accepted the notice: a fixed day, so the image never drifts.
     static let noticeAcceptedAt: Date = {
         var components = DateComponents()
@@ -473,4 +513,39 @@ extension SnapshotFixtures {
         viewModel.debug = debugState()
         return viewModel
     }
+}
+
+// MARK: - Modes
+
+extension SnapshotFixtures {
+    static let movementMode = BreakMode.fallback.definition
+    static let strengthMode = ModeDefinition.strength
+
+    /// 100s and PT exist only so the badge and icon sheets can show all four of the design's
+    /// glyphs. They are fixtures, never in `ModeDefinitionTable.standard`, so nothing can select
+    /// them.
+    static let hundredsMode = ModeDefinition(
+        id: "hundreds",
+        displayName: "100s",
+        eyebrowWord: "100s",
+        badgeGlyph: ModeGlyph.hundreds.id,
+        menuBarGlyph: ModeGlyph.hundreds.id,
+        libraryKind: ModeLibraryKind(resourceName: "hundreds-fixture"),
+        settingsGroup: ModeSettingsGroup(id: "hundreds", title: "100s"),
+        isSetUp: nil
+    )
+
+    static let personalTrainingMode = ModeDefinition(
+        id: "pt",
+        displayName: "PT",
+        eyebrowWord: "PT",
+        badgeGlyph: ModeGlyph.personalTraining.id,
+        menuBarGlyph: ModeGlyph.personalTraining.id,
+        libraryKind: ModeLibraryKind(resourceName: "pt-fixture"),
+        settingsGroup: ModeSettingsGroup(id: "pt", title: "PT"),
+        isSetUp: nil
+    )
+
+    /// The four modes the design draws, in its order.
+    static let sheetModes = [movementMode, strengthMode, hundredsMode, personalTrainingMode]
 }

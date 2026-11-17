@@ -26,21 +26,7 @@ struct LibraryBrowserSheet: View {
     }
 
     private var search: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "magnifyingglass")
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(Tokens.text3.color)
-            TextField("Search by name or id", text: $viewModel.librarySearch)
-                .textFieldStyle(.plain)
-                .movezType(MovezType.settingsRow)
-                .foregroundStyle(Tokens.text.color)
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 7)
-        .background(
-            RoundedRectangle(cornerRadius: Tokens.Radius.select, style: .continuous)
-                .strokeBorder(Tokens.panelBorder.color, lineWidth: 1)
-        )
+        LibrarySearchField(text: $viewModel.librarySearch)
     }
 
     private var buckets: some View {
@@ -115,5 +101,28 @@ struct LibraryRow: View {
         }
         if movement.microEligible { parts.append("micro") }
         return parts.joined(separator: " · ")
+    }
+}
+
+/// The search box at the top of both library browsers.
+struct LibrarySearchField: View {
+    @Binding var text: String
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(Tokens.text3.color)
+            TextField("Search by name or id", text: $text)
+                .textFieldStyle(.plain)
+                .movezType(MovezType.settingsRow)
+                .foregroundStyle(Tokens.text.color)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 7)
+        .background(
+            RoundedRectangle(cornerRadius: Tokens.Radius.select, style: .continuous)
+                .strokeBorder(Tokens.panelBorder.color, lineWidth: 1)
+        )
     }
 }

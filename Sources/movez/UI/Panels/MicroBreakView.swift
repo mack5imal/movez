@@ -1,9 +1,13 @@
 import SwiftUI
 
+// design: micro-panel
+// design: strength-micro
+
 /// The micro-break, in its two moments: the thirty-second count-in, and the minute itself.
 ///
 /// The same shell as the heads-up panel and no screen dim — a micro-break is meant to be done
-/// without leaving whatever is on screen behind.
+/// without leaving whatever is on screen behind. Both modes share it: the header carries the mode
+/// badge, and a strength move's dose line, so nothing here depends on which mode built the break.
 struct MicroBreakView: View {
     @ObservedObject var viewModel: PanelViewModel
 

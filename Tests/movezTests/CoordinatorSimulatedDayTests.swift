@@ -29,7 +29,7 @@ final class CoordinatorSimulatedDayTests: XCTestCase {
 
             guard harness.state.isPendingFull else { continue }
             harness.coordinator.takeBreakNow()
-            guard let session = harness.coordinator.currentBreak else { continue }
+            guard let session = harness.coordinator.currentBreak, let routine = session.routine else { continue }
             let start = harness.now
 
             if breaks.count == skipBreakIndex {
@@ -43,7 +43,7 @@ final class CoordinatorSimulatedDayTests: XCTestCase {
                     elapsed: 300
                 ))
             }
-            breaks.append(TakenBreak(start: start, end: harness.now, routine: session.routine))
+            breaks.append(TakenBreak(start: start, end: harness.now, routine: routine))
             elapsed += breaks.count == skipBreakIndex ? 10 : 5 * minute
         }
         return breaks
@@ -210,7 +210,7 @@ final class CoordinatorSimulatedDayTests: XCTestCase {
         let library = RoutineTestSupport.library
         harness.settings.floorAvailable = false
         harness.coordinator.settingsChanged()
-        let preview = harness.coordinator.previewNextRoutine(now: harness.now)
+        let preview: PlannedBreak? = harness.coordinator.previewNextBreak(now: harness.now)
         XCTAssertNotNil(preview)
         XCTAssertFalse(preview?.movementIds.contains { library.movement(id: $0)?.requiresFloor == true } ?? true)
     }
@@ -218,11 +218,11 @@ final class CoordinatorSimulatedDayTests: XCTestCase {
     func testThePreviewMatchesTheRoutineTheOverlayServes() {
         let harness = CoordinatorHarness()
         _ = harness.run(until: { $0.isPendingFull }, limit: 90 * minute)
-        let preview = harness.coordinator.nextRoutinePreview
+        let preview = harness.coordinator.nextBreakPreview
         XCTAssertNotNil(preview)
 
         _ = harness.run(until: { $0.isFullBreak }, limit: 5 * minute)
-        XCTAssertEqual(harness.coordinator.currentBreak?.routine.movementIds, preview?.movementIds)
+        XCTAssertEqual(harness.coordinator.currentBreak?.planned.movementIds, preview?.movementIds)
     }
 
     /// An absence is written down, moves none of the day's numbers or the streak, and "I was
@@ -304,7 +304,7 @@ final class CoordinatorSimulatedDayTests: XCTestCase {
 
         XCTAssertEqual(
             harness.history.data.completions.map(\.movementId),
-            micro.blocksRun(seconds: 40).map(\.movement.id)
+            micro.partsRun(seconds: 40).map(\.movementId)
         )
         XCTAssertFalse(harness.history.data.completions.isEmpty, "forty seconds is past half of either kind")
     }

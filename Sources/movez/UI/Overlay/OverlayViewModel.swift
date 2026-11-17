@@ -26,6 +26,9 @@ final class OverlayViewModel: ObservableObject {
     /// The scheduler's own rules, so the overlay and the state machine agree about what counts.
     private let config: SchedulerConfig
     private let reduceMotion: Bool
+    /// The mode the break was built in, kept with the session rather than read from the settings,
+    /// so a switch while the break is on screen does not change its header.
+    private let mode: BreakMode
 
     private(set) var blockIndex = 0
     private(set) var completedBlocks = 0
@@ -67,9 +70,11 @@ final class OverlayViewModel: ObservableObject {
         skipsToday: Int = 0,
         streak: Int = 0,
         nextBreakAt: Date? = nil,
-        reduceMotion: Bool = false
+        reduceMotion: Bool = false,
+        mode: BreakMode = .fallback
     ) {
         self.routine = routine
+        self.mode = mode
         self.startedAt = startedAt
         self.clock = clock
         self.config = config
@@ -288,6 +293,7 @@ final class OverlayViewModel: ObservableObject {
     func refresh() {
         var state = OverlayState()
         state.phase = phase
+        state.mode = mode.definition
         state.strip = cachedStrip
         state.streak = streak
         state.skipsToday = skipsToday
@@ -357,9 +363,15 @@ final class OverlayViewModel: ObservableObject {
 
     /// The strip abbreviates per-side movements the way the handoff does: "Hip flexor /side".
     static func stripName(_ block: RoutineBlock) -> String {
-        guard block.perSide else { return block.movement.name }
-        let words = block.movement.name.split(separator: " ")
-        let short = words.count > 2 ? words.dropFirst().prefix(2).joined(separator: " ") : block.movement.name
+        stripName(name: block.movement.name, perSide: block.perSide)
+    }
+
+    /// The same abbreviation for any move, so a strength break's strip reads like a movement
+    /// break's.
+    static func stripName(name: String, perSide: Bool) -> String {
+        guard perSide else { return name }
+        let words = name.split(separator: " ")
+        let short = words.count > 2 ? words.dropFirst().prefix(2).joined(separator: " ") : name
         return "\(short.prefix(1).uppercased())\(short.dropFirst()) /side"
     }
 

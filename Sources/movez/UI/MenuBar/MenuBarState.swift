@@ -51,7 +51,16 @@ struct MenuBarState: Equatable {
     /// The minutes the menu offers to bring the next break forward by.
     static let makeDueMinutes = [5, 10, 15, 30]
 
+    /// The "Make due in" row's offers read as one phrase, which is what VoiceOver says for the
+    /// row; a test holds it to `makeDueMinutes`.
+    static let makeDueSummary = "5 · 10 · 15 · 30 min"
+
     var mode: Mode = .sitting
+    /// The mode the next break is built in; the menu-bar icon wears its glyph and the mode row
+    /// shows it selected.
+    var breakMode: BreakMode = .fallback
+    /// The modes the mode row offers, in the order the definitions list them.
+    var modes: [ModeDefinition] = ModeDefinition.all
     var minutesRemaining = 0
     /// 0 at the start of a sitting bout, 1 when the break falls due.
     var elapsedFraction: Double = 0
@@ -170,6 +179,8 @@ struct MenuBarActions {
     var extendPause: (PauseOption) -> Void = { _ in }
     var startSession: () -> Void = {}
     var endSession: () -> Void = {}
+    /// The mode row, with the id of the segment clicked.
+    var selectMode: (String) -> Void = { _ in }
     var togglePauseOptions: () -> Void = {}
     var toggleExtendOptions: () -> Void = {}
     var openSettings: () -> Void = {}

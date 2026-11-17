@@ -139,7 +139,7 @@ final class SecurityAndCopyTests: XCTestCase {
             "Excluded", "Wait", "Sounds", "Launch", "Search", "Add", "Browse", "Edit", "Time",
             "Signals", "Scheduler", "Preset", "Difficulty", "Micro", "Hip", "Hips", "One", "Two",
             "Three", "Four", "Five", "Six", "Arm", "Half", "Standing", "Wall", "Box", "March", "Stand",
-            "I'm"
+            "I'm", "Strength"
         ]
         var violations: [String] = []
 

@@ -1,6 +1,6 @@
 import Foundation
 
-/// Turning scheduler effects into app state: attaching routines, recording history, and shaping
+/// Turning scheduler effects into app state: attaching breaks, recording history, and shaping
 /// what the menu bar shows.
 extension AppCoordinator {
     func apply(_ effect: SchedulerEffect) {
@@ -14,7 +14,7 @@ extension AppCoordinator {
         case .showHeadsUp(let info):
             headsUpInfo = info
         case .hideHeadsUp:
-            headsUpInfo = nil
+            dismissHeadsUp()
         case .startFullBreak(let plan):
             beginBreak(plan)
         case .endFullBreak(let outcome):
@@ -65,13 +65,41 @@ extension AppCoordinator {
 
     // MARK: - Breaks
 
+    /// Fills in what only the coordinator knows before an effect reaches anything.
+    ///
+    /// A heads-up is the moment the next break is fixed: it is planned here, in the mode in use
+    /// now, and the full break that follows serves it however the mode changes in between (S13).
+    func attachingBreak(to effect: SchedulerEffect) -> SchedulerEffect {
+        guard case .showHeadsUp(var info) = effect else { return effect }
+        let planned = nextBreak(at: clock.now)
+        headsUpBreak = (planned: planned, mode: settings.mode)
+        info.breakKind = planned.kind
+        info.breakMinutes = max(1, Int((Double(planned.plannedSeconds) / 60).rounded()))
+        return .showHeadsUp(info)
+    }
+
+    /// The heads-up is gone. Into its full break, its planned break stays for `beginBreak`;
+    /// otherwise it is put aside for the snooze or skip that follows in the same batch, and the
+    /// next heads-up plans afresh.
+    private func dismissHeadsUp() {
+        headsUpInfo = nil
+        if case .fullBreak = scheduler.state { return }
+        dismissedHeadsUpBreak = headsUpBreak ?? dismissedHeadsUpBreak
+        headsUpBreak = nil
+    }
+
     private func beginBreak(_ plan: BreakPlan) {
         // A break the lid closed on picks up where it left off, with the movements it had, and
-        // without being counted twice among the day's routines.
-        if let resumed = interruptedSession {
-            interruptedSession = nil
+        // without being counted twice among the day's breaks. Only a start the scheduler marks
+        // as a resume serves it: a fresh break also clears the scheduler's interruption, and
+        // serving the kept session then would run a stale break instead of the announced one.
+        let kept = interruptedSession
+        interruptedSession = nil
+        if plan.resumed, let resumed = kept {
+            headsUpBreak = nil
             currentBreak = BreakSession(
-                routine: resumed.routine,
+                planned: resumed.planned,
+                mode: resumed.mode,
                 startedAt: plan.startedAt,
                 blockIndex: resumed.blockIndex,
                 completedBlocks: resumed.completedBlocks,
@@ -80,15 +108,22 @@ extension AppCoordinator {
             return
         }
 
-        let routine = nextRoutine(at: plan.startedAt)
-        rememberRoutine(routine, at: plan.startedAt)
+        let announced = headsUpBreak ?? (planned: nextBreak(at: plan.startedAt), mode: settings.mode)
+        headsUpBreak = nil
+        rememberBreak(announced.planned, at: plan.startedAt)
         cachedPreview = nil
-        currentBreak = BreakSession(routine: routine, startedAt: plan.startedAt, deferred: plan.deferred)
+        currentBreak = BreakSession(
+            planned: announced.planned,
+            mode: announced.mode,
+            startedAt: plan.startedAt,
+            deferred: plan.deferred
+        )
     }
 
     private func finishBreak(_ outcome: BreakOutcome) {
         defer { currentBreak = nil }
         guard let current = currentBreak else { return }
+        let kind = current.planned.kind
 
         switch outcome {
         case .completed(let completed, let total, _):
@@ -98,7 +133,8 @@ extension AppCoordinator {
                     routineName: BreakRecord.movementBreakName,
                     outcome: .done,
                     completedBlocks: completed,
-                    totalBlocks: total
+                    totalBlocks: total,
+                    kind: kind
                 ),
                 longestBoutSeconds: scheduler.snapshot.longestBoutSeconds
             )
@@ -109,7 +145,8 @@ extension AppCoordinator {
                 routineName: BreakRecord.movementBreakName,
                 outcome: .skipped,
                 completedBlocks: max(completed, current.completedBlocks),
-                totalBlocks: current.totalBlocks
+                totalBlocks: current.totalBlocks,
+                kind: kind
             ))
         case .snoozed:
             history.record(breakRecord: BreakRecord(
@@ -117,7 +154,8 @@ extension AppCoordinator {
                 routineName: BreakRecord.movementBreakName,
                 outcome: .snoozed,
                 completedBlocks: current.completedBlocks,
-                totalBlocks: current.totalBlocks
+                totalBlocks: current.totalBlocks,
+                kind: kind
             ))
         case .interrupted:
             // Sleep or a locked screen: nothing is recorded until the machine comes back and the
@@ -129,47 +167,47 @@ extension AppCoordinator {
 
     /// Writes down a break that was turned away at the heads-up, which never became a session.
     ///
-    /// The block count is the routine that was about to run, so the record reads the same as one
-    /// written for a break the user actually saw. Nothing was done, so no blocks are claimed.
+    /// The block count and kind are the break the heads-up announced, so the record reads the same
+    /// as one written for a break the user actually saw, and a snoozed or skipped strength break
+    /// is one the planner knows did not happen. Nothing was done, so no blocks are claimed.
     private func recordHeadsUpOutcome(_ outcome: HeadsUpOutcome) {
-        let routine = previewNextRoutine(now: clock.now)
+        let planned = (headsUpBreak ?? dismissedHeadsUpBreak)?.planned ?? previewNextBreak(now: clock.now)
+        headsUpBreak = nil
+        dismissedHeadsUpBreak = nil
         history.record(breakRecord: BreakRecord(
             at: clock.now,
             routineName: BreakRecord.movementBreakName,
             outcome: outcome == .snoozed ? .snoozed : .skipped,
             completedBlocks: 0,
-            totalBlocks: routine?.blocks.count ?? 0
+            totalBlocks: planned.parts.count,
+            kind: planned.kind
         ))
     }
 
-    /// Writes the block the user just finished to history.
-    func recordBlockCompletion(_ block: RoutineBlock, routineId: UUID) {
+    /// Writes one finished part of a break, a strength set as much as a movement block, so the
+    /// planner, recency and the difficulty-3 unlock all read it.
+    func recordPartCompletion(_ part: BreakPart, breakId: UUID?) {
         history.record(completion: MovementCompletion(
-            movementId: block.movement.id,
+            movementId: part.movementId,
             at: clock.now,
-            seconds: block.seconds,
-            routineId: routineId
+            seconds: part.seconds,
+            routineId: breakId
         ))
     }
 
     // MARK: - Micro-breaks
 
+    /// Built in the mode in use now, and kept as it is until it ends whatever the mode does.
     private func beginMicro() {
-        var context = MicroContext()
-        context.usedMovementIdsToday = usedMovementIdsToday(at: clock.now)
-        context.lastMicroMovementIds = lastMicroIds
-        context.nextFullRoutineIds = Set(previewNextRoutine(now: clock.now)?.movementIds ?? [])
-        context.excluded = settings.excludedMovementIds
-        context.equipment = settings.equipment
-        context.unavailable = settings.unavailableRequirements
-        context.recency = history.recencyScores(before: clock.now)
-        context.seed = SplitMix64.seed(day: scheduler.snapshot.dayKey, index: 1_000 + scheduler.snapshot.microEmphasisIndex)
-        currentMicro = microBuilder.build(context: context)
+        let next = Set(previewNextBreak(now: clock.now).movementIds)
+        currentMicro = activeModeBuilder.microBreak(for: self, at: clock.now, nextFullBreakIds: next)
+        currentMicroMode = settings.mode
     }
 
     private func endMicro() {
         if let micro = currentMicro { lastMicroIds = Set(micro.movementIds) }
         currentMicro = nil
+        currentMicroMode = nil
     }
 
     /// Writes the micro-break's movements, on the scheduler's word that it ran (§4.11's half rule).
@@ -183,20 +221,16 @@ extension AppCoordinator {
     /// skipped in its first half did one of them, not both.
     private func recordMicro(ranSeconds: Int) {
         guard let micro = currentMicro else { return }
-        for block in micro.blocksRun(seconds: ranSeconds) {
-            history.record(completion: MovementCompletion(
-                movementId: block.movement.id,
-                at: clock.now,
-                seconds: block.seconds,
-                routineId: nil
-            ))
+        for part in micro.partsRun(seconds: ranSeconds) {
+            recordPartCompletion(part, breakId: nil)
         }
     }
 
     // MARK: - Absences
 
     /// Writes down that an absence reset or paused the countdowns. It goes in the same list as the
-    /// breaks, so the record says what happened, but it moves none of the day's numbers.
+    /// breaks, so the record says what happened, but it moves none of the day's numbers. It is the
+    /// same record in every mode: an absence is not a break of any kind (S23).
     private func recordAbsence(_ record: AbsenceRecord) {
         history.record(
             breakRecord: BreakRecord(
@@ -216,27 +250,36 @@ extension AppCoordinator {
         history.removeLastBreakRecord(matching: BreakResult(toast.behaviour))
     }
 
-    // MARK: - Routine selection
+    // MARK: - Break selection
 
-    /// The routine this break will run. Deterministic in the day and the break index, and cached
-    /// against everything it reads, so what the menu advertises is what the overlay serves.
-    func nextRoutine(at now: Date) -> Routine {
+    /// The break this full break will run, built by the mode in use now. Deterministic in the day
+    /// and the break index, and cached against everything it reads, so what the menu advertises is
+    /// what the overlay serves.
+    func nextBreak(at now: Date) -> PlannedBreak {
+        let key = previewKey(at: now)
+        if let cached = cachedPreview, cached.key == key { return cached.planned }
+
+        let planned = plannedBreak(modeId: settings.mode.rawValue, at: now)
+        cachedPreview = (key, planned)
+        return planned
+    }
+
+    /// The coordinator's one build path: a full break from the builder `modeId` names, uncached.
+    func plannedBreak(modeId: String, at now: Date) -> PlannedBreak {
+        rollDayIfNeeded(at: now)
+        return modeBuilders.builder(for: modeId).fullBreak(for: self, at: now)
+    }
+
+    /// The break on screen, a slept-through break waiting to resume, the break a heads-up
+    /// announced, or else the next one to build: whichever the scheduler's next full break serves.
+    func previewNextBreak(now: Date) -> PlannedBreak {
+        currentBreak?.planned ?? interruptedSession?.planned ?? headsUpBreak?.planned ?? nextBreak(at: now)
+    }
+
+    /// Everything the built break depends on. When any of it moves, the preview is rebuilt.
+    func previewKey(at now: Date) -> String {
         let index = breakIndexToday(at: now)
-        let key = previewKey(index: index)
-        if let cached = cachedPreview, cached.key == key { return cached.routine }
-
-        let routine = builder.build(context: routineContext(at: now, breakIndex: index))
-        cachedPreview = (key, routine)
-        return routine
-    }
-
-    func previewNextRoutine(now: Date) -> Routine? {
-        currentBreak?.routine ?? nextRoutine(at: now)
-    }
-
-    /// Everything the built routine depends on. When any of it moves, the preview is rebuilt.
-    private func previewKey(index: Int) -> String {
-        [
+        let shared = [
             scheduler.snapshot.dayKey,
             String(index),
             String(history.data.completions.count),
@@ -245,16 +288,18 @@ extension AppCoordinator {
             settings.focus.rawValue,
             String(settings.difficultyCap),
             settings.equipment.map(\.rawValue).sorted().joined(separator: "+"),
-            settings.unavailableRequirements.map(\.rawValue).sorted().joined(separator: "+")
-        ].joined(separator: "|")
+            settings.unavailableRequirements.map(\.rawValue).sorted().joined(separator: "+"),
+            settings.mode.rawValue
+        ]
+        return (shared + activeModeBuilder.previewKeyParts(for: self, at: now)).joined(separator: "|")
     }
 
     func routineContext(at now: Date, breakIndex: Int) -> RoutineContext {
         rollDayIfNeeded(at: now)
         var context = RoutineContext()
         context.date = now
-        context.usedMovementIdsToday = usedMovementIdsToday(at: now)
-        context.usedStrRegionsLastBreak = routinesToday.last?.strengthRegions ?? []
+        context.usedMovementIdsToday = movementIdsUsedToday(at: now)
+        context.usedStrRegionsLastBreak = breaksToday.last?.routine?.strengthRegions ?? []
         context.equipment = settings.equipment
         context.unavailable = settings.unavailableRequirements
         context.excluded = settings.excludedMovementIds
@@ -266,28 +311,40 @@ extension AppCoordinator {
         return context
     }
 
-    /// Everything served today, in either kind of break: what history has recorded, and the
-    /// routines already put on screen, which are remembered even when they were skipped.
-    func usedMovementIdsToday(at now: Date) -> Set<String> {
+    /// Everything served today, in any kind of break and from either library: what history has
+    /// recorded, and the breaks already put on screen, which are remembered even when they were
+    /// skipped.
+    func idsServedToday(at now: Date) -> Set<String> {
         rollDayIfNeeded(at: now)
-        return history.usedMovementIds(on: now).union(routinesToday.flatMap(\.movementIds))
+        return history.usedMovementIds(on: now).union(breaksToday.flatMap(\.movementIds))
+    }
+
+    /// The movement-library ids a Movement build must leave alone today: everything served, plus
+    /// the counterpart of any strength move served today that is the same exercise (S8). With no
+    /// strength move served, that is exactly what was served.
+    func movementIdsUsedToday(at now: Date) -> Set<String> {
+        let served = idsServedToday(at: now)
+        guard let strengthLibrary, let crossModeUsage else { return served }
+        let strength = served.filter { strengthLibrary.movement(id: $0) != nil }
+        guard !strength.isEmpty else { return served }
+        return served.union(crossModeUsage.used(movementIds: [], strengthIds: strength).movementIds)
     }
 
     func breakIndexToday(at now: Date) -> Int {
         rollDayIfNeeded(at: now)
-        return routinesToday.count
+        return breaksToday.count
     }
 
-    func rememberRoutine(_ routine: Routine, at now: Date) {
+    func rememberBreak(_ planned: PlannedBreak, at now: Date) {
         rollDayIfNeeded(at: now)
-        routinesToday.append(routine)
+        breaksToday.append(planned)
     }
 
     func rollDayIfNeeded(at now: Date) {
         let key = DayKey.key(for: now, calendar: settings.schedulerConfig.calendar)
         guard key != routinesDayKey else { return }
         routinesDayKey = key
-        routinesToday.removeAll()
+        breaksToday.removeAll()
     }
 
     // MARK: - Menu state
@@ -316,6 +373,8 @@ extension AppCoordinator {
 
         state.secondsUntilBreak = scheduler.snapshot.secondsUntilFullBreak(at: now)
         state.nextBreakAt = scheduler.snapshot.nextFullDueAt
+        state.breakMode = settings.mode
+        state.dayProgress = dayProgress
         return state
     }
 

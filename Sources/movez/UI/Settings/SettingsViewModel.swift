@@ -12,18 +12,31 @@ final class SettingsViewModel: ObservableObject {
         case workingHours
         case library
         case exceptions
+        /// The selected mode's own library browser (Strength's; Movement keeps `library`).
+        case modeLibrary
+        /// A mode's first-switch setup. Named for the role rather than the mode, since nothing
+        /// outside `Modes/` names a mode case.
+        case modeSetup
 
         var id: String { rawValue }
     }
 
     let settings: SettingsStore
     let library: MovementLibrary
+    /// The strength library the Strength browser lists. Nil where it is not loaded, in which case
+    /// the browser shows an empty list rather than the movement library.
+    let strengthLibrary: StrengthLibrary?
     let launchAtLogin: LaunchAtLoginService
     private let onChange: () -> Void
     /// Opens the health and safety notice, read-only. Nil where there is no notice window — a
     /// snapshot, or a test that does not care.
     private let onOpenNotice: (() -> Void)?
+    /// Told when a mode request needs a setup shown instead of switching.
+    private let onModeAction: (ModeSwitchAction) -> Void
     private var debugCancellables: Set<AnyCancellable> = []
+    /// Forwards the store's own changes, so a change made elsewhere (the menu bar's mode row)
+    /// redraws an open window.
+    private var storeCancellable: AnyCancellable?
 
     @Published var openSheet: Sheet?
     /// The working hours being edited. Nothing is written until Apply passes validation.
@@ -31,6 +44,9 @@ final class SettingsViewModel: ObservableObject {
     @Published var hoursError: String?
     @Published var librarySearch = ""
     @Published var libraryBucket: Bucket?
+    @Published var strengthLibraryBucket: StrengthBucket?
+    /// What the first-switch sheet will save. Nothing reaches the store until Switch to Strength.
+    @Published var strengthSetupDraft = StrengthSetupChoices()
     @Published var launchAtLoginError: String?
     /// The debug tools, once they are attached. Absent in contexts with no coordinator.
     @Published var debug: DebugState?
@@ -39,16 +55,28 @@ final class SettingsViewModel: ObservableObject {
     init(
         settings: SettingsStore,
         library: MovementLibrary,
+        strengthLibrary: StrengthLibrary? = nil,
         launchAtLogin: LaunchAtLoginService? = nil,
         openNotice: (() -> Void)? = nil,
+        onModeAction: @escaping (ModeSwitchAction) -> Void = { _ in },
         onChange: @escaping () -> Void = {}
     ) {
         self.settings = settings
         self.library = library
+        self.strengthLibrary = strengthLibrary
         self.launchAtLogin = launchAtLogin ?? SystemLaunchAtLogin()
         onOpenNotice = openNotice
+        self.onModeAction = onModeAction
         self.onChange = onChange
         hoursDraft = settings.workingHours
+        // The views read most values through `settings`, which this object does not own, so a
+        // write that bypasses the setters here would otherwise leave the window stale. The store
+        // is main-actor bound, so its publisher already fires on the main thread and the forward
+        // can be synchronous. It deliberately skips `onChange`: that hook tells the coordinator
+        // the user changed something here, and calling it would echo the change back.
+        storeCancellable = settings.objectWillChange.sink { [weak self] _ in
+            self?.objectWillChange.send()
+        }
     }
 
     // MARK: - The health and safety notice
@@ -100,8 +128,13 @@ final class SettingsViewModel: ObservableObject {
     /// build number from the bundle (set in `project.yml` and stamped with the commit count at build
     /// time), the library version and size from the JSON. A bump of either shows up on its own.
     var versionLine: String {
-        Self.versionLine(info: Bundle.main.infoDictionary ?? [:], library: library)
+        Self.versionLine(info: bundleInfo, library: library)
     }
+
+    /// Where the version and build number are read from. The installed bundle, except in a
+    /// snapshot, which freezes it: the Debug build stamps the commit count as the build number, so
+    /// a live read would make the image change with every commit and hide real changes among them.
+    var bundleInfo: [String: Any] = Bundle.main.infoDictionary ?? [:]
 
     static func versionLine(info: [String: Any], library: MovementLibrary) -> String {
         let version = info["CFBundleShortVersionString"] as? String ?? "?"
@@ -345,5 +378,118 @@ final class SettingsViewModel: ObservableObject {
     private func changed() {
         objectWillChange.send()
         onChange()
+    }
+}
+
+// MARK: - Mode and Strength
+
+extension SettingsViewModel {
+    static var modeOptions: [ModeDefinition] { ModeDefinition.all }
+    static var strengthEquipmentOptions: [StrengthEquipment] { StrengthEquipment.allCases }
+    static var strengthBreaksOptions: [(value: Int, label: String)] {
+        SettingsStore.strengthBreaksRange.map { ($0, "\($0)") }
+    }
+    static var strengthFocusOptions: [(value: StrengthFocus, label: String)] {
+        StrengthFocus.allCases.map { ($0, $0.displayName) }
+    }
+
+    var strengthExcludedLine: String { "\(settings.strengthExcludedIds.count) excluded" }
+
+    /// The mode control's only way in. A mode that still needs setting up is not switched to; the
+    /// setup is asked for instead, and shown here in the window the request came from.
+    func requestMode(_ mode: BreakMode) {
+        if let action = ModeSwitch.request(mode, in: settings) {
+            show(action)
+            onModeAction(action)
+        } else {
+            changed()
+        }
+    }
+
+    /// The mode control binds to a definition id; an id with no mode behind it is ignored.
+    func requestMode(id: String) {
+        guard let mode = BreakMode(rawValue: id) else { return }
+        requestMode(mode)
+    }
+
+    /// Opens whatever sheet a mode request asked for, whether it came from this window's mode
+    /// control or from the dropdown by way of the open-settings notification.
+    func show(_ action: ModeSwitchAction) {
+        guard action.opensStrengthSetup else { return }
+        beginStrengthSetup()
+    }
+
+    /// The setup always starts from the agreed defaults (three breaks, Beginner, a wall, nothing
+    /// ticked), not from whatever an earlier abandoned setup left behind.
+    func beginStrengthSetup() {
+        strengthSetupDraft = StrengthSetupChoices()
+        openSheet = .modeSetup
+    }
+
+    /// Switch to Strength is never disabled: no equipment is a valid answer, the user trains with
+    /// bodyweight only (the spec overrules the design's "at least one" gate).
+    var strengthSetupCanConfirm: Bool { true }
+
+    func confirmStrengthSetup(_ choices: StrengthSetupChoices) {
+        ModeSwitch.confirmStrengthSetup(choices, in: settings)
+        changed()
+    }
+
+    /// Switch to Strength in the sheet: saves the draft, switches and closes.
+    func confirmStrengthSetupSheet() {
+        confirmStrengthSetup(strengthSetupDraft)
+        openSheet = nil
+    }
+
+    /// "Not now": the setup closes and nothing is saved, so the mode stays where it was.
+    func declineStrengthSetup() {
+        if openSheet == .modeSetup { openSheet = nil }
+    }
+
+    func toggleSetupEquipment(_ item: StrengthEquipment) {
+        if strengthSetupDraft.equipment.contains(item) {
+            strengthSetupDraft.equipment.remove(item)
+        } else {
+            strengthSetupDraft.equipment.insert(item)
+        }
+    }
+
+    func toggleStrengthEquipment(_ item: StrengthEquipment) {
+        if settings.strengthEquipment.contains(item) {
+            settings.strengthEquipment.remove(item)
+        } else {
+            settings.strengthEquipment.insert(item)
+        }
+        changed()
+    }
+
+    func setStrengthSolidWallNearby(_ nearby: Bool) {
+        settings.strengthSolidWallNearby = nearby
+        changed()
+    }
+
+    func setStrengthBreaksPerDay(_ count: Int) {
+        let range = SettingsStore.strengthBreaksRange
+        settings.strengthBreaksPerDay = min(max(count, range.lowerBound), range.upperBound)
+        changed()
+    }
+
+    func setStrengthDifficultyCap(_ cap: Int) {
+        settings.strengthDifficultyCap = cap
+        changed()
+    }
+
+    func setStrengthFocus(_ focus: StrengthFocus) {
+        settings.strengthFocus = focus
+        changed()
+    }
+
+    func setStrengthExcluded(_ movementId: String, _ excluded: Bool) {
+        if excluded {
+            settings.strengthExcludedIds.insert(movementId)
+        } else {
+            settings.strengthExcludedIds.remove(movementId)
+        }
+        changed()
     }
 }

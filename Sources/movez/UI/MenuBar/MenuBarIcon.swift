@@ -1,77 +1,115 @@
 import AppKit
 
-/// The menu-bar glyph: a small ring whose filled arc is the fraction of the sitting bout already
-/// spent, so the time to the next break is legible without opening anything.
+/// The menu-bar icon: an 18 pt circle with the current mode's glyph inside. In a sitting bout the
+/// circle's spent arc is the fraction of the bout already gone, so the time to the next break is
+/// legible without opening anything.
 ///
-/// It is a template image, so it follows the menu bar's own appearance — light text on a dark
-/// bar, dark on a light one — rather than insisting on the app's palette in the one place on
-/// screen that belongs to the system.
+/// It is a template image, so it follows the menu bar's own appearance — light on a dark bar, dark
+/// on a light one — rather than insisting on the app's palette in the one place on screen that
+/// belongs to the system. Every mode draws the same circle; modes differ by glyph only, and the
+/// glyph comes from the mode's definition.
 enum MenuBarIcon {
-    /// The handoff's 12 px ring.
-    static let pointSize: CGFloat = 12
-    static let strokeRatio: CGFloat = 1.2 / 12
-    /// Off hours the ring is still there, just quieter.
-    static let offHoursAlpha: CGFloat = 0.55
-    /// The unspent part of the ring, under the filled arc.
-    static let trackAlpha: CGFloat = 0.3
-    static let pausedAlpha: CGFloat = 0.75
+    /// The full status-item height.
+    static let pointSize: CGFloat = Tokens.Metric.menuBarIcon
+    /// The design's measurements at 18 pt; everything scales with the drawn size.
+    static let ringRadius: CGFloat = 8
+    static let ringStroke: CGFloat = 1.6
+    static let glyphSize: CGFloat = 10
+    static let glyphStroke: CGFloat = 1.1
+    /// The paused ring's dash and gap, in hundredths of the circle's length.
+    static let pausedDash: (dash: CGFloat, gap: CGFloat) = (6, 5)
 
     static func image(for state: MenuBarState, size: CGFloat = pointSize) -> NSImage {
-        image(mode: state.mode, fraction: state.elapsedFraction, size: size)
+        image(
+            mode: state.mode,
+            fraction: state.elapsedFraction,
+            glyph: ModeGlyph.menuBar(for: state.breakMode.definition),
+            size: size
+        )
     }
 
-    static func image(mode: MenuBarState.Mode, fraction: Double, size: CGFloat = pointSize) -> NSImage {
-        let image = NSImage(size: NSSize(width: size, height: size), flipped: false) { rect in
-            draw(mode: mode, fraction: fraction, in: rect)
+    static func image(
+        mode: MenuBarState.Mode,
+        fraction: Double,
+        glyph: ModeGlyph? = ModeGlyph.menuBar(for: BreakMode.fallback.definition),
+        size: CGFloat = pointSize
+    ) -> NSImage {
+        // Flipped, so the glyph's vectors and the arc are drawn in the design's y-down coordinates.
+        let image = NSImage(size: NSSize(width: size, height: size), flipped: true) { rect in
+            guard let context = NSGraphicsContext.current?.cgContext else { return false }
+            draw(mode: mode, fraction: fraction, glyph: glyph, in: rect, context: context)
             return true
         }
         image.isTemplate = true
         return image
     }
 
-    /// The alpha the ring is drawn at, which is what the off-hours criterion is about.
+    /// The alpha the whole ring is drawn at before any progress goes on top.
     static func ringAlpha(for mode: MenuBarState.Mode) -> CGFloat {
         switch mode {
-        case .sitting: return trackAlpha
-        case .paused: return pausedAlpha
-        case .offHours: return offHoursAlpha
-        // The same faint ring a closed day gets: there is no bout to show progress through.
-        case .away: return offHoursAlpha
+        case .sitting: return Tokens.iconTrack.alpha
+        case .paused: return Tokens.iconPaused.alpha
+        case .offHours: return Tokens.iconOffhours.alpha
+        case .away: return Tokens.iconAway.alpha
         }
     }
 
-    private static func draw(mode: MenuBarState.Mode, fraction: Double, in rect: NSRect) {
-        let stroke = max(1, rect.width * strokeRatio)
-        let ring = NSBezierPath(ovalIn: rect.insetBy(dx: stroke / 2, dy: stroke / 2))
-        ring.lineWidth = stroke
-        NSColor.black.withAlphaComponent(ringAlpha(for: mode)).setStroke()
+    /// Off hours the glyph goes quiet with the ring; otherwise it is the one thing always at full
+    /// strength.
+    static func glyphAlpha(for mode: MenuBarState.Mode) -> CGFloat {
+        mode == .offHours ? Tokens.iconOffhours.alpha : 1
+    }
 
-        if mode == .paused {
-            var dashes: [CGFloat] = [stroke * 2, stroke * 2]
-            ring.setLineDash(&dashes, count: dashes.count, phase: 0)
+    /// Only a sitting bout has progress to show.
+    static func showsProgress(_ mode: MenuBarState.Mode) -> Bool { mode == .sitting }
+
+    /// The dash pattern of the ring at `size`, nil for a solid ring. Only a pause dashes it.
+    static func dashPattern(for mode: MenuBarState.Mode, size: CGFloat = pointSize) -> [CGFloat]? {
+        guard mode == .paused else { return nil }
+        let unit = 2 * CGFloat.pi * ringRadius * size / pointSize / 100
+        return [pausedDash.dash * unit, pausedDash.gap * unit]
+    }
+
+    private static func draw(mode: MenuBarState.Mode, fraction: Double, glyph: ModeGlyph?, in rect: NSRect, context: CGContext) {
+        let scale = rect.width / pointSize
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        let radius = ringRadius * scale
+        let stroke = ringStroke * scale
+        context.setLineCap(.round)
+        context.setLineJoin(.round)
+
+        context.setLineWidth(stroke)
+        context.setStrokeColor(Tokens.templateInk.opacity(ringAlpha(for: mode)).nsColor.cgColor)
+        if let dashes = dashPattern(for: mode, size: rect.width) {
+            context.setLineDash(phase: 0, lengths: dashes)
         }
-        ring.stroke()
+        context.addEllipse(in: CGRect(x: center.x - radius, y: center.y - radius, width: radius * 2, height: radius * 2))
+        context.strokePath()
+        context.setLineDash(phase: 0, lengths: [])
 
-        guard mode == .sitting else { return }
-        drawArc(fraction: fraction, in: rect, stroke: stroke)
+        if showsProgress(mode) {
+            drawArc(fraction: fraction, center: center, radius: radius, stroke: stroke, context: context)
+        }
+
+        guard let glyph else { return }
+        let side = glyphSize * scale
+        let box = CGRect(x: center.x - side / 2, y: center.y - side / 2, width: side, height: side)
+        context.setLineWidth(glyphStroke * scale)
+        context.setStrokeColor(Tokens.templateInk.opacity(glyphAlpha(for: mode)).nsColor.cgColor)
+        context.addPath(glyph.cgPath(in: box))
+        context.strokePath()
     }
 
     /// The spent arc, from twelve o'clock, clockwise — the same direction every ring in movez
-    /// drains.
-    private static func drawArc(fraction: Double, in rect: NSRect, stroke: CGFloat) {
+    /// drains. In y-down coordinates a growing angle runs clockwise.
+    private static func drawArc(fraction: Double, center: CGPoint, radius: CGFloat, stroke: CGFloat, context: CGContext) {
         let spent = max(0, min(1, fraction))
         guard spent > 0 else { return }
-        let arc = NSBezierPath()
-        arc.appendArc(
-            withCenter: NSPoint(x: rect.midX, y: rect.midY),
-            radius: (rect.width - stroke) / 2,
-            startAngle: 90,
-            endAngle: 90 - 360 * spent,
-            clockwise: true
-        )
-        arc.lineWidth = stroke
-        arc.lineCapStyle = .round
-        NSColor.black.setStroke()
-        arc.stroke()
+        let arc = CGMutablePath()
+        arc.addRelativeArc(center: center, radius: radius, startAngle: -.pi / 2, delta: 2 * .pi * CGFloat(spent))
+        context.setLineWidth(stroke)
+        context.setStrokeColor(Tokens.templateInk.nsColor.cgColor)
+        context.addPath(arc)
+        context.strokePath()
     }
 }

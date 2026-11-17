@@ -12,10 +12,16 @@ final class MenuBarViewModel: ObservableObject {
     @Published private(set) var state = MenuBarState()
 
     private let coordinator: AppCoordinator
+    /// Told when a mode request needs a setup shown instead of switching.
+    private let onModeAction: (ModeSwitchAction) -> Void
     private var cancellables: Set<AnyCancellable> = []
 
-    init(coordinator: AppCoordinator) {
+    init(
+        coordinator: AppCoordinator,
+        onModeAction: @escaping (ModeSwitchAction) -> Void = MenuBarViewModel.openSetup
+    ) {
         self.coordinator = coordinator
+        self.onModeAction = onModeAction
         // objectWillChange fires before the coordinator's own state settles, so the rebuild waits
         // for the next turn of the run loop.
         coordinator.objectWillChange
@@ -28,7 +34,9 @@ final class MenuBarViewModel: ObservableObject {
     var iconImage: NSImage { MenuBarIcon.image(for: state) }
     var labelText: String { state.labelText }
 
-    var actions: MenuBarActions {
+    /// The dropdown's actions. `closeMenu` dismisses the dropdown; it is handed in by the view
+    /// that hosts it, because only SwiftUI knows how to close a `MenuBarExtra` window.
+    func actions(closingWith closeMenu: @escaping () -> Void = {}) -> MenuBarActions {
         MenuBarActions(
             takeBreakNow: { [weak self] in self?.takeBreakNow() },
             makeDue: { [weak self] minutes in self?.makeDue(minutes) },
@@ -37,6 +45,7 @@ final class MenuBarViewModel: ObservableObject {
             extendPause: { [weak self] option in self?.extendPause(option) },
             startSession: { [weak self] in self?.startSession() },
             endSession: { [weak self] in self?.endSession() },
+            selectMode: { [weak self] id in self?.selectMode(id, closeMenu: closeMenu) },
             togglePauseOptions: { [weak self] in self?.togglePauseOptions() },
             toggleExtendOptions: { [weak self] in self?.toggleExtendOptions() },
             openSettings: { [weak self] in self?.openSettings() },
@@ -81,6 +90,36 @@ final class MenuBarViewModel: ObservableObject {
         collapseRows()
     }
 
+    /// The mode row's click, through the same switch Settings uses.
+    ///
+    /// A mode that is ready switches at once, from the next break. One that still needs its setup
+    /// (Strength, the first time) leaves the mode where it was, closes the dropdown and asks for
+    /// Settings to open at the setup: the setup is a sheet in the settings window, and a dropdown
+    /// left open over it would sit on top of the question being asked.
+    func selectMode(_ id: String, closeMenu: () -> Void) {
+        guard let mode = BreakMode(rawValue: id), mode != coordinator.settings.mode else { return }
+        if let action = ModeSwitch.request(mode, in: coordinator.settings) {
+            closeMenu()
+            onModeAction(action)
+        } else {
+            coordinator.settingsChanged()
+            refresh()
+        }
+    }
+
+    /// Asks the settings window to open at a mode's setup. The window opens on the notification
+    /// the "Settings…" row posts; the mode rides along so the window can show its setup sheet.
+    nonisolated static func openSetup(_ action: ModeSwitchAction) {
+        switch action {
+        case let .openSetup(mode):
+            NotificationCenter.default.post(
+                name: .movezOpenSettings,
+                object: nil,
+                userInfo: [Notification.Name.modeSetupKey: mode.rawValue]
+            )
+        }
+    }
+
     func togglePauseOptions() {
         state.pauseExpanded.toggle()
         state.extendExpanded = false
@@ -114,6 +153,7 @@ final class MenuBarViewModel: ObservableObject {
         next.pauseExpanded = state.pauseExpanded
         next.extendExpanded = state.extendExpanded
         next.mode = Self.mode(for: coordinator.menuState.mode)
+        next.breakMode = coordinator.menuState.breakMode
         next.isAdHocSession = coordinator.scheduler.snapshot.adHocSession
         next.isBreaking = coordinator.scheduler.state.isBreakSurfaceVisible
         next.breakLabel = Self.breakLabel(for: coordinator.scheduler.state)
@@ -136,8 +176,9 @@ final class MenuBarViewModel: ObservableObject {
         next.minutesRemaining = Self.minutes(remaining)
         next.elapsedFraction = sitSeconds > 0 ? 1 - Double(remaining) / Double(sitSeconds) : 0
         next.title = MenuBarState.title(mode: .sitting, minutesRemaining: next.minutesRemaining)
-        // Routines have no names to preview, and the title already says when the break is.
-        next.subtitle = ""
+        // Movement routines have no names to preview, and the title already says when the break
+        // is. A mode that plans its day names where in the day the next break falls.
+        next.subtitle = coordinator.menuState.dayProgress?.menuSubtitle ?? ""
         applyStats(to: &next, day: "Today", stats: coordinator.history.stats(on: now))
     }
 
@@ -149,7 +190,18 @@ final class MenuBarViewModel: ObservableObject {
         next.minutesRemaining = Self.minutes(away)
         next.elapsedFraction = 0
         next.title = MenuBarState.awayTitle(seconds: away)
-        next.subtitle = MenuBarState.awaySubtitle
+        if let progress = coordinator.menuState.dayProgress {
+            // What the pause setting is holding: the countdown as it stood when the user went.
+            let held = coordinator.scheduler.snapshot.remainingAtAwaySeconds
+                ?? coordinator.scheduler.snapshot.secondsUntilFullBreak(at: now)
+                ?? coordinator.scheduler.config.sitSeconds
+            next.subtitle = progress.awaySubtitle(
+                behaviour: coordinator.scheduler.config.awayBehaviour,
+                minutesLeft: Self.minutes(held)
+            )
+        } else {
+            next.subtitle = MenuBarState.awaySubtitle
+        }
         applyStats(to: &next, day: "Today", stats: coordinator.history.stats(on: now))
     }
 
@@ -215,4 +267,7 @@ final class MenuBarViewModel: ObservableObject {
 extension Notification.Name {
     /// Posted by the menu's "Settings…" row. The settings window listens for it.
     static let movezOpenSettings = Notification.Name("movez.openSettings")
+
+    /// The `userInfo` key, on `movezOpenSettings`, naming the mode whose setup to show.
+    static let modeSetupKey = "modeSetup"
 }

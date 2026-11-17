@@ -1,5 +1,7 @@
 import SwiftUI
 
+// design: overlay
+
 /// The break itself: a 1000×660 card centred on each display, with the timer disc sitting on its
 /// top-right corner.
 struct OverlayView: View {
@@ -7,38 +9,22 @@ struct OverlayView: View {
     var actions = OverlayActions()
     var animated = true
 
-    /// The card's own size, from the handoff.
-    private let card = Tokens.Metric.overlayCard
-    private let disc = Tokens.Metric.overlayDisc
-    /// On a 1440×900 screen the handoff puts the card at (220, 130) and the disc at (1070, 60),
-    /// so the disc's centre sits on the card's right edge, 70 pt below its top corner.
-    private let discCentreBelowTop: CGFloat = 80
-
     var body: some View {
-        ZStack(alignment: .topLeading) {
+        OverlayCard(disc: disc) {
             cardBody
-                .frame(width: card.width, height: card.height)
-                .background(Tokens.panel.color)
-                .clipShape(RoundedRectangle(cornerRadius: Tokens.Radius.overlay, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: Tokens.Radius.overlay, style: .continuous)
-                        .strokeBorder(Tokens.panelBorder.color, lineWidth: 1)
-                )
-                .movezShadow(Tokens.Shadow.overlay)
-
-            if state.phase == .running {
-                TimerDisc(
-                    size: disc,
-                    progress: state.discProgress,
-                    numerals: state.discNumerals,
-                    label: state.discLabel,
-                    mode: state.discMode,
-                    action: actions.next
-                )
-                .offset(x: card.width - disc / 2, y: discCentreBelowTop - disc / 2)
-            }
         }
-        .frame(width: card.width, height: card.height)
+    }
+
+    private var disc: TimerDisc? {
+        guard state.phase == .running else { return nil }
+        return TimerDisc(
+            size: Tokens.Metric.overlayDisc,
+            progress: state.discProgress,
+            numerals: state.discNumerals,
+            label: state.discLabel,
+            mode: state.discMode,
+            action: actions.next
+        )
     }
 
     @ViewBuilder
@@ -52,7 +38,7 @@ struct OverlayView: View {
 
     private var runningBody: some View {
         VStack(spacing: 0) {
-            header
+            OverlayHeader(mode: state.mode, trailing: state.headerTrailing)
             Spacer(minLength: 0)
             movementBody
                 .frame(maxWidth: 780)
@@ -64,17 +50,7 @@ struct OverlayView: View {
             actionRow
                 .padding(.top, 24)
         }
-        .padding(EdgeInsets(top: 56, leading: 80, bottom: 44, trailing: 80))
-    }
-
-    private var header: some View {
-        HStack(alignment: .firstTextBaseline) {
-            MovezText(state.eyebrow, MovezType.eyebrowOverlay, color: Tokens.accent)
-            Spacer(minLength: 24)
-            MovezText(state.headerTrailing, MovezType.eyebrowOverlay, color: Tokens.text2)
-        }
-        // Keeps the header clear of the disc sitting on the corner.
-        .padding(.trailing, 200)
+        .padding(OverlayCardLayout.contentInsets)
     }
 
     @ViewBuilder
@@ -128,9 +104,73 @@ struct OverlayView: View {
     }
 }
 
+/// Measurements the card and the bodies inside it share.
+enum OverlayCardLayout {
+    /// The card's padding, from the handoff: 56 80 44.
+    static let contentInsets = EdgeInsets(top: 56, leading: 80, bottom: 44, trailing: 80)
+}
+
+/// The overlay's frame, shared by every kind of break: the card, its border and shadow, and the
+/// timer disc on its top-right corner.
+struct OverlayCard<Content: View>: View {
+    var disc: TimerDisc?
+    @ViewBuilder var content: Content
+
+    /// The card's own size, from the handoff.
+    private let card = Tokens.Metric.overlayCard
+    private let discSize = Tokens.Metric.overlayDisc
+    /// On a 1440×900 screen the handoff puts the card at (220, 130) and the disc at (1070, 60),
+    /// so the disc's centre sits on the card's right edge, 70 pt below its top corner.
+    private let discCentreBelowTop: CGFloat = 80
+
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            content
+                .frame(width: card.width, height: card.height)
+                .background(Tokens.panel.color)
+                .clipShape(RoundedRectangle(cornerRadius: Tokens.Radius.overlay, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: Tokens.Radius.overlay, style: .continuous)
+                        .strokeBorder(Tokens.panelBorder.color, lineWidth: 1)
+                )
+                .movezShadow(Tokens.Shadow.overlay)
+
+            if let disc {
+                disc.offset(x: card.width - discSize / 2, y: discCentreBelowTop - discSize / 2)
+            }
+        }
+        .frame(width: card.width, height: card.height)
+    }
+}
+
+/// The overlay's header row: the mode badge on the left and the time left on the right.
+///
+/// The badge comes from the mode the break was built in, so a Movement break says MOVEMENT BREAK
+/// behind its glyph and a strength or end-range break says STRENGTH BREAK behind its own.
+struct OverlayHeader: View {
+    var mode: ModeDefinition
+    var trailing: String
+
+    var badge: ModeBadge {
+        ModeBadge(definition: mode, size: .overlay, label: .breakEyebrow)
+    }
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline) {
+            badge
+            Spacer(minLength: 24)
+            MovezText(trailing, MovezType.eyebrowOverlay, color: Tokens.text2)
+        }
+        // Keeps the header clear of the disc sitting on the corner.
+        .padding(.trailing, 200)
+    }
+}
+
 /// The Left / Right pill on a per-side block.
 struct SideToggle: View {
     var side: BreakSide
+    /// The smaller pill that sits at the right end of a dose line beside the rep meter.
+    var compact = false
     var choose: (BreakSide) -> Void
 
     var body: some View {
@@ -138,7 +178,7 @@ struct SideToggle: View {
             segment(.left)
             segment(.right)
         }
-        .padding(6)
+        .padding(compact ? 4 : 6)
         .background(Capsule().fill(Tokens.accentTint.color))
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Side")
@@ -148,11 +188,11 @@ struct SideToggle: View {
         Button { choose(target) } label: {
             MovezText(
                 target.label,
-                MovezType.sideToggle,
+                compact ? MovezType.sidePillCompact : MovezType.sideToggle,
                 color: side == target ? Tokens.ink : Tokens.text3,
                 alignment: .center
             )
-            .padding(.horizontal, 30)
+            .padding(.horizontal, compact ? 22 : 30)
             .padding(.vertical, 6)
             .background(Capsule().fill(side == target ? Tokens.accent.color : .clear))
         }

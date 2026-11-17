@@ -30,11 +30,27 @@ final class SettingsStore: ObservableObject {
         static let debugExpanded = "debugExpanded"
         static let acceptedNoticeVersion = "acceptedNoticeVersion"
         static let acceptedNoticeAt = "acceptedNoticeAt"
+        // The mode and Strength's own settings. New keys only: an upgrade finds none of them and
+        // reads the defaults, so every movement-mode key above keeps the value it had.
+        static let mode = "mode"
+        static let strengthSetUp = "strengthSetUp"
+        static let strengthEquipment = "strengthEquipment"
+        static let strengthSolidWallNearby = "strengthSolidWallNearby"
+        static let strengthBreaksPerDay = "strengthBreaksPerDay"
+        static let strengthDifficultyCap = "strengthDifficultyCap"
+        static let strengthFocus = "strengthFocus"
+        static let strengthExcludedIds = "strengthExcludedIds"
     }
 
     static let suiteName = "movez"
     /// The range the "Count me away after" select offers, in minutes.
     static let awayThresholdRange = 2...10
+    /// The strength breaks a day the Settings segments offer, and the default the owner chose.
+    nonisolated static let strengthBreaksRange = 1...4
+    nonisolated static let strengthBreaksDefault = 3
+    /// Strength starts at Beginner, below the movement cap's Moderate: loaded work is the riskier
+    /// place to start too high.
+    nonisolated static let strengthDifficultyDefault = 1
 
     private let defaults: UserDefaults
 
@@ -70,6 +86,25 @@ final class SettingsStore: ObservableObject {
     }
     @Published var acceptedNoticeAt: Date? { didSet { writeOptional(acceptedNoticeAt, Key.acceptedNoticeAt) } }
 
+    /// The mode the next break is served in. Change it through `ModeSwitch`, which holds back a
+    /// first switch until the mode has been set up.
+    @Published var mode: BreakMode { didSet { write(mode.rawValue, Key.mode) } }
+    /// Whether the user has confirmed the Strength setup once. Until then a switch to Strength
+    /// opens the setup and leaves the mode alone.
+    @Published var strengthSetUp: Bool { didSet { write(strengthSetUp, Key.strengthSetUp) } }
+    @Published var strengthEquipment: Set<StrengthEquipment> {
+        didSet { write(strengthEquipment.map(\.rawValue).sorted(), Key.strengthEquipment) }
+    }
+    @Published var strengthSolidWallNearby: Bool {
+        didSet { write(strengthSolidWallNearby, Key.strengthSolidWallNearby) }
+    }
+    @Published var strengthBreaksPerDay: Int { didSet { write(strengthBreaksPerDay, Key.strengthBreaksPerDay) } }
+    @Published var strengthDifficultyCap: Int { didSet { write(strengthDifficultyCap, Key.strengthDifficultyCap) } }
+    @Published var strengthFocus: StrengthFocus { didSet { write(strengthFocus.rawValue, Key.strengthFocus) } }
+    @Published var strengthExcludedIds: Set<String> {
+        didSet { write(strengthExcludedIds.sorted(), Key.strengthExcludedIds) }
+    }
+
     init(defaults: UserDefaults? = nil) {
         let defaults = defaults ?? UserDefaults(suiteName: Self.suiteName) ?? .standard
         self.defaults = defaults
@@ -97,6 +132,18 @@ final class SettingsStore: ObservableObject {
         debugExpanded = defaults.object(forKey: Key.debugExpanded) as? Bool ?? false
         acceptedNoticeVersion = defaults.string(forKey: Key.acceptedNoticeVersion)
         acceptedNoticeAt = defaults.object(forKey: Key.acceptedNoticeAt) as? Date
+
+        mode = BreakMode(rawValue: defaults.string(forKey: Key.mode) ?? "") ?? .fallback
+        strengthSetUp = defaults.object(forKey: Key.strengthSetUp) as? Bool ?? false
+        strengthEquipment = Set(
+            (defaults.stringArray(forKey: Key.strengthEquipment) ?? []).compactMap(StrengthEquipment.init(rawValue:))
+        )
+        strengthSolidWallNearby = defaults.object(forKey: Key.strengthSolidWallNearby) as? Bool ?? true
+        let storedBreaks = defaults.object(forKey: Key.strengthBreaksPerDay) as? Int ?? Self.strengthBreaksDefault
+        strengthBreaksPerDay = min(max(storedBreaks, Self.strengthBreaksRange.lowerBound), Self.strengthBreaksRange.upperBound)
+        strengthDifficultyCap = defaults.object(forKey: Key.strengthDifficultyCap) as? Int ?? Self.strengthDifficultyDefault
+        strengthFocus = StrengthFocus(rawValue: defaults.string(forKey: Key.strengthFocus) ?? "") ?? .none
+        strengthExcludedIds = Set(defaults.stringArray(forKey: Key.strengthExcludedIds) ?? [])
     }
 
     /// What the user has said they do not have, so no movement that needs it is served.

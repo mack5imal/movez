@@ -83,6 +83,7 @@ struct Scheduler {
         case .tick: return tick(now: now)
         case .input(let age): return handleInput(lastEventAgeSeconds: age, now: now)
         case .settingsChanged(let updated): return apply(updated, now: now)
+        case .breakLength(let seconds): return setBreakLength(seconds)
         default: return nil
         }
     }
@@ -260,6 +261,18 @@ struct Scheduler {
         var effects: [SchedulerEffect] = [.persist, .menuRefresh]
         if wasPolling != pollingRequired { effects.append(.pollingChanged(pollingRequired)) }
         return effects
+    }
+
+    /// Takes the next break's planned length, which is what "half the time" in the completion
+    /// rule and a slept-through break's planned end are measured against.
+    ///
+    /// Deliberately not `apply(_:now:)`: that re-plans the due times from the bout start, which
+    /// would undo a skip's fresh interval, and the length changes after every strength break. A
+    /// length is not a setting the user changed, so nothing is re-planned, persisted or redrawn.
+    mutating func setBreakLength(_ seconds: Int) -> [SchedulerEffect] {
+        config.breakSeconds = max(1, seconds)
+        snapshot.configHash = config.stableHash
+        return []
     }
 
     /// Research §4.11: a break counts as done at half the movements or half the time.

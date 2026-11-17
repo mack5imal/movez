@@ -1,0 +1,7411 @@
+{
+  "full" : [
+    {
+      "ids" : [
+        "CIR-17",
+        "BAL-11",
+        "FLX-23",
+        "STR-12",
+        "HWF-08"
+      ],
+      "label" : "base#0"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "STR-28",
+        "FLX-20",
+        "BAL-06",
+        "EYE-04"
+      ],
+      "label" : "base#1"
+    },
+    {
+      "ids" : [
+        "CIR-20",
+        "STR-07",
+        "FLX-02",
+        "BAL-05",
+        "HWF-11"
+      ],
+      "label" : "base#2"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "BAL-28",
+        "FLX-32",
+        "STR-39",
+        "EYE-03"
+      ],
+      "label" : "base#3"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "BAL-25",
+        "FLX-44",
+        "STR-31",
+        "BRE-03"
+      ],
+      "label" : "base#4"
+    },
+    {
+      "ids" : [
+        "CIR-05",
+        "STR-37",
+        "BAL-03",
+        "FLX-42",
+        "HWF-03"
+      ],
+      "label" : "base#5"
+    },
+    {
+      "ids" : [
+        "CIR-10",
+        "FLX-42",
+        "STR-22",
+        "BAL-18",
+        "HWF-08"
+      ],
+      "label" : "base#6"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "STR-20",
+        "BAL-01",
+        "FLX-34",
+        "HWF-03"
+      ],
+      "label" : "base#7"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "BAL-20",
+        "FLX-20",
+        "STR-40",
+        "HWF-04"
+      ],
+      "label" : "base#8"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "FLX-44",
+        "BAL-12",
+        "STR-43",
+        "HWF-06"
+      ],
+      "label" : "base#9"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "FLX-26",
+        "BAL-29",
+        "STR-58",
+        "EYE-05"
+      ],
+      "label" : "base#10"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "STR-54",
+        "FLX-28",
+        "BAL-26",
+        "HWF-01"
+      ],
+      "label" : "base#11"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "FLX-14",
+        "BAL-22",
+        "STR-13",
+        "BRE-01"
+      ],
+      "label" : "base#12"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "FLX-37",
+        "BAL-05",
+        "STR-05",
+        "HWF-06"
+      ],
+      "label" : "base#13"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "STR-35",
+        "BAL-12",
+        "FLX-05",
+        "HWF-01"
+      ],
+      "label" : "base#14"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "FLX-32",
+        "BAL-01",
+        "STR-03",
+        "EYE-03"
+      ],
+      "label" : "base#15"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "FLX-30",
+        "BAL-30",
+        "STR-26",
+        "EYE-01"
+      ],
+      "label" : "base#16"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "FLX-06",
+        "BAL-03",
+        "STR-20",
+        "EYE-03"
+      ],
+      "label" : "base#17"
+    },
+    {
+      "ids" : [
+        "CIR-08",
+        "BAL-09",
+        "STR-52",
+        "FLX-25",
+        "HWF-04"
+      ],
+      "label" : "base#18"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "BAL-10",
+        "STR-50",
+        "FLX-05",
+        "BRE-05"
+      ],
+      "label" : "base#19"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "BAL-11",
+        "FLX-23",
+        "STR-13",
+        "HWF-08"
+      ],
+      "label" : "equipment-band#0"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "STR-20",
+        "FLX-20",
+        "BAL-06",
+        "EYE-05"
+      ],
+      "label" : "equipment-band#1"
+    },
+    {
+      "ids" : [
+        "CIR-20",
+        "STR-11",
+        "FLX-02",
+        "BAL-05",
+        "HWF-11"
+      ],
+      "label" : "equipment-band#2"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "BAL-28",
+        "FLX-32",
+        "STR-36",
+        "EYE-04"
+      ],
+      "label" : "equipment-band#3"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "BAL-25",
+        "FLX-44",
+        "STR-27",
+        "BRE-04"
+      ],
+      "label" : "equipment-band#4"
+    },
+    {
+      "ids" : [
+        "CIR-05",
+        "STR-34",
+        "BAL-03",
+        "FLX-42",
+        "HWF-03"
+      ],
+      "label" : "equipment-band#5"
+    },
+    {
+      "ids" : [
+        "CIR-10",
+        "FLX-42",
+        "STR-23",
+        "BAL-18",
+        "HWF-08"
+      ],
+      "label" : "equipment-band#6"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "STR-19",
+        "BAL-01",
+        "FLX-34",
+        "HWF-03"
+      ],
+      "label" : "equipment-band#7"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "BAL-20",
+        "FLX-20",
+        "STR-36",
+        "HWF-04"
+      ],
+      "label" : "equipment-band#8"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "FLX-44",
+        "BAL-12",
+        "STR-41",
+        "HWF-06"
+      ],
+      "label" : "equipment-band#9"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "FLX-26",
+        "BAL-29",
+        "STR-58",
+        "BRE-01"
+      ],
+      "label" : "equipment-band#10"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "STR-53",
+        "FLX-28",
+        "BAL-26",
+        "HWF-01"
+      ],
+      "label" : "equipment-band#11"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "FLX-14",
+        "BAL-22",
+        "STR-15",
+        "BRE-02"
+      ],
+      "label" : "equipment-band#12"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "FLX-37",
+        "BAL-05",
+        "STR-06",
+        "HWF-06"
+      ],
+      "label" : "equipment-band#13"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "STR-31",
+        "BAL-12",
+        "FLX-05",
+        "HWF-01"
+      ],
+      "label" : "equipment-band#14"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "FLX-32",
+        "BAL-01",
+        "STR-04",
+        "EYE-04"
+      ],
+      "label" : "equipment-band#15"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "FLX-30",
+        "BAL-30",
+        "STR-24",
+        "EYE-02"
+      ],
+      "label" : "equipment-band#16"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "FLX-06",
+        "BAL-03",
+        "STR-19",
+        "EYE-04"
+      ],
+      "label" : "equipment-band#17"
+    },
+    {
+      "ids" : [
+        "CIR-08",
+        "BAL-09",
+        "STR-50",
+        "FLX-25",
+        "HWF-04"
+      ],
+      "label" : "equipment-band#18"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "BAL-10",
+        "STR-49",
+        "FLX-05",
+        "BRE-06"
+      ],
+      "label" : "equipment-band#19"
+    },
+    {
+      "ids" : [
+        "CIR-18",
+        "BAL-11",
+        "FLX-23",
+        "STR-09",
+        "HWF-08"
+      ],
+      "label" : "equipment-kettlebell_or_dumbbell#0"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "STR-20",
+        "FLX-20",
+        "BAL-06",
+        "EYE-04"
+      ],
+      "label" : "equipment-kettlebell_or_dumbbell#1"
+    },
+    {
+      "ids" : [
+        "CIR-20",
+        "STR-08",
+        "FLX-02",
+        "BAL-05",
+        "HWF-11"
+      ],
+      "label" : "equipment-kettlebell_or_dumbbell#2"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "BAL-28",
+        "FLX-32",
+        "STR-36",
+        "EYE-03"
+      ],
+      "label" : "equipment-kettlebell_or_dumbbell#3"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "BAL-25",
+        "FLX-44",
+        "STR-26",
+        "BRE-03"
+      ],
+      "label" : "equipment-kettlebell_or_dumbbell#4"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "STR-34",
+        "BAL-03",
+        "FLX-42",
+        "HWF-03"
+      ],
+      "label" : "equipment-kettlebell_or_dumbbell#5"
+    },
+    {
+      "ids" : [
+        "CIR-10",
+        "FLX-42",
+        "STR-22",
+        "BAL-18",
+        "HWF-08"
+      ],
+      "label" : "equipment-kettlebell_or_dumbbell#6"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "STR-15",
+        "BAL-01",
+        "FLX-34",
+        "HWF-03"
+      ],
+      "label" : "equipment-kettlebell_or_dumbbell#7"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "BAL-20",
+        "FLX-20",
+        "STR-36",
+        "HWF-04"
+      ],
+      "label" : "equipment-kettlebell_or_dumbbell#8"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "FLX-44",
+        "BAL-12",
+        "STR-42",
+        "HWF-06"
+      ],
+      "label" : "equipment-kettlebell_or_dumbbell#9"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "FLX-26",
+        "BAL-29",
+        "STR-58",
+        "EYE-05"
+      ],
+      "label" : "equipment-kettlebell_or_dumbbell#10"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "STR-54",
+        "FLX-28",
+        "BAL-26",
+        "HWF-01"
+      ],
+      "label" : "equipment-kettlebell_or_dumbbell#11"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "FLX-14",
+        "BAL-22",
+        "STR-12",
+        "BRE-01"
+      ],
+      "label" : "equipment-kettlebell_or_dumbbell#12"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "FLX-37",
+        "BAL-05",
+        "STR-06",
+        "HWF-06"
+      ],
+      "label" : "equipment-kettlebell_or_dumbbell#13"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "STR-32",
+        "BAL-12",
+        "FLX-05",
+        "HWF-01"
+      ],
+      "label" : "equipment-kettlebell_or_dumbbell#14"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "FLX-32",
+        "BAL-01",
+        "STR-04",
+        "EYE-03"
+      ],
+      "label" : "equipment-kettlebell_or_dumbbell#15"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "FLX-30",
+        "BAL-30",
+        "STR-22",
+        "EYE-01"
+      ],
+      "label" : "equipment-kettlebell_or_dumbbell#16"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "FLX-06",
+        "BAL-02",
+        "STR-15",
+        "EYE-03"
+      ],
+      "label" : "equipment-kettlebell_or_dumbbell#17"
+    },
+    {
+      "ids" : [
+        "CIR-09",
+        "BAL-09",
+        "STR-51",
+        "FLX-25",
+        "HWF-04"
+      ],
+      "label" : "equipment-kettlebell_or_dumbbell#18"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "BAL-10",
+        "STR-49",
+        "FLX-05",
+        "BRE-05"
+      ],
+      "label" : "equipment-kettlebell_or_dumbbell#19"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "BAL-11",
+        "FLX-22",
+        "STR-12",
+        "HWF-08"
+      ],
+      "label" : "equipment-foam_roller#0"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "STR-28",
+        "FLX-20",
+        "BAL-06",
+        "EYE-04"
+      ],
+      "label" : "equipment-foam_roller#1"
+    },
+    {
+      "ids" : [
+        "CIR-20",
+        "STR-07",
+        "FLX-02",
+        "BAL-05",
+        "HWF-11"
+      ],
+      "label" : "equipment-foam_roller#2"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "BAL-28",
+        "FLX-31",
+        "STR-39",
+        "EYE-03"
+      ],
+      "label" : "equipment-foam_roller#3"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "BAL-25",
+        "FLX-44",
+        "STR-31",
+        "BRE-03"
+      ],
+      "label" : "equipment-foam_roller#4"
+    },
+    {
+      "ids" : [
+        "CIR-05",
+        "STR-37",
+        "BAL-03",
+        "FLX-42",
+        "HWF-03"
+      ],
+      "label" : "equipment-foam_roller#5"
+    },
+    {
+      "ids" : [
+        "CIR-10",
+        "FLX-42",
+        "STR-22",
+        "BAL-18",
+        "HWF-08"
+      ],
+      "label" : "equipment-foam_roller#6"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "STR-20",
+        "BAL-01",
+        "FLX-34",
+        "HWF-03"
+      ],
+      "label" : "equipment-foam_roller#7"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "BAL-20",
+        "FLX-19",
+        "STR-40",
+        "HWF-04"
+      ],
+      "label" : "equipment-foam_roller#8"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "FLX-44",
+        "BAL-12",
+        "STR-43",
+        "HWF-06"
+      ],
+      "label" : "equipment-foam_roller#9"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "FLX-26",
+        "BAL-29",
+        "STR-58",
+        "EYE-05"
+      ],
+      "label" : "equipment-foam_roller#10"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "STR-54",
+        "FLX-28",
+        "BAL-26",
+        "HWF-01"
+      ],
+      "label" : "equipment-foam_roller#11"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "FLX-15",
+        "BAL-22",
+        "STR-13",
+        "BRE-01"
+      ],
+      "label" : "equipment-foam_roller#12"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "FLX-37",
+        "BAL-05",
+        "STR-05",
+        "HWF-06"
+      ],
+      "label" : "equipment-foam_roller#13"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "STR-35",
+        "BAL-12",
+        "FLX-05",
+        "HWF-01"
+      ],
+      "label" : "equipment-foam_roller#14"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "FLX-32",
+        "BAL-01",
+        "STR-03",
+        "EYE-03"
+      ],
+      "label" : "equipment-foam_roller#15"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "FLX-30",
+        "BAL-30",
+        "STR-26",
+        "EYE-01"
+      ],
+      "label" : "equipment-foam_roller#16"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "FLX-06",
+        "BAL-03",
+        "STR-20",
+        "EYE-03"
+      ],
+      "label" : "equipment-foam_roller#17"
+    },
+    {
+      "ids" : [
+        "CIR-08",
+        "BAL-09",
+        "STR-52",
+        "FLX-24",
+        "HWF-04"
+      ],
+      "label" : "equipment-foam_roller#18"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "BAL-10",
+        "STR-50",
+        "FLX-05",
+        "BRE-05"
+      ],
+      "label" : "equipment-foam_roller#19"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "BAL-12",
+        "FLX-23",
+        "STR-13",
+        "HWF-08"
+      ],
+      "label" : "equipment-ball#0"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "STR-28",
+        "FLX-21",
+        "BAL-07",
+        "EYE-04"
+      ],
+      "label" : "equipment-ball#1"
+    },
+    {
+      "ids" : [
+        "CIR-20",
+        "STR-07",
+        "FLX-02",
+        "BAL-06",
+        "HWF-10"
+      ],
+      "label" : "equipment-ball#2"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "BAL-28",
+        "FLX-32",
+        "STR-39",
+        "EYE-03"
+      ],
+      "label" : "equipment-ball#3"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "BAL-25",
+        "FLX-44",
+        "STR-31",
+        "BRE-03"
+      ],
+      "label" : "equipment-ball#4"
+    },
+    {
+      "ids" : [
+        "CIR-05",
+        "STR-37",
+        "BAL-04",
+        "FLX-42",
+        "HWF-03"
+      ],
+      "label" : "equipment-ball#5"
+    },
+    {
+      "ids" : [
+        "CIR-10",
+        "FLX-42",
+        "STR-22",
+        "BAL-20",
+        "HWF-08"
+      ],
+      "label" : "equipment-ball#6"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "STR-20",
+        "BAL-02",
+        "FLX-35",
+        "HWF-03"
+      ],
+      "label" : "equipment-ball#7"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "BAL-21",
+        "FLX-20",
+        "STR-40",
+        "HWF-04"
+      ],
+      "label" : "equipment-ball#8"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "FLX-44",
+        "BAL-13",
+        "STR-43",
+        "HWF-06"
+      ],
+      "label" : "equipment-ball#9"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "FLX-27",
+        "BAL-29",
+        "STR-58",
+        "EYE-05"
+      ],
+      "label" : "equipment-ball#10"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "STR-54",
+        "FLX-29",
+        "BAL-26",
+        "HWF-01"
+      ],
+      "label" : "equipment-ball#11"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "FLX-16",
+        "BAL-01",
+        "STR-13",
+        "BRE-01"
+      ],
+      "label" : "equipment-ball#12"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "FLX-38",
+        "BAL-06",
+        "STR-05",
+        "HWF-06"
+      ],
+      "label" : "equipment-ball#13"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "STR-35",
+        "BAL-13",
+        "FLX-05",
+        "HWF-01"
+      ],
+      "label" : "equipment-ball#14"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "FLX-33",
+        "BAL-02",
+        "STR-03",
+        "EYE-03"
+      ],
+      "label" : "equipment-ball#15"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "FLX-31",
+        "BAL-30",
+        "STR-26",
+        "EYE-01"
+      ],
+      "label" : "equipment-ball#16"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "FLX-06",
+        "BAL-03",
+        "STR-20",
+        "EYE-03"
+      ],
+      "label" : "equipment-ball#17"
+    },
+    {
+      "ids" : [
+        "CIR-08",
+        "BAL-10",
+        "STR-52",
+        "FLX-25",
+        "HWF-04"
+      ],
+      "label" : "equipment-ball#18"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "BAL-10",
+        "STR-50",
+        "FLX-05",
+        "BRE-05"
+      ],
+      "label" : "equipment-ball#19"
+    },
+    {
+      "ids" : [
+        "CIR-18",
+        "BAL-12",
+        "FLX-23",
+        "STR-12",
+        "HWF-08"
+      ],
+      "label" : "equipment-all#0"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "STR-19",
+        "FLX-20",
+        "BAL-07",
+        "EYE-05"
+      ],
+      "label" : "equipment-all#1"
+    },
+    {
+      "ids" : [
+        "CIR-20",
+        "STR-09",
+        "FLX-02",
+        "BAL-06",
+        "HWF-11"
+      ],
+      "label" : "equipment-all#2"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "BAL-28",
+        "FLX-32",
+        "STR-34",
+        "EYE-03"
+      ],
+      "label" : "equipment-all#3"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "BAL-25",
+        "FLX-44",
+        "STR-26",
+        "BRE-04"
+      ],
+      "label" : "equipment-all#4"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "STR-32",
+        "BAL-04",
+        "FLX-42",
+        "HWF-04"
+      ],
+      "label" : "equipment-all#5"
+    },
+    {
+      "ids" : [
+        "CIR-10",
+        "FLX-42",
+        "STR-22",
+        "BAL-20",
+        "HWF-09"
+      ],
+      "label" : "equipment-all#6"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "STR-17",
+        "BAL-02",
+        "FLX-35",
+        "HWF-03"
+      ],
+      "label" : "equipment-all#7"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "BAL-21",
+        "FLX-20",
+        "STR-34",
+        "HWF-04"
+      ],
+      "label" : "equipment-all#8"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "FLX-44",
+        "BAL-13",
+        "STR-39",
+        "HWF-06"
+      ],
+      "label" : "equipment-all#9"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "FLX-27",
+        "BAL-29",
+        "STR-57",
+        "BRE-01"
+      ],
+      "label" : "equipment-all#10"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "STR-53",
+        "FLX-28",
+        "BAL-26",
+        "HWF-01"
+      ],
+      "label" : "equipment-all#11"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "FLX-15",
+        "BAL-01",
+        "STR-13",
+        "BRE-02"
+      ],
+      "label" : "equipment-all#12"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "FLX-37",
+        "BAL-06",
+        "STR-07",
+        "HWF-06"
+      ],
+      "label" : "equipment-all#13"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "STR-30",
+        "BAL-13",
+        "FLX-05",
+        "HWF-01"
+      ],
+      "label" : "equipment-all#14"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "FLX-32",
+        "BAL-02",
+        "STR-04",
+        "EYE-04"
+      ],
+      "label" : "equipment-all#15"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "FLX-30",
+        "BAL-30",
+        "STR-22",
+        "EYE-01"
+      ],
+      "label" : "equipment-all#16"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "FLX-06",
+        "BAL-03",
+        "STR-17",
+        "EYE-04"
+      ],
+      "label" : "equipment-all#17"
+    },
+    {
+      "ids" : [
+        "CIR-09",
+        "BAL-10",
+        "STR-49",
+        "FLX-25",
+        "HWF-04"
+      ],
+      "label" : "equipment-all#18"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "BAL-10",
+        "STR-48",
+        "FLX-05",
+        "BRE-06"
+      ],
+      "label" : "equipment-all#19"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "BAL-11",
+        "FLX-24",
+        "STR-11",
+        "HWF-07"
+      ],
+      "label" : "unavailable-floor#0"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "STR-31",
+        "FLX-22",
+        "BAL-06",
+        "EYE-03"
+      ],
+      "label" : "unavailable-floor#1"
+    },
+    {
+      "ids" : [
+        "CIR-20",
+        "STR-07",
+        "FLX-05",
+        "BAL-06",
+        "HWF-10"
+      ],
+      "label" : "unavailable-floor#2"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "BAL-28",
+        "FLX-34",
+        "STR-49",
+        "EYE-02"
+      ],
+      "label" : "unavailable-floor#3"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "BAL-25",
+        "FLX-43",
+        "STR-35",
+        "BRE-01"
+      ],
+      "label" : "unavailable-floor#4"
+    },
+    {
+      "ids" : [
+        "CIR-05",
+        "STR-48",
+        "BAL-03",
+        "FLX-42",
+        "HWF-03"
+      ],
+      "label" : "unavailable-floor#5"
+    },
+    {
+      "ids" : [
+        "CIR-10",
+        "FLX-41",
+        "STR-34",
+        "BAL-18",
+        "HWF-07"
+      ],
+      "label" : "unavailable-floor#6"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "STR-31",
+        "BAL-01",
+        "FLX-36",
+        "HWF-03"
+      ],
+      "label" : "unavailable-floor#7"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "BAL-20",
+        "FLX-22",
+        "STR-50",
+        "HWF-04"
+      ],
+      "label" : "unavailable-floor#8"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "FLX-43",
+        "BAL-12",
+        "STR-52",
+        "HWF-05"
+      ],
+      "label" : "unavailable-floor#9"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "FLX-27",
+        "BAL-29",
+        "STR-58",
+        "EYE-04"
+      ],
+      "label" : "unavailable-floor#10"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "STR-56",
+        "FLX-29",
+        "BAL-26",
+        "HWF-01"
+      ],
+      "label" : "unavailable-floor#11"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "FLX-19",
+        "BAL-22",
+        "STR-20",
+        "EYE-04"
+      ],
+      "label" : "unavailable-floor#12"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "FLX-39",
+        "BAL-05",
+        "STR-06",
+        "HWF-05"
+      ],
+      "label" : "unavailable-floor#13"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "STR-48",
+        "BAL-12",
+        "FLX-08",
+        "HWF-01"
+      ],
+      "label" : "unavailable-floor#14"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "FLX-34",
+        "BAL-01",
+        "STR-07",
+        "EYE-02"
+      ],
+      "label" : "unavailable-floor#15"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "FLX-31",
+        "BAL-30",
+        "STR-35",
+        "HWF-11"
+      ],
+      "label" : "unavailable-floor#16"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "FLX-09",
+        "BAL-02",
+        "STR-26",
+        "EYE-02"
+      ],
+      "label" : "unavailable-floor#17"
+    },
+    {
+      "ids" : [
+        "CIR-09",
+        "BAL-09",
+        "STR-55",
+        "FLX-26",
+        "HWF-04"
+      ],
+      "label" : "unavailable-floor#18"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "BAL-10",
+        "STR-54",
+        "FLX-08",
+        "BRE-03"
+      ],
+      "label" : "unavailable-floor#19"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "BAL-11",
+        "FLX-23",
+        "STR-12",
+        "HWF-08"
+      ],
+      "label" : "unavailable-wall#0"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "STR-20",
+        "FLX-21",
+        "BAL-06",
+        "EYE-04"
+      ],
+      "label" : "unavailable-wall#1"
+    },
+    {
+      "ids" : [
+        "CIR-20",
+        "STR-07",
+        "FLX-02",
+        "BAL-05",
+        "HWF-11"
+      ],
+      "label" : "unavailable-wall#2"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "BAL-28",
+        "FLX-32",
+        "STR-40",
+        "EYE-03"
+      ],
+      "label" : "unavailable-wall#3"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "BAL-25",
+        "FLX-44",
+        "STR-27",
+        "BRE-03"
+      ],
+      "label" : "unavailable-wall#4"
+    },
+    {
+      "ids" : [
+        "CIR-05",
+        "STR-36",
+        "BAL-03",
+        "FLX-43",
+        "HWF-03"
+      ],
+      "label" : "unavailable-wall#5"
+    },
+    {
+      "ids" : [
+        "CIR-10",
+        "FLX-41",
+        "STR-22",
+        "BAL-18",
+        "HWF-08"
+      ],
+      "label" : "unavailable-wall#6"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "STR-16",
+        "BAL-01",
+        "FLX-34",
+        "HWF-03"
+      ],
+      "label" : "unavailable-wall#7"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "BAL-20",
+        "FLX-20",
+        "STR-40",
+        "HWF-04"
+      ],
+      "label" : "unavailable-wall#8"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "FLX-44",
+        "BAL-12",
+        "STR-44",
+        "HWF-06"
+      ],
+      "label" : "unavailable-wall#9"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "FLX-26",
+        "BAL-29",
+        "STR-58",
+        "EYE-05"
+      ],
+      "label" : "unavailable-wall#10"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "STR-55",
+        "FLX-27",
+        "BAL-26",
+        "HWF-01"
+      ],
+      "label" : "unavailable-wall#11"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "FLX-13",
+        "BAL-22",
+        "STR-13",
+        "BRE-01"
+      ],
+      "label" : "unavailable-wall#12"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "FLX-36",
+        "BAL-05",
+        "STR-05",
+        "HWF-06"
+      ],
+      "label" : "unavailable-wall#13"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "STR-35",
+        "BAL-12",
+        "FLX-05",
+        "HWF-01"
+      ],
+      "label" : "unavailable-wall#14"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "FLX-32",
+        "BAL-01",
+        "STR-03",
+        "EYE-03"
+      ],
+      "label" : "unavailable-wall#15"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "FLX-30",
+        "BAL-30",
+        "STR-22",
+        "EYE-01"
+      ],
+      "label" : "unavailable-wall#16"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "FLX-06",
+        "BAL-03",
+        "STR-16",
+        "EYE-03"
+      ],
+      "label" : "unavailable-wall#17"
+    },
+    {
+      "ids" : [
+        "CIR-08",
+        "BAL-09",
+        "STR-51",
+        "FLX-25",
+        "HWF-04"
+      ],
+      "label" : "unavailable-wall#18"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "BAL-10",
+        "STR-50",
+        "FLX-05",
+        "BRE-05"
+      ],
+      "label" : "unavailable-wall#19"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "BAL-11",
+        "FLX-23",
+        "STR-13",
+        "HWF-08"
+      ],
+      "label" : "unavailable-stairs#0"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "STR-28",
+        "FLX-20",
+        "BAL-06",
+        "EYE-04"
+      ],
+      "label" : "unavailable-stairs#1"
+    },
+    {
+      "ids" : [
+        "CIR-20",
+        "STR-11",
+        "FLX-02",
+        "BAL-05",
+        "HWF-11"
+      ],
+      "label" : "unavailable-stairs#2"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "BAL-28",
+        "FLX-32",
+        "STR-40",
+        "EYE-03"
+      ],
+      "label" : "unavailable-stairs#3"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "BAL-25",
+        "FLX-44",
+        "STR-31",
+        "BRE-03"
+      ],
+      "label" : "unavailable-stairs#4"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "STR-37",
+        "BAL-03",
+        "FLX-42",
+        "HWF-03"
+      ],
+      "label" : "unavailable-stairs#5"
+    },
+    {
+      "ids" : [
+        "CIR-10",
+        "FLX-42",
+        "STR-26",
+        "BAL-18",
+        "HWF-08"
+      ],
+      "label" : "unavailable-stairs#6"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "STR-20",
+        "BAL-01",
+        "FLX-34",
+        "HWF-03"
+      ],
+      "label" : "unavailable-stairs#7"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "BAL-20",
+        "FLX-20",
+        "STR-40",
+        "HWF-04"
+      ],
+      "label" : "unavailable-stairs#8"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "FLX-44",
+        "BAL-12",
+        "STR-44",
+        "HWF-06"
+      ],
+      "label" : "unavailable-stairs#9"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "FLX-26",
+        "BAL-29",
+        "STR-58",
+        "EYE-05"
+      ],
+      "label" : "unavailable-stairs#10"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "STR-54",
+        "FLX-28",
+        "BAL-26",
+        "HWF-01"
+      ],
+      "label" : "unavailable-stairs#11"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "FLX-14",
+        "BAL-22",
+        "STR-14",
+        "BRE-01"
+      ],
+      "label" : "unavailable-stairs#12"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "FLX-37",
+        "BAL-05",
+        "STR-05",
+        "HWF-06"
+      ],
+      "label" : "unavailable-stairs#13"
+    },
+    {
+      "ids" : [
+        "CIR-04",
+        "STR-36",
+        "BAL-11",
+        "FLX-05",
+        "HWF-01"
+      ],
+      "label" : "unavailable-stairs#14"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "FLX-32",
+        "BAL-01",
+        "STR-03",
+        "EYE-03"
+      ],
+      "label" : "unavailable-stairs#15"
+    },
+    {
+      "ids" : [
+        "CIR-04",
+        "FLX-30",
+        "BAL-30",
+        "STR-22",
+        "EYE-01"
+      ],
+      "label" : "unavailable-stairs#16"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "FLX-06",
+        "BAL-03",
+        "STR-20",
+        "EYE-03"
+      ],
+      "label" : "unavailable-stairs#17"
+    },
+    {
+      "ids" : [
+        "CIR-08",
+        "BAL-09",
+        "STR-52",
+        "FLX-25",
+        "HWF-04"
+      ],
+      "label" : "unavailable-stairs#18"
+    },
+    {
+      "ids" : [
+        "CIR-13",
+        "BAL-10",
+        "STR-51",
+        "FLX-05",
+        "BRE-05"
+      ],
+      "label" : "unavailable-stairs#19"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "BAL-10",
+        "FLX-24",
+        "STR-26",
+        "HWF-07"
+      ],
+      "label" : "unavailable-all#0"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "STR-34",
+        "FLX-23",
+        "BAL-06",
+        "EYE-03"
+      ],
+      "label" : "unavailable-all#1"
+    },
+    {
+      "ids" : [
+        "CIR-20",
+        "STR-06",
+        "FLX-01",
+        "BAL-05",
+        "HWF-10"
+      ],
+      "label" : "unavailable-all#2"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "BAL-28",
+        "FLX-34",
+        "STR-50",
+        "EYE-02"
+      ],
+      "label" : "unavailable-all#3"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "BAL-25",
+        "FLX-43",
+        "STR-48",
+        "BRE-01"
+      ],
+      "label" : "unavailable-all#4"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "STR-50",
+        "BAL-03",
+        "FLX-41",
+        "HWF-03"
+      ],
+      "label" : "unavailable-all#5"
+    },
+    {
+      "ids" : [
+        "CIR-10",
+        "FLX-41",
+        "STR-35",
+        "BAL-18",
+        "HWF-07"
+      ],
+      "label" : "unavailable-all#6"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "STR-35",
+        "BAL-01",
+        "FLX-35",
+        "HWF-03"
+      ],
+      "label" : "unavailable-all#7"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "BAL-20",
+        "FLX-22",
+        "STR-51",
+        "HWF-04"
+      ],
+      "label" : "unavailable-all#8"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "FLX-43",
+        "BAL-12",
+        "STR-52",
+        "HWF-05"
+      ],
+      "label" : "unavailable-all#9"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "FLX-26",
+        "BAL-29",
+        "STR-58",
+        "EYE-04"
+      ],
+      "label" : "unavailable-all#10"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "STR-57",
+        "FLX-27",
+        "BAL-26",
+        "HWF-01"
+      ],
+      "label" : "unavailable-all#11"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "FLX-19",
+        "BAL-22",
+        "STR-20",
+        "EYE-04"
+      ],
+      "label" : "unavailable-all#12"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "FLX-37",
+        "BAL-05",
+        "STR-05",
+        "HWF-05"
+      ],
+      "label" : "unavailable-all#13"
+    },
+    {
+      "ids" : [
+        "CIR-02",
+        "STR-49",
+        "BAL-12",
+        "FLX-08",
+        "HWF-01"
+      ],
+      "label" : "unavailable-all#14"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "FLX-34",
+        "BAL-01",
+        "STR-20",
+        "EYE-02"
+      ],
+      "label" : "unavailable-all#15"
+    },
+    {
+      "ids" : [
+        "CIR-04",
+        "FLX-31",
+        "BAL-30",
+        "STR-48",
+        "HWF-11"
+      ],
+      "label" : "unavailable-all#16"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "FLX-08",
+        "BAL-03",
+        "STR-26",
+        "EYE-02"
+      ],
+      "label" : "unavailable-all#17"
+    },
+    {
+      "ids" : [
+        "CIR-09",
+        "BAL-09",
+        "STR-56",
+        "FLX-26",
+        "HWF-04"
+      ],
+      "label" : "unavailable-all#18"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "BAL-10",
+        "STR-55",
+        "FLX-08",
+        "BRE-03"
+      ],
+      "label" : "unavailable-all#19"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "BAL-12",
+        "FLX-23",
+        "STR-16",
+        "HWF-08"
+      ],
+      "label" : "focus-moreUpperBack#0"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "STR-28",
+        "FLX-20",
+        "BAL-07",
+        "EYE-04"
+      ],
+      "label" : "focus-moreUpperBack#1"
+    },
+    {
+      "ids" : [
+        "CIR-20",
+        "STR-13",
+        "FLX-03",
+        "BAL-06",
+        "HWF-11"
+      ],
+      "label" : "focus-moreUpperBack#2"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "BAL-28",
+        "FLX-33",
+        "STR-37",
+        "EYE-03"
+      ],
+      "label" : "focus-moreUpperBack#3"
+    },
+    {
+      "ids" : [
+        "CIR-10",
+        "BAL-25",
+        "FLX-43",
+        "STR-26",
+        "BRE-03"
+      ],
+      "label" : "focus-moreUpperBack#4"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "STR-36",
+        "BAL-04",
+        "FLX-42",
+        "HWF-03"
+      ],
+      "label" : "focus-moreUpperBack#5"
+    },
+    {
+      "ids" : [
+        "CIR-09",
+        "FLX-41",
+        "STR-21",
+        "BAL-20",
+        "HWF-08"
+      ],
+      "label" : "focus-moreUpperBack#6"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "STR-20",
+        "BAL-01",
+        "FLX-35",
+        "HWF-03"
+      ],
+      "label" : "focus-moreUpperBack#7"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "BAL-20",
+        "FLX-20",
+        "STR-37",
+        "HWF-04"
+      ],
+      "label" : "focus-moreUpperBack#8"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "FLX-44",
+        "BAL-14",
+        "STR-43",
+        "HWF-06"
+      ],
+      "label" : "focus-moreUpperBack#9"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "FLX-27",
+        "BAL-29",
+        "STR-57",
+        "EYE-05"
+      ],
+      "label" : "focus-moreUpperBack#10"
+    },
+    {
+      "ids" : [
+        "CIR-13",
+        "STR-54",
+        "FLX-28",
+        "BAL-25",
+        "HWF-01"
+      ],
+      "label" : "focus-moreUpperBack#11"
+    },
+    {
+      "ids" : [
+        "CIR-02",
+        "FLX-17",
+        "BAL-22",
+        "STR-16",
+        "BRE-01"
+      ],
+      "label" : "focus-moreUpperBack#12"
+    },
+    {
+      "ids" : [
+        "CIR-09",
+        "FLX-39",
+        "BAL-06",
+        "STR-07",
+        "HWF-06"
+      ],
+      "label" : "focus-moreUpperBack#13"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "STR-34",
+        "BAL-14",
+        "FLX-10",
+        "HWF-01"
+      ],
+      "label" : "focus-moreUpperBack#14"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "FLX-33",
+        "BAL-01",
+        "STR-05",
+        "EYE-03"
+      ],
+      "label" : "focus-moreUpperBack#15"
+    },
+    {
+      "ids" : [
+        "CIR-04",
+        "FLX-31",
+        "BAL-30",
+        "STR-21",
+        "EYE-01"
+      ],
+      "label" : "focus-moreUpperBack#16"
+    },
+    {
+      "ids" : [
+        "CIR-13",
+        "FLX-10",
+        "BAL-03",
+        "STR-28",
+        "EYE-03"
+      ],
+      "label" : "focus-moreUpperBack#17"
+    },
+    {
+      "ids" : [
+        "CIR-08",
+        "BAL-11",
+        "STR-53",
+        "FLX-25",
+        "HWF-04"
+      ],
+      "label" : "focus-moreUpperBack#18"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "BAL-11",
+        "STR-51",
+        "FLX-08",
+        "BRE-05"
+      ],
+      "label" : "focus-moreUpperBack#19"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "BAL-11",
+        "FLX-21",
+        "STR-07",
+        "HWF-08"
+      ],
+      "label" : "focus-moreHips#0"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "STR-14",
+        "FLX-17",
+        "BAL-08",
+        "EYE-04"
+      ],
+      "label" : "focus-moreHips#1"
+    },
+    {
+      "ids" : [
+        "CIR-20",
+        "STR-05",
+        "FLX-01",
+        "BAL-07",
+        "HWF-11"
+      ],
+      "label" : "focus-moreHips#2"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "BAL-25",
+        "FLX-32",
+        "STR-36",
+        "EYE-03"
+      ],
+      "label" : "focus-moreHips#3"
+    },
+    {
+      "ids" : [
+        "CIR-13",
+        "BAL-24",
+        "FLX-44",
+        "STR-27",
+        "BRE-03"
+      ],
+      "label" : "focus-moreHips#4"
+    },
+    {
+      "ids" : [
+        "CIR-10",
+        "STR-35",
+        "BAL-06",
+        "FLX-43",
+        "HWF-03"
+      ],
+      "label" : "focus-moreHips#5"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "FLX-42",
+        "STR-20",
+        "BAL-17",
+        "HWF-08"
+      ],
+      "label" : "focus-moreHips#6"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "STR-13",
+        "BAL-02",
+        "FLX-34",
+        "HWF-03"
+      ],
+      "label" : "focus-moreHips#7"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "BAL-18",
+        "FLX-21",
+        "STR-39",
+        "HWF-04"
+      ],
+      "label" : "focus-moreHips#8"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "FLX-44",
+        "BAL-12",
+        "STR-42",
+        "HWF-06"
+      ],
+      "label" : "focus-moreHips#9"
+    },
+    {
+      "ids" : [
+        "CIR-10",
+        "FLX-26",
+        "BAL-26",
+        "STR-58",
+        "EYE-05"
+      ],
+      "label" : "focus-moreHips#10"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "STR-55",
+        "FLX-27",
+        "BAL-25",
+        "HWF-01"
+      ],
+      "label" : "focus-moreHips#11"
+    },
+    {
+      "ids" : [
+        "CIR-02",
+        "FLX-09",
+        "BAL-22",
+        "STR-06",
+        "BRE-01"
+      ],
+      "label" : "focus-moreHips#12"
+    },
+    {
+      "ids" : [
+        "CIR-13",
+        "FLX-36",
+        "BAL-07",
+        "STR-03",
+        "HWF-06"
+      ],
+      "label" : "focus-moreHips#13"
+    },
+    {
+      "ids" : [
+        "CIR-05",
+        "STR-34",
+        "BAL-12",
+        "FLX-03",
+        "HWF-01"
+      ],
+      "label" : "focus-moreHips#14"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "FLX-32",
+        "BAL-03",
+        "STR-02",
+        "EYE-03"
+      ],
+      "label" : "focus-moreHips#15"
+    },
+    {
+      "ids" : [
+        "CIR-05",
+        "FLX-31",
+        "BAL-30",
+        "STR-20",
+        "EYE-01"
+      ],
+      "label" : "focus-moreHips#16"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "FLX-04",
+        "BAL-05",
+        "STR-13",
+        "EYE-03"
+      ],
+      "label" : "focus-moreHips#17"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "BAL-10",
+        "STR-50",
+        "FLX-25",
+        "HWF-04"
+      ],
+      "label" : "focus-moreHips#18"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "BAL-11",
+        "STR-50",
+        "FLX-03",
+        "BRE-05"
+      ],
+      "label" : "focus-moreHips#19"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "BAL-11",
+        "FLX-23",
+        "STR-16",
+        "HWF-08"
+      ],
+      "label" : "focus-moreNeckShoulders#0"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "STR-28",
+        "FLX-22",
+        "BAL-06",
+        "EYE-04"
+      ],
+      "label" : "focus-moreNeckShoulders#1"
+    },
+    {
+      "ids" : [
+        "CIR-20",
+        "STR-14",
+        "FLX-03",
+        "BAL-05",
+        "HWF-10"
+      ],
+      "label" : "focus-moreNeckShoulders#2"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "BAL-28",
+        "FLX-31",
+        "STR-37",
+        "EYE-02"
+      ],
+      "label" : "focus-moreNeckShoulders#3"
+    },
+    {
+      "ids" : [
+        "CIR-10",
+        "BAL-25",
+        "FLX-44",
+        "STR-31",
+        "BRE-03"
+      ],
+      "label" : "focus-moreNeckShoulders#4"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "STR-36",
+        "BAL-03",
+        "FLX-43",
+        "HWF-04"
+      ],
+      "label" : "focus-moreNeckShoulders#5"
+    },
+    {
+      "ids" : [
+        "CIR-09",
+        "FLX-42",
+        "STR-22",
+        "BAL-18",
+        "HWF-10"
+      ],
+      "label" : "focus-moreNeckShoulders#6"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "STR-28",
+        "BAL-01",
+        "FLX-33",
+        "HWF-03"
+      ],
+      "label" : "focus-moreNeckShoulders#7"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "BAL-20",
+        "FLX-21",
+        "STR-39",
+        "HWF-04"
+      ],
+      "label" : "focus-moreNeckShoulders#8"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "FLX-44",
+        "BAL-13",
+        "STR-44",
+        "HWF-06"
+      ],
+      "label" : "focus-moreNeckShoulders#9"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "FLX-25",
+        "BAL-28",
+        "STR-57",
+        "EYE-05"
+      ],
+      "label" : "focus-moreNeckShoulders#10"
+    },
+    {
+      "ids" : [
+        "CIR-13",
+        "STR-54",
+        "FLX-27",
+        "BAL-25",
+        "HWF-01"
+      ],
+      "label" : "focus-moreNeckShoulders#11"
+    },
+    {
+      "ids" : [
+        "CIR-02",
+        "FLX-19",
+        "BAL-22",
+        "STR-16",
+        "BRE-01"
+      ],
+      "label" : "focus-moreNeckShoulders#12"
+    },
+    {
+      "ids" : [
+        "CIR-09",
+        "FLX-39",
+        "BAL-04",
+        "STR-11",
+        "HWF-06"
+      ],
+      "label" : "focus-moreNeckShoulders#13"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "STR-36",
+        "BAL-13",
+        "FLX-08",
+        "HWF-01"
+      ],
+      "label" : "focus-moreNeckShoulders#14"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "FLX-32",
+        "BAL-02",
+        "STR-05",
+        "EYE-03"
+      ],
+      "label" : "focus-moreNeckShoulders#15"
+    },
+    {
+      "ids" : [
+        "CIR-04",
+        "FLX-28",
+        "BAL-30",
+        "STR-22",
+        "HWF-11"
+      ],
+      "label" : "focus-moreNeckShoulders#16"
+    },
+    {
+      "ids" : [
+        "CIR-13",
+        "FLX-10",
+        "BAL-03",
+        "STR-28",
+        "EYE-03"
+      ],
+      "label" : "focus-moreNeckShoulders#17"
+    },
+    {
+      "ids" : [
+        "CIR-08",
+        "BAL-10",
+        "STR-53",
+        "FLX-24",
+        "HWF-04"
+      ],
+      "label" : "focus-moreNeckShoulders#18"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "BAL-10",
+        "STR-52",
+        "FLX-09",
+        "BRE-05"
+      ],
+      "label" : "focus-moreNeckShoulders#19"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "BAL-11",
+        "FLX-23",
+        "STR-12",
+        "HWF-06"
+      ],
+      "label" : "focus-moreHandsEyes#0"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "STR-28",
+        "FLX-20",
+        "BAL-06",
+        "EYE-02"
+      ],
+      "label" : "focus-moreHandsEyes#1"
+    },
+    {
+      "ids" : [
+        "CIR-20",
+        "STR-07",
+        "FLX-02",
+        "BAL-05",
+        "HWF-08"
+      ],
+      "label" : "focus-moreHandsEyes#2"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "BAL-28",
+        "FLX-32",
+        "STR-39",
+        "EYE-01"
+      ],
+      "label" : "focus-moreHandsEyes#3"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "BAL-25",
+        "FLX-44",
+        "STR-31",
+        "EYE-05"
+      ],
+      "label" : "focus-moreHandsEyes#4"
+    },
+    {
+      "ids" : [
+        "CIR-05",
+        "STR-37",
+        "BAL-03",
+        "FLX-42",
+        "HWF-03"
+      ],
+      "label" : "focus-moreHandsEyes#5"
+    },
+    {
+      "ids" : [
+        "CIR-10",
+        "FLX-42",
+        "STR-22",
+        "BAL-18",
+        "HWF-07"
+      ],
+      "label" : "focus-moreHandsEyes#6"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "STR-20",
+        "BAL-01",
+        "FLX-34",
+        "HWF-02"
+      ],
+      "label" : "focus-moreHandsEyes#7"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "BAL-20",
+        "FLX-20",
+        "STR-40",
+        "HWF-03"
+      ],
+      "label" : "focus-moreHandsEyes#8"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "FLX-44",
+        "BAL-12",
+        "STR-43",
+        "HWF-05"
+      ],
+      "label" : "focus-moreHandsEyes#9"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "FLX-26",
+        "BAL-29",
+        "STR-58",
+        "EYE-03"
+      ],
+      "label" : "focus-moreHandsEyes#10"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "STR-54",
+        "FLX-28",
+        "BAL-26",
+        "HWF-01"
+      ],
+      "label" : "focus-moreHandsEyes#11"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "FLX-14",
+        "BAL-22",
+        "STR-13",
+        "EYE-03"
+      ],
+      "label" : "focus-moreHandsEyes#12"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "FLX-37",
+        "BAL-05",
+        "STR-05",
+        "HWF-05"
+      ],
+      "label" : "focus-moreHandsEyes#13"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "STR-35",
+        "BAL-12",
+        "FLX-05",
+        "HWF-01"
+      ],
+      "label" : "focus-moreHandsEyes#14"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "FLX-32",
+        "BAL-01",
+        "STR-03",
+        "EYE-01"
+      ],
+      "label" : "focus-moreHandsEyes#15"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "FLX-30",
+        "BAL-30",
+        "STR-26",
+        "HWF-10"
+      ],
+      "label" : "focus-moreHandsEyes#16"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "FLX-06",
+        "BAL-03",
+        "STR-20",
+        "EYE-01"
+      ],
+      "label" : "focus-moreHandsEyes#17"
+    },
+    {
+      "ids" : [
+        "CIR-08",
+        "BAL-09",
+        "STR-52",
+        "FLX-25",
+        "HWF-04"
+      ],
+      "label" : "focus-moreHandsEyes#18"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "BAL-10",
+        "STR-50",
+        "FLX-05",
+        "BRE-04"
+      ],
+      "label" : "focus-moreHandsEyes#19"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "BAL-11",
+        "FLX-26",
+        "STR-14",
+        "HWF-10"
+      ],
+      "label" : "focus-moreCore#0"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "STR-21",
+        "FLX-23",
+        "BAL-08",
+        "BRE-02"
+      ],
+      "label" : "focus-moreCore#1"
+    },
+    {
+      "ids" : [
+        "CIR-20",
+        "STR-13",
+        "FLX-02",
+        "BAL-07",
+        "EYE-02"
+      ],
+      "label" : "focus-moreCore#2"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "BAL-28",
+        "FLX-34",
+        "STR-41",
+        "BRE-01"
+      ],
+      "label" : "focus-moreCore#3"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "BAL-28",
+        "FLX-44",
+        "STR-36",
+        "BRE-05"
+      ],
+      "label" : "focus-moreCore#4"
+    },
+    {
+      "ids" : [
+        "CIR-07",
+        "STR-40",
+        "BAL-04",
+        "FLX-42",
+        "HWF-04"
+      ],
+      "label" : "focus-moreCore#5"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "FLX-41",
+        "STR-27",
+        "BAL-20",
+        "HWF-10"
+      ],
+      "label" : "focus-moreCore#6"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "STR-20",
+        "BAL-01",
+        "FLX-36",
+        "HWF-03"
+      ],
+      "label" : "focus-moreCore#7"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "BAL-20",
+        "FLX-22",
+        "STR-41",
+        "HWF-05"
+      ],
+      "label" : "focus-moreCore#8"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "FLX-44",
+        "BAL-13",
+        "STR-44",
+        "HWF-07"
+      ],
+      "label" : "focus-moreCore#9"
+    },
+    {
+      "ids" : [
+        "CIR-07",
+        "FLX-31",
+        "BAL-28",
+        "STR-57",
+        "BRE-03"
+      ],
+      "label" : "focus-moreCore#10"
+    },
+    {
+      "ids" : [
+        "CIR-13",
+        "STR-51",
+        "FLX-32",
+        "BAL-28",
+        "HWF-01"
+      ],
+      "label" : "focus-moreCore#11"
+    },
+    {
+      "ids" : [
+        "CIR-02",
+        "FLX-18",
+        "BAL-22",
+        "STR-15",
+        "BRE-04"
+      ],
+      "label" : "focus-moreCore#12"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "FLX-37",
+        "BAL-06",
+        "STR-12",
+        "HWF-07"
+      ],
+      "label" : "focus-moreCore#13"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "STR-39",
+        "BAL-13",
+        "FLX-07",
+        "HWF-01"
+      ],
+      "label" : "focus-moreCore#14"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "FLX-34",
+        "BAL-02",
+        "STR-06",
+        "BRE-01"
+      ],
+      "label" : "focus-moreCore#15"
+    },
+    {
+      "ids" : [
+        "CIR-04",
+        "FLX-33",
+        "BAL-30",
+        "STR-27",
+        "EYE-03"
+      ],
+      "label" : "focus-moreCore#16"
+    },
+    {
+      "ids" : [
+        "CIR-13",
+        "FLX-08",
+        "BAL-03",
+        "STR-21",
+        "BRE-01"
+      ],
+      "label" : "focus-moreCore#17"
+    },
+    {
+      "ids" : [
+        "CIR-10",
+        "BAL-11",
+        "STR-49",
+        "FLX-29",
+        "HWF-05"
+      ],
+      "label" : "focus-moreCore#18"
+    },
+    {
+      "ids" : [
+        "CIR-13",
+        "BAL-11",
+        "STR-48",
+        "FLX-07",
+        "BRE-05"
+      ],
+      "label" : "focus-moreCore#19"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "BAL-05",
+        "FLX-24",
+        "STR-12",
+        "HWF-07"
+      ],
+      "label" : "cap-1#0"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "STR-20",
+        "FLX-22",
+        "BAL-04",
+        "EYE-04"
+      ],
+      "label" : "cap-1#1"
+    },
+    {
+      "ids" : [
+        "CIR-20",
+        "STR-07",
+        "FLX-02",
+        "BAL-04",
+        "HWF-11"
+      ],
+      "label" : "cap-1#2"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "BAL-30",
+        "FLX-33",
+        "STR-39",
+        "EYE-03"
+      ],
+      "label" : "cap-1#3"
+    },
+    {
+      "ids" : [
+        "CIR-13",
+        "BAL-29",
+        "FLX-44",
+        "STR-27",
+        "BRE-03"
+      ],
+      "label" : "cap-1#4"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "STR-35",
+        "BAL-01",
+        "FLX-43",
+        "HWF-03"
+      ],
+      "label" : "cap-1#5"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "FLX-42",
+        "STR-22",
+        "BAL-24",
+        "HWF-07"
+      ],
+      "label" : "cap-1#6"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "STR-15",
+        "BAL-22",
+        "FLX-37",
+        "HWF-03"
+      ],
+      "label" : "cap-1#7"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "BAL-24",
+        "FLX-22",
+        "STR-46",
+        "HWF-04"
+      ],
+      "label" : "cap-1#8"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "FLX-44",
+        "BAL-11",
+        "STR-49",
+        "HWF-06"
+      ],
+      "label" : "cap-1#9"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "FLX-29",
+        "BAL-30",
+        "STR-57",
+        "BRE-01"
+      ],
+      "label" : "cap-1#10"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "STR-55",
+        "FLX-30",
+        "BAL-29",
+        "HWF-01"
+      ],
+      "label" : "cap-1#11"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "FLX-18",
+        "BAL-22",
+        "STR-12",
+        "BRE-01"
+      ],
+      "label" : "cap-1#12"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "FLX-40",
+        "BAL-01",
+        "STR-06",
+        "HWF-05"
+      ],
+      "label" : "cap-1#13"
+    },
+    {
+      "ids" : [
+        "CIR-04",
+        "STR-31",
+        "BAL-11",
+        "FLX-10",
+        "HWF-01"
+      ],
+      "label" : "cap-1#14"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "FLX-33",
+        "BAL-22",
+        "STR-04",
+        "EYE-04"
+      ],
+      "label" : "cap-1#15"
+    },
+    {
+      "ids" : [
+        "CIR-04",
+        "FLX-32",
+        "BAL-30",
+        "STR-22",
+        "EYE-02"
+      ],
+      "label" : "cap-1#16"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "FLX-11",
+        "BAL-22",
+        "STR-15",
+        "EYE-04"
+      ],
+      "label" : "cap-1#17"
+    },
+    {
+      "ids" : [
+        "CIR-09",
+        "BAL-05",
+        "STR-53",
+        "FLX-27",
+        "HWF-04"
+      ],
+      "label" : "cap-1#18"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "BAL-11",
+        "STR-52",
+        "FLX-10",
+        "BRE-05"
+      ],
+      "label" : "cap-1#19"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "BAL-11",
+        "FLX-23",
+        "STR-12",
+        "HWF-08"
+      ],
+      "label" : "cap-3-locked#0"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "STR-28",
+        "FLX-20",
+        "BAL-06",
+        "EYE-04"
+      ],
+      "label" : "cap-3-locked#1"
+    },
+    {
+      "ids" : [
+        "CIR-20",
+        "STR-07",
+        "FLX-02",
+        "BAL-05",
+        "HWF-11"
+      ],
+      "label" : "cap-3-locked#2"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "BAL-28",
+        "FLX-32",
+        "STR-39",
+        "EYE-03"
+      ],
+      "label" : "cap-3-locked#3"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "BAL-25",
+        "FLX-44",
+        "STR-31",
+        "BRE-03"
+      ],
+      "label" : "cap-3-locked#4"
+    },
+    {
+      "ids" : [
+        "CIR-05",
+        "STR-37",
+        "BAL-03",
+        "FLX-42",
+        "HWF-03"
+      ],
+      "label" : "cap-3-locked#5"
+    },
+    {
+      "ids" : [
+        "CIR-10",
+        "FLX-42",
+        "STR-22",
+        "BAL-18",
+        "HWF-08"
+      ],
+      "label" : "cap-3-locked#6"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "STR-20",
+        "BAL-01",
+        "FLX-34",
+        "HWF-03"
+      ],
+      "label" : "cap-3-locked#7"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "BAL-20",
+        "FLX-20",
+        "STR-40",
+        "HWF-04"
+      ],
+      "label" : "cap-3-locked#8"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "FLX-44",
+        "BAL-12",
+        "STR-43",
+        "HWF-06"
+      ],
+      "label" : "cap-3-locked#9"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "FLX-26",
+        "BAL-29",
+        "STR-58",
+        "EYE-05"
+      ],
+      "label" : "cap-3-locked#10"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "STR-54",
+        "FLX-28",
+        "BAL-26",
+        "HWF-01"
+      ],
+      "label" : "cap-3-locked#11"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "FLX-14",
+        "BAL-22",
+        "STR-13",
+        "BRE-01"
+      ],
+      "label" : "cap-3-locked#12"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "FLX-37",
+        "BAL-05",
+        "STR-05",
+        "HWF-06"
+      ],
+      "label" : "cap-3-locked#13"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "STR-35",
+        "BAL-12",
+        "FLX-05",
+        "HWF-01"
+      ],
+      "label" : "cap-3-locked#14"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "FLX-32",
+        "BAL-01",
+        "STR-03",
+        "EYE-03"
+      ],
+      "label" : "cap-3-locked#15"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "FLX-30",
+        "BAL-30",
+        "STR-26",
+        "EYE-01"
+      ],
+      "label" : "cap-3-locked#16"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "FLX-06",
+        "BAL-03",
+        "STR-20",
+        "EYE-03"
+      ],
+      "label" : "cap-3-locked#17"
+    },
+    {
+      "ids" : [
+        "CIR-08",
+        "BAL-09",
+        "STR-52",
+        "FLX-25",
+        "HWF-04"
+      ],
+      "label" : "cap-3-locked#18"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "BAL-10",
+        "STR-50",
+        "FLX-05",
+        "BRE-05"
+      ],
+      "label" : "cap-3-locked#19"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "BAL-12",
+        "FLX-23",
+        "STR-14",
+        "HWF-08"
+      ],
+      "label" : "cap-3-unlocked#0"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "STR-28",
+        "FLX-20",
+        "BAL-07",
+        "EYE-04"
+      ],
+      "label" : "cap-3-unlocked#1"
+    },
+    {
+      "ids" : [
+        "CIR-20",
+        "STR-11",
+        "FLX-02",
+        "BAL-06",
+        "HWF-11"
+      ],
+      "label" : "cap-3-unlocked#2"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "BAL-28",
+        "FLX-32",
+        "STR-39",
+        "EYE-03"
+      ],
+      "label" : "cap-3-unlocked#3"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "BAL-26",
+        "FLX-44",
+        "STR-31",
+        "BRE-03"
+      ],
+      "label" : "cap-3-unlocked#4"
+    },
+    {
+      "ids" : [
+        "CIR-05",
+        "STR-37",
+        "BAL-04",
+        "FLX-42",
+        "HWF-03"
+      ],
+      "label" : "cap-3-unlocked#5"
+    },
+    {
+      "ids" : [
+        "CIR-10",
+        "FLX-42",
+        "STR-26",
+        "BAL-19",
+        "HWF-08"
+      ],
+      "label" : "cap-3-unlocked#6"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "STR-20",
+        "BAL-01",
+        "FLX-34",
+        "HWF-03"
+      ],
+      "label" : "cap-3-unlocked#7"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "BAL-19",
+        "FLX-20",
+        "STR-40",
+        "HWF-04"
+      ],
+      "label" : "cap-3-unlocked#8"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "FLX-44",
+        "BAL-13",
+        "STR-43",
+        "HWF-06"
+      ],
+      "label" : "cap-3-unlocked#9"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "FLX-26",
+        "BAL-29",
+        "STR-58",
+        "EYE-05"
+      ],
+      "label" : "cap-3-unlocked#10"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "STR-54",
+        "FLX-28",
+        "BAL-27",
+        "HWF-01"
+      ],
+      "label" : "cap-3-unlocked#11"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "FLX-14",
+        "BAL-22",
+        "STR-14",
+        "BRE-01"
+      ],
+      "label" : "cap-3-unlocked#12"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "FLX-37",
+        "BAL-06",
+        "STR-06",
+        "HWF-06"
+      ],
+      "label" : "cap-3-unlocked#13"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "STR-35",
+        "BAL-14",
+        "FLX-05",
+        "HWF-01"
+      ],
+      "label" : "cap-3-unlocked#14"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "FLX-32",
+        "BAL-01",
+        "STR-04",
+        "EYE-03"
+      ],
+      "label" : "cap-3-unlocked#15"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "FLX-30",
+        "BAL-30",
+        "STR-26",
+        "EYE-01"
+      ],
+      "label" : "cap-3-unlocked#16"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "FLX-06",
+        "BAL-03",
+        "STR-20",
+        "EYE-03"
+      ],
+      "label" : "cap-3-unlocked#17"
+    },
+    {
+      "ids" : [
+        "CIR-08",
+        "BAL-11",
+        "STR-51",
+        "FLX-25",
+        "HWF-04"
+      ],
+      "label" : "cap-3-unlocked#18"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "BAL-12",
+        "STR-50",
+        "FLX-05",
+        "BRE-05"
+      ],
+      "label" : "cap-3-unlocked#19"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "BAL-10",
+        "FLX-22",
+        "STR-11",
+        "HWF-08"
+      ],
+      "label" : "excluded-every-fifth#0"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "STR-28",
+        "FLX-19",
+        "BAL-07",
+        "EYE-04"
+      ],
+      "label" : "excluded-every-fifth#1"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "STR-11",
+        "FLX-02",
+        "BAL-05",
+        "HWF-10"
+      ],
+      "label" : "excluded-every-fifth#2"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "BAL-29",
+        "FLX-32",
+        "STR-39",
+        "EYE-03"
+      ],
+      "label" : "excluded-every-fifth#3"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "BAL-25",
+        "FLX-44",
+        "STR-27",
+        "BRE-04"
+      ],
+      "label" : "excluded-every-fifth#4"
+    },
+    {
+      "ids" : [
+        "CIR-04",
+        "STR-37",
+        "BAL-03",
+        "FLX-43",
+        "HWF-04"
+      ],
+      "label" : "excluded-every-fifth#5"
+    },
+    {
+      "ids" : [
+        "CIR-09",
+        "FLX-42",
+        "STR-22",
+        "BAL-18",
+        "HWF-08"
+      ],
+      "label" : "excluded-every-fifth#6"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "STR-16",
+        "BAL-22",
+        "FLX-34",
+        "HWF-03"
+      ],
+      "label" : "excluded-every-fifth#7"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "BAL-18",
+        "FLX-22",
+        "STR-39",
+        "HWF-04"
+      ],
+      "label" : "excluded-every-fifth#8"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "FLX-44",
+        "BAL-13",
+        "STR-43",
+        "HWF-07"
+      ],
+      "label" : "excluded-every-fifth#9"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "FLX-26",
+        "BAL-29",
+        "STR-58",
+        "BRE-02"
+      ],
+      "label" : "excluded-every-fifth#10"
+    },
+    {
+      "ids" : [
+        "CIR-13",
+        "STR-54",
+        "FLX-27",
+        "BAL-28",
+        "HWF-02"
+      ],
+      "label" : "excluded-every-fifth#11"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "FLX-14",
+        "BAL-22",
+        "STR-13",
+        "BRE-02"
+      ],
+      "label" : "excluded-every-fifth#12"
+    },
+    {
+      "ids" : [
+        "CIR-09",
+        "FLX-37",
+        "BAL-05",
+        "STR-04",
+        "HWF-05"
+      ],
+      "label" : "excluded-every-fifth#13"
+    },
+    {
+      "ids" : [
+        "CIR-02",
+        "STR-34",
+        "BAL-12",
+        "FLX-04",
+        "HWF-02"
+      ],
+      "label" : "excluded-every-fifth#14"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "FLX-32",
+        "BAL-02",
+        "STR-03",
+        "EYE-03"
+      ],
+      "label" : "excluded-every-fifth#15"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "FLX-29",
+        "BAL-30",
+        "STR-22",
+        "EYE-01"
+      ],
+      "label" : "excluded-every-fifth#16"
+    },
+    {
+      "ids" : [
+        "CIR-13",
+        "FLX-06",
+        "BAL-03",
+        "STR-16",
+        "EYE-03"
+      ],
+      "label" : "excluded-every-fifth#17"
+    },
+    {
+      "ids" : [
+        "CIR-08",
+        "BAL-09",
+        "STR-52",
+        "FLX-24",
+        "HWF-04"
+      ],
+      "label" : "excluded-every-fifth#18"
+    },
+    {
+      "ids" : [
+        "CIR-13",
+        "BAL-10",
+        "STR-51",
+        "FLX-04",
+        "BRE-05"
+      ],
+      "label" : "excluded-every-fifth#19"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "BAL-10",
+        "FLX-24",
+        "STR-11",
+        "HWF-08"
+      ],
+      "label" : "used-family-member#0"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "STR-16",
+        "FLX-20",
+        "BAL-06",
+        "EYE-04"
+      ],
+      "label" : "used-family-member#1"
+    },
+    {
+      "ids" : [
+        "CIR-20",
+        "STR-06",
+        "FLX-02",
+        "BAL-05",
+        "HWF-11"
+      ],
+      "label" : "used-family-member#2"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "BAL-28",
+        "FLX-32",
+        "STR-41",
+        "EYE-03"
+      ],
+      "label" : "used-family-member#3"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "BAL-26",
+        "FLX-44",
+        "STR-22",
+        "BRE-03"
+      ],
+      "label" : "used-family-member#4"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "STR-35",
+        "BAL-03",
+        "FLX-42",
+        "HWF-03"
+      ],
+      "label" : "used-family-member#5"
+    },
+    {
+      "ids" : [
+        "CIR-10",
+        "FLX-42",
+        "STR-28",
+        "BAL-18",
+        "HWF-08"
+      ],
+      "label" : "used-family-member#6"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "STR-15",
+        "BAL-01",
+        "FLX-35",
+        "HWF-03"
+      ],
+      "label" : "used-family-member#7"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "BAL-20",
+        "FLX-20",
+        "STR-41",
+        "HWF-04"
+      ],
+      "label" : "used-family-member#8"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "FLX-44",
+        "BAL-11",
+        "STR-45",
+        "HWF-06"
+      ],
+      "label" : "used-family-member#9"
+    },
+    {
+      "ids" : [
+        "CIR-07",
+        "FLX-27",
+        "BAL-29",
+        "STR-58",
+        "EYE-05"
+      ],
+      "label" : "used-family-member#10"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "STR-55",
+        "FLX-29",
+        "BAL-26",
+        "HWF-01"
+      ],
+      "label" : "used-family-member#11"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "FLX-16",
+        "BAL-22",
+        "STR-12",
+        "BRE-01"
+      ],
+      "label" : "used-family-member#12"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "FLX-37",
+        "BAL-05",
+        "STR-05",
+        "HWF-06"
+      ],
+      "label" : "used-family-member#13"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "STR-31",
+        "BAL-11",
+        "FLX-05",
+        "HWF-01"
+      ],
+      "label" : "used-family-member#14"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "FLX-33",
+        "BAL-01",
+        "STR-03",
+        "EYE-03"
+      ],
+      "label" : "used-family-member#15"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "FLX-31",
+        "BAL-30",
+        "STR-28",
+        "EYE-01"
+      ],
+      "label" : "used-family-member#16"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "FLX-06",
+        "BAL-02",
+        "STR-15",
+        "EYE-03"
+      ],
+      "label" : "used-family-member#17"
+    },
+    {
+      "ids" : [
+        "CIR-09",
+        "BAL-09",
+        "STR-52",
+        "FLX-26",
+        "HWF-04"
+      ],
+      "label" : "used-family-member#18"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "BAL-10",
+        "STR-51",
+        "FLX-05",
+        "BRE-05"
+      ],
+      "label" : "used-family-member#19"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "BAL-11",
+        "FLX-23",
+        "STR-11",
+        "HWF-08"
+      ],
+      "label" : "used-all-but-cir#0"
+    },
+    {
+      "ids" : [
+        "CIR-13",
+        "STR-20",
+        "FLX-20",
+        "BAL-06",
+        "EYE-04"
+      ],
+      "label" : "used-all-but-cir#1"
+    },
+    {
+      "ids" : [
+        "CIR-20",
+        "STR-07",
+        "FLX-02",
+        "BAL-05",
+        "HWF-11"
+      ],
+      "label" : "used-all-but-cir#2"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "BAL-28",
+        "FLX-32",
+        "STR-39",
+        "EYE-03"
+      ],
+      "label" : "used-all-but-cir#3"
+    },
+    {
+      "ids" : [
+        "CIR-10",
+        "BAL-25",
+        "FLX-44",
+        "STR-31",
+        "BRE-03"
+      ],
+      "label" : "used-all-but-cir#4"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "STR-37",
+        "BAL-03",
+        "FLX-42",
+        "HWF-03"
+      ],
+      "label" : "used-all-but-cir#5"
+    },
+    {
+      "ids" : [
+        "CIR-09",
+        "FLX-42",
+        "STR-22",
+        "BAL-18",
+        "HWF-08"
+      ],
+      "label" : "used-all-but-cir#6"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "STR-15",
+        "BAL-01",
+        "FLX-34",
+        "HWF-03"
+      ],
+      "label" : "used-all-but-cir#7"
+    },
+    {
+      "ids" : [
+        "CIR-13",
+        "BAL-20",
+        "FLX-20",
+        "STR-39",
+        "HWF-04"
+      ],
+      "label" : "used-all-but-cir#8"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "FLX-44",
+        "BAL-12",
+        "STR-43",
+        "HWF-06"
+      ],
+      "label" : "used-all-but-cir#9"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "FLX-26",
+        "BAL-29",
+        "STR-58",
+        "EYE-05"
+      ],
+      "label" : "used-all-but-cir#10"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "STR-54",
+        "FLX-28",
+        "BAL-26",
+        "HWF-01"
+      ],
+      "label" : "used-all-but-cir#11"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "FLX-14",
+        "BAL-22",
+        "STR-13",
+        "BRE-01"
+      ],
+      "label" : "used-all-but-cir#12"
+    },
+    {
+      "ids" : [
+        "CIR-09",
+        "FLX-37",
+        "BAL-05",
+        "STR-05",
+        "HWF-06"
+      ],
+      "label" : "used-all-but-cir#13"
+    },
+    {
+      "ids" : [
+        "CIR-02",
+        "STR-35",
+        "BAL-12",
+        "FLX-05",
+        "HWF-01"
+      ],
+      "label" : "used-all-but-cir#14"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "FLX-32",
+        "BAL-01",
+        "STR-04",
+        "EYE-03"
+      ],
+      "label" : "used-all-but-cir#15"
+    },
+    {
+      "ids" : [
+        "CIR-02",
+        "FLX-30",
+        "BAL-30",
+        "STR-22",
+        "EYE-01"
+      ],
+      "label" : "used-all-but-cir#16"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "FLX-06",
+        "BAL-02",
+        "STR-20",
+        "EYE-03"
+      ],
+      "label" : "used-all-but-cir#17"
+    },
+    {
+      "ids" : [
+        "CIR-08",
+        "BAL-09",
+        "STR-52",
+        "FLX-25",
+        "HWF-04"
+      ],
+      "label" : "used-all-but-cir#18"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "BAL-10",
+        "STR-50",
+        "FLX-05",
+        "BRE-05"
+      ],
+      "label" : "used-all-but-cir#19"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "BAL-11",
+        "FLX-23",
+        "STR-12",
+        "HWF-08"
+      ],
+      "label" : "used-all#0"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "STR-28",
+        "FLX-20",
+        "BAL-06",
+        "EYE-04"
+      ],
+      "label" : "used-all#1"
+    },
+    {
+      "ids" : [
+        "CIR-20",
+        "STR-07",
+        "FLX-02",
+        "BAL-05",
+        "HWF-11"
+      ],
+      "label" : "used-all#2"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "BAL-28",
+        "FLX-32",
+        "STR-39",
+        "EYE-03"
+      ],
+      "label" : "used-all#3"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "BAL-25",
+        "FLX-44",
+        "STR-31",
+        "BRE-03"
+      ],
+      "label" : "used-all#4"
+    },
+    {
+      "ids" : [
+        "CIR-05",
+        "STR-37",
+        "BAL-03",
+        "FLX-42",
+        "HWF-03"
+      ],
+      "label" : "used-all#5"
+    },
+    {
+      "ids" : [
+        "CIR-10",
+        "FLX-42",
+        "STR-22",
+        "BAL-18",
+        "HWF-08"
+      ],
+      "label" : "used-all#6"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "STR-20",
+        "BAL-01",
+        "FLX-34",
+        "HWF-03"
+      ],
+      "label" : "used-all#7"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "BAL-20",
+        "FLX-20",
+        "STR-40",
+        "HWF-04"
+      ],
+      "label" : "used-all#8"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "FLX-44",
+        "BAL-12",
+        "STR-43",
+        "HWF-06"
+      ],
+      "label" : "used-all#9"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "FLX-26",
+        "BAL-29",
+        "STR-58",
+        "EYE-05"
+      ],
+      "label" : "used-all#10"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "STR-54",
+        "FLX-28",
+        "BAL-26",
+        "HWF-01"
+      ],
+      "label" : "used-all#11"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "FLX-14",
+        "BAL-22",
+        "STR-13",
+        "BRE-01"
+      ],
+      "label" : "used-all#12"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "FLX-37",
+        "BAL-05",
+        "STR-05",
+        "HWF-06"
+      ],
+      "label" : "used-all#13"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "STR-35",
+        "BAL-12",
+        "FLX-05",
+        "HWF-01"
+      ],
+      "label" : "used-all#14"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "FLX-32",
+        "BAL-01",
+        "STR-03",
+        "EYE-03"
+      ],
+      "label" : "used-all#15"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "FLX-30",
+        "BAL-30",
+        "STR-26",
+        "EYE-01"
+      ],
+      "label" : "used-all#16"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "FLX-06",
+        "BAL-03",
+        "STR-20",
+        "EYE-03"
+      ],
+      "label" : "used-all#17"
+    },
+    {
+      "ids" : [
+        "CIR-08",
+        "BAL-09",
+        "STR-52",
+        "FLX-25",
+        "HWF-04"
+      ],
+      "label" : "used-all#18"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "BAL-10",
+        "STR-50",
+        "FLX-05",
+        "BRE-05"
+      ],
+      "label" : "used-all#19"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "BAL-11",
+        "FLX-23",
+        "STR-12",
+        "HWF-08"
+      ],
+      "label" : "used-all-excluded-all#0"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "STR-28",
+        "FLX-20",
+        "BAL-06",
+        "EYE-04"
+      ],
+      "label" : "used-all-excluded-all#1"
+    },
+    {
+      "ids" : [
+        "CIR-20",
+        "STR-07",
+        "FLX-02",
+        "BAL-05",
+        "HWF-11"
+      ],
+      "label" : "used-all-excluded-all#2"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "BAL-28",
+        "FLX-32",
+        "STR-39",
+        "EYE-03"
+      ],
+      "label" : "used-all-excluded-all#3"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "BAL-25",
+        "FLX-44",
+        "STR-31",
+        "BRE-03"
+      ],
+      "label" : "used-all-excluded-all#4"
+    },
+    {
+      "ids" : [
+        "CIR-05",
+        "STR-37",
+        "BAL-03",
+        "FLX-42",
+        "HWF-03"
+      ],
+      "label" : "used-all-excluded-all#5"
+    },
+    {
+      "ids" : [
+        "CIR-10",
+        "FLX-42",
+        "STR-22",
+        "BAL-18",
+        "HWF-08"
+      ],
+      "label" : "used-all-excluded-all#6"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "STR-20",
+        "BAL-01",
+        "FLX-34",
+        "HWF-03"
+      ],
+      "label" : "used-all-excluded-all#7"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "BAL-20",
+        "FLX-20",
+        "STR-40",
+        "HWF-04"
+      ],
+      "label" : "used-all-excluded-all#8"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "FLX-44",
+        "BAL-12",
+        "STR-43",
+        "HWF-06"
+      ],
+      "label" : "used-all-excluded-all#9"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "FLX-26",
+        "BAL-29",
+        "STR-58",
+        "EYE-05"
+      ],
+      "label" : "used-all-excluded-all#10"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "STR-54",
+        "FLX-28",
+        "BAL-26",
+        "HWF-01"
+      ],
+      "label" : "used-all-excluded-all#11"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "FLX-14",
+        "BAL-22",
+        "STR-13",
+        "BRE-01"
+      ],
+      "label" : "used-all-excluded-all#12"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "FLX-37",
+        "BAL-05",
+        "STR-05",
+        "HWF-06"
+      ],
+      "label" : "used-all-excluded-all#13"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "STR-35",
+        "BAL-12",
+        "FLX-05",
+        "HWF-01"
+      ],
+      "label" : "used-all-excluded-all#14"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "FLX-32",
+        "BAL-01",
+        "STR-03",
+        "EYE-03"
+      ],
+      "label" : "used-all-excluded-all#15"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "FLX-30",
+        "BAL-30",
+        "STR-26",
+        "EYE-01"
+      ],
+      "label" : "used-all-excluded-all#16"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "FLX-06",
+        "BAL-03",
+        "STR-20",
+        "EYE-03"
+      ],
+      "label" : "used-all-excluded-all#17"
+    },
+    {
+      "ids" : [
+        "CIR-08",
+        "BAL-09",
+        "STR-52",
+        "FLX-25",
+        "HWF-04"
+      ],
+      "label" : "used-all-excluded-all#18"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "BAL-10",
+        "STR-50",
+        "FLX-05",
+        "BRE-05"
+      ],
+      "label" : "used-all-excluded-all#19"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "BAL-11",
+        "FLX-23",
+        "STR-14",
+        "HWF-06"
+      ],
+      "label" : "recency#0"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "STR-28",
+        "FLX-21",
+        "BAL-06",
+        "EYE-01"
+      ],
+      "label" : "recency#1"
+    },
+    {
+      "ids" : [
+        "CIR-20",
+        "STR-12",
+        "FLX-04",
+        "BAL-06",
+        "HWF-08"
+      ],
+      "label" : "recency#2"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "BAL-29",
+        "FLX-33",
+        "STR-41",
+        "HWF-11"
+      ],
+      "label" : "recency#3"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "BAL-29",
+        "FLX-44",
+        "STR-35",
+        "EYE-04"
+      ],
+      "label" : "recency#4"
+    },
+    {
+      "ids" : [
+        "CIR-07",
+        "STR-39",
+        "BAL-02",
+        "FLX-42",
+        "HWF-03"
+      ],
+      "label" : "recency#5"
+    },
+    {
+      "ids" : [
+        "CIR-10",
+        "FLX-42",
+        "STR-27",
+        "BAL-21",
+        "HWF-06"
+      ],
+      "label" : "recency#6"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "STR-20",
+        "BAL-22",
+        "FLX-35",
+        "HWF-02"
+      ],
+      "label" : "recency#7"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "BAL-23",
+        "FLX-21",
+        "STR-41",
+        "HWF-03"
+      ],
+      "label" : "recency#8"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "FLX-44",
+        "BAL-12",
+        "STR-44",
+        "HWF-05"
+      ],
+      "label" : "recency#9"
+    },
+    {
+      "ids" : [
+        "CIR-07",
+        "FLX-27",
+        "BAL-30",
+        "STR-58",
+        "EYE-02"
+      ],
+      "label" : "recency#10"
+    },
+    {
+      "ids" : [
+        "CIR-13",
+        "STR-54",
+        "FLX-28",
+        "BAL-29",
+        "HWF-01"
+      ],
+      "label" : "recency#11"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "FLX-17",
+        "BAL-22",
+        "STR-15",
+        "EYE-03"
+      ],
+      "label" : "recency#12"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "FLX-37",
+        "BAL-05",
+        "STR-07",
+        "HWF-05"
+      ],
+      "label" : "recency#13"
+    },
+    {
+      "ids" : [
+        "CIR-05",
+        "STR-37",
+        "BAL-13",
+        "FLX-07",
+        "HWF-01"
+      ],
+      "label" : "recency#14"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "FLX-33",
+        "BAL-22",
+        "STR-03",
+        "EYE-01"
+      ],
+      "label" : "recency#15"
+    },
+    {
+      "ids" : [
+        "CIR-05",
+        "FLX-30",
+        "BAL-30",
+        "STR-27",
+        "HWF-10"
+      ],
+      "label" : "recency#16"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "FLX-08",
+        "BAL-05",
+        "STR-28",
+        "EYE-01"
+      ],
+      "label" : "recency#17"
+    },
+    {
+      "ids" : [
+        "CIR-09",
+        "BAL-10",
+        "STR-52",
+        "FLX-26",
+        "HWF-03"
+      ],
+      "label" : "recency#18"
+    },
+    {
+      "ids" : [
+        "CIR-13",
+        "BAL-10",
+        "STR-51",
+        "FLX-07",
+        "BRE-02"
+      ],
+      "label" : "recency#19"
+    },
+    {
+      "ids" : [
+        "CIR-17",
+        "BAL-11",
+        "FLX-23",
+        "STR-20",
+        "HWF-08"
+      ],
+      "label" : "last-strength-regions#0"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "STR-22",
+        "FLX-20",
+        "BAL-06",
+        "EYE-04"
+      ],
+      "label" : "last-strength-regions#1"
+    },
+    {
+      "ids" : [
+        "CIR-20",
+        "STR-16",
+        "FLX-02",
+        "BAL-05",
+        "HWF-11"
+      ],
+      "label" : "last-strength-regions#2"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "BAL-28",
+        "FLX-32",
+        "STR-44",
+        "EYE-03"
+      ],
+      "label" : "last-strength-regions#3"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "BAL-25",
+        "FLX-44",
+        "STR-37",
+        "BRE-03"
+      ],
+      "label" : "last-strength-regions#4"
+    },
+    {
+      "ids" : [
+        "CIR-05",
+        "STR-43",
+        "BAL-03",
+        "FLX-42",
+        "HWF-03"
+      ],
+      "label" : "last-strength-regions#5"
+    },
+    {
+      "ids" : [
+        "CIR-10",
+        "FLX-42",
+        "STR-31",
+        "BAL-18",
+        "HWF-08"
+      ],
+      "label" : "last-strength-regions#6"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "STR-21",
+        "BAL-01",
+        "FLX-34",
+        "HWF-03"
+      ],
+      "label" : "last-strength-regions#7"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "BAL-20",
+        "FLX-20",
+        "STR-44",
+        "HWF-04"
+      ],
+      "label" : "last-strength-regions#8"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "FLX-44",
+        "BAL-12",
+        "STR-46",
+        "HWF-06"
+      ],
+      "label" : "last-strength-regions#9"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "FLX-26",
+        "BAL-29",
+        "STR-57",
+        "EYE-05"
+      ],
+      "label" : "last-strength-regions#10"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "STR-54",
+        "FLX-28",
+        "BAL-26",
+        "HWF-01"
+      ],
+      "label" : "last-strength-regions#11"
+    },
+    {
+      "ids" : [
+        "CIR-01",
+        "FLX-14",
+        "BAL-22",
+        "STR-28",
+        "BRE-01"
+      ],
+      "label" : "last-strength-regions#12"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "FLX-37",
+        "BAL-05",
+        "STR-15",
+        "HWF-06"
+      ],
+      "label" : "last-strength-regions#13"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "STR-39",
+        "BAL-12",
+        "FLX-05",
+        "HWF-01"
+      ],
+      "label" : "last-strength-regions#14"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "FLX-32",
+        "BAL-01",
+        "STR-14",
+        "EYE-03"
+      ],
+      "label" : "last-strength-regions#15"
+    },
+    {
+      "ids" : [
+        "CIR-03",
+        "FLX-30",
+        "BAL-30",
+        "STR-31",
+        "EYE-01"
+      ],
+      "label" : "last-strength-regions#16"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "FLX-06",
+        "BAL-03",
+        "STR-22",
+        "EYE-03"
+      ],
+      "label" : "last-strength-regions#17"
+    },
+    {
+      "ids" : [
+        "CIR-08",
+        "BAL-09",
+        "STR-52",
+        "FLX-25",
+        "HWF-04"
+      ],
+      "label" : "last-strength-regions#18"
+    },
+    {
+      "ids" : [
+        "CIR-14",
+        "BAL-10",
+        "STR-52",
+        "FLX-05",
+        "BRE-05"
+      ],
+      "label" : "last-strength-regions#19"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "BAL-14",
+        "FLX-26",
+        "STR-19",
+        "HWF-07"
+      ],
+      "label" : "mixed#0"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "STR-31",
+        "FLX-24",
+        "BAL-09",
+        "EYE-01"
+      ],
+      "label" : "mixed#1"
+    },
+    {
+      "ids" : [
+        "CIR-19",
+        "STR-17",
+        "FLX-06",
+        "BAL-09",
+        "HWF-08"
+      ],
+      "label" : "mixed#2"
+    },
+    {
+      "ids" : [
+        "CIR-02",
+        "BAL-29",
+        "FLX-34",
+        "STR-48",
+        "EYE-01"
+      ],
+      "label" : "mixed#3"
+    },
+    {
+      "ids" : [
+        "CIR-13",
+        "BAL-25",
+        "FLX-43",
+        "STR-37",
+        "EYE-03"
+      ],
+      "label" : "mixed#4"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "STR-38",
+        "BAL-07",
+        "FLX-42",
+        "HWF-03"
+      ],
+      "label" : "mixed#5"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "FLX-41",
+        "STR-31",
+        "BAL-18",
+        "HWF-07"
+      ],
+      "label" : "mixed#6"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "STR-23",
+        "BAL-22",
+        "FLX-36",
+        "HWF-03"
+      ],
+      "label" : "mixed#7"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "BAL-19",
+        "FLX-23",
+        "STR-49",
+        "HWF-04"
+      ],
+      "label" : "mixed#8"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "FLX-43",
+        "BAL-14",
+        "STR-52",
+        "HWF-05"
+      ],
+      "label" : "mixed#9"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "FLX-27",
+        "BAL-29",
+        "STR-58",
+        "EYE-02"
+      ],
+      "label" : "mixed#10"
+    },
+    {
+      "ids" : [
+        "CIR-13",
+        "STR-57",
+        "FLX-29",
+        "BAL-27",
+        "HWF-02"
+      ],
+      "label" : "mixed#11"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "FLX-18",
+        "BAL-22",
+        "STR-18",
+        "EYE-02"
+      ],
+      "label" : "mixed#12"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "FLX-37",
+        "BAL-09",
+        "STR-06",
+        "HWF-04"
+      ],
+      "label" : "mixed#13"
+    },
+    {
+      "ids" : [
+        "CIR-07",
+        "STR-38",
+        "BAL-15",
+        "FLX-06",
+        "HWF-02"
+      ],
+      "label" : "mixed#14"
+    },
+    {
+      "ids" : [
+        "CIR-16",
+        "FLX-34",
+        "BAL-02",
+        "STR-11",
+        "EYE-01"
+      ],
+      "label" : "mixed#15"
+    },
+    {
+      "ids" : [
+        "CIR-07",
+        "FLX-34",
+        "BAL-30",
+        "STR-31",
+        "HWF-10"
+      ],
+      "label" : "mixed#16"
+    },
+    {
+      "ids" : [
+        "CIR-13",
+        "FLX-09",
+        "BAL-05",
+        "STR-23",
+        "EYE-01"
+      ],
+      "label" : "mixed#17"
+    },
+    {
+      "ids" : [
+        "CIR-12",
+        "BAL-12",
+        "STR-56",
+        "FLX-26",
+        "HWF-04"
+      ],
+      "label" : "mixed#18"
+    },
+    {
+      "ids" : [
+        "CIR-13",
+        "BAL-12",
+        "STR-56",
+        "FLX-06",
+        "BRE-02"
+      ],
+      "label" : "mixed#19"
+    }
+  ],
+  "micro" : [
+    {
+      "ids" : [
+        "CIR-15",
+        "FLX-21"
+      ],
+      "label" : "base#0"
+    },
+    {
+      "ids" : [
+        "FLX-31"
+      ],
+      "label" : "base#1"
+    },
+    {
+      "ids" : [
+        "FLX-14",
+        "HWF-05"
+      ],
+      "label" : "base#2"
+    },
+    {
+      "ids" : [
+        "FLX-01"
+      ],
+      "label" : "base#3"
+    },
+    {
+      "ids" : [
+        "BAL-11",
+        "BAL-29"
+      ],
+      "label" : "base#4"
+    },
+    {
+      "ids" : [
+        "BAL-20"
+      ],
+      "label" : "base#5"
+    },
+    {
+      "ids" : [
+        "BAL-01"
+      ],
+      "label" : "base#6"
+    },
+    {
+      "ids" : [
+        "STR-52",
+        "CIR-02"
+      ],
+      "label" : "base#7"
+    },
+    {
+      "ids" : [
+        "FLX-41"
+      ],
+      "label" : "base#8"
+    },
+    {
+      "ids" : [
+        "BAL-04",
+        "FLX-14"
+      ],
+      "label" : "base#9"
+    },
+    {
+      "ids" : [
+        "BAL-22",
+        "STR-53"
+      ],
+      "label" : "base#10"
+    },
+    {
+      "ids" : [
+        "FLX-27",
+        "STR-55"
+      ],
+      "label" : "base#11"
+    },
+    {
+      "ids" : [
+        "EYE-05",
+        "EYE-02"
+      ],
+      "label" : "base#12"
+    },
+    {
+      "ids" : [
+        "STR-20",
+        "CIR-12"
+      ],
+      "label" : "base#13"
+    },
+    {
+      "ids" : [
+        "STR-34",
+        "CIR-20"
+      ],
+      "label" : "base#14"
+    },
+    {
+      "ids" : [
+        "FLX-23"
+      ],
+      "label" : "base#15"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "BRE-02"
+      ],
+      "label" : "base#16"
+    },
+    {
+      "ids" : [
+        "BAL-24",
+        "STR-55"
+      ],
+      "label" : "base#17"
+    },
+    {
+      "ids" : [
+        "FLX-27",
+        "BAL-29"
+      ],
+      "label" : "base#18"
+    },
+    {
+      "ids" : [
+        "BAL-14"
+      ],
+      "label" : "base#19"
+    },
+    {
+      "ids" : [
+        "FLX-42"
+      ],
+      "label" : "base#20"
+    },
+    {
+      "ids" : [
+        "BAL-24",
+        "HWF-04"
+      ],
+      "label" : "base#21"
+    },
+    {
+      "ids" : [
+        "FLX-27",
+        "FLX-22"
+      ],
+      "label" : "base#22"
+    },
+    {
+      "ids" : [
+        "HWF-01"
+      ],
+      "label" : "base#23"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "FLX-21"
+      ],
+      "label" : "unavailable-floor#0"
+    },
+    {
+      "ids" : [
+        "FLX-31"
+      ],
+      "label" : "unavailable-floor#1"
+    },
+    {
+      "ids" : [
+        "FLX-14",
+        "HWF-05"
+      ],
+      "label" : "unavailable-floor#2"
+    },
+    {
+      "ids" : [
+        "FLX-01"
+      ],
+      "label" : "unavailable-floor#3"
+    },
+    {
+      "ids" : [
+        "BAL-11",
+        "BAL-29"
+      ],
+      "label" : "unavailable-floor#4"
+    },
+    {
+      "ids" : [
+        "BAL-20"
+      ],
+      "label" : "unavailable-floor#5"
+    },
+    {
+      "ids" : [
+        "BAL-01"
+      ],
+      "label" : "unavailable-floor#6"
+    },
+    {
+      "ids" : [
+        "STR-52",
+        "CIR-02"
+      ],
+      "label" : "unavailable-floor#7"
+    },
+    {
+      "ids" : [
+        "FLX-41"
+      ],
+      "label" : "unavailable-floor#8"
+    },
+    {
+      "ids" : [
+        "BAL-04",
+        "FLX-14"
+      ],
+      "label" : "unavailable-floor#9"
+    },
+    {
+      "ids" : [
+        "BAL-22",
+        "STR-53"
+      ],
+      "label" : "unavailable-floor#10"
+    },
+    {
+      "ids" : [
+        "FLX-27",
+        "STR-55"
+      ],
+      "label" : "unavailable-floor#11"
+    },
+    {
+      "ids" : [
+        "EYE-05",
+        "EYE-02"
+      ],
+      "label" : "unavailable-floor#12"
+    },
+    {
+      "ids" : [
+        "STR-20",
+        "CIR-12"
+      ],
+      "label" : "unavailable-floor#13"
+    },
+    {
+      "ids" : [
+        "STR-34",
+        "CIR-20"
+      ],
+      "label" : "unavailable-floor#14"
+    },
+    {
+      "ids" : [
+        "FLX-23"
+      ],
+      "label" : "unavailable-floor#15"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "BRE-02"
+      ],
+      "label" : "unavailable-floor#16"
+    },
+    {
+      "ids" : [
+        "BAL-24",
+        "STR-55"
+      ],
+      "label" : "unavailable-floor#17"
+    },
+    {
+      "ids" : [
+        "FLX-27",
+        "BAL-29"
+      ],
+      "label" : "unavailable-floor#18"
+    },
+    {
+      "ids" : [
+        "BAL-14"
+      ],
+      "label" : "unavailable-floor#19"
+    },
+    {
+      "ids" : [
+        "FLX-42"
+      ],
+      "label" : "unavailable-floor#20"
+    },
+    {
+      "ids" : [
+        "BAL-24",
+        "HWF-04"
+      ],
+      "label" : "unavailable-floor#21"
+    },
+    {
+      "ids" : [
+        "FLX-27",
+        "FLX-22"
+      ],
+      "label" : "unavailable-floor#22"
+    },
+    {
+      "ids" : [
+        "HWF-01"
+      ],
+      "label" : "unavailable-floor#23"
+    },
+    {
+      "ids" : [
+        "CIR-13",
+        "FLX-19"
+      ],
+      "label" : "unavailable-wall#0"
+    },
+    {
+      "ids" : [
+        "FLX-24",
+        "FLX-18"
+      ],
+      "label" : "unavailable-wall#1"
+    },
+    {
+      "ids" : [
+        "FLX-10"
+      ],
+      "label" : "unavailable-wall#2"
+    },
+    {
+      "ids" : [
+        "EYE-04",
+        "EYE-01"
+      ],
+      "label" : "unavailable-wall#3"
+    },
+    {
+      "ids" : [
+        "BAL-11",
+        "BAL-29"
+      ],
+      "label" : "unavailable-wall#4"
+    },
+    {
+      "ids" : [
+        "BAL-20"
+      ],
+      "label" : "unavailable-wall#5"
+    },
+    {
+      "ids" : [
+        "BAL-01"
+      ],
+      "label" : "unavailable-wall#6"
+    },
+    {
+      "ids" : [
+        "STR-52",
+        "CIR-02"
+      ],
+      "label" : "unavailable-wall#7"
+    },
+    {
+      "ids" : [
+        "FLX-39"
+      ],
+      "label" : "unavailable-wall#8"
+    },
+    {
+      "ids" : [
+        "BAL-04",
+        "EYE-05"
+      ],
+      "label" : "unavailable-wall#9"
+    },
+    {
+      "ids" : [
+        "BAL-22",
+        "STR-53"
+      ],
+      "label" : "unavailable-wall#10"
+    },
+    {
+      "ids" : [
+        "FLX-23"
+      ],
+      "label" : "unavailable-wall#11"
+    },
+    {
+      "ids" : [
+        "EYE-03",
+        "EYE-02"
+      ],
+      "label" : "unavailable-wall#12"
+    },
+    {
+      "ids" : [
+        "STR-20",
+        "CIR-12"
+      ],
+      "label" : "unavailable-wall#13"
+    },
+    {
+      "ids" : [
+        "STR-34",
+        "CIR-16"
+      ],
+      "label" : "unavailable-wall#14"
+    },
+    {
+      "ids" : [
+        "FLX-22",
+        "STR-52"
+      ],
+      "label" : "unavailable-wall#15"
+    },
+    {
+      "ids" : [
+        "CIR-07",
+        "BRE-02"
+      ],
+      "label" : "unavailable-wall#16"
+    },
+    {
+      "ids" : [
+        "BAL-23"
+      ],
+      "label" : "unavailable-wall#17"
+    },
+    {
+      "ids" : [
+        "FLX-23"
+      ],
+      "label" : "unavailable-wall#18"
+    },
+    {
+      "ids" : [
+        "BAL-14"
+      ],
+      "label" : "unavailable-wall#19"
+    },
+    {
+      "ids" : [
+        "FLX-40"
+      ],
+      "label" : "unavailable-wall#20"
+    },
+    {
+      "ids" : [
+        "BAL-23"
+      ],
+      "label" : "unavailable-wall#21"
+    },
+    {
+      "ids" : [
+        "FLX-23"
+      ],
+      "label" : "unavailable-wall#22"
+    },
+    {
+      "ids" : [
+        "FLX-43"
+      ],
+      "label" : "unavailable-wall#23"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "FLX-21"
+      ],
+      "label" : "unavailable-stairs#0"
+    },
+    {
+      "ids" : [
+        "FLX-31"
+      ],
+      "label" : "unavailable-stairs#1"
+    },
+    {
+      "ids" : [
+        "FLX-14",
+        "HWF-05"
+      ],
+      "label" : "unavailable-stairs#2"
+    },
+    {
+      "ids" : [
+        "FLX-01"
+      ],
+      "label" : "unavailable-stairs#3"
+    },
+    {
+      "ids" : [
+        "BAL-11",
+        "BAL-29"
+      ],
+      "label" : "unavailable-stairs#4"
+    },
+    {
+      "ids" : [
+        "BAL-20"
+      ],
+      "label" : "unavailable-stairs#5"
+    },
+    {
+      "ids" : [
+        "BAL-01"
+      ],
+      "label" : "unavailable-stairs#6"
+    },
+    {
+      "ids" : [
+        "STR-52",
+        "CIR-02"
+      ],
+      "label" : "unavailable-stairs#7"
+    },
+    {
+      "ids" : [
+        "FLX-41"
+      ],
+      "label" : "unavailable-stairs#8"
+    },
+    {
+      "ids" : [
+        "BAL-04",
+        "FLX-14"
+      ],
+      "label" : "unavailable-stairs#9"
+    },
+    {
+      "ids" : [
+        "BAL-22",
+        "STR-53"
+      ],
+      "label" : "unavailable-stairs#10"
+    },
+    {
+      "ids" : [
+        "FLX-27",
+        "STR-55"
+      ],
+      "label" : "unavailable-stairs#11"
+    },
+    {
+      "ids" : [
+        "EYE-05",
+        "EYE-02"
+      ],
+      "label" : "unavailable-stairs#12"
+    },
+    {
+      "ids" : [
+        "STR-20",
+        "CIR-12"
+      ],
+      "label" : "unavailable-stairs#13"
+    },
+    {
+      "ids" : [
+        "STR-34",
+        "CIR-20"
+      ],
+      "label" : "unavailable-stairs#14"
+    },
+    {
+      "ids" : [
+        "FLX-23"
+      ],
+      "label" : "unavailable-stairs#15"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "BRE-02"
+      ],
+      "label" : "unavailable-stairs#16"
+    },
+    {
+      "ids" : [
+        "BAL-24",
+        "STR-55"
+      ],
+      "label" : "unavailable-stairs#17"
+    },
+    {
+      "ids" : [
+        "FLX-27",
+        "BAL-29"
+      ],
+      "label" : "unavailable-stairs#18"
+    },
+    {
+      "ids" : [
+        "BAL-14"
+      ],
+      "label" : "unavailable-stairs#19"
+    },
+    {
+      "ids" : [
+        "FLX-42"
+      ],
+      "label" : "unavailable-stairs#20"
+    },
+    {
+      "ids" : [
+        "BAL-24",
+        "HWF-04"
+      ],
+      "label" : "unavailable-stairs#21"
+    },
+    {
+      "ids" : [
+        "FLX-27",
+        "FLX-22"
+      ],
+      "label" : "unavailable-stairs#22"
+    },
+    {
+      "ids" : [
+        "HWF-01"
+      ],
+      "label" : "unavailable-stairs#23"
+    },
+    {
+      "ids" : [
+        "CIR-13",
+        "FLX-19"
+      ],
+      "label" : "unavailable-all#0"
+    },
+    {
+      "ids" : [
+        "FLX-24",
+        "FLX-18"
+      ],
+      "label" : "unavailable-all#1"
+    },
+    {
+      "ids" : [
+        "FLX-10"
+      ],
+      "label" : "unavailable-all#2"
+    },
+    {
+      "ids" : [
+        "EYE-04",
+        "EYE-01"
+      ],
+      "label" : "unavailable-all#3"
+    },
+    {
+      "ids" : [
+        "BAL-11",
+        "BAL-29"
+      ],
+      "label" : "unavailable-all#4"
+    },
+    {
+      "ids" : [
+        "BAL-20"
+      ],
+      "label" : "unavailable-all#5"
+    },
+    {
+      "ids" : [
+        "BAL-01"
+      ],
+      "label" : "unavailable-all#6"
+    },
+    {
+      "ids" : [
+        "STR-52",
+        "CIR-02"
+      ],
+      "label" : "unavailable-all#7"
+    },
+    {
+      "ids" : [
+        "FLX-39"
+      ],
+      "label" : "unavailable-all#8"
+    },
+    {
+      "ids" : [
+        "BAL-04",
+        "EYE-05"
+      ],
+      "label" : "unavailable-all#9"
+    },
+    {
+      "ids" : [
+        "BAL-22",
+        "STR-53"
+      ],
+      "label" : "unavailable-all#10"
+    },
+    {
+      "ids" : [
+        "FLX-23"
+      ],
+      "label" : "unavailable-all#11"
+    },
+    {
+      "ids" : [
+        "EYE-03",
+        "EYE-02"
+      ],
+      "label" : "unavailable-all#12"
+    },
+    {
+      "ids" : [
+        "STR-20",
+        "CIR-12"
+      ],
+      "label" : "unavailable-all#13"
+    },
+    {
+      "ids" : [
+        "STR-34",
+        "CIR-16"
+      ],
+      "label" : "unavailable-all#14"
+    },
+    {
+      "ids" : [
+        "FLX-22",
+        "STR-52"
+      ],
+      "label" : "unavailable-all#15"
+    },
+    {
+      "ids" : [
+        "CIR-07",
+        "BRE-02"
+      ],
+      "label" : "unavailable-all#16"
+    },
+    {
+      "ids" : [
+        "BAL-23"
+      ],
+      "label" : "unavailable-all#17"
+    },
+    {
+      "ids" : [
+        "FLX-23"
+      ],
+      "label" : "unavailable-all#18"
+    },
+    {
+      "ids" : [
+        "BAL-14"
+      ],
+      "label" : "unavailable-all#19"
+    },
+    {
+      "ids" : [
+        "FLX-40"
+      ],
+      "label" : "unavailable-all#20"
+    },
+    {
+      "ids" : [
+        "BAL-23"
+      ],
+      "label" : "unavailable-all#21"
+    },
+    {
+      "ids" : [
+        "FLX-23"
+      ],
+      "label" : "unavailable-all#22"
+    },
+    {
+      "ids" : [
+        "FLX-43"
+      ],
+      "label" : "unavailable-all#23"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "FLX-21"
+      ],
+      "label" : "equipment-all#0"
+    },
+    {
+      "ids" : [
+        "FLX-31"
+      ],
+      "label" : "equipment-all#1"
+    },
+    {
+      "ids" : [
+        "FLX-14",
+        "HWF-05"
+      ],
+      "label" : "equipment-all#2"
+    },
+    {
+      "ids" : [
+        "FLX-01"
+      ],
+      "label" : "equipment-all#3"
+    },
+    {
+      "ids" : [
+        "BAL-11",
+        "BAL-29"
+      ],
+      "label" : "equipment-all#4"
+    },
+    {
+      "ids" : [
+        "BAL-20"
+      ],
+      "label" : "equipment-all#5"
+    },
+    {
+      "ids" : [
+        "BAL-01"
+      ],
+      "label" : "equipment-all#6"
+    },
+    {
+      "ids" : [
+        "STR-52",
+        "CIR-02"
+      ],
+      "label" : "equipment-all#7"
+    },
+    {
+      "ids" : [
+        "FLX-41"
+      ],
+      "label" : "equipment-all#8"
+    },
+    {
+      "ids" : [
+        "BAL-04",
+        "FLX-14"
+      ],
+      "label" : "equipment-all#9"
+    },
+    {
+      "ids" : [
+        "BAL-22",
+        "STR-53"
+      ],
+      "label" : "equipment-all#10"
+    },
+    {
+      "ids" : [
+        "FLX-27",
+        "STR-55"
+      ],
+      "label" : "equipment-all#11"
+    },
+    {
+      "ids" : [
+        "EYE-05",
+        "EYE-02"
+      ],
+      "label" : "equipment-all#12"
+    },
+    {
+      "ids" : [
+        "STR-20",
+        "CIR-12"
+      ],
+      "label" : "equipment-all#13"
+    },
+    {
+      "ids" : [
+        "STR-34",
+        "CIR-20"
+      ],
+      "label" : "equipment-all#14"
+    },
+    {
+      "ids" : [
+        "FLX-23"
+      ],
+      "label" : "equipment-all#15"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "BRE-02"
+      ],
+      "label" : "equipment-all#16"
+    },
+    {
+      "ids" : [
+        "BAL-24",
+        "STR-55"
+      ],
+      "label" : "equipment-all#17"
+    },
+    {
+      "ids" : [
+        "FLX-27",
+        "BAL-29"
+      ],
+      "label" : "equipment-all#18"
+    },
+    {
+      "ids" : [
+        "BAL-14"
+      ],
+      "label" : "equipment-all#19"
+    },
+    {
+      "ids" : [
+        "FLX-42"
+      ],
+      "label" : "equipment-all#20"
+    },
+    {
+      "ids" : [
+        "BAL-24",
+        "HWF-04"
+      ],
+      "label" : "equipment-all#21"
+    },
+    {
+      "ids" : [
+        "FLX-27",
+        "FLX-22"
+      ],
+      "label" : "equipment-all#22"
+    },
+    {
+      "ids" : [
+        "HWF-01"
+      ],
+      "label" : "equipment-all#23"
+    },
+    {
+      "ids" : [
+        "CIR-13",
+        "FLX-19"
+      ],
+      "label" : "excluded-every-fifth#0"
+    },
+    {
+      "ids" : [
+        "FLX-27",
+        "FLX-19"
+      ],
+      "label" : "excluded-every-fifth#1"
+    },
+    {
+      "ids" : [
+        "FLX-18",
+        "HWF-03"
+      ],
+      "label" : "excluded-every-fifth#2"
+    },
+    {
+      "ids" : [
+        "EYE-04",
+        "EYE-02"
+      ],
+      "label" : "excluded-every-fifth#3"
+    },
+    {
+      "ids" : [
+        "BAL-17"
+      ],
+      "label" : "excluded-every-fifth#4"
+    },
+    {
+      "ids" : [
+        "BAL-22",
+        "CIR-11"
+      ],
+      "label" : "excluded-every-fifth#5"
+    },
+    {
+      "ids" : [
+        "BAL-04",
+        "HWF-08"
+      ],
+      "label" : "excluded-every-fifth#6"
+    },
+    {
+      "ids" : [
+        "STR-52",
+        "CIR-02"
+      ],
+      "label" : "excluded-every-fifth#7"
+    },
+    {
+      "ids" : [
+        "FLX-39"
+      ],
+      "label" : "excluded-every-fifth#8"
+    },
+    {
+      "ids" : [
+        "BAL-14"
+      ],
+      "label" : "excluded-every-fifth#9"
+    },
+    {
+      "ids" : [
+        "BAL-22",
+        "STR-53"
+      ],
+      "label" : "excluded-every-fifth#10"
+    },
+    {
+      "ids" : [
+        "FLX-27",
+        "STR-57"
+      ],
+      "label" : "excluded-every-fifth#11"
+    },
+    {
+      "ids" : [
+        "EYE-04",
+        "EYE-02"
+      ],
+      "label" : "excluded-every-fifth#12"
+    },
+    {
+      "ids" : [
+        "STR-11",
+        "CIR-12"
+      ],
+      "label" : "excluded-every-fifth#13"
+    },
+    {
+      "ids" : [
+        "STR-31",
+        "CIR-16"
+      ],
+      "label" : "excluded-every-fifth#14"
+    },
+    {
+      "ids" : [
+        "FLX-23"
+      ],
+      "label" : "excluded-every-fifth#15"
+    },
+    {
+      "ids" : [
+        "CIR-07",
+        "BRE-03"
+      ],
+      "label" : "excluded-every-fifth#16"
+    },
+    {
+      "ids" : [
+        "BAL-23"
+      ],
+      "label" : "excluded-every-fifth#17"
+    },
+    {
+      "ids" : [
+        "FLX-24",
+        "BAL-29"
+      ],
+      "label" : "excluded-every-fifth#18"
+    },
+    {
+      "ids" : [
+        "BAL-17"
+      ],
+      "label" : "excluded-every-fifth#19"
+    },
+    {
+      "ids" : [
+        "FLX-41"
+      ],
+      "label" : "excluded-every-fifth#20"
+    },
+    {
+      "ids" : [
+        "BAL-23"
+      ],
+      "label" : "excluded-every-fifth#21"
+    },
+    {
+      "ids" : [
+        "FLX-24",
+        "FLX-19"
+      ],
+      "label" : "excluded-every-fifth#22"
+    },
+    {
+      "ids" : [
+        "FLX-42"
+      ],
+      "label" : "excluded-every-fifth#23"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "FLX-19"
+      ],
+      "label" : "used-family-member#0"
+    },
+    {
+      "ids" : [
+        "FLX-31"
+      ],
+      "label" : "used-family-member#1"
+    },
+    {
+      "ids" : [
+        "FLX-14",
+        "HWF-05"
+      ],
+      "label" : "used-family-member#2"
+    },
+    {
+      "ids" : [
+        "EYE-05",
+        "EYE-01"
+      ],
+      "label" : "used-family-member#3"
+    },
+    {
+      "ids" : [
+        "BAL-11",
+        "BAL-29"
+      ],
+      "label" : "used-family-member#4"
+    },
+    {
+      "ids" : [
+        "BAL-20"
+      ],
+      "label" : "used-family-member#5"
+    },
+    {
+      "ids" : [
+        "BAL-01"
+      ],
+      "label" : "used-family-member#6"
+    },
+    {
+      "ids" : [
+        "STR-52",
+        "CIR-02"
+      ],
+      "label" : "used-family-member#7"
+    },
+    {
+      "ids" : [
+        "FLX-41"
+      ],
+      "label" : "used-family-member#8"
+    },
+    {
+      "ids" : [
+        "BAL-04",
+        "EYE-05"
+      ],
+      "label" : "used-family-member#9"
+    },
+    {
+      "ids" : [
+        "BAL-22",
+        "STR-53"
+      ],
+      "label" : "used-family-member#10"
+    },
+    {
+      "ids" : [
+        "FLX-27",
+        "STR-57"
+      ],
+      "label" : "used-family-member#11"
+    },
+    {
+      "ids" : [
+        "EYE-04",
+        "EYE-02"
+      ],
+      "label" : "used-family-member#12"
+    },
+    {
+      "ids" : [
+        "STR-20",
+        "CIR-12"
+      ],
+      "label" : "used-family-member#13"
+    },
+    {
+      "ids" : [
+        "STR-31",
+        "CIR-20"
+      ],
+      "label" : "used-family-member#14"
+    },
+    {
+      "ids" : [
+        "FLX-24",
+        "STR-52"
+      ],
+      "label" : "used-family-member#15"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "BRE-02"
+      ],
+      "label" : "used-family-member#16"
+    },
+    {
+      "ids" : [
+        "BAL-23"
+      ],
+      "label" : "used-family-member#17"
+    },
+    {
+      "ids" : [
+        "FLX-27",
+        "BAL-29"
+      ],
+      "label" : "used-family-member#18"
+    },
+    {
+      "ids" : [
+        "BAL-14"
+      ],
+      "label" : "used-family-member#19"
+    },
+    {
+      "ids" : [
+        "FLX-42"
+      ],
+      "label" : "used-family-member#20"
+    },
+    {
+      "ids" : [
+        "BAL-23"
+      ],
+      "label" : "used-family-member#21"
+    },
+    {
+      "ids" : [
+        "FLX-27",
+        "FLX-22"
+      ],
+      "label" : "used-family-member#22"
+    },
+    {
+      "ids" : [
+        "HWF-01"
+      ],
+      "label" : "used-family-member#23"
+    },
+    {
+      "ids" : [
+        "STR-56"
+      ],
+      "label" : "used-almost-all#0"
+    },
+    {
+      "ids" : [
+        "STR-57"
+      ],
+      "label" : "used-almost-all#1"
+    },
+    {
+      "ids" : [
+        "STR-57"
+      ],
+      "label" : "used-almost-all#2"
+    },
+    {
+      "ids" : [
+        "STR-56"
+      ],
+      "label" : "used-almost-all#3"
+    },
+    {
+      "ids" : [
+        "STR-56"
+      ],
+      "label" : "used-almost-all#4"
+    },
+    {
+      "ids" : [
+        "STR-56"
+      ],
+      "label" : "used-almost-all#5"
+    },
+    {
+      "ids" : [
+        "STR-56"
+      ],
+      "label" : "used-almost-all#6"
+    },
+    {
+      "ids" : [
+        "STR-57"
+      ],
+      "label" : "used-almost-all#7"
+    },
+    {
+      "ids" : [
+        "STR-57"
+      ],
+      "label" : "used-almost-all#8"
+    },
+    {
+      "ids" : [
+        "STR-56"
+      ],
+      "label" : "used-almost-all#9"
+    },
+    {
+      "ids" : [
+        "STR-56"
+      ],
+      "label" : "used-almost-all#10"
+    },
+    {
+      "ids" : [
+        "STR-57"
+      ],
+      "label" : "used-almost-all#11"
+    },
+    {
+      "ids" : [
+        "STR-56"
+      ],
+      "label" : "used-almost-all#12"
+    },
+    {
+      "ids" : [
+        "STR-57"
+      ],
+      "label" : "used-almost-all#13"
+    },
+    {
+      "ids" : [
+        "STR-57"
+      ],
+      "label" : "used-almost-all#14"
+    },
+    {
+      "ids" : [
+        "STR-57"
+      ],
+      "label" : "used-almost-all#15"
+    },
+    {
+      "ids" : [
+        "STR-56"
+      ],
+      "label" : "used-almost-all#16"
+    },
+    {
+      "ids" : [
+        "STR-56"
+      ],
+      "label" : "used-almost-all#17"
+    },
+    {
+      "ids" : [
+        "STR-57"
+      ],
+      "label" : "used-almost-all#18"
+    },
+    {
+      "ids" : [
+        "STR-56"
+      ],
+      "label" : "used-almost-all#19"
+    },
+    {
+      "ids" : [
+        "STR-57"
+      ],
+      "label" : "used-almost-all#20"
+    },
+    {
+      "ids" : [
+        "STR-56"
+      ],
+      "label" : "used-almost-all#21"
+    },
+    {
+      "ids" : [
+        "STR-57"
+      ],
+      "label" : "used-almost-all#22"
+    },
+    {
+      "ids" : [
+        "STR-57"
+      ],
+      "label" : "used-almost-all#23"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "FLX-21"
+      ],
+      "label" : "used-all#0"
+    },
+    {
+      "ids" : [
+        "FLX-31"
+      ],
+      "label" : "used-all#1"
+    },
+    {
+      "ids" : [
+        "FLX-14",
+        "HWF-05"
+      ],
+      "label" : "used-all#2"
+    },
+    {
+      "ids" : [
+        "FLX-01"
+      ],
+      "label" : "used-all#3"
+    },
+    {
+      "ids" : [
+        "BAL-11",
+        "BAL-29"
+      ],
+      "label" : "used-all#4"
+    },
+    {
+      "ids" : [
+        "BAL-20"
+      ],
+      "label" : "used-all#5"
+    },
+    {
+      "ids" : [
+        "BAL-01"
+      ],
+      "label" : "used-all#6"
+    },
+    {
+      "ids" : [
+        "STR-52",
+        "CIR-02"
+      ],
+      "label" : "used-all#7"
+    },
+    {
+      "ids" : [
+        "FLX-41"
+      ],
+      "label" : "used-all#8"
+    },
+    {
+      "ids" : [
+        "BAL-04",
+        "FLX-14"
+      ],
+      "label" : "used-all#9"
+    },
+    {
+      "ids" : [
+        "BAL-22",
+        "STR-53"
+      ],
+      "label" : "used-all#10"
+    },
+    {
+      "ids" : [
+        "FLX-27",
+        "STR-55"
+      ],
+      "label" : "used-all#11"
+    },
+    {
+      "ids" : [
+        "EYE-05",
+        "EYE-02"
+      ],
+      "label" : "used-all#12"
+    },
+    {
+      "ids" : [
+        "STR-20",
+        "CIR-12"
+      ],
+      "label" : "used-all#13"
+    },
+    {
+      "ids" : [
+        "STR-34",
+        "CIR-20"
+      ],
+      "label" : "used-all#14"
+    },
+    {
+      "ids" : [
+        "FLX-23"
+      ],
+      "label" : "used-all#15"
+    },
+    {
+      "ids" : [
+        "CIR-11",
+        "BRE-02"
+      ],
+      "label" : "used-all#16"
+    },
+    {
+      "ids" : [
+        "BAL-24",
+        "STR-55"
+      ],
+      "label" : "used-all#17"
+    },
+    {
+      "ids" : [
+        "FLX-27",
+        "BAL-29"
+      ],
+      "label" : "used-all#18"
+    },
+    {
+      "ids" : [
+        "BAL-14"
+      ],
+      "label" : "used-all#19"
+    },
+    {
+      "ids" : [
+        "FLX-42"
+      ],
+      "label" : "used-all#20"
+    },
+    {
+      "ids" : [
+        "BAL-24",
+        "HWF-04"
+      ],
+      "label" : "used-all#21"
+    },
+    {
+      "ids" : [
+        "FLX-27",
+        "FLX-22"
+      ],
+      "label" : "used-all#22"
+    },
+    {
+      "ids" : [
+        "HWF-01"
+      ],
+      "label" : "used-all#23"
+    },
+    {
+      "ids" : [
+        "EYE-01",
+        "FLX-22"
+      ],
+      "label" : "last-micro#0"
+    },
+    {
+      "ids" : [
+        "FLX-36",
+        "FLX-21"
+      ],
+      "label" : "last-micro#1"
+    },
+    {
+      "ids" : [
+        "FLX-19",
+        "HWF-06"
+      ],
+      "label" : "last-micro#2"
+    },
+    {
+      "ids" : [
+        "FLX-06"
+      ],
+      "label" : "last-micro#3"
+    },
+    {
+      "ids" : [
+        "BAL-17"
+      ],
+      "label" : "last-micro#4"
+    },
+    {
+      "ids" : [
+        "BAL-24",
+        "CIR-12"
+      ],
+      "label" : "last-micro#5"
+    },
+    {
+      "ids" : [
+        "BAL-11",
+        "STR-11"
+      ],
+      "label" : "last-micro#6"
+    },
+    {
+      "ids" : [
+        "STR-52",
+        "CIR-05"
+      ],
+      "label" : "last-micro#7"
+    },
+    {
+      "ids" : [
+        "FLX-43"
+      ],
+      "label" : "last-micro#8"
+    },
+    {
+      "ids" : [
+        "BAL-14"
+      ],
+      "label" : "last-micro#9"
+    },
+    {
+      "ids" : [
+        "BAL-24",
+        "STR-53"
+      ],
+      "label" : "last-micro#10"
+    },
+    {
+      "ids" : [
+        "FLX-36",
+        "STR-57"
+      ],
+      "label" : "last-micro#11"
+    },
+    {
+      "ids" : [
+        "FLX-05"
+      ],
+      "label" : "last-micro#12"
+    },
+    {
+      "ids" : [
+        "STR-31",
+        "CIR-15"
+      ],
+      "label" : "last-micro#13"
+    },
+    {
+      "ids" : [
+        "STR-34",
+        "EYE-01"
+      ],
+      "label" : "last-micro#14"
+    },
+    {
+      "ids" : [
+        "FLX-27",
+        "STR-52"
+      ],
+      "label" : "last-micro#15"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "CIR-01"
+      ],
+      "label" : "last-micro#16"
+    },
+    {
+      "ids" : [
+        "BAL-28",
+        "STR-55"
+      ],
+      "label" : "last-micro#17"
+    },
+    {
+      "ids" : [
+        "FLX-31"
+      ],
+      "label" : "last-micro#18"
+    },
+    {
+      "ids" : [
+        "BAL-18"
+      ],
+      "label" : "last-micro#19"
+    },
+    {
+      "ids" : [
+        "HWF-01"
+      ],
+      "label" : "last-micro#20"
+    },
+    {
+      "ids" : [
+        "BAL-28",
+        "HWF-04"
+      ],
+      "label" : "last-micro#21"
+    },
+    {
+      "ids" : [
+        "FLX-31"
+      ],
+      "label" : "last-micro#22"
+    },
+    {
+      "ids" : [
+        "HWF-02"
+      ],
+      "label" : "last-micro#23"
+    },
+    {
+      "ids" : [
+        "EYE-01",
+        "FLX-22"
+      ],
+      "label" : "next-full#0"
+    },
+    {
+      "ids" : [
+        "FLX-37",
+        "FLX-21"
+      ],
+      "label" : "next-full#1"
+    },
+    {
+      "ids" : [
+        "FLX-20"
+      ],
+      "label" : "next-full#2"
+    },
+    {
+      "ids" : [
+        "FLX-10"
+      ],
+      "label" : "next-full#3"
+    },
+    {
+      "ids" : [
+        "BAL-22",
+        "BAL-30"
+      ],
+      "label" : "next-full#4"
+    },
+    {
+      "ids" : [
+        "BAL-26",
+        "CIR-12"
+      ],
+      "label" : "next-full#5"
+    },
+    {
+      "ids" : [
+        "BAL-01"
+      ],
+      "label" : "next-full#6"
+    },
+    {
+      "ids" : [
+        "STR-52",
+        "CIR-04"
+      ],
+      "label" : "next-full#7"
+    },
+    {
+      "ids" : [
+        "FLX-43"
+      ],
+      "label" : "next-full#8"
+    },
+    {
+      "ids" : [
+        "BAL-04",
+        "FLX-14"
+      ],
+      "label" : "next-full#9"
+    },
+    {
+      "ids" : [
+        "BAL-26",
+        "STR-53"
+      ],
+      "label" : "next-full#10"
+    },
+    {
+      "ids" : [
+        "FLX-37",
+        "STR-57"
+      ],
+      "label" : "next-full#11"
+    },
+    {
+      "ids" : [
+        "FLX-06"
+      ],
+      "label" : "next-full#12"
+    },
+    {
+      "ids" : [
+        "STR-31",
+        "CIR-13"
+      ],
+      "label" : "next-full#13"
+    },
+    {
+      "ids" : [
+        "STR-35",
+        "EYE-01"
+      ],
+      "label" : "next-full#14"
+    },
+    {
+      "ids" : [
+        "FLX-31"
+      ],
+      "label" : "next-full#15"
+    },
+    {
+      "ids" : [
+        "CIR-15",
+        "BRE-03"
+      ],
+      "label" : "next-full#16"
+    },
+    {
+      "ids" : [
+        "BAL-29",
+        "STR-55"
+      ],
+      "label" : "next-full#17"
+    },
+    {
+      "ids" : [
+        "FLX-36",
+        "BAL-30"
+      ],
+      "label" : "next-full#18"
+    },
+    {
+      "ids" : [
+        "BAL-23"
+      ],
+      "label" : "next-full#19"
+    },
+    {
+      "ids" : [
+        "HWF-01"
+      ],
+      "label" : "next-full#20"
+    },
+    {
+      "ids" : [
+        "BAL-29",
+        "HWF-04"
+      ],
+      "label" : "next-full#21"
+    },
+    {
+      "ids" : [
+        "FLX-36",
+        "FLX-22"
+      ],
+      "label" : "next-full#22"
+    },
+    {
+      "ids" : [
+        "HWF-02"
+      ],
+      "label" : "next-full#23"
+    },
+    {
+      "ids" : [
+        "FLX-10"
+      ],
+      "label" : "recency#0"
+    },
+    {
+      "ids" : [
+        "FLX-43"
+      ],
+      "label" : "recency#1"
+    },
+    {
+      "ids" : [
+        "FLX-27",
+        "HWF-11"
+      ],
+      "label" : "recency#2"
+    },
+    {
+      "ids" : [
+        "FLX-22",
+        "FLX-18"
+      ],
+      "label" : "recency#3"
+    },
+    {
+      "ids" : [
+        "BAL-28",
+        "CIR-07"
+      ],
+      "label" : "recency#4"
+    },
+    {
+      "ids" : [
+        "CIR-05",
+        "EYE-03"
+      ],
+      "label" : "recency#5"
+    },
+    {
+      "ids" : [
+        "BAL-01"
+      ],
+      "label" : "recency#6"
+    },
+    {
+      "ids" : [
+        "STR-53",
+        "CIR-16"
+      ],
+      "label" : "recency#7"
+    },
+    {
+      "ids" : [
+        "HWF-04",
+        "FLX-37"
+      ],
+      "label" : "recency#8"
+    },
+    {
+      "ids" : [
+        "BAL-23"
+      ],
+      "label" : "recency#9"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "STR-55"
+      ],
+      "label" : "recency#10"
+    },
+    {
+      "ids" : [
+        "FLX-42"
+      ],
+      "label" : "recency#11"
+    },
+    {
+      "ids" : [
+        "FLX-21",
+        "FLX-22"
+      ],
+      "label" : "recency#12"
+    },
+    {
+      "ids" : [
+        "STR-35",
+        "EYE-04"
+      ],
+      "label" : "recency#13"
+    },
+    {
+      "ids" : [
+        "STR-48"
+      ],
+      "label" : "recency#14"
+    },
+    {
+      "ids" : [
+        "FLX-41"
+      ],
+      "label" : "recency#15"
+    },
+    {
+      "ids" : [
+        "FLX-05"
+      ],
+      "label" : "recency#16"
+    },
+    {
+      "ids" : [
+        "CIR-07",
+        "STR-55"
+      ],
+      "label" : "recency#17"
+    },
+    {
+      "ids" : [
+        "FLX-42"
+      ],
+      "label" : "recency#18"
+    },
+    {
+      "ids" : [
+        "BAL-29",
+        "EYE-02"
+      ],
+      "label" : "recency#19"
+    },
+    {
+      "ids" : [
+        "HWF-05",
+        "EYE-05"
+      ],
+      "label" : "recency#20"
+    },
+    {
+      "ids" : [
+        "CIR-07",
+        "HWF-07"
+      ],
+      "label" : "recency#21"
+    },
+    {
+      "ids" : [
+        "FLX-42"
+      ],
+      "label" : "recency#22"
+    },
+    {
+      "ids" : [
+        "HWF-06",
+        "HWF-07"
+      ],
+      "label" : "recency#23"
+    },
+    {
+      "ids" : [
+        "FLX-06"
+      ],
+      "label" : "mixed#0"
+    },
+    {
+      "ids" : [
+        "FLX-39"
+      ],
+      "label" : "mixed#1"
+    },
+    {
+      "ids" : [
+        "FLX-24",
+        "HWF-04"
+      ],
+      "label" : "mixed#2"
+    },
+    {
+      "ids" : [
+        "FLX-22",
+        "EYE-04"
+      ],
+      "label" : "mixed#3"
+    },
+    {
+      "ids" : [
+        "BAL-29",
+        "CIR-07"
+      ],
+      "label" : "mixed#4"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "EYE-02"
+      ],
+      "label" : "mixed#5"
+    },
+    {
+      "ids" : [
+        "BAL-22",
+        "HWF-07"
+      ],
+      "label" : "mixed#6"
+    },
+    {
+      "ids" : [
+        "STR-53",
+        "CIR-13"
+      ],
+      "label" : "mixed#7"
+    },
+    {
+      "ids" : [
+        "HWF-02"
+      ],
+      "label" : "mixed#8"
+    },
+    {
+      "ids" : [
+        "BAL-28",
+        "FLX-19"
+      ],
+      "label" : "mixed#9"
+    },
+    {
+      "ids" : [
+        "CIR-06",
+        "STR-53"
+      ],
+      "label" : "mixed#10"
+    },
+    {
+      "ids" : [
+        "FLX-39"
+      ],
+      "label" : "mixed#11"
+    },
+    {
+      "ids" : [
+        "FLX-22",
+        "FLX-14"
+      ],
+      "label" : "mixed#12"
+    },
+    {
+      "ids" : [
+        "STR-48"
+      ],
+      "label" : "mixed#13"
+    },
+    {
+      "ids" : [
+        "STR-51",
+        "EYE-04"
+      ],
+      "label" : "mixed#14"
+    },
+    {
+      "ids" : [
+        "FLX-37",
+        "STR-53"
+      ],
+      "label" : "mixed#15"
+    },
+    {
+      "ids" : [
+        "EYE-04",
+        "CIR-11"
+      ],
+      "label" : "mixed#16"
+    },
+    {
+      "ids" : [
+        "CIR-07",
+        "STR-57"
+      ],
+      "label" : "mixed#17"
+    },
+    {
+      "ids" : [
+        "FLX-39"
+      ],
+      "label" : "mixed#18"
+    },
+    {
+      "ids" : [
+        "BAL-30",
+        "EYE-01"
+      ],
+      "label" : "mixed#19"
+    },
+    {
+      "ids" : [
+        "HWF-03",
+        "EYE-03"
+      ],
+      "label" : "mixed#20"
+    },
+    {
+      "ids" : [
+        "CIR-07",
+        "HWF-03"
+      ],
+      "label" : "mixed#21"
+    },
+    {
+      "ids" : [
+        "FLX-39"
+      ],
+      "label" : "mixed#22"
+    },
+    {
+      "ids" : [
+        "HWF-03",
+        "FLX-37"
+      ],
+      "label" : "mixed#23"
+    }
+  ]
+}

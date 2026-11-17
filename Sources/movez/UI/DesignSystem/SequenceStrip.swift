@@ -13,6 +13,12 @@ struct StripItem: Equatable, Identifiable {
     var state: State
     /// For a per-side block in progress: 0 while the left half runs, 1 once the right does.
     var sideIndex: Int?
+    /// The column's top line in place of its number: a strength break labels its columns
+    /// "Warm-up", "Set 1" and so on, and puts the move under the label.
+    var title: String?
+
+    /// What the column's top line reads.
+    var heading: String { title ?? "\(number)" }
 
     var id: Int { number }
 }
@@ -22,6 +28,9 @@ struct SequenceStrip: View {
     var items: [StripItem]
     /// The end state paints every column accent, with nothing struck through.
     var allAccent = false
+    /// One line per name, cut with an ellipsis, as a strength break's strip is drawn. The Movement
+    /// strip keeps its two lines that shrink, so its screens stay as they were.
+    var truncatesNames = false
 
     var body: some View {
         HStack(alignment: .top, spacing: Tokens.Metric.stripGap) {
@@ -36,7 +45,7 @@ struct SequenceStrip: View {
     private func column(_ item: StripItem) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             rule(for: item)
-            MovezText("\(item.number)", MovezType.stripNumber, color: numberColor(item))
+            MovezText(item.heading, MovezType.stripNumber, color: numberColor(item), lineLimit: truncatesNames ? 1 : nil)
             name(item)
         }
         .accessibilityElement(children: .ignore)
@@ -45,7 +54,8 @@ struct SequenceStrip: View {
 
     /// "March in place, block 1 of 4, current" — read from standing distance, or not at all.
     func announcement(for item: StripItem) -> String {
-        var parts = ["\(item.name), block \(item.number) of \(items.count)"]
+        let label = item.title.map { "\($0), \(item.name)" } ?? item.name
+        var parts = ["\(label), block \(item.number) of \(items.count)"]
         switch item.state {
         case .current: parts.append("current")
         case .done: parts.append("done")
@@ -81,8 +91,11 @@ struct SequenceStrip: View {
 
     @ViewBuilder
     private func name(_ item: StripItem) -> some View {
-        // Two lines, then smaller type, and never an ellipsis: the column is a quarter of the card.
-        let text = MovezText(item.name, MovezType.stripName, color: numberColor(item), lineLimit: 2, minimumScaleFactor: 0.7)
+        // Movement: two lines, then smaller type, and never an ellipsis, since the column is a
+        // quarter of the card. Strength: one line and an ellipsis, as its design asks.
+        let text = truncatesNames
+            ? MovezText(item.name, MovezType.stripName, color: numberColor(item), lineLimit: 1)
+            : MovezText(item.name, MovezType.stripName, color: numberColor(item), lineLimit: 2, minimumScaleFactor: 0.7)
         if item.state == .done, !allAccent {
             text.strikethrough(true, color: Tokens.text3.color)
         } else {

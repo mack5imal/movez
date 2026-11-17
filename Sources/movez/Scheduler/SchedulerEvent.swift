@@ -43,6 +43,10 @@ enum SchedulerEvent: Equatable {
 
     // Settings and toasts
     case settingsChanged(SchedulerConfig)
+    /// How long the next full break is planned to run, which the coordinator knows and the
+    /// scheduler does not: it never looks inside a break, and the breaks of different modes run
+    /// for different lengths. Sets `SchedulerConfig.breakSeconds` and nothing else.
+    case breakLength(seconds: Int)
     case toastReverse(ToastReversal)
 }
 

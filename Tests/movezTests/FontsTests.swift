@@ -9,7 +9,7 @@ final class FontsTests: XCTestCase {
     }
 
     func testEveryTextStyleResolvesToManrope() {
-        XCTAssertEqual(MovezType.all.count, 33)
+        XCTAssertEqual(MovezType.all.count, 44)
         for entry in MovezType.all {
             let font = entry.style.nsFont
             XCTAssertEqual(font.familyName, "Manrope", "\(entry.name) fell back to \(font.familyName ?? "nil")")

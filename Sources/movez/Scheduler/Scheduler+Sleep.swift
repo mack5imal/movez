@@ -143,7 +143,7 @@ extension Scheduler {
 
         let resumedStart = now.addingTimeInterval(-Double(interrupted.elapsedSeconds))
         transition(to: .fullBreak(startedAt: resumedStart), reason: "break resumed after wake", at: now)
-        let plan = BreakPlan(startedAt: resumedStart, seconds: config.breakSeconds)
+        let plan = BreakPlan(startedAt: resumedStart, seconds: config.breakSeconds, resumed: true)
         return [.startFullBreak(plan), .persist, .menuRefresh]
     }
 

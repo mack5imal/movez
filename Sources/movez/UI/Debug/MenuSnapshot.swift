@@ -8,9 +8,9 @@ struct MenuSnapshot: View {
     var pendingNotice = false
 
     /// The light desktop the handoff draws its menus over.
-    private static let desktop = MovezColor(hex: 0xD9D6_CF)
-    private static let bar = MovezColor(hex: 0xF2F0_EA)
-    private static let barInk = MovezColor(hex: 0x2A30_35)
+    private static let desktop = Tokens.Backdrop.menuDesktop
+    private static let bar = Tokens.Backdrop.lightBar
+    private static let barInk = Tokens.Backdrop.lightBarInk
 
     private static let barHeight: CGFloat = 26
 
@@ -40,8 +40,8 @@ struct MenuSnapshot: View {
     private var menuBar: some View {
         ZStack(alignment: .trailing) {
             Self.bar.color
-            HStack(spacing: 6) {
-                Image(nsImage: MenuBarIcon.image(for: state, size: 12))
+            HStack(spacing: MenuIconSheet.labelGap) {
+                Image(nsImage: MenuBarIcon.image(for: state))
                     .renderingMode(.template)
                 if !state.labelText.isEmpty {
                     MovezText(state.labelText, MovezType.menuSecondary, color: Self.barInk)
@@ -64,6 +64,9 @@ struct MenuIconStrip: View {
         var label: String
     }
 
+    /// The mode whose glyph sits in the circle.
+    var definition: ModeDefinition = BreakMode.fallback.definition
+
     static let samples: [Sample] = [
         Sample(mode: .sitting, fraction: 0, caption: "fresh bout", label: "55m"),
         Sample(mode: .sitting, fraction: 0.42, caption: "42% elapsed", label: "32m"),
@@ -73,14 +76,19 @@ struct MenuIconStrip: View {
         Sample(mode: .offHours, fraction: 0, caption: "off hours", label: "")
     ]
 
-    /// Drawn at four times the menu bar's 12 pt so the arc is actually judgeable.
-    static let drawSize: CGFloat = 48
+    /// Drawn well above the menu bar's 18 pt so the arc and the glyph are actually judgeable.
+    static let drawSize: CGFloat = 54
 
     var body: some View {
         HStack(alignment: .top, spacing: 40) {
             ForEach(Self.samples) { sample in
                 VStack(spacing: 14) {
-                    Image(nsImage: MenuBarIcon.image(mode: sample.mode, fraction: sample.fraction, size: Self.drawSize))
+                    Image(nsImage: MenuBarIcon.image(
+                        mode: sample.mode,
+                        fraction: sample.fraction,
+                        glyph: ModeGlyph.menuBar(for: definition),
+                        size: Self.drawSize
+                    ))
                         .renderingMode(.template)
                         .foregroundStyle(Tokens.text.color)
                         .frame(width: Self.drawSize, height: Self.drawSize)

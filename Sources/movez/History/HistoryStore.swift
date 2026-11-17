@@ -34,6 +34,16 @@ enum BreakResult: String, Codable, Equatable, CaseIterable {
     }
 }
 
+/// What kind of full break a record was, which the strength day planner reads back to decide the
+/// day's letter and whether the next break is a strength or an end-range one. The raw values are
+/// what the history file stores, so a case is never renamed.
+enum BreakKind: String, Codable, Equatable, CaseIterable {
+    case movement
+    case strengthA
+    case strengthB
+    case endRange
+}
+
 /// One break, as it happened.
 struct BreakRecord: Codable, Equatable, Identifiable {
     /// What every full break is recorded as, now that routines have no names. The field keeps its
@@ -45,8 +55,13 @@ struct BreakRecord: Codable, Equatable, Identifiable {
     var outcome: BreakResult
     var completedBlocks: Int
     var totalBlocks: Int
+    /// Optional so that every record written before strength mode existed still decodes; such a
+    /// record was always a movement break, which is what `breakKind` reads it as.
+    var kind: BreakKind?
 
     var id: String { "\(at.timeIntervalSince1970)-\(routineName)" }
+
+    var breakKind: BreakKind { kind ?? .movement }
 }
 
 /// A day the user actually used movez on, and what it came to.

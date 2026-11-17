@@ -40,6 +40,8 @@ targets:
         buildPhase: resources
       - path: movement-library-v4.json
         buildPhase: resources
+      - path: strength-library-v1.json
+        buildPhase: resources
       - path: HEALTH_AND_SAFETY.md
         buildPhase: resources
     settings:
@@ -79,6 +81,9 @@ targets:
     platform: macOS
     sources:
       - path: Tests/movezTests
+        # The golden fixture is read through #filePath, so it is no bundle resource.
+        excludes:
+          - "Fixtures/**"
     dependencies:
       - target: movez
     settings:

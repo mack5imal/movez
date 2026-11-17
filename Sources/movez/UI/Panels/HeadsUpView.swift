@@ -1,5 +1,8 @@
 import SwiftUI
 
+// design: headsup
+// design: strength-headsup
+
 /// The minute before a break: a 64 pt disc draining beside three lines of text, and the three
 /// things the user may do about it.
 struct HeadsUpView: View {
@@ -29,8 +32,15 @@ struct HeadsUpView: View {
 }
 
 /// The disc-and-text row every panel opens with.
+///
+/// The eyebrow is the mode badge, so every panel names its mode by glyph and word. A running
+/// strength micro-break adds its dose under the move's name, in accent like the overlay's.
 struct PanelHeader: View {
     @ObservedObject var viewModel: PanelViewModel
+
+    /// The dose line's look, which the tests hold to the design's `panel-dose`.
+    static let doseStyle = MovezType.panelDose
+    static let doseColor = Tokens.accent
 
     var body: some View {
         HStack(alignment: .top, spacing: 14) {
@@ -43,9 +53,18 @@ struct PanelHeader: View {
             )
 
             VStack(alignment: .leading, spacing: 5) {
-                MovezText(viewModel.eyebrow, MovezType.eyebrowPanel, color: Tokens.accent)
+                if let label = viewModel.eyebrowLabel {
+                    ModeBadge(definition: viewModel.modeDefinition, size: .panel, label: label)
+                }
                 MovezText(viewModel.title, MovezType.panelTitle)
                     .fixedSize(horizontal: false, vertical: true)
+                if let dose = viewModel.microDose {
+                    MovezText(dose.line, Self.doseStyle, color: Self.doseColor)
+                        .fixedSize(horizontal: false, vertical: true)
+                    if let modifier = dose.modifier {
+                        MovezText(modifier, MovezType.panelBody, color: Tokens.text, lineLimit: 1)
+                    }
+                }
                 MovezText(viewModel.body, MovezType.panelBody, color: Tokens.text2)
                     .fixedSize(horizontal: false, vertical: true)
             }

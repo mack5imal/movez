@@ -78,10 +78,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     /// coordinator does not exist yet. A library or notice that will not load is fatal and loud.
     private func launch() {
         guard let library = Launch.loadLibrary(presenter: fatalPresenter),
+              let strengthLibrary = Launch.loadStrengthLibrary(movementLibrary: library, presenter: fatalPresenter),
               let notice = Launch.loadNotice(presenter: fatalPresenter) else { return }
         let settings = SettingsStore()
         guard NoticeAcceptance.isNeeded(acceptedVersion: settings.acceptedNoticeVersion, notice: notice) else {
-            startCoordinator(library: library, notice: notice, settings: settings)
+            startCoordinator(library: library, strengthLibrary: strengthLibrary, notice: notice, settings: settings)
             return
         }
         awaitingNotice = true
@@ -93,7 +94,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
                 guard let self else { return }
                 noticeWindow.close()
                 awaitingNotice = false
-                startCoordinator(library: library, notice: notice, settings: settings)
+                startCoordinator(library: library, strengthLibrary: strengthLibrary, notice: notice, settings: settings)
             },
             onQuit: { NSApp.terminate(nil) }
         ))
@@ -105,11 +106,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     }
 
     /// Builds the coordinator from the bundled library and the user's saved state.
-    private func startCoordinator(library: MovementLibrary, notice: HealthNotice, settings: SettingsStore) {
+    private func startCoordinator(
+        library: MovementLibrary,
+        strengthLibrary: StrengthLibrary,
+        notice: HealthNotice,
+        settings: SettingsStore
+    ) {
         let historyStore = try? FileHistoryStore.historyFile()
         let snapshotStore = try? FileSnapshotStore.stateFile()
         let coordinator = AppCoordinator(
             library: library,
+            strengthLibrary: strengthLibrary,
             settings: settings,
             history: historyStore.map { HistoryStore(store: $0) } ?? HistoryStore(),
             clock: SystemClock(),
@@ -124,6 +131,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
         let settingsViewModel = SettingsViewModel(
             settings: settings,
             library: library,
+            strengthLibrary: strengthLibrary,
             openNotice: { [weak self] in
                 guard let self else { return }
                 noticeWindow.show(NoticeViewModel(

@@ -59,10 +59,10 @@ final class MenuBarViewModelTests: XCTestCase {
     // MARK: - The icon
 
     func testTheIconIsATemplateAtEveryMode() {
-        for mode in [MenuBarState.Mode.sitting, .paused, .offHours] {
+        for mode in [MenuBarState.Mode.sitting, .paused, .offHours, .away] {
             let image = MenuBarIcon.image(mode: mode, fraction: 0.5)
             XCTAssertTrue(image.isTemplate, mode.rawValue)
-            XCTAssertEqual(image.size, NSSize(width: 12, height: 12), mode.rawValue)
+            XCTAssertEqual(image.size, NSSize(width: 18, height: 18), mode.rawValue)
         }
     }
 

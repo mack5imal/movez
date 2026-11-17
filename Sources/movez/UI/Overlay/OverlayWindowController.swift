@@ -8,8 +8,14 @@ import SwiftUI
 /// misses the second display. Each has a counterpart below.
 @MainActor
 final class OverlayWindowController {
+    /// The break on screen: a movement routine, or a strength or end-range session.
+    private enum Session {
+        case routine(OverlayViewModel)
+        case timeline(StrengthOverlayViewModel)
+    }
+
     private(set) var windows: [NSWindow] = []
-    private(set) var viewModel: OverlayViewModel?
+    private var session: Session?
     private var keyMonitor: Any?
     private var previousApp: NSRunningApplication?
     private var screenObserver: NSObjectProtocol?
@@ -22,6 +28,11 @@ final class OverlayWindowController {
     /// How long the dim takes to fade when a break ends well.
     static let dismissFade: TimeInterval = 0.3
 
+    var viewModel: OverlayViewModel? {
+        if case let .routine(viewModel) = session { return viewModel }
+        return nil
+    }
+
     var isPresenting: Bool { !windows.isEmpty }
     var windowCount: Int { windows.count }
     var hasKeyMonitor: Bool { keyMonitor != nil }
@@ -29,9 +40,19 @@ final class OverlayWindowController {
     // MARK: - Presenting
 
     func present(_ viewModel: OverlayViewModel) {
+        present(.routine(viewModel))
+    }
+
+    /// A strength or end-range break: the same windows, focus handling and keyboard capture, with
+    /// the strength card in them.
+    func present(_ viewModel: StrengthOverlayViewModel) {
+        present(.timeline(viewModel))
+    }
+
+    private func present(_ session: Session) {
         dismiss(animated: false)
         presentation += 1
-        self.viewModel = viewModel
+        self.session = session
         previousApp = NSWorkspace.shared.frontmostApplication
 
         build()
@@ -102,9 +123,12 @@ final class OverlayWindowController {
 
     @ViewBuilder
     private func content() -> some View {
-        if let viewModel {
+        switch session {
+        case let .routine(viewModel):
             OverlayScreen(viewModel: viewModel)
-        } else {
+        case let .timeline(viewModel):
+            StrengthOverlayScreen(viewModel: viewModel)
+        case nil:
             Color.clear
         }
     }
@@ -119,18 +143,22 @@ final class OverlayWindowController {
 
     // MARK: - Keyboard
 
-    /// → and Return advance, and Space pauses or resumes. Everything else is swallowed, so a break
-    /// never types into whatever was underneath it. Escape deliberately does nothing: snoozing should be easier than
-    /// skipping, and neither should happen by reflex.
+    /// Every key is swallowed, so a break never types into whatever was underneath it; what the
+    /// few it acts on do is `OverlayKeyMap`'s. Escape deliberately does nothing: snoozing should be
+    /// easier than skipping, and neither should happen by reflex.
     private func installKeyMonitor() {
         keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
             guard let self, self.isPresenting else { return event }
-            switch event.keyCode {
-            case 124, 36, 76:
-                self.viewModel?.next()
-            case 49:
-                self.viewModel?.togglePause()
-            default:
+            switch self.session {
+            case let .routine(viewModel):
+                switch OverlayKeyMap.routine(event.keyCode) {
+                case .next: viewModel.next()
+                case .togglePause: viewModel.togglePause()
+                case .disc, .ignored: break
+                }
+            case let .timeline(viewModel):
+                viewModel.handleKey(event.keyCode)
+            case nil:
                 break
             }
             return nil
@@ -151,7 +179,7 @@ final class OverlayWindowController {
 
     /// A display plugged in or unplugged mid-break gets its own copy of the break rather than a gap.
     private func rebuildForScreenChange() {
-        guard isPresenting, viewModel != nil else { return }
+        guard isPresenting, session != nil else { return }
         closeWindows()
         build()
     }
@@ -162,7 +190,13 @@ final class OverlayWindowController {
         tickTimer?.cancel()
         let timer = DispatchSource.makeTimerSource(queue: .main)
         timer.schedule(deadline: .now() + 1, repeating: 1)
-        timer.setEventHandler { [weak self] in self?.viewModel?.tick() }
+        timer.setEventHandler { [weak self] in
+            switch self?.session {
+            case let .routine(viewModel): viewModel.tick()
+            case let .timeline(viewModel): viewModel.tick()
+            case nil: break
+            }
+        }
         timer.resume()
         tickTimer = timer
     }
@@ -183,7 +217,7 @@ final class OverlayWindowController {
         }
 
         guard !windows.isEmpty else {
-            viewModel = nil
+            session = nil
             return
         }
 
@@ -204,7 +238,7 @@ final class OverlayWindowController {
         // A newer break took over while this one was fading; it owns the windows and the focus.
         guard generation == presentation else { return }
         closeWindows()
-        viewModel = nil
+        session = nil
         // Give focus back to whatever the user was in.
         previousApp?.activate()
         previousApp = nil
@@ -235,6 +269,43 @@ final class OverlayWindowController {
     var hasKeyWindow: Bool { windows.contains { $0.isKeyWindow } }
     var windowsCanBecomeKey: Bool { windows.contains(where: \.canBecomeKey) }
     var visibleWindowCount: Int { windows.filter(\.isVisible).count }
+}
+
+/// What a key does during a break, kept apart from the event monitor so a test can ask.
+enum OverlayKeyAction: Equatable {
+    /// A movement break's Next.
+    case next
+    /// A movement break's Space.
+    case togglePause
+    /// The disc of a strength or end-range break: Done on a set, Next elsewhere.
+    case disc
+    /// Swallowed and otherwise ignored.
+    case ignored
+}
+
+/// The keys a break listens to. On a movement break → and Return advance and Space pauses; on a
+/// strength break the disc is Done, so Space presses it, and → and Return press it too. A strength
+/// break pauses only from its Pause button, so a Space meant as Done never parks the break.
+enum OverlayKeyMap {
+    static let space: UInt16 = 49
+    static let rightArrow: UInt16 = 124
+    static let returnKey: UInt16 = 36
+    static let enter: UInt16 = 76
+
+    static func routine(_ keyCode: UInt16) -> OverlayKeyAction {
+        switch keyCode {
+        case rightArrow, returnKey, enter: return .next
+        case space: return .togglePause
+        default: return .ignored
+        }
+    }
+
+    static func timeline(_ keyCode: UInt16) -> OverlayKeyAction {
+        switch keyCode {
+        case space, rightArrow, returnKey, enter: return .disc
+        default: return .ignored
+        }
+    }
 }
 
 /// One screen's worth of overlay: the dim, and the card if this is the screen the user is on.

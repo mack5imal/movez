@@ -23,8 +23,14 @@ final class SettingsWindowController {
             forName: .movezOpenSettings,
             object: nil,
             queue: .main
-        ) { [weak self] _ in
-            MainActor.assumeIsolated { self?.show() }
+        ) { [weak self] note in
+            // The dropdown names the mode whose setup it could not switch past; the window opens
+            // with that setup's sheet already showing.
+            let setupMode = (note.userInfo?[Notification.Name.modeSetupKey] as? String).flatMap(BreakMode.init(rawValue:))
+            MainActor.assumeIsolated {
+                if let setupMode { self?.viewModel.show(.openSetup(setupMode)) }
+                self?.show()
+            }
         }
     }
 

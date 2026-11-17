@@ -37,15 +37,19 @@ final class PanelEffectSink: EffectSink {
     private func present(headsUp info: HeadsUpInfo, coordinator: AppCoordinator) {
         let now = coordinator.clock.now
         let config = coordinator.settings.schedulerConfig
-        let routine = coordinator.nextRoutinePreview ?? coordinator.nextRoutine(at: now)
+        // The break this heads-up announced, which the coordinator fixed as the effect arrived.
+        let planned = coordinator.headsUpBreak?.planned ?? coordinator.nextBreak(at: now)
+        let mode = coordinator.headsUpBreak?.mode ?? coordinator.settings.mode
         let model = PanelViewModel(
             phase: .headsUp,
             clock: coordinator.clock,
             startedAt: now,
             totalSeconds: config.headsUpSeconds
         )
-        model.blockCount = routine.blocks.count
-        model.breakMinutes = max(1, config.breakSeconds / 60)
+        model.modeDefinition = mode.definition
+        model.announced = HeadsUpAnnouncement(planned)
+        model.blockCount = planned.parts.count
+        model.breakMinutes = info.breakMinutes ?? max(1, config.breakSeconds / 60)
         model.snoozesLeft = info.snoozesLeft
         model.skipsToday = info.skipsToday
         if info.showDeferredBadge {
@@ -68,7 +72,8 @@ final class PanelEffectSink: EffectSink {
             startedAt: coordinator.clock.now,
             totalSeconds: info.countInSeconds
         )
-        model.micro = micro
+        model.micro = MicroPanelBreak(micro)
+        model.modeDefinition = (coordinator.currentMicroMode ?? coordinator.settings.mode).definition
         model.microSeconds = info.seconds
         model.chimes = chimes
         model.microSnoozeUsed = coordinator.scheduler.snapshot.microSnoozeUsed

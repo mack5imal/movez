@@ -51,7 +51,12 @@ final class PanelViewModel: ObservableObject {
     var snoozesLeft = 2
     var skipsToday = 0
     var deferred: DeferredInfo?
-    var micro: MicroBreak?
+    /// The mode whose badge heads the panel. It is the mode the break or micro-break was built in,
+    /// so a mode switch while a panel is up does not relabel it.
+    var modeDefinition: ModeDefinition = .movement
+    /// The kind of full break the heads-up announces, which decides its title and body.
+    var announced: HeadsUpAnnouncement = .movement
+    var micro: MicroPanelBreak?
     /// The longest a micro-break runs, from the scheduler. The panel runs the micro-break's own
     /// length, which is shorter when it is a single movement.
     var microSeconds = 70
@@ -119,21 +124,21 @@ final class PanelViewModel: ObservableObject {
 
     // MARK: - The running micro-break
 
-    /// The block on screen: the count-in shows the first, and each later one takes over as it
+    /// The move on screen: the count-in shows the first, and each later one takes over as it
     /// appears, at the start of its lead-in.
     var microBlockIndex: Int {
         guard phase == .microRunning, let micro else { return 0 }
-        return micro.blocks.indices.last { Double(micro.appearsAt(block: $0)) <= elapsed } ?? 0
+        return micro.moves.indices.last { Double(micro.appearsAt(move: $0)) <= elapsed } ?? 0
     }
 
-    var microBlock: RoutineBlock? {
-        guard let micro, micro.blocks.indices.contains(microBlockIndex) else { return nil }
-        return micro.blocks[microBlockIndex]
+    var microBlock: MicroPanelMove? {
+        guard let micro, micro.moves.indices.contains(microBlockIndex) else { return nil }
+        return micro.moves[microBlockIndex]
     }
 
-    /// Seconds into the running micro-break at which the block on screen starts moving.
+    /// Seconds into the running micro-break at which the move on screen starts moving.
     private var microBlockStart: Double {
-        Double(micro?.startsAt(block: microBlockIndex) ?? 0)
+        Double(micro?.startsAt(move: microBlockIndex) ?? 0)
     }
 
     /// The five seconds before each movement starts, the first included.
@@ -165,21 +170,25 @@ final class PanelViewModel: ObservableObject {
 
     // MARK: - Words
 
-    var eyebrow: String {
+    /// What the mode badge says: "{MODE} BREAK" on the heads-up and "{MODE} MICRO-BREAK" on every
+    /// micro-break state. The micro panel no longer names a body area or side there; the move's
+    /// name and instruction already say both.
+    var eyebrowLabel: ModeBadge.Label? {
         switch phase {
-        case .headsUp: return OverlayState.movementBreakEyebrow
-        case .microCountIn: return MicroBreak.eyebrow(for: microBlock)
-        case .microRunning:
-            // A per-side movement says which side in the eyebrow, where it fits on one line.
-            let eyebrow = MicroBreak.eyebrow(for: microBlock)
-            return microSide == .none ? eyebrow : "\(eyebrow) · \(microSide.rawValue.uppercased()) SIDE"
-        case .toast: return ""
+        case .headsUp: return .breakEyebrow
+        case .microCountIn, .microRunning: return .microBreakEyebrow
+        case .toast: return nil
         }
+    }
+
+    var eyebrow: String {
+        guard let label = eyebrowLabel else { return "" }
+        return ModeBadge.text(for: modeDefinition, label: label)
     }
 
     var title: String {
         switch phase {
-        case .headsUp: return "Movement break in a minute"
+        case .headsUp: return announced.title
         case .microCountIn: return "\(movementName) in a moment"
         case .microRunning: return movementName
         case .toast: return toastTitle
@@ -188,15 +197,25 @@ final class PanelViewModel: ObservableObject {
 
     var body: String {
         switch phase {
-        case .headsUp: return Self.headsUpBody(minutes: breakMinutes, movements: blockCount)
+        case .headsUp: return announced.fixedBody ?? Self.headsUpBody(minutes: breakMinutes, movements: blockCount)
         case .microCountIn: return microCountInBody
-        case .microRunning: return microBlock?.movement.instructions ?? ""
+        case .microRunning:
+            guard let micro, let move = microBlock else { return "" }
+            return micro.instructions(for: move)
         case .toast: return toastSubtitle
         }
     }
 
-    /// The block on screen.
-    var movementName: String { microBlock?.movement.name ?? "" }
+    /// The move on screen.
+    var movementName: String { microBlock?.name ?? "" }
+
+    /// The dose under the move's name, written by the design's dose rule. Only a running strength
+    /// micro-break has one: the count-in's title already names the move, and Movement moves carry
+    /// no dose.
+    var microDose: DoseText? {
+        guard phase == .microRunning else { return nil }
+        return microBlock?.dose
+    }
 
     /// "Five minutes, four movements." — counts this small are spelled out.
     static func headsUpBody(minutes: Int, movements: Int) -> String {
@@ -214,12 +233,8 @@ final class PanelViewModel: ObservableObject {
         return "\(OverlayState.numberWord(minutes)) \(minuteWord), \(posture). Starts in \(remaining) \(secondWord)."
     }
 
-    /// A micro-break whose movements can only be done in a chair is done seated; one with anything
-    /// that can be done standing is standing.
-    var posture: String {
-        guard let blocks = micro?.blocks, !blocks.isEmpty else { return "standing" }
-        return blocks.allSatisfy { $0.movement.settings == [.chair] } ? "seated" : "standing"
-    }
+    /// How the micro-break is done, worded by the library that built it.
+    var posture: String { micro?.posture ?? "standing" }
 
     /// The countdown on the disc.
     ///

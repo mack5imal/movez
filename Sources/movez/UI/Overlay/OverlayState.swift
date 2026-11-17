@@ -6,7 +6,15 @@ enum BreakSide: String, Equatable {
     case left
     case right
 
-    var label: String { rawValue.capitalized }
+    /// Spelled out rather than derived from the raw value, so the words on the toggle are the
+    /// design's and a renamed case cannot change them.
+    var label: String {
+        switch self {
+        case .none: return ""
+        case .left: return "Left"
+        case .right: return "Right"
+        }
+    }
     var index: Int { self == .right ? 1 : 0 }
 }
 
@@ -27,6 +35,8 @@ struct OverlayState: Equatable {
     var phase: Phase = .running
 
     // Header
+    /// The mode the break was built in, whose badge leads the header.
+    var mode: ModeDefinition = .movement
     var eyebrow = ""
     var headerTrailing = ""
 

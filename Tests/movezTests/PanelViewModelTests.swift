@@ -40,7 +40,7 @@ final class PanelViewModelTests: XCTestCase {
             startedAt: clock.now.addingTimeInterval(remaining - 30),
             totalSeconds: 30
         )
-        model.micro = microBreak()
+        model.micro = MicroPanelBreak(microBreak())
         model.microSeconds = 60
         return model
     }
@@ -182,7 +182,7 @@ final class PanelViewModelTests: XCTestCase {
         let clock = ManualClock(now: start)
         let model = microCountIn(clock: clock)
 
-        XCTAssertEqual(model.eyebrow, "MICRO-BREAK · SHOULDERS")
+        XCTAssertEqual(model.eyebrow, "MOVEMENT MICRO-BREAK")
         XCTAssertEqual(model.title, "Arm circles in a moment")
         XCTAssertEqual(model.discNumerals, "−0:21")
         XCTAssertEqual(model.body, "One minute, standing. Starts in 21 seconds.")
@@ -199,10 +199,10 @@ final class PanelViewModelTests: XCTestCase {
 
         let clock = ManualClock(now: start)
         let model = microCountIn(clock: clock)
-        model.micro = MicroBreak(
+        model.micro = MicroPanelBreak(MicroBreak(
             id: UUID(),
             blocks: [RoutineBlock(movement: movement, seconds: 60)]
-        )
+        ))
         XCTAssertTrue(model.body.contains("seated"), model.body)
     }
 
